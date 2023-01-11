@@ -1,0 +1,9 @@
+{
+    "kind": "core/block-type",
+    "metadata": {
+        "name": "blockware/block-type-service"
+    },
+    "spec": {
+
+    }
+}

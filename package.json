@@ -1,0 +1,76 @@
+{
+    "name": "@blockware/ui-web-plan-editor",
+    "version": "0.0.1",
+    "main": "dist/cjs/index.js",
+    "module": "dist/esm/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "package.json",
+        "README.md",
+        "styles",
+        "src"
+    ],
+    "description": "Provides ReactJS components for viewing and editing Blockware plans",
+    "private": false,
+    "publishConfig": {
+        "access": "public"
+    },
+    "keywords": [
+        "blockware"
+    ],
+    "license": "MIT",
+    "scripts": {
+        "prebuild": "rm -rf dist",
+        "storybook": "start-storybook",
+        "prepublishOnly": "npm run build",
+        "start": "rollup -c -w",
+        "build": "npm run prebuild && rollup -c"
+    },
+    "peerDependencies": {
+        "@blockware/ui-web-components": "<2",
+        "@blockware/ui-web-context": "<2",
+        "@blockware/ui-web-types": "<2",
+        "@blockware/ui-web-utils": "<2",
+        "guid-typescript": "*",
+        "lodash": ">=4",
+        "react": ">=18",
+        "react-dom": ">=18"
+    },
+    "devDependencies": {
+        "@blockware/ui-web-components": "<2",
+        "@blockware/ui-web-context": "<2",
+        "@blockware/ui-web-types": "<2",
+        "@blockware/ui-web-utils": "<2",
+        "@rollup/plugin-commonjs": "^21.0.1",
+        "@rollup/plugin-node-resolve": "^13.3.0",
+        "@rollup/plugin-typescript": "^8.3.0",
+        "@sambego/storybook-state": "^2.0.1",
+        "@storybook/builder-webpack5": "^6.5.10",
+        "@storybook/manager-webpack5": "^6.5.0-rc.1",
+        "@storybook/react": "^6.5.12",
+        "@types/lodash": "^4.14.185",
+        "@types/node": "^18.7.18",
+        "@types/react": ">=18",
+        "@types/react-dom": ">=18",
+        "css-loader": "^6.7.1",
+        "json-loader": "^0.5.7",
+        "less": "^4.1.3",
+        "less-loader": "^11.0.0",
+        "lodash": "^4.17.15",
+        "react": ">=18",
+        "react-dom": ">=18",
+        "react-tabs": "^6.0.0",
+        "react-use": "^17.4.0",
+        "rollup": "^2.79.0",
+        "rollup-plugin-dts": "^4.2.2",
+        "rollup-plugin-peer-deps-external": "^2.2.4",
+        "rollup-plugin-styles": "^4.0.0",
+        "rollup-plugin-terser": "^7.0.2",
+        "style-loader": "^3.3.1",
+        "tokenizr": "^1.6.7",
+        "typescript": "^4.8.3",
+        "yaml": "^2.1.1",
+        "yaml-loader": "^0.8.0"
+    }
+}

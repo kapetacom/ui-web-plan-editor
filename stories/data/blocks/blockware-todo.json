@@ -1,0 +1,77 @@
+{
+    "kind": "blockware/block-type-service",
+    "metadata": {
+        "name": "blockware/todo"
+    },
+    "spec": {
+        "target": {
+            "kind": "blockware/language-target-java-spring-boot",
+            "options": {
+                "groupId": "org.mycompany",
+                "artifactId": "service-todo",
+                "basePackage": "org.mycompany.services.todo"
+            }
+        },
+        "entities": [ ],
+        "consumers": [
+            {
+                "kind": "blockware/resource-type-mongodb",
+                "metadata": {
+                    "name": "tasks"
+                }
+            },
+            {
+                "kind": "blockware/resource-type-rest-client",
+                "metadata": {
+                    "name": "users"
+                },
+                "spec": {
+                    "methods": {
+                        "createUser": {
+                            "description": "Create user",
+                            "method": "POST",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                },
+                                "user": {
+                                    "type": "User",
+                                    "transport": "body"
+                                }
+                            },
+                            "responseType": {
+                                "$ref": "User"
+                            }
+                        },
+                        "getUser": {
+                            "description": "Get user by id",
+                            "method": "GET",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                }
+                            },
+                            "responseType": "User"
+                        },
+                        "deleteUser": {
+                            "description": "Delete user by id",
+                            "method": "DELETE",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "providers": [ ]
+    }
+}

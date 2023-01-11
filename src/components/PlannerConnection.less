@@ -1,0 +1,55 @@
+@import "~@blockware/ui-web-components/styles/values";
+@import "~@blockware/ui-web-components/styles/functions";
+
+.planner-connection {
+
+    .mouse-catcher,.line {
+        stroke-linejoin: miter;
+        fill: none;
+    }
+
+    .mouse-catcher {
+        cursor: pointer;
+        stroke: black;
+        fill:transparent;
+        stroke-width: 30;
+        opacity: 0;
+    }
+
+    .line {
+        .transition();
+        stroke: @bw-orange;
+        stroke-width: 4;
+        stroke-linecap: round;
+    }
+
+    .background {
+        fill:transparent;
+        .transition();
+        stroke: @bw-planner-background;
+        stroke-width: 12;
+        stroke-linecap: round;
+    }
+
+    .buttons {
+        .transition();
+        stroke-dasharray: none;
+    }
+
+    &.highlight {
+        .line {
+            stroke-dasharray: 5;
+            stroke: @bw-orange-light;
+        }
+    }
+}
+
+.planner-area-container {
+    &.dragging {
+        .planner-connection {
+            .line,.background {
+                .transition(none);
+            }
+        }
+    }
+}

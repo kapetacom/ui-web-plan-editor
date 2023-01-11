@@ -1,0 +1,10 @@
+{
+    "kind": "core/resource-type-operator",
+    "metadata": {
+        "name": "blockware/resource-type-postgresql",
+        "title": "Postgres"
+    },
+    "spec": {
+
+    }
+}

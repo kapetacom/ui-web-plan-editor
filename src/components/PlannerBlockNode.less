@@ -1,0 +1,123 @@
+@import "~@blockware/ui-web-components/styles/values";
+@import "~@blockware/ui-web-components/styles/functions";
+
+.planner-block-node {
+    .transition(d 100ms);
+    .transition(transform 150ms);
+    overflow: visible;
+
+    &.block-dragging{
+        .transition(transform 0ms);
+    }
+
+    & > .mouse-catcher {
+        cursor: move;
+    }
+
+
+    .block-actions {
+        .svg-button {
+            .transition(transform 200ms);
+
+
+            &.inspect {
+                .transform(translate(25px, -40px));
+                .svg-button-background {
+                    fill: #00909e;
+                    stroke: #00909e
+                }
+            }
+
+            &.delete {
+                .transform(translate(0px, -40px));
+                transition-delay: 80ms;
+            }
+
+            &.edit {
+                .transform(translate(-25px, -40px));
+                transition-delay: 160ms;
+            }
+
+            &:hover {
+                .svg-button-background {
+                    fill: white;
+                }
+            }
+        }
+    }
+
+    .block-body-text.instance-name {
+        .pointer-event-all();
+
+    }
+
+    .instance-name-container {
+        cursor: text;
+        .pointer-event-all();
+
+        &:hover {
+            .background {
+                fill: rgba(255,255,255, 0.1);
+            }
+
+            .edit {
+                cursor: pointer;
+                visibility: visible;
+
+                &:hover {
+                    fill: @gray-xdark;
+                }
+            }
+        }
+    }
+
+    .block-body {
+        cursor: move;
+    }
+
+    &:not(.highlight,.focused-link) {
+        .block-action-container:hover,
+        &.buttons-visible {
+            .block-actions {
+                .svg-button {
+
+                    &.edit,
+                    &.delete,
+                    &.inspect {
+                        .transform(translate(0,0));
+                    }
+                }
+            }
+        }
+    }
+
+    &.invalid {
+        .block-node .block-body {
+            fill: @status-warning-fg;
+        }
+    }
+
+    &.focused-link {
+        .block-body {
+            cursor: pointer;
+        }
+
+        .instance-name-container {
+            cursor: default;
+            pointer-events: none;
+
+            .block-body-text {
+                pointer-events: none;
+            }
+        }
+    }
+}
+
+.planner-block-node-container {
+    width: 150px;
+    &.linked-block {
+        .planner-resource-list {
+            pointer-events: none;
+        }
+    }
+}

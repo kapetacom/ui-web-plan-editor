@@ -1,0 +1,93 @@
+@import "~@blockware/ui-web-components/styles/values";
+@import "~@blockware/ui-web-components/styles/functions";
+
+.block-node {
+    overflow: visible;
+
+    .instance_exited {
+        fill: @red;
+    }
+
+    .instance_stopped {
+        fill: #ccc;
+    }
+
+    .instance_ready {
+        fill: lightgreen;
+    }
+
+    .instance_unhealthy {
+        fill: yellow;
+    }
+    
+    .instance_starting {
+        fill: lightgreen;
+        animation: blinker 1s linear infinite;
+    }
+
+    @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+    }
+
+    .block-body {
+        .transition(fill 150ms);
+        fill: @bw-service-bg;
+        stroke: transparent;
+        stroke-width: 1.5
+    }
+
+    .block-body-text {
+        .pointer-event-none();
+        .transition();
+        font-family: inherit;
+        text-anchor: middle;
+        fill: white;
+        transform-origin: top left;
+
+        &.instance-name {
+            font-weight: 500;
+            font-size: 20px;
+            line-height: 27px;
+        }
+
+        &.block-name,
+        &.block-version,
+        &.block-handle {
+            font-size: 10px;
+            line-height: 14px;
+        }
+
+        &.block-name {
+            font-size: 12px;
+            line-height: 16px;
+        }
+
+        .edit {
+            visibility: hidden;
+        }
+
+        .background {
+            fill: rgba(255,255,255,0);
+        }
+    }
+
+    &.extension {
+        .block-body {
+            fill: @bw-extension-bg;
+        }
+    }
+
+    &.database {
+        .block-body {
+            fill: @bw-database-bg;
+        }
+    }
+
+    &.highlight {
+        .block-body {
+            fill: @bw-orange-light;
+        }
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "kind": "core/resource-type-internal",
+    "metadata": {
+        "name": "blockware/resource-type-rest-api",
+        "title": "Rest API"
+    },
+    "spec": {
+
+    }
+}

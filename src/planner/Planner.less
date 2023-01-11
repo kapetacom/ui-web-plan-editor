@@ -1,0 +1,190 @@
+@import "~@blockware/ui-web-components/styles/values";
+@import "~@blockware/ui-web-components/styles/functions";
+
+
+.focus-toolbar {
+  .transition(all 500ms);
+  position: fixed;
+  width: calc(100vw - 300px);
+  z-index: 1;
+  top: 34px;
+  height: 34px;
+  display: flex;
+  flex-direction: row;
+  opacity: 1;
+  background-color: @bw-planner-background;
+  border-bottom: 2px solid @bw-planner-background;
+
+  &.client-block-focus {
+    border-bottom: 2px solid @bw-orange;
+  }
+
+  .focus-toolbox-back {
+    background-color: @gray;
+    height: 100%;
+    float: left;
+    text-align: center;
+    width: 28px;
+
+    svg {
+      padding-top: 13px;
+      stroke-width: 2px;
+    }
+  }
+
+  .focused-block-info {
+    display: flex;
+    height: 30px;
+
+    p {
+      vertical-align: middle;
+      margin: auto;
+      padding-top: 8px;
+      display: flex;
+      font-size: 10px;
+      color: @gray-xdark;
+      justify-content: center;
+      padding-left: 5px;
+    }
+
+    padding-left: 30px;
+
+    svg {
+      padding-top: 8px;
+      height: 20px;
+    }
+  }
+
+  &.focus-toolbar-hidden {
+    .transition();
+    top: -30px;
+    height: 0;
+  }
+}
+
+
+.planner-area-container {
+  position: fixed;
+  overflow: visible;
+  min-height: 100vh;
+
+  .focused-block-side-info {
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    width: 300px;
+    height: 100%;
+  }
+
+  .zoom-buttons {
+    :last-child {
+      .transition();
+    }
+
+    position: fixed;
+    overflow: visible;
+    top: calc(100% - 100px);
+    right: 400px;
+
+    .zoom-reset-hidden {
+      overflow: visible;
+      transform: translate(-0, 20px);
+      opacity: 0;
+    }
+  }
+
+  .planner-temp-resource-item {
+    position: absolute;
+  }
+  .planner-area-scroll {
+    .transition(background 500ms);
+
+    height: calc(100vh - 40px);
+    width: calc(100vw - 300px);
+    background-color: @bw-planner-background;
+
+    &.focused-planner {
+      background-color: @gray-background;
+
+      .planner-connection {
+        path.background {
+          stroke: @gray-background;
+        }
+      }
+
+    }
+
+    overflow: scroll;
+
+    .planner-zoom-panel {
+      background-color: #23423444;
+      overflow: visible;
+      position: relative;
+      width: inherit;
+      top: 0;
+      left: 0;
+      height: inherit;
+      .transition();
+    }
+
+    .connection-hidden {
+      opacity: 0;
+    }
+  }
+}
+
+.planner-area-canvas {
+  .no-select();
+  .transition();
+  background-color: @bw-planner-background;
+  position: relative;
+  transform-origin: 0px 0px;
+
+  .planner-block {
+    user-select: none;
+    display: none;
+    transition: all 200ms;
+    opacity: 0;
+  }
+
+  .linked-block {
+    .transition();
+    opacity: 0.65;
+  }
+
+  .hovered-block {
+    .transition();
+    opacity: 1;
+  }
+
+  .planner-focused-block {
+    transition: all 200ms;
+    opacity: 1;
+  }
+
+  .planner-draw {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+  }
+
+}
+
+.planner-toolbox-container {
+  flex: 1;
+}
+
+.planner-canvas,
+.planner-draw,
+.planner-connections,
+.planner-area-canvas,
+.planner-block-node-container,
+.planner-canvas svg,
+.planner-area-canvas svg {
+  overflow: visible;
+}
+
+.planner-block-node-container {
+  position: absolute;
+}
