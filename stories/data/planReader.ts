@@ -1,6 +1,6 @@
-import PlannerModelReader from "../../src/planner/PlannerModelReader";
-import BlockServiceMock from "./BlockServiceMock";
-import PlannerData from './blocksMockData';
+import {PlannerModelReader} from "../../src/planner/PlannerModelReader";
+import {BlockServiceMock} from "./BlockServiceMock";
+import {PlannerData} from './PlannerData';
 
 export function readPlan() {
 

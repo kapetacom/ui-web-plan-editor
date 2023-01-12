@@ -17,16 +17,16 @@ import {
 import {BlockTypeProvider, ResourceTypeProvider} from "@blockware/ui-web-context";
 
 
-import PlannerBlockModelWrapper from "../../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
 import {BlockMode} from "../../wrappers/wrapperHelpers";
-import PlannerResourceModelWrapper from "../../wrappers/PlannerResourceModelWrapper";
-import Planner from "../Planner";
-import EditPanelHelper from "./EditPanelHelper";
+import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
+import {Planner} from "../Planner";
+import {EditPanelHelper} from "./EditPanelHelper";
 
 /**
  * Helper class for handling drag-n-drop in the Planner UI
  */
-export default class DnDHelper {
+export class DnDHelper {
 
     private planner: Planner;
 

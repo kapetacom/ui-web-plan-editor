@@ -1,5 +1,5 @@
 import React from 'react';
-import PlannerConnectionModelWrapper from "../wrappers/PlannerConnectionModelWrapper";
+import {PlannerConnectionModelWrapper} from "../wrappers/PlannerConnectionModelWrapper";
 
 import { BlockConnectionSpec, DataWrapper, ItemType, Point } from "@blockware/ui-web-types";
 import { toClass } from "@blockware/ui-web-utils";
@@ -9,8 +9,8 @@ import { PlannerNodeSize } from '../types';
 
 import './PlannerConnection.less';
 import { observer } from "mobx-react";
-import PlannerConnectionButtons from "./PlannerConnectionButtons";
-import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
+import {PlannerConnectionButtons} from "./PlannerConnectionButtons";
+import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 
 interface PlannerConnectionProps {
     size: PlannerNodeSize;
@@ -30,7 +30,7 @@ interface PlannerConnectionState {
 }
 
 @observer
-export default class PlannerConnection extends React.Component<PlannerConnectionProps, PlannerConnectionState> {
+export class PlannerConnection extends React.Component<PlannerConnectionProps, PlannerConnectionState> {
 
     constructor(props: any) {
         super(props);

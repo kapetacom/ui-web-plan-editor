@@ -5,9 +5,9 @@ import {ItemType, ResourceRole} from "@blockware/ui-web-types";
 import {toClass} from "@blockware/ui-web-utils";
 
 import {PlannerNodeSize} from "../types";
-import PlannerBlockResourceListItem from "./PlannerBlockResourceListItem";
-import PlannerResourceModelWrapper from "../wrappers/PlannerResourceModelWrapper";
-import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockResourceListItem} from "./PlannerBlockResourceListItem";
+import {PlannerResourceModelWrapper} from "../wrappers/PlannerResourceModelWrapper";
+import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 import { PlannerModelWrapper } from "../wrappers/PlannerModelWrapper";
 import {BlockMode} from "../wrappers/wrapperHelpers";
 
@@ -24,7 +24,7 @@ export interface PlannerBlockResourceListProps {
 }
 
 @observer
-class PlannerBlockResourceList extends Component<PlannerBlockResourceListProps, any> {
+export class PlannerBlockResourceList extends Component<PlannerBlockResourceListProps, any> {
 
     constructor(props: PlannerBlockResourceListProps) {
         super(props);
@@ -108,5 +108,4 @@ class PlannerBlockResourceList extends Component<PlannerBlockResourceListProps, 
     }
 }
 
-export default PlannerBlockResourceList;
 

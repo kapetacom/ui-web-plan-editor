@@ -6,11 +6,11 @@ import { ResourceRole } from "@blockware/ui-web-types";
 import { BasisCurve } from "@blockware/ui-web-utils";
 import { ResourceTypeProvider } from '@blockware/ui-web-context';
 
-import PlannerResourceModelWrapper from "./PlannerResourceModelWrapper";
+import {PlannerResourceModelWrapper} from "./PlannerResourceModelWrapper";
 import { PlannerModelWrapper } from "./PlannerModelWrapper";
 import { PlannerNodeSize } from "../types";
 
-export default class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectionSpec> {
+export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectionSpec> {
     @observable
     id: string;
 

@@ -1,4 +1,4 @@
-import PlannerBlockModelWrapper from "./wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "./wrappers/PlannerBlockModelWrapper";
 import { Point } from "@blockware/ui-web-types";
 
 export enum PlannerNodeSize {

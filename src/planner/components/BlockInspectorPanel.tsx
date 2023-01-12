@@ -4,7 +4,7 @@ import {action, makeObservable, observable} from "mobx";
 import {PanelSize, SidePanel, TabContainer, TabPage} from "@blockware/ui-web-components";
 import {InstanceEventType, InstanceService} from "@blockware/ui-web-context";
 
-import PlannerBlockModelWrapper from "../../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
 import {LogEmitter, LogEntry, LogPanel} from "../../logs/LogPanel";
 
 import './BlockInspectorPanel.less';
@@ -17,7 +17,7 @@ interface BlockInspectorPanelProps {
 }
 
 @observer
-export default class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
+export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
 
     private sidePanel: SidePanel | null = null;
 

@@ -1,18 +1,17 @@
 import React from 'react';
-import {storiesOf} from '@storybook/react';
 
 import {Loader} from "@blockware/ui-web-components";
 import {InstanceStatus} from "@blockware/ui-web-context";
 import {BlockInstanceSpec, ResourceRole, BlockKind, BlockType} from "@blockware/ui-web-types";
 
-import Planner from '../src/planner/Planner';
-
-import PlannerBlockNode from '../src/components/PlannerBlockNode';
-import PlannerBlockResourceList from '../src/components/PlannerBlockResourceList';
-import PlannerBlockResourceListItem from '../src/components/PlannerBlockResourceListItem';
-
-import {ResourceMode} from "../src/wrappers/wrapperHelpers";
-import {PlannerNodeSize} from '../src/types';
+import {
+    Planner,
+    PlannerBlockNode,
+    PlannerBlockResourceList,
+    PlannerBlockResourceListItem,
+    ResourceMode,
+    PlannerNodeSize
+} from '../src';
 
 import {readPlan} from "./data/planReader";
 

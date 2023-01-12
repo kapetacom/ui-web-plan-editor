@@ -1,7 +1,7 @@
 
 import {ConnectionMethodMappingType, PLAN_KIND, PlanKind} from "@blockware/ui-web-types";
 
-const PlannerData: PlanKind = {
+export const PlannerData: PlanKind = {
     kind: PLAN_KIND,
     metadata: {
         name: 'blockware/my-todo-system',
@@ -96,4 +96,3 @@ const PlannerData: PlanKind = {
 };
 
 
-export default PlannerData;

@@ -1,18 +1,20 @@
 import {action, makeObservable, observable, toJS} from "mobx";
 import { DataWrapper, ItemType } from "@blockware/ui-web-types";
 
-import Planner from "../Planner";
-import PlannerResourceModelWrapper from "../../wrappers/PlannerResourceModelWrapper";
+import {Planner} from "../Planner";
+import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
 import {BlockMode, ResourceMode} from "../../wrappers/wrapperHelpers";
-import PlannerBlockModelWrapper from "../../wrappers/PlannerBlockModelWrapper";
-import PlannerConnectionModelWrapper from "../../wrappers/PlannerConnectionModelWrapper";
+import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
+import {
+    PlannerConnectionModelWrapper
+} from "../../wrappers/PlannerConnectionModelWrapper";
 import type {EditableItemInterface} from "../../wrappers/models";
 
 
 /**
  * Helper class for handling editing items in the Planner UI
  */
-export default class EditPanelHelper {
+export class EditPanelHelper {
 
     private planner:Planner;
 

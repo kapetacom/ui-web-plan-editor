@@ -1,18 +1,18 @@
 import {action, makeObservable, observable, toJS} from "mobx";
 import {PlannerNodeSize} from "../types";
 
-import PlannerBlockModelWrapper from "./PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "./PlannerBlockModelWrapper";
 
 
-import {BlockMode, ResourceMode} from "./wrapperHelpers";
 import type {DataWrapper, ResourceKind, Dimensions, Point} from "@blockware/ui-web-types";
+import {BlockMode, ResourceMode} from "./wrapperHelpers";
 import {ResourceRole} from "@blockware/ui-web-types";
 import { ResourceTypeProvider } from "@blockware/ui-web-context";
-import PlannerConnectionModelWrapper from "./PlannerConnectionModelWrapper";
+import {PlannerConnectionModelWrapper} from "./PlannerConnectionModelWrapper";
 
 const DEFAULT_EXTENSION_SIZE = 110;
 
-export default class PlannerResourceModelWrapper<T = any> implements DataWrapper<ResourceKind> {
+export class PlannerResourceModelWrapper<T = any> implements DataWrapper<ResourceKind> {
 
     readonly block:PlannerBlockModelWrapper;
 

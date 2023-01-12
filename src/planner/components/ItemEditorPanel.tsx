@@ -20,9 +20,11 @@ import {ResourceKind} from "@blockware/ui-web-types";
 
 
 import {EditableItemInterface} from "../../wrappers/models";
-import PlannerConnectionModelWrapper from "../../wrappers/PlannerConnectionModelWrapper";
-import PlannerBlockModelWrapper from "../../wrappers/PlannerBlockModelWrapper";
-import PlannerResourceModelWrapper from "../../wrappers/PlannerResourceModelWrapper";
+import {
+    PlannerConnectionModelWrapper
+} from "../../wrappers/PlannerConnectionModelWrapper";
+import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
+import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
 
 import './ItemEditorPanel.less';
 
@@ -45,7 +47,7 @@ interface ItemEditorPanelProps {
 }
 
 @observer
-export default class ItemEditorPanel extends Component<ItemEditorPanelProps> {
+export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
 
     @observable
     private editedSchema?: SchemaKind;

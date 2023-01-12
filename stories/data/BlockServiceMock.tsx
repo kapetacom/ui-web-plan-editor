@@ -1,8 +1,8 @@
 import React from 'react';
 import {BlockService, BlockTypeProvider, ResourceTypeProvider} from "@blockware/ui-web-context";
-import {BlockConfigProps, ResourceRole, ResourceType} from "@blockware/ui-web-types";
+import {ResourceRole, ResourceType} from "@blockware/ui-web-types";
 
-const BlockServiceMock = BlockService;
+export const BlockServiceMock = BlockService;
 
 const blocks = [
     require('./blocks/blockware-user.json'),
@@ -82,5 +82,3 @@ BlockServiceMock.get = async (ref) => {
     }
     return out;
 };
-
-export default BlockServiceMock;

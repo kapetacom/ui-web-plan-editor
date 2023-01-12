@@ -14,12 +14,12 @@ import {
 
 
 import { PlannerNodeSize } from '../types';
-import PlannerResourceModelWrapper from "../wrappers/PlannerResourceModelWrapper";
+import {PlannerResourceModelWrapper} from "../wrappers/PlannerResourceModelWrapper";
 import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
-import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 
 import { ResourceMode } from "../wrappers/wrapperHelpers";
-import BlockResource from "./BlockResource";
+import { BlockResource} from "./BlockResource";
 
 import './PlannerBlockResourceListItem.less';
 
@@ -48,7 +48,7 @@ interface PlannerBlockResourceListItemState {
 }
 
 @observer
-class PlannerBlockResourceListItem extends Component<PlannerBlockResourceListItemProps, PlannerBlockResourceListItemState>{
+export class PlannerBlockResourceListItem extends Component<PlannerBlockResourceListItemProps, PlannerBlockResourceListItemState>{
 
 
     private container: SVGSVGElement | null = null;
@@ -407,5 +407,3 @@ class PlannerBlockResourceListItem extends Component<PlannerBlockResourceListIte
         )
     }
 }
-
-export default PlannerBlockResourceListItem;

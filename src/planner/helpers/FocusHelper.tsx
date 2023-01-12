@@ -2,17 +2,19 @@ import React from "react";
 
 import {Point, ResourceRole, Size} from "@blockware/ui-web-types";
 
-import PlannerBlockModelWrapper from "../../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
 import {FocusPositioningData, PlannerNodeSize, ZoomAreaMap, NeighboringBlocks} from "../../types";
 import {PlannerModelWrapper} from "../../wrappers/PlannerModelWrapper";
-import PlannerConnectionModelWrapper from "../../wrappers/PlannerConnectionModelWrapper";
-import PlannerFocusSideBar from "../PlannerFocusSideBar";
+import {
+    PlannerConnectionModelWrapper
+} from "../../wrappers/PlannerConnectionModelWrapper";
+import {PlannerFocusSideBar} from "../PlannerFocusSideBar";
 
 export const POSITIONING_DATA = "preFocusPosition";
 export const FOCUSED_ID = "focusedID";
 const OFFSET_FROM_TOP = 20;
 
-export default class FocusHelper {
+export class FocusHelper {
 
 
     private plan: PlannerModelWrapper;

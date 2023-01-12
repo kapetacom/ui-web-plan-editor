@@ -5,7 +5,7 @@ import { SVGButtonEdit, SVGButtonDelete, SVGButtonWarning, SVGButtonInspect } fr
 import { ResourceTypeProvider } from "@blockware/ui-web-context";
 
 import './PlannerConnectionButtons.less';
-import PlannerConnectionModelWrapper from "../wrappers/PlannerConnectionModelWrapper";
+import {PlannerConnectionModelWrapper} from "../wrappers/PlannerConnectionModelWrapper";
 
 function makeButtonBg(x:number, y:number, height:number, lineLength:number) {
 
@@ -42,7 +42,7 @@ interface PlannerConnectionButtonsPropsState {
     over: boolean
 }
 
-export default class PlannerConnectionButtons extends React.Component<PlannerConnectionButtonsProps, PlannerConnectionButtonsPropsState> {
+export class PlannerConnectionButtons extends React.Component<PlannerConnectionButtonsProps, PlannerConnectionButtonsPropsState> {
 
     private ix:number = ID_IX++;
 

@@ -6,7 +6,9 @@ import { Modal, ModalSize } from "@blockware/ui-web-components";
 import {TrafficService, TrafficEventType,  ResourceTypeProvider} from "@blockware/ui-web-context";
 import { ConnectionMethodsMapping, Traffic } from "@blockware/ui-web-types";
 
-import PlannerConnectionModelWrapper from "../../wrappers/PlannerConnectionModelWrapper"
+import {
+    PlannerConnectionModelWrapper
+} from "../../wrappers/PlannerConnectionModelWrapper"
 
 interface InspectConnectionWrapperProps {
     connection: PlannerConnectionModelWrapper,
@@ -19,7 +21,7 @@ interface InspectConnectionWrapperState {
 }
 
 @observer
-export default class InspectConnectionPanel extends Component<InspectConnectionWrapperProps, InspectConnectionWrapperState>{
+export class InspectConnectionPanel extends Component<InspectConnectionWrapperProps, InspectConnectionWrapperState>{
 
     @observable
     private trafficLines: Traffic[] = []

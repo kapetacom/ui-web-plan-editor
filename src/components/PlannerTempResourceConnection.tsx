@@ -6,9 +6,8 @@ import './PlannerBlockResourceListItem.less';
 
 import { PlannerNodeSize } from "../types";
 
-import PlannerConnection from "./PlannerConnection";
-
-import PlannerConnectionModelWrapper from '../wrappers/PlannerConnectionModelWrapper';
+import {PlannerConnection} from "./PlannerConnection";
+import {PlannerConnectionModelWrapper} from '../wrappers/PlannerConnectionModelWrapper';
 import {SelectedResourceItem} from "../wrappers/models";
 
 
@@ -19,7 +18,7 @@ export interface PlannerTempResourceConnectionProps {
 
 
 @observer
-class PlannerTempResourceConnection extends Component<PlannerTempResourceConnectionProps> {
+export class PlannerTempResourceConnection extends Component<PlannerTempResourceConnectionProps> {
 
     constructor(props: PlannerTempResourceConnectionProps) {
         super(props);
@@ -60,5 +59,3 @@ class PlannerTempResourceConnection extends Component<PlannerTempResourceConnect
         )
     }
 }
-
-export default PlannerTempResourceConnection;

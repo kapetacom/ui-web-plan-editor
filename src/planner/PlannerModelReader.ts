@@ -2,15 +2,15 @@ import {BlockStore} from "@blockware/ui-web-context";
 import {BlockReference, BlockInstanceSpec, PlanKind, BlockKind} from "@blockware/ui-web-types";
 
 import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
-import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
-import PlannerConnectionModelWrapper from "../wrappers/PlannerConnectionModelWrapper";
+import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
+import {PlannerConnectionModelWrapper} from "../wrappers/PlannerConnectionModelWrapper";
 import Path from 'path';
 
 function toReferenceId(block: BlockReference) {
     return block.ref;
 }
 
-export default class PlannerModelReader {
+export class PlannerModelReader {
     private readonly blockStore: BlockStore;
 
     constructor(blockStore:BlockStore) {

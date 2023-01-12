@@ -3,10 +3,10 @@ import { BlockConfig } from "@blockware/ui-web-types";
 import {InstanceStatus} from "@blockware/ui-web-context";
 
 import { PlannerToolboxPainterProps } from "./PlannerToolbox";
-import BlockNode from "../../components/BlockNode";
+import {BlockNode} from "../../components/BlockNode";
 
 
-export default function PlannerToolboxBlock(props: PlannerToolboxPainterProps<BlockConfig>) {
+export function PlannerToolboxBlock(props: PlannerToolboxPainterProps<BlockConfig>) {
 
     return (
         <svg width={120} height={120}>

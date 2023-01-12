@@ -6,16 +6,16 @@ import {ResourceTypeProvider} from "@blockware/ui-web-context";
 import './PlannerBlockResourceListItem.less';
 
 import {PlannerNodeSize} from "../types";
-import PlannerResourceModelWrapper from "../wrappers/PlannerResourceModelWrapper";
-import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
+import {PlannerResourceModelWrapper} from "../wrappers/PlannerResourceModelWrapper";
+import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
 
 import {RESOURCE_SPACE} from "./PlannerBlockResourceListItem";
 
-import BlockResource from "./BlockResource";
+import {BlockResource} from "./BlockResource";
 import {BlockMode, ResourceMode} from '../wrappers/wrapperHelpers';
 
-import PlannerConnectionModelWrapper from '../wrappers/PlannerConnectionModelWrapper';
+import {PlannerConnectionModelWrapper} from '../wrappers/PlannerConnectionModelWrapper';
 import {SelectedResourceItem} from '../wrappers/models';
 import { asHTMLElement, DOMElement } from "@blockware/ui-web-utils";
 import {observer} from "mobx-react";
@@ -35,7 +35,7 @@ export interface PlannerTempResourceItemState {
 }
 
 @observer
-class PlannerTempResourceItem extends Component<PlannerTempResourceItemProps, PlannerTempResourceItemState> {
+export class PlannerTempResourceItem extends Component<PlannerTempResourceItemProps, PlannerTempResourceItemState> {
 
     private compatibleResources: PlannerResourceModelWrapper[] = [];
     private elm: DOMElement | null = null;
@@ -240,5 +240,3 @@ class PlannerTempResourceItem extends Component<PlannerTempResourceItemProps, Pl
         )
     }
 }
-
-export default PlannerTempResourceItem;

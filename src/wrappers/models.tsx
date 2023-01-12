@@ -1,4 +1,4 @@
-import PlannerResourceModelWrapper from "./PlannerResourceModelWrapper";
+import {PlannerResourceModelWrapper} from "./PlannerResourceModelWrapper";
 import { DataWrapper, ItemType } from "@blockware/ui-web-types";
 
 export interface SelectedResourceItem {

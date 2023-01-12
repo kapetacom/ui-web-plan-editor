@@ -15,27 +15,29 @@ import {
     InstanceStatus
 } from "@blockware/ui-web-context";
 
-import PlannerBlockNode from "../components/PlannerBlockNode";
-import PlannerTempResourceItem from '../components/PlannerTempResourceItem';
 import type {BlockPositionCache, ZoomAreaMap} from "../types";
+import {PlannerBlockNode} from "../components/PlannerBlockNode";
+import {PlannerTempResourceItem} from '../components/PlannerTempResourceItem';
 import {PlannerNodeSize} from "../types";
-import PlannerConnection from "../components/PlannerConnection";
+import {PlannerConnection} from "../components/PlannerConnection";
 import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
-import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
-import PlannerConnectionModelWrapper from "../wrappers/PlannerConnectionModelWrapper";
-import PlannerTempResourceConnection from "../components/PlannerTempResourceConnection";
+import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
+import {PlannerConnectionModelWrapper} from "../wrappers/PlannerConnectionModelWrapper";
+import {
+    PlannerTempResourceConnection
+} from "../components/PlannerTempResourceConnection";
 
-import PlannerToolbox from "./components/PlannerToolbox";
-import InspectConnectionPanel from './components/InspectConnectionPanel';
-import ItemEditorPanel from "./components/ItemEditorPanel";
-import BlockInspectorPanel from "./components/BlockInspectorPanel";
+import {PlannerToolbox} from "./components/PlannerToolbox";
+import {InspectConnectionPanel} from './components/InspectConnectionPanel';
+import {ItemEditorPanel} from "./components/ItemEditorPanel";
+import {BlockInspectorPanel} from "./components/BlockInspectorPanel";
 
-import FocusHelper, {FOCUSED_ID, POSITIONING_DATA} from "./helpers/FocusHelper";
-import DnDHelper from "./helpers/DnDHelper";
-import EditPanelHelper from "./helpers/EditPanelHelper";
-import InspectBlockPanelHelper from "./helpers/InspectBlockPanelHelper";
+import {FOCUSED_ID, FocusHelper, POSITIONING_DATA} from "./helpers/FocusHelper";
+import {DnDHelper} from "./helpers/DnDHelper";
+import {EditPanelHelper} from "./helpers/EditPanelHelper";
+import {InspectBlockPanelHelper} from "./helpers/InspectBlockPanelHelper";
 
-import SVGDropShadow from "../utils/SVGDropShadow";
+import {SVGDropShadow} from "../utils/SVGDropShadow";
 
 
 import "./Planner.less";
@@ -71,7 +73,7 @@ export interface PlannerState {
 const zoomStep = 0.25;
 
 @observer
-export default class Planner extends React.Component<PlannerProps, PlannerState> {
+export class Planner extends React.Component<PlannerProps, PlannerState> {
 
     private readonly blockListObserver: Lambda;
     private readonly connectionListObserver: Lambda;
@@ -158,7 +160,7 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
             .then(instanceStatuses => this.updateRunningBlockStatus(instanceStatuses))
             .catch(() => {});
 
-        
+
         this.instanceServiceUnsubscriber = InstanceService.subscribe(this.props.systemId, InstanceEventType.EVENT_INSTANCE_CHANGED, this.onInstanceStatusChanged);
         this.props.plan.blocks.forEach(block => {
             this.instanceServiceExitedUnsubscribers.push(InstanceService.subscribe(block.id, InstanceEventType.EVENT_INSTANCE_EXITED, this.onInstanceStatusExited));

@@ -18,7 +18,8 @@ const INITIAL_POINTS =[{ x: 0, y: 0 },
     { x: 0, y: 0 },
     { x: 19, y: 7 },
     { x: 20, y: 7 }]
-const PlannerBlockWarningTag = (props: PlannerBlockWarningTagProps) => {
+
+export const PlannerBlockWarningTag = (props: PlannerBlockWarningTagProps) => {
     const [id] = useState(Guid.create().toString());
     const warningTag = "warning-tag_"+id;
     const warningTagSign = "warning-tag-sign_"+id;
@@ -73,5 +74,3 @@ const PlannerBlockWarningTag = (props: PlannerBlockWarningTagProps) => {
 
     )
 }
-
-export default PlannerBlockWarningTag;

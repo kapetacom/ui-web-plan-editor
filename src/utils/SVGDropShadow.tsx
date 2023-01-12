@@ -1,6 +1,6 @@
 import React from 'react';
 
-function SVGDropShadow() {
+export function SVGDropShadow() {
 
     return (
         <defs>
@@ -20,5 +20,3 @@ function SVGDropShadow() {
         </defs>
     );
 }
-
-export default SVGDropShadow;

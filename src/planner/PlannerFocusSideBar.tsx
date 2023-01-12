@@ -2,10 +2,10 @@ import React, {useEffect, useRef} from "react";
 
 import {SidePanel, PanelAlignment, PanelSize, SidePanelHeader} from "@blockware/ui-web-components";
 
-import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
 
-import BlockTree from "./components/BlockTree";
+import {BlockTree} from "./components/BlockTree";
 
 import "./PlannerFocusSideBar.less";
 
@@ -20,7 +20,7 @@ interface Props {
 }
 
 
-const PlannerFocusSideBar = (props: Props) => {
+export const PlannerFocusSideBar = (props: Props) => {
 
     const focusPanel = useRef<SidePanel>();
 
@@ -71,6 +71,3 @@ const PlannerFocusSideBar = (props: Props) => {
         </SidePanel>
     )
 }
-
-
-export default PlannerFocusSideBar;

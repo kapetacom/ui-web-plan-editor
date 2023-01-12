@@ -4,7 +4,7 @@ import { SVGText, SVGAutoSizeText } from "@blockware/ui-web-components";
 import { InstanceStatus } from "@blockware/ui-web-context";
 
 import './BlockNode.less';
-import PlannerBlockWarningTag from "./PlannerBlockWarningTag";
+import {PlannerBlockWarningTag} from "./PlannerBlockWarningTag";
 import { Guid } from "guid-typescript";
 import { Point } from "@blockware/ui-web-types";
 
@@ -25,7 +25,7 @@ interface BlockNodeProps {
     onInstanceNameChange?: (newName: string) => void
 }
 
-export default function BlockNode(props: BlockNodeProps) {
+export function BlockNode(props: BlockNodeProps) {
     const maxWidth = props.width - 20;
     const typeFullName = props.typeName || 'unknown/unknown';
     const [typeHandle, typeName] = typeFullName.split('/');

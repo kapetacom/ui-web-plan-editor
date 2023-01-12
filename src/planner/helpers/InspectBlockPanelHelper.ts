@@ -1,15 +1,15 @@
 import {action, makeObservable, observable} from "mobx";
 import type { DataWrapper, ItemType } from "@blockware/ui-web-types";
 
-import Planner from "../Planner";
+import {Planner} from "../Planner";
 import {BlockMode} from "../../wrappers/wrapperHelpers";
-import PlannerBlockModelWrapper from "../../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
 
 
 /**
  * Helper class for handling inspecting blocks in the Planner UI
  */
-export default class InspectBlockPanelHelper {
+export class InspectBlockPanelHelper {
 
     private planner:Planner;
 

@@ -15,11 +15,11 @@ import {
 
 
 import {PlannerNodeSize} from '../types';
-import PlannerBlockResourceList from './PlannerBlockResourceList';
-import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockResourceList} from './PlannerBlockResourceList';
+import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
 import {BlockMode} from "../wrappers/wrapperHelpers";
-import BlockNode from "./BlockNode";
+import {BlockNode} from "./BlockNode";
 
 import './PlannerBlockNode.less';
 
@@ -38,7 +38,7 @@ interface PlannerBlockNodeProps {
 }
 
 @observer
-export default class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any> {
+export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any> {
 
     private container: SVGPathElement | null = null;
 

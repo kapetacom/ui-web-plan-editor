@@ -19,7 +19,7 @@ interface PlannerResourceProps {
 
 }
 
-export default function BlockResource(props:PlannerResourceProps) {
+export function BlockResource(props:PlannerResourceProps) {
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const isSmall = nodeSize === PlannerNodeSize.SMALL;

@@ -6,7 +6,7 @@ import {ResourceTypeProvider} from "@blockware/ui-web-context";
 import { ResourceConfig, ComponentType, ResourceRole } from "@blockware/ui-web-types";
 import { toClass, SVGCornersHelper, ResourceTagSide } from "@blockware/ui-web-utils";
 
-import PlannerToolboxResource from "./PlannerToolboxResource";
+import {PlannerToolboxResource} from "./PlannerToolboxResource";
 
 import './PlannerToolbox.less';
 
@@ -36,7 +36,7 @@ interface PlannerToolboxState {
     blockStoreVisible: boolean
 }
 
-export default class PlannerToolbox extends React.Component<PlannerToolboxProps, PlannerToolboxState> {
+export class PlannerToolbox extends React.Component<PlannerToolboxProps, PlannerToolboxState> {
 
     private toolSections: ToolSection<any>[] = [];
     private resourceTagHeight = 45;

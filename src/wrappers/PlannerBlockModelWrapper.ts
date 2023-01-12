@@ -17,15 +17,15 @@ import {isSchemaEntityCompatible, ResourceRole} from "@blockware/ui-web-types";
 import {BlockTypeProvider} from '@blockware/ui-web-context';
 
 import {NeighboringBlocks, PlannerNodeSize} from "../types";
-import PlannerResourceModelWrapper from "./PlannerResourceModelWrapper";
+import {PlannerResourceModelWrapper} from "./PlannerResourceModelWrapper";
 import {PlannerModelWrapper} from "./PlannerModelWrapper";
 import {BlockMode, ResourceMode} from "./wrapperHelpers";
-import PlannerConnectionModelWrapper from "./PlannerConnectionModelWrapper";
+import {PlannerConnectionModelWrapper} from "./PlannerConnectionModelWrapper";
 import {DSL_LANGUAGE_ID, DSLConverters, DSLWriter} from "@blockware/ui-web-components";
 
 type HeightCache = {[size:number]:number};
 
-export default class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
+export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
     readonly plan: PlannerModelWrapper;
 

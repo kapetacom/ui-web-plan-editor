@@ -1,10 +1,10 @@
 import {action, makeObservable, observable} from "mobx";
 import {PlannerNodeSize} from "../types";
 import _ from "lodash";
-import PlannerBlockModelWrapper from "./PlannerBlockModelWrapper";
-import PlannerConnectionModelWrapper from "./PlannerConnectionModelWrapper";
 import type {SelectedResourceItem} from "./models";
-import PlannerResourceModelWrapper from "./PlannerResourceModelWrapper";
+import {PlannerBlockModelWrapper} from "./PlannerBlockModelWrapper";
+import {PlannerConnectionModelWrapper} from "./PlannerConnectionModelWrapper";
+import {PlannerResourceModelWrapper} from "./PlannerResourceModelWrapper";
 import {Dimensions, PLAN_KIND, PlanKind, ResourceRole} from "@blockware/ui-web-types";
 import {ResourceTypeProvider} from "@blockware/ui-web-context";
 import {BlockMode, ResourceMode} from "./wrapperHelpers";

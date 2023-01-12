@@ -3,9 +3,9 @@ import React from "react";
 import { ResourceRole } from "@blockware/ui-web-types";
 import { ResourceTypeProvider } from "@blockware/ui-web-context";
 
-import PlannerBlockModelWrapper from "../../wrappers/PlannerBlockModelWrapper";
+import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
 import { PlannerModelWrapper } from "../../wrappers/PlannerModelWrapper";
-import PlannerResourceModelWrapper from "../../wrappers/PlannerResourceModelWrapper";
+import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
 import { ResourceMode } from "../../wrappers/wrapperHelpers";
 
 export interface BlockTreeProps {
@@ -15,7 +15,7 @@ export interface BlockTreeProps {
     onBlockItemHover:(block?:PlannerBlockModelWrapper)=>void
 }
 
-export default class BlockTree extends React.Component<BlockTreeProps> {
+export class BlockTree extends React.Component<BlockTreeProps> {
 
 
     private hoveredBlock?:PlannerBlockModelWrapper;
