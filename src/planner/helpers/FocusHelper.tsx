@@ -108,7 +108,7 @@ export class FocusHelper {
         if (this.plan.focusedBlock) {
             const focusBlock = this.plan.focusedBlock;
             Object.keys(zoomLevelAreas).forEach((key: string) => {
-                positioningMap[key] = this.getBlocksFitToScreen(focusBlock, zoomLevelAreas[parseInt(key)], nodeSize)
+                positioningMap[key] = this.getBlocksFitToScreen(focusBlock, zoomLevelAreas[key], nodeSize)
             });
             fittingZoomLevels = Object.keys(positioningMap).filter((key: string) => {
                 return this.getFitBothSides(focusBlock, positioningMap[+key], nodeSize);
@@ -120,11 +120,12 @@ export class FocusHelper {
         return Math.min(...fittingZoomLevels);
     }
 
-    public renderTopBar = (props: { getFocusZoom: (block?: PlannerBlockModelWrapper) => void }) => {
+    public renderTopBar = (props: { setFocusBlock: (block: PlannerBlockModelWrapper) => void }) => {
         return (
             <div>
                 <div className="focus-toolbox-back" onClick={() => {
-                    props.getFocusZoom(this.plan.focusedBlock)
+                    this.plan.focusedBlock &&
+                    props.setFocusBlock(this.plan.focusedBlock);
                 }}>
                     <svg width="10" height="10" viewBox="0 0 8 13" fill="none">
                         <path d="M6.5351 11.6896L1.31038 6.46523" stroke="#544B49" strokeLinecap="round"/>
@@ -182,16 +183,22 @@ export class FocusHelper {
 
     public renderSideBar = (props: {
         onNeighboringBlockHover: (block?: PlannerBlockModelWrapper) => void,
-        getFocusZoom: (block?: PlannerBlockModelWrapper) => void,
+        setFocusZoom: (block: PlannerBlockModelWrapper) => void,
         sidePanelOpen: boolean
     }) => {
+
+        const close = () => {
+            this.plan.focusedBlock &&
+            props.setFocusZoom(this.plan.focusedBlock)
+        };
+
         return (
             <PlannerFocusSideBar block={this.plan.focusedBlock}
                                  onBlockItemHover={(block ?: PlannerBlockModelWrapper) => props.onNeighboringBlockHover(block)}
-                                 blurFocus={() => props.getFocusZoom(this.plan.focusedBlock)}
+                                 blurFocus={close}
                                  open={props.sidePanelOpen} plan={this.plan}
-                                 onClose={() => props.getFocusZoom(this.plan.focusedBlock)}
-                                 onFocusChange={(block: PlannerBlockModelWrapper) => props.getFocusZoom(block)}
+                                 onClose={close}
+                                 onFocusChange={(block: PlannerBlockModelWrapper) => props.setFocusZoom(block)}
             />
         )
     }

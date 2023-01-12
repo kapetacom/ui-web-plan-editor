@@ -458,7 +458,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         if (focusedBlockId) {
             this.props.plan.blocks.forEach(block => {
                 if (focusedBlockId === block.id) {
-                    this.setFocusZoom(block);
+                    this.setFocusBlock(block);
                 }
             });
         }
@@ -506,7 +506,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         } else if (this.zoom <= 0.4) {
             this.zoom = 0.4
         }
-        console.log('this.zoom', this.zoom, this.lastZoomLevel);
 
         this.updateAnimation();
     }
@@ -523,27 +522,28 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         if (this.plan.focusedBlock) {
             this.plan.focusedBlock = undefined;
         }
-        console.log('Reset zoom')
         this.zoom = 1;
         this.updateAnimation();
     }
 
     @action
-    private setFocusZoom = (block?: PlannerBlockModelWrapper) => {
+    private setFocusBlock = (block: PlannerBlockModelWrapper) => {
         //sets the focus block or removes if the block double clicked is the same as the previous one
-        if (block) {
-            this.plan.setFocusedBlock(block);
-            if (this.plan.focusedBlock) {
-                window.localStorage.setItem(FOCUSED_ID, this.plan.focusedBlock.id)
-            } else {
-                window.localStorage.setItem(FOCUSED_ID, "")
-            }
-        }
 
+        this.plan.setFocusedBlock(block);
+        if (this.plan.focusedBlock) {
+            window.localStorage.setItem(FOCUSED_ID, this.plan.focusedBlock.id)
+        } else {
+            window.localStorage.setItem(FOCUSED_ID, "")
+        }
+        this.reorderForFocus();
+    }
+
+    private reorderForFocus() {
         this.scrollPlannerTo();
-        console.trace('Set focus zoom');
         this.zoom = this.focusHelper.getFocusZoomLevel(this.zoomLevelAreas, this.nodeSize);
-        if (!this.props.plan.focusedBlock && window.localStorage.getItem(FOCUSED_ID) !== null) {
+        if (!this.props.plan.focusedBlock &&
+            window.localStorage.getItem(FOCUSED_ID) !== null) {
             Object.keys(this.cachedPositions).forEach((key: string) => {
                 if (this.plan.findBlockById(key)) {
                     this.plan.findBlockById(key).setPosition(this.cachedPositions[key].x, this.cachedPositions[key].y);
@@ -555,7 +555,8 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
             this.resetZoomLevel();
             return;
-        } else if (window.localStorage.getItem(POSITIONING_DATA) === null || window.localStorage.getItem(POSITIONING_DATA) === "") {
+        } else if (window.localStorage.getItem(POSITIONING_DATA) === null ||
+            window.localStorage.getItem(POSITIONING_DATA) === "") {
 
             this.plan.blocks.forEach((block: PlannerBlockModelWrapper) => {
                 this.cachedPositions[block.id] = {
@@ -641,7 +642,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
         const canvasSize = this.getZoomDivDimensions();
 
-        console.log('render zoom', this.zoom);
 
         return (
             <>
@@ -676,8 +676,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
                         <div className={focusToolbar}>
                             {
-                                !!this.plan.focusedBlock &&
-                                this.focusHelper.renderTopBar({getFocusZoom: this.setFocusZoom})
+                                this.focusHelper.renderTopBar({setFocusBlock: this.setFocusBlock})
                             }
                         </div>
 
@@ -687,7 +686,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
                         {this.focusHelper.renderSideBar({
                             onNeighboringBlockHover: this.onNeighboringBlockHover,
-                            getFocusZoom: this.setFocusZoom,
+                            setFocusZoom: this.setFocusBlock,
                             sidePanelOpen: this.sidePanelOpen
                         })}
 
@@ -768,7 +767,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                                     block={block}
                                                     zoom={this.zoom}
                                                     onDoubleTap={() => {
-                                                        this.setFocusZoom(block);
+                                                        this.setFocusBlock(block);
                                                     }}
                                                     readOnly={this.props.plan.isReadOnly() || this.plan.focusedBlock !== undefined}
                                                     onDrop={() => {
