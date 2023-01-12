@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Loader} from "@blockware/ui-web-components";
+import {DefaultContext, Loader} from "@blockware/ui-web-components";
 import {InstanceStatus} from "@blockware/ui-web-context";
 import {BlockInstanceSpec, ResourceRole, BlockKind, BlockType} from "@blockware/ui-web-types";
 
@@ -102,18 +102,22 @@ export const StandAloneBlocks = () => {
 
 
 export const PlannerEditor = () => {
-    return <Loader load={() => readPlan().then((plan) =>
+    return <DefaultContext>
+        <Loader load={() => readPlan().then((plan) =>
         <Planner systemId={'my-system'} plan={plan}/>
-    )}/>
+        )}/>
+    </DefaultContext>
 };
 
 export const PlannerViewer = () => {
-    return <Loader load={() => readPlan().then((plan) => {
+    return <DefaultContext>
+        <Loader load={() => readPlan().then((plan) => {
         plan.setReadOnly(true);
         return (
             <Planner systemId={'my-system'} plan={plan}/>
         )
         })} />
+    </DefaultContext>
 };
 
 export const BlockResourceProvider = () => {
