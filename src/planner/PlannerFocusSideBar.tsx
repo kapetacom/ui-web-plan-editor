@@ -1,72 +1,76 @@
-import React, { Component, createRef } from "react";
+import React, {useEffect, useRef} from "react";
 
-import {SidePanel, PanelAlignment, PanelSize, SidePanelHeader } from "@blockware/ui-web-components";
+import {SidePanel, PanelAlignment, PanelSize, SidePanelHeader} from "@blockware/ui-web-components";
 
 import PlannerBlockModelWrapper from "../wrappers/PlannerBlockModelWrapper";
-import { PlannerModelWrapper } from "../wrappers/PlannerModelWrapper";
+import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
 
 import BlockTree from "./components/BlockTree";
 
 import "./PlannerFocusSideBar.less";
 
-interface PlannerFocusSideBarProps{
-    plan:PlannerModelWrapper,
-    open:boolean
-    block?:PlannerBlockModelWrapper
-    blurFocus:()=>void
-    onBlockItemHover:(block?:PlannerBlockModelWrapper)=>void
-    onClose:()=>void
-    onFocusChange:(block:PlannerBlockModelWrapper)=>void
+interface Props {
+    plan: PlannerModelWrapper,
+    open: boolean
+    block?: PlannerBlockModelWrapper
+    blurFocus: () => void
+    onBlockItemHover: (block?: PlannerBlockModelWrapper) => void
+    onClose: () => void
+    onFocusChange: (block: PlannerBlockModelWrapper) => void
 }
 
-export default class PlannerFocusSideBar extends Component<PlannerFocusSideBarProps>{
-    
-    private focusPanel = createRef<SidePanel>();
 
-    componentDidUpdate() {
-        if(this.focusPanel.current){
-            if(this.props.plan.focusedBlock){
-                this.focusPanel.current.open()
-            }else {
-                this.focusPanel.current.close()
+const PlannerFocusSideBar = (props: Props) => {
+
+    const focusPanel = useRef<SidePanel>();
+
+    useEffect(() => {
+
+        if (focusPanel.current) {
+            if (props.plan.focusedBlock) {
+                focusPanel.current.open()
+            } else {
+                focusPanel.current.close()
             }
         }
-    } 
+    }, [props.plan.focusedBlock])
 
-    render(){
-        return(
-            <>
-                <SidePanel
-                    title="Blocks in view"
-                    closable={false}
-                    className={"focus-side-panel"}
-                    ref={this.focusPanel}
-                    open={this.props.open}
-                    side={PanelAlignment.right}
-                    size={PanelSize.small} 
-                    onClose={this.props.onClose}
-                    header={(<SidePanelHeader title={"Blocks in use"}
-                    onIconPress={this.props.blurFocus}
-                    icon={(<svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                                <path d="M6.05054 11L0.999978 5.94974" stroke="#F5F1EE" strokeLinecap="round" />
-                                <path d="M1 5.94971L6.05025 0.999976" stroke="#F5F1EE" strokeLinecap="round" />
-                            </svg>)
-                        }
-                    />) }
-                
-                    >
-                    {
-                        this.props.block && 
-                        <BlockTree
-                            onBlockItemHover={this.props.onBlockItemHover}
-                            onBlockClicked={(block)=>{this.props.onFocusChange(block)}}
-                            plan={this.props.plan}
-                        block={this.props.block} />
-                    }
-            </SidePanel>
-            </>
-        )
-    }
+
+    return (
+        <SidePanel
+            title="Blocks in view"
+            closable={false}
+            className={"focus-side-panel"}
+            ref={focusPanel}
+            open={props.open}
+            side={PanelAlignment.right}
+            size={PanelSize.small}
+            onClose={props.onClose}
+            header={(<SidePanelHeader title={"Blocks in use"}
+                                      onIconPress={props.blurFocus}
+                                      icon={(<svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                                          <path d="M6.05054 11L0.999978 5.94974" stroke="#F5F1EE"
+                                                strokeLinecap="round"/>
+                                          <path d="M1 5.94971L6.05025 0.999976" stroke="#F5F1EE"
+                                                strokeLinecap="round"/>
+                                      </svg>)
+                                      }
+            />)}
+
+        >
+            {
+                props.block &&
+                <BlockTree
+                    onBlockItemHover={props.onBlockItemHover}
+                    onBlockClicked={(block) => {
+                        props.onFocusChange(block)
+                    }}
+                    plan={props.plan}
+                    block={props.block}/>
+            }
+        </SidePanel>
+    )
 }
 
 
+export default PlannerFocusSideBar;

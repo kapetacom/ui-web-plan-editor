@@ -350,6 +350,7 @@ class PlannerBlockResourceListItem extends Component<PlannerBlockResourceListIte
                                         role={this.props.resource.role}
                                         size={this.props.size}
                                         name={this.props.resource.getName()}
+                                        readOnly={this.props.readOnly}
                                         type={type}
                                         typeName={typeName}
                                         width={this.getBlock().width}

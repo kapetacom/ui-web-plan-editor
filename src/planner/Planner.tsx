@@ -494,7 +494,7 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
     }
 
     @action
-    private setZoomLevel = (increase: boolean) => {//
+    private setZoomLevel = (increase: boolean) => {
         const resizeStep = 0.25;
         this.lastZoomLevel = this.zoom;
         this.zoom = increase ? +(this.zoom - resizeStep).toFixed(2) : +(this.zoom + resizeStep).toFixed(2);
@@ -503,6 +503,7 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
         } else if (this.zoom <= 0.4) {
             this.zoom = 0.4
         }
+        console.log('this.zoom', this.zoom, this.lastZoomLevel);
 
         this.updateAnimation();
     }
@@ -519,6 +520,7 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
         if (this.plan.focusedBlock) {
             this.plan.focusedBlock = undefined;
         }
+        console.log('Reset zoom')
         this.zoom = 1;
         this.updateAnimation();
     }
@@ -536,6 +538,7 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
         }
 
         this.scrollPlannerTo();
+        console.trace('Set focus zoom');
         this.zoom = this.focusHelper.getFocusZoomLevel(this.zoomLevelAreas, this.nodeSize);
         if (!this.props.plan.focusedBlock && window.localStorage.getItem(FOCUSED_ID) !== null) {
             Object.keys(this.cachedPositions).forEach((key: string) => {
@@ -615,7 +618,8 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
             'node-size-small': this.state.size === PlannerNodeSize.SMALL,
             'node-size-medium': this.state.size === PlannerNodeSize.MEDIUM,
             'node-size-full': this.state.size === PlannerNodeSize.FULL,
-            'dragging': this.plan.isDragging()
+            'dragging': this.plan.isDragging(),
+            'read-only': this.plan.isReadOnly()
         });
         const zoomResetClassName = toClass({
             "zoom-reset-hidden": this.zoom === 1,
@@ -633,6 +637,8 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
         });
 
         const canvasSize = this.getZoomDivDimensions();
+
+        console.log('render zoom', this.zoom);
 
         return (
             <>
@@ -659,17 +665,18 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
                     onClosed={this.blockInspectorPanelHelper.onClosed}
                 />
 
-                <div className={focusToolbar}>
-                    {
-                        !!this.plan.focusedBlock &&
-                        this.focusHelper.renderTopBar({getFocusZoom: this.setFocusZoom})
-                    }
-                </div>
                 <DnDContainer
                     overflowX={true}
                     overflowY={true}
                 >
                     <div className={containerClass}>
+
+                        <div className={focusToolbar}>
+                            {
+                                !!this.plan.focusedBlock &&
+                                this.focusHelper.renderTopBar({getFocusZoom: this.setFocusZoom})
+                            }
+                        </div>
 
                         {!this.props.plan.isReadOnly() &&
                             <PlannerToolbox open={true}/>

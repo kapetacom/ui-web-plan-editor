@@ -12,11 +12,9 @@ import PlannerBlockResourceList from '../src/components/PlannerBlockResourceList
 import PlannerBlockResourceListItem from '../src/components/PlannerBlockResourceListItem';
 
 import {ResourceMode} from "../src/wrappers/wrapperHelpers";
-import {PlannerModelWrapper} from '../src/wrappers/PlannerModelWrapper';
 import {PlannerNodeSize} from '../src/types';
 
 import {readPlan} from "./data/planReader";
-import exp from "constants";
 
 const emptyBlockInstance: BlockInstanceSpec = {
     id: "demoBlock1",
@@ -81,8 +79,12 @@ const emptyBlockDefinition2: BlockKind = {
 };
 
 export default {
-    title: 'Planner'
+    title: 'Planner',
+    parameters: {
+        layout: 'fullscreen'
+    },
 }
+
 
 export const StandAloneBlocks = () => {
     return (

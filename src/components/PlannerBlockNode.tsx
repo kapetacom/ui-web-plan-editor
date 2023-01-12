@@ -262,6 +262,7 @@ export default class PlannerBlockNode extends React.Component<PlannerBlockNodePr
                                     typeName={block.getData().metadata.name}
                                     variant={variant}
                                     valid={block.isValid()}
+                                    readOnly={this.props.readOnly}
                                     blockRef={(elm) => {
                                         this.container = elm
                                     }}

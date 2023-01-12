@@ -15,6 +15,7 @@ interface PlannerResourceProps {
     name:string
     height: number
     width: number
+    readOnly?:boolean
 
 }
 
@@ -28,7 +29,8 @@ export default function BlockResource(props:PlannerResourceProps) {
 
     const resourceClass = toClass({
         'block-resource': true,
-        [props.type]: true
+        [props.type]: true,
+        'read-only': !!props.readOnly
     });
 
     const maxTextWidth = props.width - 50;

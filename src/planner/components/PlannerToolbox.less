@@ -35,7 +35,6 @@
             margin-bottom: 25px;
         }
     }
-
     .provider-resources,
     .consumer-resources {
         position: relative;
@@ -52,14 +51,12 @@
             // text-align: center;
         }
     }
-
     .toolbox-tabs {
         position: relative;
         ul {
             list-style-type: none;
             margin: 0;
-            padding: 0;
-            padding-top: 5px;
+            padding: 5px 0 0;
             display: flex;            
             justify-content: space-around;
             color: @tab-title;
@@ -74,7 +71,7 @@
             .react-tabs__tab {
                 text-align: center;
                 opacity: 0.3;
-                padding-bottom: 10;
+                padding-bottom: 10px;
             }
             .react-tabs__tab:focus {
                 display: none;
@@ -84,7 +81,7 @@
             .react-tabs__tab--selected {
                 border-bottom: 2px solid @tab-title;
                 box-shadow: none;
-                border-radius: none;
+                border-radius: 0;
                 background-color: transparent;
                 text-align: center;
                 opacity: 1;
@@ -94,11 +91,9 @@
         }
 
     }
-
-
     .side-panel-container {
         background-color: @gray-xdark;
-        margin-top: 30px;
+        margin-top: 0;
         &.small {
             width: 300px;
         }

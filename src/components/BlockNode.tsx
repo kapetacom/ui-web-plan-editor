@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createHexagonPath, Orientation } from "@blockware/ui-web-utils";
+import {createHexagonPath, Orientation, toClass} from "@blockware/ui-web-utils";
 import { SVGText, SVGAutoSizeText } from "@blockware/ui-web-components";
 import { InstanceStatus } from "@blockware/ui-web-context";
 
@@ -20,6 +20,7 @@ interface BlockNodeProps {
     position?:Point
     valid?: boolean
     variant?: string
+    readOnly?:boolean
     blockRef?: (elm: SVGPathElement) => void
     onInstanceNameChange?: (newName: string) => void
 }
@@ -38,6 +39,12 @@ export default function BlockNode(props: BlockNodeProps) {
     }
 
     const variant = props.variant ? props.variant : 'service';
+
+    const className = toClass({
+        'block-node':true,
+        [variant]:true,
+        'read-only':!!props.readOnly
+    });
     const pointSize = props.pointSize ? props.pointSize : 30;
     const clipWidth = 4;
     const hexagonClipPath = "hex_clip"+id;
@@ -50,7 +57,7 @@ export default function BlockNode(props: BlockNodeProps) {
                 <path x={20} d={clipPath} fill="transparent" />
             </clipPath>
   
-            <g className={`block-node ${variant}`} clipPath={`url(#${hexagonClipPath})`} x={(props.position)?props.position.x:50}>
+            <g className={className} clipPath={`url(#${hexagonClipPath})`} x={(props.position)?props.position.x:50}>
                 <path className="block-body"
                     ref={props.blockRef}
                     d={path}
@@ -68,7 +75,7 @@ export default function BlockNode(props: BlockNodeProps) {
                     maxWidth={maxWidth}
                     maxChars={15}
                     maxLines={2}
-                    onChange={props.onInstanceNameChange}
+                    onChange={props.readOnly ? undefined : props.onInstanceNameChange}
                     value={props.instanceName} />
 
                 <SVGAutoSizeText className={'block-body-text block-name'}

@@ -4,10 +4,10 @@
 
 .focus-toolbar {
   .transition(all 500ms);
-  position: fixed;
-  width: calc(100vw - 300px);
+  position: absolute;
+  width: calc(100% - 300px);
   z-index: 1;
-  top: 34px;
+  top: 0;
   height: 34px;
   display: flex;
   flex-direction: row;
@@ -64,9 +64,9 @@
 
 
 .planner-area-container {
-  position: fixed;
+  position: relative;
   overflow: visible;
-  min-height: 100vh;
+  height: 100%;
 
   .focused-block-side-info {
     position: absolute;
@@ -86,6 +86,10 @@
     top: calc(100% - 100px);
     right: 400px;
 
+    & > svg {
+      cursor: pointer;
+    }
+
     .zoom-reset-hidden {
       overflow: visible;
       transform: translate(-0, 20px);
@@ -96,11 +100,12 @@
   .planner-temp-resource-item {
     position: absolute;
   }
+
   .planner-area-scroll {
     .transition(background 500ms);
 
-    height: calc(100vh - 40px);
-    width: calc(100vw - 300px);
+    height: 100%;
+    width: calc(100% - 300px);
     background-color: @bw-planner-background;
 
     &.focused-planner {
@@ -129,6 +134,17 @@
 
     .connection-hidden {
       opacity: 0;
+    }
+  }
+
+  &.read-only {
+    .planner-area-scroll {
+      height: 100%;
+      width:  100%;
+    }
+
+    .focus-toolbar {
+      width:  100%;
     }
   }
 }

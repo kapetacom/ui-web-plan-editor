@@ -51,28 +51,30 @@
 
     }
 
-    .instance-name-container {
-        cursor: text;
-        .pointer-event-all();
+    .block-node:not(.read-only) {
+        .instance-name-container {
+            cursor: text;
+            .pointer-event-all();
 
-        &:hover {
-            .background {
-                fill: rgba(255,255,255, 0.1);
-            }
+            &:hover {
+                .background {
+                    fill: rgba(255,255,255, 0.1);
+                }
 
-            .edit {
-                cursor: pointer;
-                visibility: visible;
+                .edit {
+                    cursor: pointer;
+                    visibility: visible;
 
-                &:hover {
-                    fill: @gray-xdark;
+                    &:hover {
+                        fill: @gray-xdark;
+                    }
                 }
             }
         }
-    }
 
-    .block-body {
-        cursor: move;
+        .block-body {
+            cursor: move;
+        }
     }
 
     &:not(.highlight,.focused-link) {
