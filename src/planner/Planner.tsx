@@ -60,6 +60,7 @@ export interface PlannerProps {
     routing?: any
     enableInstanceListening?:boolean
     systemId: string
+    blockStore?:React.ComponentType
 }
 
 export interface PlannerState {
@@ -681,7 +682,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                         </div>
 
                         {!this.props.plan.isReadOnly() &&
-                            <PlannerToolbox open={true}/>
+                            <PlannerToolbox blockStore={this.props.blockStore} open={true}/>
                         }
 
                         {this.focusHelper.renderSideBar({

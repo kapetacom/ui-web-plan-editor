@@ -35,6 +35,9 @@ export class PlannerModelReader {
             if (!blockDefinition) {
                 const blockRef = this.resolveReference(blockInstance.block.ref, plan.getRef());
                 const asset:any = await this.blockStore.get(blockRef);
+                if (asset.error) {
+                    throw new Error(asset.error);
+                }
                            
                 if(asset.data){
                     blockDefinition = asset.data;
