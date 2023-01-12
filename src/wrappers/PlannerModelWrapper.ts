@@ -15,6 +15,12 @@ export interface PlannerModelRef {
     version: string
 }
 
+export enum PlannerMode {
+    VIEW,
+    CONFIGURATION,
+    EDIT
+}
+
 export class PlannerModelWrapper {
 
     @observable
@@ -44,7 +50,7 @@ export class PlannerModelWrapper {
     private readonly _ref: string;
 
     @observable
-    private readOnly:boolean = false;
+    private mode:PlannerMode = PlannerMode.EDIT;
 
     constructor(ref: string, name: string) {
         this._ref = ref;
@@ -82,12 +88,24 @@ export class PlannerModelWrapper {
     }
 
     @action
-    setReadOnly(readOnly:boolean) {
-        this.readOnly = readOnly;
+    setMode(mode:PlannerMode) {
+        this.mode = mode;
+    }
+
+    isEditing() {
+        return this.mode === PlannerMode.EDIT;
+    }
+
+    isViewing() {
+        return this.mode === PlannerMode.VIEW;
     }
 
     isReadOnly() {
-        return this.readOnly;
+        return this.mode === PlannerMode.VIEW || this.mode === PlannerMode.CONFIGURATION;
+    }
+
+    isConfiguring() {
+        return this.mode === PlannerMode.CONFIGURATION;
     }
 
     isDragging() {

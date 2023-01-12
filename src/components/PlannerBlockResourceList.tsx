@@ -21,6 +21,7 @@ export interface PlannerBlockResourceListProps {
     planner?: PlannerModelWrapper
     zoom?: number
     readOnly?:boolean
+    viewOnly?:boolean
 }
 
 @observer
@@ -87,6 +88,7 @@ export class PlannerBlockResourceList extends Component<PlannerBlockResourceList
                     return (
                         <PlannerBlockResourceListItem
                             readOnly={this.props.readOnly}
+                            viewOnly={this.props.viewOnly}
                             setItemToEdit={this.props.setItemToEdit}
                             size={this.props.size}
                             key={resource.id + '_' + index}

@@ -106,8 +106,12 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     
     getExtensionSize() {
         let extensionSize = DEFAULT_EXTENSION_SIZE;
-        const readOnly = !!this.block?.plan?.isReadOnly();
+        const readOnly = this.block?.plan?.isReadOnly();
+        const viewing = this.block?.plan?.isViewing();
         if (readOnly) {
+            extensionSize -= 30;
+        }
+        if (viewing) {
             extensionSize -= 30;
         }
 
@@ -116,7 +120,13 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         }
 
         if (this.isExtended()) {
-            return extensionSize + (readOnly ? 20 : - 10);
+            if (viewing) {
+                return extensionSize + 60;
+            }
+            if (readOnly) {
+                return extensionSize + 20;
+            }
+            return extensionSize - 10;
         }
 
         return 0;

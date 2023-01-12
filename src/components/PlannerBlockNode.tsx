@@ -31,6 +31,7 @@ interface PlannerBlockNodeProps {
     zoom: number
     onDoubleTap?: () => void
     readOnly?: boolean
+    viewOnly?: boolean
     onDrop?: () => void
     setItemToEdit?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void
     setItemToInspect?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void
@@ -127,6 +128,10 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
     }
 
     renderBlockActions(block:PlannerBlockModelWrapper) {
+        if (this.props.viewOnly) {
+            return <g className={'block-actions'} />
+        }
+
         if (this.props.readOnly) {
             return (
                 <g className={'block-actions'}>
@@ -170,7 +175,6 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
 
     render() {
         const block = this.props.block;
-        const blockType = BlockTypeProvider.get(block.getData().kind);
         const nodeSize = this.props.size !== undefined ? this.props.size : PlannerNodeSize.FULL;
         const height = block.calculateHeight(nodeSize);
         const highlight = BlockMode.HIGHLIGHT === this.props.block.mode;
@@ -242,6 +246,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
                                     planner={this.props.planner}
                                     role={ResourceRole.CONSUMES}
                                     readOnly={this.props.readOnly}
+                                    viewOnly={this.props.viewOnly}
                                     list={block.consumes}
                                     zoom={this.props.zoom}
                                 />
@@ -253,6 +258,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
                                     blockData={block}
                                     role={ResourceRole.PROVIDES}
                                     readOnly={this.props.readOnly}
+                                    viewOnly={this.props.viewOnly}
                                     list={block.provides}
                                     zoom={this.props.zoom}/>
 

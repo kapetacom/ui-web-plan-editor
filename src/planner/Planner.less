@@ -68,6 +68,15 @@
   overflow: hidden;
   height: 100%;
 
+  .planner-area-position-parent {
+    position: absolute;
+    left: 0;
+    right: 300px;
+    top:0;
+    bottom: 0;
+    overflow: hidden;
+  }
+
   .focused-block-side-info {
     position: absolute;
     z-index: 10;
@@ -104,7 +113,7 @@
   .planner-area-scroll {
     .transition(background 500ms);
     height: 100%;
-    width: calc(100% - 300px);
+    width: 100%;
     background-color: @bw-planner-background;
 
     &.focused-planner {
@@ -134,12 +143,15 @@
     .connection-hidden {
       opacity: 0;
     }
+
   }
 
   &.read-only {
-    .planner-area-scroll {
+    .planner-area-position-parent {
       height: 100%;
       width:  100%;
+      max-height: 100%;
+      max-width:  100%;
     }
 
     .focus-toolbar {

@@ -35,6 +35,7 @@ interface PlannerBlockResourceListItemProps {
     planner?: PlannerModelWrapper
     zoom?: number
     readOnly?: boolean
+    viewOnly?: boolean
     setItemToEdit?: (res: PlannerResourceModelWrapper | PlannerBlockModelWrapper | any | undefined, type: ItemType, block?: PlannerBlockModelWrapper) => void
 }
 
@@ -380,6 +381,11 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
     }
 
     private renderActions(consumer:boolean) {
+        if (this.props.viewOnly) {
+            return (
+                <g className={'resource-actions'}></g>
+            )
+        }
         if (this.props.readOnly) {
             return (
                 <g className={'resource-actions'}>

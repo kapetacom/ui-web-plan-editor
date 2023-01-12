@@ -2,15 +2,16 @@ import React from 'react';
 
 import {DefaultContext, Loader} from "@blockware/ui-web-components";
 import {InstanceStatus} from "@blockware/ui-web-context";
-import {BlockInstanceSpec, ResourceRole, BlockKind, BlockType} from "@blockware/ui-web-types";
+import {BlockInstanceSpec, BlockKind, BlockType, ResourceRole} from "@blockware/ui-web-types";
 
 import {
     Planner,
     PlannerBlockNode,
     PlannerBlockResourceList,
     PlannerBlockResourceListItem,
-    ResourceMode,
-    PlannerNodeSize
+    PlannerMode,
+    PlannerNodeSize,
+    ResourceMode
 } from '../src';
 
 import {readPlan} from "./data/planReader";
@@ -112,10 +113,21 @@ export const PlannerEditor = () => {
 export const PlannerViewer = () => {
     return <DefaultContext>
         <Loader load={() => readPlan().then((plan) => {
-        plan.setReadOnly(true);
+        plan.setMode(PlannerMode.VIEW);
         return (
             <Planner systemId={'my-system'} plan={plan}/>
         )
+        })} />
+    </DefaultContext>
+};
+
+export const PlannerConfig = () => {
+    return <DefaultContext>
+        <Loader load={() => readPlan().then((plan) => {
+            plan.setMode(PlannerMode.CONFIGURATION);
+            return (
+                <Planner systemId={'my-system'} plan={plan}/>
+            )
         })} />
     </DefaultContext>
 };

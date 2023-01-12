@@ -623,7 +623,8 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             'node-size-medium': this.state.size === PlannerNodeSize.MEDIUM,
             'node-size-full': this.state.size === PlannerNodeSize.FULL,
             'dragging': this.plan.isDragging(),
-            'read-only': this.plan.isReadOnly()
+            'read-only': this.plan.isReadOnly(),
+            'view-only': this.plan.isViewing()
         });
         const zoomResetClassName = toClass({
             "zoom-reset-hidden": this.zoom === 1,
@@ -691,109 +692,113 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                         })}
 
                         <div ref={this.canvasContainerElement}
-                             className={plannerScrollClassnames}
-                        >
-                            <DnDDrop
-                                type={['tool', 'block']}
-                                onDrop={(type, value, dimensions) => {
-                                    if (!this.plan.focusedBlock) {
-                                        this.dnd.handleItemDropped(type, value, dimensions)
-                                    }
-                                }}
-                                onDrag={(type, value, dimensions) => {
-                                    if (!this.plan.focusedBlock) {
-                                        this.dnd.handleItemDragged(type, value, dimensions)
-                                    }
-                                }}
+                             className={'planner-area-position-parent'}>
+                            <div className={plannerScrollClassnames}
                             >
-                                <div className={'planner-area-canvas'}
-                                     style={{...canvasSize, transform:`scale(${1/this.zoom})`}}>
-                                    <svg x={0} y={0}
-                                         width={canvasSize.width} height={canvasSize.height}
-                                         className={'planner-connections'} >
-                                        <SVGDropShadow />
+                                <DnDDrop
+                                    type={['tool', 'block']}
+                                    onDrop={(type, value, dimensions) => {
+                                        if (!this.plan.focusedBlock) {
+                                            this.dnd.handleItemDropped(type, value, dimensions)
+                                        }
+                                    }}
+                                    onDrag={(type, value, dimensions) => {
+                                        if (!this.plan.focusedBlock) {
+                                            this.dnd.handleItemDragged(type, value, dimensions)
+                                        }
+                                    }}
+                                >
+                                    <div className={'planner-area-canvas'}
+                                         style={{...canvasSize, transform:`scale(${1/this.zoom})`}}>
+                                        <svg x={0} y={0}
+                                             width={canvasSize.width} height={canvasSize.height}
+                                             className={'planner-connections'} >
+                                            <SVGDropShadow />
 
-                                        {
-                                            this.plan.connections.map((connection, index) => {
-                                                const connectionClass = toClass({
-                                                    "connection-hidden": (this.plan.focusedBlock !== undefined && !this.focusHelper.isConnectionLinkedToFocus(connection))
+                                            {
+                                                this.plan.connections.map((connection, index) => {
+                                                    const connectionClass = toClass({
+                                                        "connection-hidden": (this.plan.focusedBlock !== undefined && !this.focusHelper.isConnectionLinkedToFocus(connection))
+                                                    })
+                                                    return (
+
+                                                            <PlannerConnection
+                                                                className={connectionClass}
+                                                                readOnly={this.plan.isReadOnly()}
+                                                                viewOnly={this.plan.isViewing()}
+                                                                key={connection.id + "_link_" + index}
+                                                                size={this.state.size}
+                                                                focusBlock={this.plan.focusedBlock}
+                                                                handleInspectClick={this.handleInspection}
+                                                                setItemToEdit={(item, type) => this.editPanelHelper.edit(item, type, false)}
+                                                                onFocus={() => this.plan.moveConnectionToTop(connection)}
+                                                                onDelete={() => this.plan.removeConnection(connection)}
+                                                                connection={connection}/>
+
+                                                    )
                                                 })
-                                                return (
-
-                                                        <PlannerConnection
-                                                            className={connectionClass}
-                                                            readOnly={this.props.plan.isReadOnly()}
-                                                            key={connection.id + "_link_" + index}
-                                                            size={this.state.size}
-                                                            focusBlock={this.plan.focusedBlock}
-                                                            handleInspectClick={this.handleInspection}
-                                                            setItemToEdit={(item, type) => this.editPanelHelper.edit(item, type, false)}
-                                                            onFocus={() => this.plan.moveConnectionToTop(connection)}
-                                                            onDelete={() => this.plan.removeConnection(connection)}
-                                                            connection={connection}/>
-
-                                                )
-                                            })
-                                        }
-
-                                        {this.plan.selectedResource !== undefined &&
-                                            <PlannerTempResourceConnection
-                                                size={this.state.size}
-                                                selectedResource={this.plan.selectedResource}
-                                            />
-                                        }
-                                    </svg>
-
-                                    {this.plan.blocks.map((block, index) => {
-                                            const runningBlock = this.runningBlocks[block.id];
-                                            const failedToRunBlock = this.failedToRunBlocks[block.id];
-                                            let blockIsVisible = false;
-                                            let focusClassNames = "";
-                                            if (this.plan.focusedBlock) {
-                                                blockIsVisible = (this.plan.focusedBlock.hasConnectionTo(block) || block.id === this.plan.focusedBlock.id);
-
-                                                focusClassNames = toClass({
-                                                    "planner-block": !blockIsVisible,
-                                                    "planner-focused-block": block.id === this.plan.focusedBlock.id,
-                                                    "linked-block": (block.id !== this.plan.focusedBlock.id && blockIsVisible),
-                                                    "hovered-block": (this.hoveredBlock ? block.id === this.hoveredBlock.id : false),
-                                                });
                                             }
 
-                                            return (// if block is focused render only it and it's connected blocks
-                                                <PlannerBlockNode
-                                                    className={focusClassNames}
-                                                    key={block.id + block.name + index}
-                                                    block={block}
-                                                    zoom={this.zoom}
-                                                    onDoubleTap={() => {
-                                                        this.setFocusBlock(block);
-                                                    }}
-                                                    readOnly={this.props.plan.isReadOnly() || this.plan.focusedBlock !== undefined}
-                                                    onDrop={() => {
-                                                        this.recalculateCanvas()
-                                                    }}
-                                                    status={this.getNodeStatus(runningBlock, failedToRunBlock)}
-                                                    size={(block === this.plan.focusedBlock) ? PlannerNodeSize.MEDIUM : this.state.size}
-                                                    setItemToEdit={(item, type) => this.editPanelHelper.edit(item, type, false)}
-                                                    setItemToInspect={(item, type) => this.blockInspectorPanelHelper.show(item, type, false)}
-                                                    planner={this.plan}
+                                            {this.plan.selectedResource !== undefined &&
+                                                <PlannerTempResourceConnection
+                                                    size={this.state.size}
+                                                    selectedResource={this.plan.selectedResource}
                                                 />
-                                            )
+                                            }
+                                        </svg>
+
+                                        {this.plan.blocks.map((block, index) => {
+                                                const runningBlock = this.runningBlocks[block.id];
+                                                const failedToRunBlock = this.failedToRunBlocks[block.id];
+                                                let blockIsVisible = false;
+                                                let focusClassNames = "";
+                                                if (this.plan.focusedBlock) {
+                                                    blockIsVisible = (this.plan.focusedBlock.hasConnectionTo(block) || block.id === this.plan.focusedBlock.id);
+
+                                                    focusClassNames = toClass({
+                                                        "planner-block": !blockIsVisible,
+                                                        "planner-focused-block": block.id === this.plan.focusedBlock.id,
+                                                        "linked-block": (block.id !== this.plan.focusedBlock.id && blockIsVisible),
+                                                        "hovered-block": (this.hoveredBlock ? block.id === this.hoveredBlock.id : false),
+                                                    });
+                                                }
+
+                                                return (// if block is focused render only it and it's connected blocks
+                                                    <PlannerBlockNode
+                                                        className={focusClassNames}
+                                                        key={block.id + block.name + index}
+                                                        block={block}
+                                                        zoom={this.zoom}
+                                                        onDoubleTap={() => {
+                                                            this.setFocusBlock(block);
+                                                        }}
+                                                        readOnly={this.plan.isReadOnly() || this.plan.focusedBlock !== undefined}
+                                                        viewOnly={this.plan.isViewing()}
+                                                        onDrop={() => {
+                                                            this.recalculateCanvas()
+                                                        }}
+                                                        status={this.getNodeStatus(runningBlock, failedToRunBlock)}
+                                                        size={(block === this.plan.focusedBlock) ? PlannerNodeSize.MEDIUM : this.state.size}
+                                                        setItemToEdit={(item, type) => this.editPanelHelper.edit(item, type, false)}
+                                                        setItemToInspect={(item, type) => this.blockInspectorPanelHelper.show(item, type, false)}
+                                                        planner={this.plan}
+                                                    />
+                                                )
+                                            }
+                                        )}
+                                        {this.plan.selectedResource !== undefined &&
+                                            <PlannerTempResourceItem
+                                                planner={this.plan}
+                                                size={this.state.size}
+                                                setItemToEdit={(item, type, creating) => this.editPanelHelper.edit(item, type, creating)}
+                                                selectedResource={this.plan.selectedResource}
+                                                zoom={this.zoom}
+                                                index={-1}
+                                            />
                                         }
-                                    )}
-                                    {this.plan.selectedResource !== undefined &&
-                                        <PlannerTempResourceItem
-                                            planner={this.plan}
-                                            size={this.state.size}
-                                            setItemToEdit={(item, type, creating) => this.editPanelHelper.edit(item, type, creating)}
-                                            selectedResource={this.plan.selectedResource}
-                                            zoom={this.zoom}
-                                            index={-1}
-                                        />
-                                    }
-                                </div>
-                            </DnDDrop>
+                                    </div>
+                                </DnDDrop>
+                            </div>
                             <svg className="zoom-buttons" x="50" y="50" overflow="visible" height="20" width="40">
                                 <svg width="45" height="45" viewBox="0 0 45 45" fill="none" onClick={() => {
                                     this.setZoomLevel(true);

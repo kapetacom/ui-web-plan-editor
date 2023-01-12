@@ -18,6 +18,7 @@ interface PlannerConnectionProps {
     connection?: PlannerConnectionModelWrapper;
     path?: string | null;
     readOnly?: boolean;
+    viewOnly?: boolean;
     onFocus?: () => void;
     focusBlock?:PlannerBlockModelWrapper;
     onDelete?: (connection: PlannerConnectionModelWrapper) => void;
@@ -136,8 +137,9 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps, P
                     <path className={'line'}
                         d={path} />
 
-                    {this.props.connection && middlePoint &&
-
+                    {this.props.connection &&
+                        middlePoint &&
+                        !this.props.viewOnly &&
                         <PlannerConnectionButtons
                             connection={this.props.connection}
                             open={this.state.over}
