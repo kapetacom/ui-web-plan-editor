@@ -126,7 +126,7 @@ export default class PlannerBlockNode extends React.Component<PlannerBlockNodePr
         this.container.addEventListener('mousedown', this.mouseDownHandler);
     }
 
-    renderBlockActions(block) {
+    renderBlockActions(block:PlannerBlockModelWrapper) {
         if (this.props.readOnly) {
             return (
                 <g className={'block-actions'}>

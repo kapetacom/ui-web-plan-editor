@@ -75,8 +75,8 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
 
     private readonly blockListObserver: Lambda;
     private readonly connectionListObserver: Lambda;
-    private instanceServiceUnsubscriber: () => void;
-    private instanceServiceExitedUnsubscribers: (() => void)[];
+    private instanceServiceUnsubscriber?: () => void;
+    private instanceServiceExitedUnsubscribers: (() => void)[] =  [];
 
     private editPanelHelper: EditPanelHelper = new EditPanelHelper(this);
     private blockInspectorPanelHelper: InspectBlockPanelHelper = new InspectBlockPanelHelper(this);
@@ -158,7 +158,7 @@ export default class Planner extends React.Component<PlannerProps, PlannerState>
             .then(instanceStatuses => this.updateRunningBlockStatus(instanceStatuses))
             .catch(() => {});
 
-        this.instanceServiceExitedUnsubscribers = [];
+        
         this.instanceServiceUnsubscriber = InstanceService.subscribe(this.props.systemId, InstanceEventType.EVENT_INSTANCE_CHANGED, this.onInstanceStatusChanged);
         this.props.plan.blocks.forEach(block => {
             this.instanceServiceExitedUnsubscribers.push(InstanceService.subscribe(block.id, InstanceEventType.EVENT_INSTANCE_EXITED, this.onInstanceStatusExited));

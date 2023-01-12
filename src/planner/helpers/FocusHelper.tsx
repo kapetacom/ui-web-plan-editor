@@ -100,13 +100,13 @@ export default class FocusHelper {
      * @param currentSize
      */
     public getFocusZoomLevel = (zoomLevelAreas: ZoomAreaMap, nodeSize: PlannerNodeSize): number => {
-        let positioningMap = {};
+        let positioningMap:{[key:string]:FocusPositioningData} = {};
         let fittingZoomLevels: number[] = [1];
 
         if (this.plan.focusedBlock) {
             const focusBlock = this.plan.focusedBlock;
-            Object.keys(zoomLevelAreas).forEach((key: any) => {
-                positioningMap[key] = this.getBlocksFitToScreen(focusBlock, zoomLevelAreas[+key], nodeSize)
+            Object.keys(zoomLevelAreas).forEach((key: string) => {
+                positioningMap[key] = this.getBlocksFitToScreen(focusBlock, zoomLevelAreas[parseInt(key)], nodeSize)
             });
             fittingZoomLevels = Object.keys(positioningMap).filter((key: string) => {
                 return this.getFitBothSides(focusBlock, positioningMap[+key], nodeSize);
