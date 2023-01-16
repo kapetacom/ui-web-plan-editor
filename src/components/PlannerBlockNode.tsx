@@ -127,12 +127,17 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         this.container.addEventListener('mousedown', this.mouseDownHandler);
     }
 
+    private isReadOnly() {
+        return this.props.readOnly ||
+            this.props.block.isReadOnly();
+    }
+
     renderBlockActions(block:PlannerBlockModelWrapper) {
         if (this.props.viewOnly) {
             return <g className={'block-actions'} />
         }
 
-        if (this.props.readOnly) {
+        if (this.isReadOnly()) {
             return (
                 <g className={'block-actions'}>
 
@@ -245,7 +250,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
                                     size={this.props.size}
                                     planner={this.props.planner}
                                     role={ResourceRole.CONSUMES}
-                                    readOnly={this.props.readOnly}
+                                    readOnly={this.isReadOnly()}
                                     viewOnly={this.props.viewOnly}
                                     list={block.consumes}
                                     zoom={this.props.zoom}
@@ -257,7 +262,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
                                     size={this.props.size}
                                     blockData={block}
                                     role={ResourceRole.PROVIDES}
-                                    readOnly={this.props.readOnly}
+                                    readOnly={this.isReadOnly()}
                                     viewOnly={this.props.viewOnly}
                                     list={block.provides}
                                     zoom={this.props.zoom}/>

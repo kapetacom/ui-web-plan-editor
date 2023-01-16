@@ -41,7 +41,10 @@ const blocks = [
         version: '1.2.3',
         title: resource.metadata.title,
         type: ResourceType.SERVICE,
-        role: ResourceRole.CONSUMES
+        role: ResourceRole.CONSUMES,
+        converters: [
+            {fromKind: 'blockware/resource-type-rest-api'}
+        ]
     });
 });
 
@@ -53,7 +56,7 @@ const blocks = [
         version: '1.2.3',
         title: resource.metadata.title,
         type: ResourceType.SERVICE,
-        role: ResourceRole.PROVIDES
+        role: ResourceRole.PROVIDES,
     });
 });
 
@@ -76,7 +79,7 @@ BlockServiceMock.list = async () => {
 };
 
 BlockServiceMock.get = async (ref) => {
-    const out = blocks.find(a => a.ref === ref);
+    const out = blocks.find(a => a.ref === ref.split(':')[0]);
     if (!out) {
         console.error('Could not find ref: ', ref);
     }

@@ -12,7 +12,7 @@ export const PlannerData: PlanKind = {
                 id: 'user',
                 name: 'Users',
                 block: {
-                    ref: 'blockware/user'
+                    ref: 'blockware/user:local'
                 },
 
                 dimensions: {
@@ -26,7 +26,7 @@ export const PlannerData: PlanKind = {
                 id: 'userNos',
                 name: 'Users',
                 block: {
-                    ref: 'blockware/user'
+                    ref: 'blockware/user:local'
                 },
 
                 dimensions: {
@@ -40,7 +40,7 @@ export const PlannerData: PlanKind = {
                 id: "todo",
                 name: "Todo service",
                 block: {
-                    ref: 'blockware/todo'
+                    ref: 'blockware/todo:1.0.2'
                 },
 
                 dimensions: {
@@ -54,7 +54,7 @@ export const PlannerData: PlanKind = {
                 id: "todo2",
                 name: "Todo service 3",
                 block: {
-                    ref: 'blockware/todo'
+                    ref: 'blockware/todo:local'
                 },
 
                 dimensions: {

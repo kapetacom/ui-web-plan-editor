@@ -118,6 +118,9 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         activeResource = this.findValidResourceFromDimensions(hoverDimensions);
         if (!activeResource) {
             activeBlock = this.findValidBlockFromDimensions(hoverDimensions);
+            if (activeBlock && activeBlock.isReadOnly()) {
+                activeBlock = null;
+            }
         }
 
         this.props.planner.blocks.forEach((block) => {
@@ -164,7 +167,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
                 this.props.setItemToEdit) {
                 this.props.setItemToEdit(connection, ItemType.CONNECTION, true);
             }
-        } else if (activeBlock) {
+        } else if (activeBlock && !activeBlock.isReadOnly()) {
             activeBlock.setMode(BlockMode.HIDDEN)
             this.props.planner.copyResourceToBlock(activeBlock.id, this.original);
         }
@@ -186,7 +189,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
 
                     }
                 }
-            })
+            });
         })
     };
 

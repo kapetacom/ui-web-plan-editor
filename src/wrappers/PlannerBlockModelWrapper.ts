@@ -61,6 +61,9 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     private dragging = false;
 
     @observable
+    private readonly = false;
+
+    @observable
     consumes = [] as PlannerResourceModelWrapper[];
 
     @observable
@@ -101,6 +104,8 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
             this.version = this.blockReference.ref.split(':')[1];
         }
 
+        this.readonly = this.version !== 'local';
+
         if (blockInstance.dimensions) {
             this.size = {
                 width: blockInstance.dimensions.width,
@@ -126,6 +131,10 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         this.validate()
 
+    }
+
+    isReadOnly():boolean {
+        return this.readonly;
     }
 
     getRef(): string {

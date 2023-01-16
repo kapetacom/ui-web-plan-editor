@@ -102,8 +102,12 @@ export class DnDHelper {
     @action
     private handleToolItemDragged(data: any, dimensions: Dimensions) {
         if (ResourceTypeProvider.exists(data.kind) && !this.planner.plan.focusedBlock) {
-            const activeBlock = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
+            let activeBlock = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
             const resourceConfig: ResourceConfig = data;
+
+            if (activeBlock && activeBlock.isReadOnly()) {
+                activeBlock = null;
+            }
 
             this.planner.plan.blocks.forEach((block:PlannerBlockModelWrapper) => {
                 if (activeBlock === block) {
@@ -160,7 +164,7 @@ export class DnDHelper {
             });
 
             const block = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
-            if (!block) {
+            if (!block || block.isReadOnly()) {
                 return;
             }
 
