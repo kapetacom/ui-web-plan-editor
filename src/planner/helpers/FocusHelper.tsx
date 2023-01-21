@@ -3,12 +3,11 @@ import React from "react";
 import {Point, ResourceRole, Size} from "@blockware/ui-web-types";
 
 import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
-import {FocusPositioningData, PlannerNodeSize, ZoomAreaMap, NeighboringBlocks} from "../../types";
+import {FocusPositioningData, NeighboringBlocks, PlannerNodeSize, ZoomAreaMap} from "../../types";
 import {PlannerModelWrapper} from "../../wrappers/PlannerModelWrapper";
-import {
-    PlannerConnectionModelWrapper
-} from "../../wrappers/PlannerConnectionModelWrapper";
+import {PlannerConnectionModelWrapper} from "../../wrappers/PlannerConnectionModelWrapper";
 import {PlannerFocusSideBar} from "../PlannerFocusSideBar";
+import {action, makeObservable, observable} from "mobx";
 
 export const POSITIONING_DATA = "preFocusPosition";
 export const FOCUSED_ID = "focusedID";
@@ -16,11 +15,12 @@ const OFFSET_FROM_TOP = 20;
 
 export class FocusHelper {
 
-
-    private plan: PlannerModelWrapper;
+    @observable
+    private readonly plan: PlannerModelWrapper;
 
     constructor(plan: PlannerModelWrapper) {
         this.plan = plan;
+        makeObservable(this);
     }
 
     /**
@@ -28,12 +28,14 @@ export class FocusHelper {
      * @param block
      * @param positionData
      */
+    @observable
     private getFocusedBlockPosition = (block: PlannerBlockModelWrapper, positionData: FocusPositioningData, nodeSize: PlannerNodeSize) => {
         let x = positionData.plannerWidth / 2 - (block.width) / 2;
         const y = positionData.plannerHeight / 2 - (block.calculateHeight(nodeSize) / 2);
         return {x, y};
     }
 
+    @observable
     public isConnectionLinkedToFocus = (connection: PlannerConnectionModelWrapper) => {
         if (!this.plan.focusedBlock) {
             return false;
@@ -46,6 +48,7 @@ export class FocusHelper {
         }
     }
 
+    @observable
     private getBlockListTotalHeight = (blocks: PlannerBlockModelWrapper[], nodeSize: PlannerNodeSize) => {
         let totalHeight = OFFSET_FROM_TOP;
         blocks.forEach((block: PlannerBlockModelWrapper) => {
@@ -59,6 +62,7 @@ export class FocusHelper {
      * Calculate the number of blocks that can fit into the screen horizontally and vertically
      * in the default zoom level
      */
+    @observable
     private getBlocksFitToScreen = (focusedBlock: PlannerBlockModelWrapper, availableSize: Point, nodeSize: PlannerNodeSize): FocusPositioningData => {//having a x and y as size we can precalculate fitting items before we adjust the zoom level
         const connectedToFocusBlocks = focusedBlock.getConnectedBlocks();
         let availableHeight = availableSize.y - 100 - OFFSET_FROM_TOP;
@@ -101,6 +105,7 @@ export class FocusHelper {
      * get the minimum possible zoom level for the focused block "cluster"
      * @param currentSize
      */
+    @observable
     public getFocusZoomLevel = (zoomLevelAreas: ZoomAreaMap, nodeSize: PlannerNodeSize): number => {
         let positioningMap:{[key:string]:FocusPositioningData} = {};
         let fittingZoomLevels: number[] = [1];
@@ -147,12 +152,13 @@ export class FocusHelper {
         );
     }
 
+
     public getFocusArea(zoomIn: number, plannerCanvasSize: Size) {
-        const plannerArea = {x: plannerCanvasSize.width * zoomIn, y: plannerCanvasSize.height * zoomIn}
-        return plannerArea
+        return {x: plannerCanvasSize.width * zoomIn, y: plannerCanvasSize.height * zoomIn}
     }
 
-    public getBlockPositionForFocus(block: PlannerBlockModelWrapper, nodeSize: PlannerNodeSize, plannerSize: Point) {
+    @action
+    public updateBlockPositionForFocus(block: PlannerBlockModelWrapper, nodeSize: PlannerNodeSize, plannerSize: Point) {
         let point;
         if (this.plan.focusedBlock) {
             let positioningData = this.getBlocksFitToScreen(this.plan.focusedBlock, plannerSize, nodeSize)
@@ -187,18 +193,21 @@ export class FocusHelper {
         sidePanelOpen: boolean
     }) => {
 
-        const close = () => {
+        const close = action(() => {
             this.plan.focusedBlock &&
             props.setFocusZoom(this.plan.focusedBlock)
-        };
+        });
+
+        console.log('Rendering helper sidebar');
 
         return (
             <PlannerFocusSideBar block={this.plan.focusedBlock}
-                                 onBlockItemHover={(block ?: PlannerBlockModelWrapper) => props.onNeighboringBlockHover(block)}
+                                 onBlockItemHover={props.onNeighboringBlockHover}
+                                 onFocusChange={props.setFocusZoom}
+                                 open={props.sidePanelOpen}
                                  blurFocus={close}
-                                 open={props.sidePanelOpen} plan={this.plan}
+                                 plan={this.plan}
                                  onClose={close}
-                                 onFocusChange={(block: PlannerBlockModelWrapper) => props.setFocusZoom(block)}
             />
         )
     }
@@ -210,6 +219,7 @@ export class FocusHelper {
      * @param positionData
      * @param allBlocks
      */
+    @observable
     private getFocusedLinkedBlockPosition(blockId: string, side: ResourceRole, positionData: FocusPositioningData, allBlocks: NeighboringBlocks, nodeSize: PlannerNodeSize): Point {
         let blockIndex = allBlocks.all.indexOf(allBlocks.all.filter((block: PlannerBlockModelWrapper) => block.id === blockId)[0])
         let y = 0;
@@ -238,6 +248,7 @@ export class FocusHelper {
 
     }
 
+    @observable
     private getFitBothSides = (focusedBlock: PlannerBlockModelWrapper, dimensions: FocusPositioningData, nodeSize: PlannerNodeSize): boolean => {
         let fitLeft = false;
         let fitRight = false;

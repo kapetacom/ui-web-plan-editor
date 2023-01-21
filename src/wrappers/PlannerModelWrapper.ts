@@ -127,9 +127,7 @@ export class PlannerModelWrapper {
             if (this.focusedBlock) {
                 this.hideFocusedBlock(this.focusedBlock);
             }
-
             this.showFocusedBlock(block);
-
             this.focusedBlock = block;
         }
     }

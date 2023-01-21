@@ -19,6 +19,7 @@ import {PlannerConnectionModelWrapper} from '../wrappers/PlannerConnectionModelW
 import {SelectedResourceItem} from '../wrappers/models';
 import { asHTMLElement, DOMElement } from "@blockware/ui-web-utils";
 import {observer} from "mobx-react";
+import {action, computed, makeObservable, observable, runInAction} from "mobx";
 
 
 export interface PlannerTempResourceItemProps {
@@ -30,36 +31,35 @@ export interface PlannerTempResourceItemProps {
     zoom?: number
 }
 
-export interface PlannerTempResourceItemState {
-    index: number
-}
 
 @observer
-export class PlannerTempResourceItem extends Component<PlannerTempResourceItemProps, PlannerTempResourceItemState> {
+export class PlannerTempResourceItem extends Component<PlannerTempResourceItemProps> {
 
-    private compatibleResources: PlannerResourceModelWrapper[] = [];
+    @observable
+    private readonly compatibleResources: PlannerResourceModelWrapper[] = [];
+
+    @observable
+    private readonly resource: PlannerResourceModelWrapper
+
+    @observable
+    private readonly original: PlannerResourceModelWrapper
+
     private elm: DOMElement | null = null;
 
     constructor(props: PlannerTempResourceItemProps) {
         super(props);
-
-        this.state = {
-            index: this.props.index
-        };
+        this.resource = this.props.selectedResource.resource;
+        this.original = this.props.selectedResource.original;
+        makeObservable(this);
     }
 
+    @computed
     private get block() {
         return this.props.selectedResource.original.block;
     }
 
-    private get resource() {
-        return this.props.selectedResource.resource;
-    }
 
-    private get original() {
-        return this.props.selectedResource.original;
-    }
-
+    @action
     private updateDimensionsFromEvent(evt: MouseEvent) {
         let scroll:Point = {x:0,y:0};
         if (this.elm) {
@@ -75,14 +75,17 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         this.resource.updateDimensionsFromEvent(this.props.size, evt, this.props.zoom ? this.props.zoom : 1, scroll);
     }
 
+    @observable
     private findValidResourceFromDimensions(hoverDimensions: Dimensions) {
         return this.props.planner.filterResourcesFromDimensions(this.compatibleResources, hoverDimensions);
     }
 
+    @observable
     private findValidBlockFromDimensions(hoverDimensions: Dimensions) {
         return this.props.planner.findValidBlockTargetFromDimensionsAndResource(this.props.size, hoverDimensions, this.resource);
     }
 
+    @observable
     private getResourcesPosition() {
         if (this.resource.dimensions) {
             return this.resource.dimensions.left;
@@ -91,10 +94,12 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         return 150;
     }
 
+    @observable
     private getResourceHeight() {
         return this.block.getResourceHeight(this.props.size);
     }
 
+    @observable
     private getTopPadding(index: number) {
         if (this.resource.dimensions) {
             return this.resource.dimensions.top;
@@ -103,12 +108,15 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         return 200;
     }
 
+    @action
     private moveHandler = (evt: MouseEvent) => {
         this.updateDimensionsFromEvent(evt);
 
         if (!this.resource.dimensions) { //TypeScript needs this
             return;
         }
+
+        console.log('dimensions', this, this.resource.dimensions);
 
         const hoverDimensions = this.resource.dimensions;
 
@@ -141,6 +149,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         });
     };
 
+    @action
     private mouseUpHandler = (evt: MouseEvent) => {
         this.updateDimensionsFromEvent(evt);
 
@@ -176,7 +185,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         this.props.planner.unsetSelectedResources()
     };
 
-
+    @action
     private dragstart = () => {
         this.props.planner.blocks.filter((block) => {//remove the current block from the pool to find compatible landing resources
             return this.block.id !== block.id
@@ -193,6 +202,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         })
     };
 
+    @action
     private dragEnd = () => {
         this.props.planner.blocks.forEach((block) => {
             block.consumes.forEach(resource => {
@@ -206,7 +216,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
     componentDidMount() {
         window.addEventListener("mousemove", this.moveHandler);
         window.addEventListener('mouseup', this.mouseUpHandler);
-        this.dragstart()
+        this.dragstart();
     }
 
     componentWillUnmount() {

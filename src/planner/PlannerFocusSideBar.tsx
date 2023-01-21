@@ -8,6 +8,7 @@ import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
 import {BlockTree} from "./components/BlockTree";
 
 import "./PlannerFocusSideBar.less";
+import {observer} from "mobx-react";
 
 interface Props {
     plan: PlannerModelWrapper,
@@ -20,7 +21,7 @@ interface Props {
 }
 
 
-export const PlannerFocusSideBar = (props: Props) => {
+export const PlannerFocusSideBar = observer((props: Props) => {
 
     const focusPanel = useRef<SidePanel>();
 
@@ -33,8 +34,7 @@ export const PlannerFocusSideBar = (props: Props) => {
                 focusPanel.current.close()
             }
         }
-    }, [props.plan.focusedBlock])
-
+    }, [props.plan.focusedBlock?.id])
 
     return (
         <SidePanel
@@ -61,6 +61,7 @@ export const PlannerFocusSideBar = (props: Props) => {
             {
                 props.block &&
                 <BlockTree
+                    key={props.plan.focusedBlock?.id}
                     onBlockItemHover={props.onBlockItemHover}
                     onBlockClicked={(block) => {
                         props.onFocusChange(block)
@@ -70,4 +71,4 @@ export const PlannerFocusSideBar = (props: Props) => {
             }
         </SidePanel>
     )
-}
+})

@@ -76,7 +76,8 @@ export class Planner extends React.Component<PlannerProps> {
 
     private blockInspectorPanel: BlockInspectorPanel | null = null;
 
-    private readonly focusHelper = new FocusHelper(this.plan);
+    @observable
+    private readonly focusHelper;
 
     @observable
     private readonly editPanelHelper: EditPanelHelper;
@@ -97,7 +98,7 @@ export class Planner extends React.Component<PlannerProps> {
     private hoveredBlock?: PlannerBlockModelWrapper = undefined;
 
     @observable
-    private sidePanelOpen: boolean = false;
+    private focusSideBarOpen: boolean = false;
 
     @observable
     private runningBlocks: { [id: string]: { status: InstanceStatus } } = {};
@@ -139,10 +140,13 @@ export class Planner extends React.Component<PlannerProps> {
         this.connectionListObserver = reaction(() => this.plan.connections, this.onConnectionsChange);
         this.blockListObserver = reaction(() => this.plan.blocks, this.onBlocksChange);
 
+        this.focusHelper = new FocusHelper(this.plan);
 
         makeObservable(this);
 
         this.init();
+
+
     }
 
     private get nodeSize():PlannerNodeSize {
@@ -160,6 +164,7 @@ export class Planner extends React.Component<PlannerProps> {
         this.observerBlocks(Object.values(this.plan.blocks));
 
         this.plan.validate();
+
 
         if (this.props?.enableInstanceListening) {
             this.setupInstanceService()
@@ -553,22 +558,27 @@ export class Planner extends React.Component<PlannerProps> {
     @action
     private setFocusBlock = (block: PlannerBlockModelWrapper) => {
         //sets the focus block or removes if the block double clicked is the same as the previous one
-
         this.plan.setFocusedBlock(block);
         if (this.plan.focusedBlock) {
+            this.focusSideBarOpen = true;
             window.localStorage.setItem(FOCUSED_ID, this.plan.focusedBlock.id)
         } else {
+            this.focusSideBarOpen = false;
             window.localStorage.setItem(FOCUSED_ID, "")
         }
+
+        console.log('focusing block', this.focusSideBarOpen);
         this.reorderForFocus();
     }
 
-    @observable
+    @action
     private reorderForFocus() {
         this.scrollPlannerTo();
         this.zoom = this.focusHelper.getFocusZoomLevel(this.zoomLevelAreas, this.nodeSize);
-        if (!this.props.plan.focusedBlock &&
+
+        if (!this.plan.focusedBlock &&
             window.localStorage.getItem(FOCUSED_ID) !== null) {
+
             Object.keys(this.cachedPositions).forEach((key: string) => {
                 if (this.plan.findBlockById(key)) {
                     this.plan.findBlockById(key).setPosition(this.cachedPositions[key].x, this.cachedPositions[key].y);
@@ -580,7 +590,9 @@ export class Planner extends React.Component<PlannerProps> {
 
             this.resetZoomLevel();
             return;
-        } else if (window.localStorage.getItem(POSITIONING_DATA) === null ||
+        }
+
+        if (window.localStorage.getItem(POSITIONING_DATA) === null ||
             window.localStorage.getItem(POSITIONING_DATA) === "") {
 
             this.plan.blocks.forEach((block: PlannerBlockModelWrapper) => {
@@ -597,16 +609,16 @@ export class Planner extends React.Component<PlannerProps> {
 
         if (this.plan.focusedBlock) {
             this.plan.focusedBlock.getConnectedBlocks().all.forEach((block: PlannerBlockModelWrapper) => {
-                this.focusHelper.getBlockPositionForFocus(block, this.nodeSize, this.getAdjustedSize({
+                this.focusHelper.updateBlockPositionForFocus(block, this.nodeSize, this.getAdjustedSize({
                     x: this.plannerCanvasSize.width,
                     y: this.plannerCanvasSize.height
                 }, this.zoom));
-            })
-            this.focusHelper.getBlockPositionForFocus(this.plan.focusedBlock, this.nodeSize, this.getAdjustedSize({
+            });
+
+            this.focusHelper.updateBlockPositionForFocus(this.plan.focusedBlock, this.nodeSize, this.getAdjustedSize({
                 x: this.plannerCanvasSize.width,
                 y: this.plannerCanvasSize.height
-            }, this.zoom))
-
+            }, this.zoom));
         }
     }
 
@@ -663,6 +675,9 @@ export class Planner extends React.Component<PlannerProps> {
 
         const canvasSize = this.getZoomDivDimensions();
 
+
+        console.log('render plan');
+
         return (
             <>
                 {this.connectionToInspect &&
@@ -705,7 +720,7 @@ export class Planner extends React.Component<PlannerProps> {
                         {this.focusHelper.renderSideBar({
                             onNeighboringBlockHover: this.onNeighboringBlockHover,
                             setFocusZoom: this.setFocusBlock,
-                            sidePanelOpen: this.sidePanelOpen
+                            sidePanelOpen: this.focusSideBarOpen
                         })}
 
                         <div ref={this.canvasContainerElement}

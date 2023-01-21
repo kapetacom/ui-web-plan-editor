@@ -27,7 +27,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     @observable
     mode: ResourceMode;
 
-    @observable
+    @observable.struct
     dimensions?: Dimensions;
 
     @observable
@@ -227,6 +227,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         }
 
         //Adjust for main container - hardcoded for now
+        //TODO: Fix
         x -= 0;
         y -= 35;
 
