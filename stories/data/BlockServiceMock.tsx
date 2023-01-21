@@ -6,7 +6,8 @@ export const BlockServiceMock = BlockService;
 
 const blocks = [
     require('./blocks/blockware-user.json'),
-    require('./blocks/blockware-todo.json')
+    require('./blocks/blockware-todo.json'),
+    require('./blocks/blockware-images.json')
 ].map(data => {
     return {
         ref: data.metadata.name,

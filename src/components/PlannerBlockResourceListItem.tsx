@@ -141,6 +141,10 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         evt.stopPropagation();
         evt.preventDefault();
 
+        if (this.getBlock()?.plan?.isReadOnly()) {
+            return;
+        }
+
         this.setState({ dragging: false, clickDown: true });
         if (this.props.resource) {
 

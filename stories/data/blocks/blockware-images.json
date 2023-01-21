@@ -1,0 +1,95 @@
+{
+    "kind": "blockware/block-type-service",
+    "metadata": {
+        "name": "blockware/image"
+    },
+    "spec": {
+        "target": {
+            "kind": "blockware/language-target-java-spring-boot",
+            "options": {
+                "groupId": "org.mycompany",
+                "artifactId": "service-images",
+                "basePackage": "org.mycompany.services.images"
+            }
+        },
+        "entities": {
+            "types": [
+                {
+                    "name": "image",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
+        "consumers": [
+            {
+                "kind": "blockware/resource-type-postgresql",
+                "metadata": {
+                    "name": "imagesdb"
+                }
+            }
+        ],
+        "providers": [
+            {
+                "kind": "blockware/resource-type-rest-api",
+                "metadata": {
+                    "name": "images"
+                },
+                "spec": {
+                    "methods": {
+                        "createimage": {
+                            "description": "Create image",
+                            "method": "POST",
+                            "path": "/images/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                },
+                                "image": {
+                                    "type": "image",
+                                    "transport": "body"
+                                }
+                            },
+                            "responseType": {
+                                "$ref": "image"
+                            }
+                        },
+                        "getimage": {
+                            "description": "Get image by id",
+                            "method": "GET",
+                            "path": "/images/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                }
+                            },
+                            "responseType": "image"
+                        },
+                        "deleteimage": {
+                            "description": "Delete image by id",
+                            "method": "DELETE",
+                            "path": "/images/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

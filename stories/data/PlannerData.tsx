@@ -23,8 +23,8 @@ export const PlannerData: PlanKind = {
                 }
             },
             {
-                id: 'userNos',
-                name: 'Users',
+                id: 'user2',
+                name: 'Users 2',
                 block: {
                     ref: 'blockware/user:local'
                 },
@@ -52,9 +52,23 @@ export const PlannerData: PlanKind = {
             },
             {
                 id: "todo2",
-                name: "Todo service 3",
+                name: "Todo service 2",
                 block: {
                     ref: 'blockware/todo:local'
+                },
+
+                dimensions: {
+                    top: 500,
+                    width: 150,
+                    left: 350,
+                    height: -1
+                }
+            },
+            {
+                id: "images",
+                name: "Image service",
+                block: {
+                    ref: 'blockware/image:local'
                 },
 
                 dimensions: {
