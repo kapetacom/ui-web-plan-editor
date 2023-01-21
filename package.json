@@ -1,6 +1,6 @@
 {
     "name": "@blockware/ui-web-plan-editor",
-    "version": "0.0.13",
+    "version": "0.0.14",
     "main": "src/index.ts",
     "files": [
         "package.json",

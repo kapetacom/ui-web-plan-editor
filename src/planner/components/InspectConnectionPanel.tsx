@@ -84,7 +84,7 @@ export class InspectConnectionPanel extends Component<InspectConnectionWrapperPr
         this.modal.close();
     }
 
-    UNSAFE_componentWillMount() {
+    componentDidMount() {
         this.unsubscribeAll();
         let { connection } = this.props;
         this.unsubscribers = [
@@ -126,6 +126,7 @@ export class InspectConnectionPanel extends Component<InspectConnectionWrapperPr
     render() {
 
         return ( <Modal ref={(ref) => this.modal = ref}
+                        openInitially={true}
                    title="Connection Traffic Inspector"
                    onClose={this.props.onClose}
                    size={ModalSize.large}  >

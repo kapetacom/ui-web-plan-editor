@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { observer } from "mobx-react";
+import React, {Component} from "react";
+import {observer} from "mobx-react";
 import {action, toJS, observable, makeObservable} from "mobx";
 import {
     Button,
@@ -8,7 +8,8 @@ import {
     FormContainer,
     FormButtons,
     SidePanel,
-    ButtonStyle} from "@blockware/ui-web-components";
+    ButtonStyle
+} from "@blockware/ui-web-components";
 
 import {
     BlockTypeProvider,
@@ -41,7 +42,7 @@ interface ItemEditorPanelProps {
     editableItem: DataWrapper | any | undefined
     onClosed: () => void
     onBlockSaved: (item: PlannerBlockModelWrapper) => void
-    onConnectionSaved: (item:PlannerConnectionModelWrapper) => void
+    onConnectionSaved: (item: PlannerConnectionModelWrapper) => void
     onBlockRemoved: (item: PlannerBlockModelWrapper) => void
     onConnectionRemoved: (item: PlannerConnectionModelWrapper) => void
 }
@@ -55,33 +56,11 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
     @observable
     private editedConnection?: BlockConnectionEditData;
 
-    private sidePanel: SidePanel | null = null;
+    private saved: boolean = false;
 
-    private saved:boolean = false;
-
-    constructor(props:ItemEditorPanelProps) {
+    constructor(props: ItemEditorPanelProps) {
         super(props);
         makeObservable(this);
-    }
-
-    @action
-    public open() {
-        if (!this.sidePanel) {
-            return;
-        }
-
-        this.sidePanel.open();
-    }
-
-    @action
-    public close() {
-        if (!this.sidePanel) {
-            return;
-        }
-
-        this.editedSchema = undefined;
-        this.editedConnection = undefined;
-        this.sidePanel.close();
     }
 
     @action
@@ -90,7 +69,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
             if (!this.props.editableItem) {
                 return;
             }
-    
+
             this.editedSchema = undefined;
             this.editedConnection = undefined;
 
@@ -125,7 +104,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
         if (!this.props.editableItem) {
             return;
         }
-        this.close();
+        this.onPanelClosed();
     };
 
     @action
@@ -138,7 +117,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
         } catch (e) {
             console.log(e);
         } finally {
-            this.close();
+            this.onPanelClosed();
         }
     }
 
@@ -200,7 +179,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
 
 
     @action
-    private onSchemaChanged = (metadata:BlockMetadata, spec:any) => {
+    private onSchemaChanged = (metadata: BlockMetadata, spec: any) => {
         const item = this.props.editableItem.item;
         this.editedSchema = {
             kind: item.getData().kind,
@@ -210,7 +189,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
     }
 
     @action
-    private onMappingChanged = (change:any) => {
+    private onMappingChanged = (change: any) => {
         const connection = this.props.editableItem.item;
         this.editedConnection = {
             target: change.target,
@@ -291,7 +270,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
             }
 
             const data = (!this.editedSchema || this.editedSchema.kind !== definition.kind) ?
-                                definition : this.editedSchema;
+                definition : this.editedSchema;
 
             return <>
                 <resourceType.componentType
@@ -318,13 +297,12 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
             return `Edit ${this.props.editableItem.type.toLowerCase()}`;
         };
 
-
-        return (<SidePanel ref={(ref) => this.sidePanel = ref}
+        return <SidePanel
             title={panelHeader()}
             size={PanelSize.large}
+            open={!!this.props.editableItem}
             onOpen={() => this.saved = false}
-            onClose={this.onPanelClosed} 
-            >
+            onClose={this.onPanelClosed}>
 
             {this.props.editableItem &&
                 <div className={'item-editor-panel'}>
@@ -335,13 +313,15 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
                             }
                         </div>
                         <FormButtons>
-                            <Button width={70} type={ButtonType.BUTTON} style={ButtonStyle.DANGER} onClick={this.onPanelCancel} text="Cancel" />
-                            <Button width={70} type={ButtonType.SUBMIT} style={ButtonStyle.PRIMARY} text="Save" />
+                            <Button width={70} type={ButtonType.BUTTON} style={ButtonStyle.DANGER}
+                                    onClick={this.onPanelCancel} text="Cancel"/>
+                            <Button width={70} type={ButtonType.SUBMIT} style={ButtonStyle.PRIMARY} text="Save"/>
                         </FormButtons>
                     </FormContainer>
                 </div>
             }
+            {!this.props.editableItem && <div>No item selected</div>}
         </SidePanel>
-        )
+
     }
 }

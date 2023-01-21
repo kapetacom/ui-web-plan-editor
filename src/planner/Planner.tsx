@@ -1,8 +1,7 @@
 import React from 'react';
 import {observer} from "mobx-react";
 import * as _ from 'lodash';
-import {Lambda, runInAction} from "mobx";
-import {action, computed, makeObservable, observable, reaction} from "mobx";
+import {action, computed, Lambda, makeObservable, observable, reaction, runInAction} from "mobx";
 
 import {toClass} from "@blockware/ui-web-utils";
 import {DnDContainer, DnDDrop, showToasty, ToastType} from "@blockware/ui-web-components";
@@ -16,16 +15,14 @@ import {
 } from "@blockware/ui-web-context";
 
 import type {BlockPositionCache, ZoomAreaMap} from "../types";
+import {PlannerNodeSize} from "../types";
 import {PlannerBlockNode} from "../components/PlannerBlockNode";
 import {PlannerTempResourceItem} from '../components/PlannerTempResourceItem';
-import {PlannerNodeSize} from "../types";
 import {PlannerConnection} from "../components/PlannerConnection";
 import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
 import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 import {PlannerConnectionModelWrapper} from "../wrappers/PlannerConnectionModelWrapper";
-import {
-    PlannerTempResourceConnection
-} from "../components/PlannerTempResourceConnection";
+import {PlannerTempResourceConnection} from "../components/PlannerTempResourceConnection";
 
 import {PlannerToolbox} from "./components/PlannerToolbox";
 import {InspectConnectionPanel} from './components/InspectConnectionPanel';
@@ -36,9 +33,11 @@ import {DnDHelper} from "./helpers/DnDHelper";
 import {EditPanelHelper} from "./helpers/EditPanelHelper";
 import {InspectBlockPanelHelper} from "./helpers/InspectBlockPanelHelper";
 import {SVGDropShadow} from "../utils/SVGDropShadow";
-import { ZoomButtons } from '../components/ZoomButtons';
+import {ZoomButtons} from '../components/ZoomButtons';
 import {EditableItemInterface} from "../wrappers/models";
 import "./Planner.less";
+import {PlannerResourceModelWrapper} from "../wrappers/PlannerResourceModelWrapper";
+import {BlockMode, ResourceMode} from "../wrappers/wrapperHelpers";
 
 interface BlockObserver {
     blockObserverDisposer: Lambda
@@ -60,18 +59,11 @@ export interface PlannerProps {
     blockStore?:React.ComponentType
 }
 
-export interface PlannerState {
-    over: boolean
-    clickDown: boolean
-    size: PlannerNodeSize
-    editableItem: DataWrapper | any | undefined
-    error: Error | string | undefined
-}
 
 const zoomStep = 0.25;
 
 @observer
-export class Planner extends React.Component<PlannerProps, PlannerState> {
+export class Planner extends React.Component<PlannerProps> {
 
     private readonly blockListObserver: Lambda;
     private readonly connectionListObserver: Lambda;
@@ -82,8 +74,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     private zoomLevelAreas: ZoomAreaMap = {};
     private canvasContainerElement = React.createRef<HTMLDivElement>();
 
-    private inspectConnectionPanel: InspectConnectionPanel | null = null;
-    private itemEditorPanel: ItemEditorPanel | null = null;
     private blockInspectorPanel: BlockInspectorPanel | null = null;
 
     private readonly focusHelper = new FocusHelper(this.plan);
@@ -125,7 +115,10 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     private plannerCanvasSize: Size = {width: 0, height: 0};
 
     @observable
-    private currentItem: EditableItemInterface|null = null;
+    private editingItem?: EditableItemInterface = undefined;
+
+    @observable
+    private connectionToInspect?: PlannerConnectionModelWrapper = undefined;
 
     @observable
     private canvasSize = {
@@ -143,14 +136,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         this.dnd = new DnDHelper(this, this.editPanelHelper);
         this.blockInspectorPanelHelper = new InspectBlockPanelHelper(this);
 
-        this.state = {
-            over: false,
-            clickDown: false,
-            editableItem: undefined,
-            error: undefined,
-            size: this.props.size || PlannerNodeSize.MEDIUM
-        };
-
         this.connectionListObserver = reaction(() => this.plan.connections, this.onConnectionsChange);
         this.blockListObserver = reaction(() => this.plan.blocks, this.onBlocksChange);
 
@@ -158,6 +143,10 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         makeObservable(this);
 
         this.init();
+    }
+
+    private get nodeSize():PlannerNodeSize {
+        return this.props.size || PlannerNodeSize.MEDIUM;
     }
 
     @action
@@ -178,9 +167,37 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     }
 
     @action
-    public setCurrentItem(item?:EditableItemInterface) {
-        this.currentItem = item;
-        console.log('Settings something on planner', this);
+    public setEditingItem(item?:EditableItemInterface) {
+        if (this.editingItem) {
+            //Reset existing item first
+            const {item} = this.editingItem;
+            if (item instanceof PlannerResourceModelWrapper) {
+                item.setMode(ResourceMode.HIDDEN);
+            }
+
+            if (item instanceof PlannerBlockModelWrapper) {
+                item.setMode(BlockMode.HIDDEN);
+            }
+
+            if (item instanceof PlannerConnectionModelWrapper) {
+                item.setEditing(false);
+                item.toResource.setMode(ResourceMode.HIDDEN);
+                item.fromResource.setMode(ResourceMode.HIDDEN);
+            }
+        }
+
+        this.editingItem = item;
+        if (item) {
+            this.setConnectionToInspect(undefined);
+        }
+    }
+
+    @action
+    public setConnectionToInspect(item?:PlannerConnectionModelWrapper) {
+        this.connectionToInspect = item;
+        if (item) {
+            this.setEditingItem(undefined);
+        }
     }
 
     @observable
@@ -218,22 +235,8 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         return this.props.plan;
     }
 
-    @computed
-    get nodeSize(): PlannerNodeSize {
-        return this.state.size;
-    }
-
-    public getItemEditorPanel() {
-        return this.itemEditorPanel;
-    }
-
     public getBlockInspectorPanel() {
         return this.blockInspectorPanel;
-    }
-
-
-    public getInspectConnectionPanel() {
-        return this.inspectConnectionPanel;
     }
 
     @action
@@ -243,9 +246,12 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     private setEditItem = (item, type) => this.setEditOrCreateItem(item, type, false);
 
     @action
+    private onEditorClosed = () => this.setEditingItem(undefined)
+
+    @action
     private recalculateCanvas() {
         this.recalculateSize();
-        this.canvasSize = this.plan.calculateCanvasSize(this.state.size, this.plannerCanvasSize);
+        this.canvasSize = this.plan.calculateCanvasSize(this.nodeSize, this.plannerCanvasSize);
     }
 
     private recalculateSize() {
@@ -287,7 +293,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     }
 
     private onInspectorPanelClosed = () => {
-        this.setState({editableItem: undefined});
+        this.connectionToInspect = undefined;
     };
 
     private onInstanceStatusChanged = (message: any) => {
@@ -410,11 +416,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         await this.onPlanChange();
     };
 
+    @action
     private handleInspection = (connection: PlannerConnectionModelWrapper) => {
-        this.setState({editableItem: connection}, () => {
-            this.inspectConnectionPanel && this.inspectConnectionPanel.open();
-        });
-
+        this.connectionToInspect = connection;
     };
 
     private handleWindowResized = () => {
@@ -638,13 +642,12 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         const containerClass = toClass({
             'planner-area-container': true,
             'dragging-resource': !!this.plan.selectedResource,
-            'node-size-small': this.state.size === PlannerNodeSize.SMALL,
-            'node-size-medium': this.state.size === PlannerNodeSize.MEDIUM,
-            'node-size-full': this.state.size === PlannerNodeSize.FULL,
+            'node-size-small': this.nodeSize === PlannerNodeSize.SMALL,
+            'node-size-medium': this.nodeSize === PlannerNodeSize.MEDIUM,
+            'node-size-full': this.nodeSize === PlannerNodeSize.FULL,
             'dragging': this.plan.isDragging(),
             'read-only': this.plan.isReadOnly(),
-            'view-only': this.plan.isViewing(),
-            'editing-item': !!this.currentItem
+            'view-only': this.plan.isViewing()
         });
 
         const plannerScrollClassnames = toClass({
@@ -662,16 +665,14 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
         return (
             <>
-                {this.state.editableItem &&
+                {this.connectionToInspect &&
                     <InspectConnectionPanel
-                        ref={(ref) => this.inspectConnectionPanel = ref}
-                        connection={this.state.editableItem}
+                        connection={this.connectionToInspect}
                         onClose={this.onInspectorPanelClosed}/>
                 }
 
-                <ItemEditorPanel ref={(ref) => this.itemEditorPanel = ref}
-                                 onClosed={this.editPanelHelper.onClosed}
-                                 editableItem={this.currentItem}
+                <ItemEditorPanel onClosed={this.onEditorClosed}
+                                 editableItem={this.editingItem}
                                  onBlockSaved={this.onBlockSaved}
                                  onBlockRemoved={this.onBlockRemoved}
                                  onConnectionSaved={this.onConnectionSaved}
@@ -743,7 +744,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                                                 readOnly={this.plan.isReadOnly()}
                                                                 viewOnly={this.plan.isViewing()}
                                                                 key={connection.id + "_link_" + index}
-                                                                size={this.state.size}
+                                                                size={this.nodeSize}
                                                                 focusBlock={this.plan.focusedBlock}
                                                                 handleInspectClick={this.handleInspection}
                                                                 setItemToEdit={this.setEditItem}
@@ -757,7 +758,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
                                             {this.plan.selectedResource !== undefined &&
                                                 <PlannerTempResourceConnection
-                                                    size={this.state.size}
+                                                    size={this.nodeSize}
                                                     selectedResource={this.plan.selectedResource}
                                                 />
                                             }
@@ -794,7 +795,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                                             this.recalculateCanvas()
                                                         }}
                                                         status={this.getNodeStatus(runningBlock, failedToRunBlock)}
-                                                        size={(block === this.plan.focusedBlock) ? PlannerNodeSize.MEDIUM : this.state.size}
+                                                        size={(block === this.plan.focusedBlock) ? PlannerNodeSize.MEDIUM : this.nodeSize}
                                                         setItemToEdit={this.setEditItem}
                                                         setItemToInspect={(item, type) => this.blockInspectorPanelHelper.show(item, type, false)}
                                                         planner={this.plan}
@@ -805,7 +806,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                         {this.plan.selectedResource !== undefined &&
                                             <PlannerTempResourceItem
                                                 planner={this.plan}
-                                                size={this.state.size}
+                                                size={this.nodeSize}
                                                 setItemToEdit={this.setEditOrCreateItem}
                                                 selectedResource={this.plan.selectedResource}
                                                 zoom={this.zoom}
