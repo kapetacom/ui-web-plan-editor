@@ -1,0 +1,51 @@
+@import "~@blockware/ui-web-components/styles/values";
+@import "~@blockware/ui-web-components/styles/functions";
+
+.zoom-buttons {
+  overflow: visible;
+
+
+  & > svg {
+    cursor: pointer;
+
+    path {
+      .transition();
+      fill: #EE766A;
+    }
+
+    i {
+      .transition();
+      font-weight: 100;
+      font-size: 20px;
+      color: white;
+      width: 45px;
+      height: 45px;
+      line-height: 38px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    &:hover {
+      path {
+
+      }
+      i {
+        color: @gray-xxdark;
+      }
+    }
+  }
+
+  .zoom-reset {
+    & > g {
+      .transition();
+      overflow: visible;
+    }
+
+    &.hidden {
+      & > g {
+        transform: translate(-0, 20px);
+        opacity: 0;
+      }
+    }
+  }
+}
