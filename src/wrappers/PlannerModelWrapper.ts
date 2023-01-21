@@ -1,4 +1,4 @@
-import {action, makeObservable, observable} from "mobx";
+import {action, makeAutoObservable, makeObservable, observable} from "mobx";
 import {PlannerNodeSize} from "../types";
 import _ from "lodash";
 import type {SelectedResourceItem} from "./models";
@@ -55,7 +55,7 @@ export class PlannerModelWrapper {
     constructor(ref: string, name: string) {
         this._ref = ref;
         this.name = name;
-        makeObservable(this);
+        makeAutoObservable(this);
     }
 
     getData(): PlanKind {

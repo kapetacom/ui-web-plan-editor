@@ -11,6 +11,9 @@ import './PlannerConnection.less';
 import { observer } from "mobx-react";
 import {PlannerConnectionButtons} from "./PlannerConnectionButtons";
 import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
+import {action, computed, makeObservable, observable} from "mobx";
+import {Simulate} from "react-dom/test-utils";
+import mouseOver = Simulate.mouseOver;
 
 interface PlannerConnectionProps {
     size: PlannerNodeSize;
@@ -26,43 +29,51 @@ interface PlannerConnectionProps {
     handleInspectClick?: (connection: PlannerConnectionModelWrapper) => void;
 }
 
-interface PlannerConnectionState {
-    over: boolean,
-}
-
 @observer
-export class PlannerConnection extends React.Component<PlannerConnectionProps, PlannerConnectionState> {
+export class PlannerConnection extends React.Component<PlannerConnectionProps> {
+
+    @observable
+    private mouseHover:boolean = false;
 
     constructor(props: any) {
         super(props);
-
-        const show = (this.props.connection && !this.props.connection.isValid()) ? true : false
-        this.state = {
-            over: show
-        };
+        makeObservable(this);
     }
 
-    onMouseOver = () => {
-        this.setState({ over: true });
+    @computed
+    private get connectionValid():boolean {
+        return (this.props.connection && this.props.connection.isValid())
+    }
+
+    @computed
+    private get buttonsVisible():boolean {
+        return this.mouseHover || !this.connectionValid;
+    }
+
+    @action
+    private onMouseOver = () => {
+        this.mouseHover = true;
+
         if (this.props.onFocus) {
             this.props.onFocus();
         }
     };
 
-    onMouseOut = () => {
-        const show = (this.props.connection && this.props.connection.isValid() === false) ? true : false;
-        this.setState({ over: show });
+    @action
+    private onMouseOut = () => {
+        this.mouseHover = false;
     };
 
-
-    handleEditClick = () => {
+    @observable
+    private handleEditClick = () => {
         if (this.props.setItemToEdit &&
             this.props.connection) {
             this.props.setItemToEdit(this.props.connection, ItemType.CONNECTION);
         }
     };
 
-    handleDeleteClick = () => {
+    @observable
+    private handleDeleteClick = () => {
         if (this.props.onDelete &&
             this.props.connection) {
             DialogControl.show("Delete connection?", "from " + this.props.connection.from.resourceName + " to " + this.props.connection.to.resourceName, () => {
@@ -79,13 +90,14 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps, P
         }
     };
 
-    handleInspectClick = () => {
+    @observable
+    private handleInspectClick = () => {
         if (this.props.connection && this.props.handleInspectClick) {
             this.props.handleInspectClick(this.props.connection);
         }
     };
 
-    getMiddlePoint(list: Point[]) {
+    private getMiddlePoint(list: Point[]) {
         //don't calculate it if the list is empty, to avoid setting the initial value to 0,0
         if(list.length<=0){
             return;
@@ -116,17 +128,18 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps, P
             throw new Error('Either "path" or "connection" property needs to be set with valid value');
         }
 
+
+
         let className = toClass({
             'planner-connection': true,
             'highlight': this.props.connection ? this.props.connection.editing : false,
-            'invalid': !!(this.props.connection && !this.props.connection.isValid())
+            'invalid': !this.connectionValid
         });
 
         if (this.props.className) {
             className += ' ' + this.props.className;
         }
 
-        
         return (
             <>
                 <g className={className.trim()}
@@ -142,7 +155,7 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps, P
                         !this.props.viewOnly &&
                         <PlannerConnectionButtons
                             connection={this.props.connection}
-                            open={this.state.over}
+                            open={this.buttonsVisible}
                             readOnly={this.props.readOnly}
                             x={middlePoint.x}
                             y={middlePoint.y}

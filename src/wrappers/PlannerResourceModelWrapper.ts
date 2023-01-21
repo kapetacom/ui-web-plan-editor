@@ -81,11 +81,13 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         this.validate();
     }
 
+    @observable
     getData():ResourceKind {
         return {...toJS(this.data)};
     }
     
     //X point calculations
+    @observable
     calculateXOffsetFromBlock() {
         const block = this.block;
 
@@ -96,6 +98,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         return block.left + 16 + this.getExtensionSize();
     }
 
+    @observable
     calculateXOffset() {
         if (this.role === ResourceRole.CONSUMES) {
             return this.calculateXOffsetFromBlock() + 13.5;
@@ -103,7 +106,8 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
 
         return this.calculateXOffsetFromBlock() + 148;
     }
-    
+
+    @observable
     getExtensionSize() {
         let extensionSize = DEFAULT_EXTENSION_SIZE;
         const readOnly = this.block?.isReadOnly() || this.block?.plan?.isReadOnly();
@@ -132,7 +136,8 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         return 0;
     }
 
-    //Y calculations 
+    //Y calculations
+    @observable
     calculateYOffset(size: PlannerNodeSize) {
 
         const block = this.block;
@@ -152,11 +157,14 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
 
         return offsetTop + this.calculateYOffsetFromBlock(index, resourceHeight, block) + (resourceHeight / 2);
     }
+
+    @observable
     calculateYOffsetFromBlock(index: number, resourceHeight: number, block: PlannerBlockModelWrapper) {
         return (index * resourceHeight) + block.top;
     }
 
-    //point expansion  
+    //point expansion
+    @observable
     isExtended() {
         return (
             this.mode === ResourceMode.SHOW ||
@@ -170,7 +178,8 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         )
     }
 
-    //resource connection point calculation 
+    //resource connection point calculation
+    @observable
     getConnectionPoint(size:PlannerNodeSize){
         return {x:this.calculateXOffset(),y:this.calculateYOffset(size)}
     }
@@ -243,14 +252,17 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         this.block.removeResource(this.id, this.role);
     }
 
+    @observable
     getKind() {
         return this.data.kind;
     }
 
+    @observable
     getName() {
         return this.data.metadata.name;
     }
 
+    @observable
     isValid() {
         return this.errors.length === 0;
     }
@@ -275,6 +287,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         }
     }
 
+    @observable
     hasMethod(methodId: string) {
         const resourceType = this.getResourceType();
         if (!resourceType.hasMethod) {
@@ -284,6 +297,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         return resourceType.hasMethod(this.data, methodId);
     }
 
+    @observable
     getResourceType() {
         
         return ResourceTypeProvider.get(this.getKind());

@@ -31,22 +31,19 @@
         "lodash": ">=4",
         "react": ">=18",
         "react-dom": ">=18",
-        "mobx": "6",
-        "mobx-react": "7"
+        "mobx": ">=6",
+        "mobx-react": ">=7",
+        "react-tabs": ">=6",
+        "react-use": ">=17",
+        "less": ">=4"
     },
     "dependencies": {
         "@types/lodash": "^4.14.185",
         "@types/node": "^18.7.18",
         "@types/react": ">=18",
-        "@types/react-dom": ">=18",
-        "react-tabs": "^6.0.0",
-        "react-use": "^17.4.0"
+        "@types/react-dom": ">=18"
     },
     "devDependencies": {
-        "@blockware/ui-web-components": "<2",
-        "@blockware/ui-web-context": "<2",
-        "@blockware/ui-web-types": "<2",
-        "@blockware/ui-web-utils": "<2",
         "@sambego/storybook-state": "^2.0.1",
         "@storybook/builder-webpack5": "^6.5.10",
         "@storybook/manager-webpack5": "^6.5.0-rc.1",
@@ -56,10 +53,6 @@
         "less-loader": "^11.0.0",
         "style-loader": "^3.3.1",
         "yaml-loader": "^0.8.0",
-        "less": "^4.1.3",
-        "lodash": "^4.17.15",
-        "react": ">=18",
-        "react-dom": ">=18",
         "typescript": "^4.8.3",
         "yaml": "^2.1.1"
     }

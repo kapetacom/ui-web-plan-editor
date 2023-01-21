@@ -1,7 +1,7 @@
 import React from 'react';
 import {observer} from "mobx-react";
 import * as _ from 'lodash';
-import type {Lambda} from "mobx";
+import {Lambda, runInAction} from "mobx";
 import {action, computed, makeObservable, observable, reaction} from "mobx";
 
 import {toClass} from "@blockware/ui-web-utils";
@@ -42,6 +42,7 @@ import {SVGDropShadow} from "../utils/SVGDropShadow";
 
 import "./Planner.less";
 import { ZoomButtons } from '../components/ZoomButtons';
+import {EditableItemInterface} from "../wrappers/models";
 
 
 interface BlockObserver {
@@ -82,20 +83,27 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     private instanceServiceUnsubscriber?: () => void;
     private instanceServiceExitedUnsubscribers: (() => void)[] =  [];
 
-    private editPanelHelper: EditPanelHelper = new EditPanelHelper(this);
-    private blockInspectorPanelHelper: InspectBlockPanelHelper = new InspectBlockPanelHelper(this);
-    private focusHelper = new FocusHelper(this.plan);
-    private dnd: DnDHelper = new DnDHelper(this, this.editPanelHelper);
     private blockObservers: BlockObserver[] = [];
     private zoomLevelAreas: ZoomAreaMap = {};
     private canvasContainerElement = React.createRef<HTMLDivElement>();
-    private planAnimator = React.createRef<any>(); //Has to be any to be able to invoke the begin function.
+
     private inspectConnectionPanel: InspectConnectionPanel | null = null;
     private itemEditorPanel: ItemEditorPanel | null = null;
     private blockInspectorPanel: BlockInspectorPanel | null = null;
 
+    private readonly focusHelper = new FocusHelper(this.plan);
+
     @observable
-    private connectionObservers: ConnectionObserver[] = [];
+    private readonly editPanelHelper: EditPanelHelper;
+
+    @observable
+    private readonly dnd: DnDHelper;
+
+    @observable
+    private readonly blockInspectorPanelHelper: InspectBlockPanelHelper;
+
+    @observable
+    private readonly connectionObservers: ConnectionObserver[] = [];
 
     @observable
     private cachedPositions: BlockPositionCache = {};
@@ -129,9 +137,15 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         height: 0
     };
 
+    @observable
+    public currentItem?: EditableItemInterface;
+
     constructor(props: PlannerProps) {
         super(props);
-        makeObservable(this);
+
+        this.editPanelHelper = new EditPanelHelper(this);
+        this.dnd = new DnDHelper(this, this.editPanelHelper);
+        this.blockInspectorPanelHelper = new InspectBlockPanelHelper(this);
 
         this.state = {
             over: false,
@@ -141,22 +155,37 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             size: this.props.size || PlannerNodeSize.MEDIUM
         };
 
+        this.connectionListObserver = reaction(() => this.plan.connections, this.onConnectionsChange);
+        this.blockListObserver = reaction(() => this.plan.blocks, this.onBlocksChange);
+
+        makeObservable(this);
+        this.init();
+    }
+
+    @action
+    private init() {
+
         this.plan.blocks.forEach(block => {
             this.runningBlocks[block.id] = {status: InstanceStatus.STOPPED};
         });
 
-        this.connectionListObserver = reaction(() => this.plan.connections, this.onConnectionsChange);
         this.observerConnections(this.plan.connections);
-        this.blockListObserver = reaction(() => this.plan.blocks, this.onBlocksChange);
         this.observerBlocks(Object.values(this.plan.blocks));
 
         this.plan.validate();
 
-        if (props?.enableInstanceListening) {
+        if (this.props?.enableInstanceListening) {
             this.setupInstanceService()
         }
     }
 
+    @action
+    public setCurrentItem(item?:EditableItemInterface) {
+        this.currentItem = item;
+        console.log('Settings something on planner', this);
+    }
+
+    @observable
     private setupInstanceService() {
         InstanceService.getInstanceCurrentStatus()
             .then(instanceStatuses => this.updateRunningBlockStatus(instanceStatuses))
@@ -208,6 +237,12 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     public getInspectConnectionPanel() {
         return this.inspectConnectionPanel;
     }
+
+    @action
+    private setEditOrCreateItem = (item, type, creating = false) => this.editPanelHelper.edit(item, type, creating);
+
+    @action
+    private setEditItem = (item, type) => this.setEditOrCreateItem(item, type, false);
 
     @action
     private recalculateCanvas() {
@@ -443,32 +478,35 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     }
 
     componentDidMount() {
-        window.addEventListener('resize', this.handleWindowResized);
+        runInAction(() => {
+            window.addEventListener('resize', this.handleWindowResized);
 
-        //Calculate the init canvas size after canvasContainerElement ref has been retrieved.
-        this.recalculateCanvas();
+            //Calculate the init canvas size after canvasContainerElement ref has been retrieved.
+            this.recalculateCanvas();
 
-        let zoom = 0.5;
-        do {//populate the zoomLevelArea with all possible sizes after mounting
-            zoom += zoomStep;
-            this.zoomLevelAreas[zoom] = this.focusHelper.getFocusArea(zoom, this.plannerCanvasSize);
-        } while (zoom < 3);
+            let zoom = 0.5;
+            do {//populate the zoomLevelArea with all possible sizes after mounting
+                zoom += zoomStep;
+                this.zoomLevelAreas[zoom] = this.focusHelper.getFocusArea(zoom, this.plannerCanvasSize);
+            } while (zoom < 3);
 
-        //Fetch the focused block id from local storage anf focus if it exists
-        const focusedBlockId = window.localStorage.getItem(FOCUSED_ID);
-        if (focusedBlockId) {
-            this.props.plan.blocks.forEach(block => {
-                if (focusedBlockId === block.id) {
-                    this.setFocusBlock(block);
-                }
-            });
-        }
-        const localCachedPositionData = window.localStorage.getItem(POSITIONING_DATA);
-        if (localCachedPositionData) {
-            this.cachedPositions = JSON.parse(localCachedPositionData) as BlockPositionCache;
-        }
+            //Fetch the focused block id from local storage anf focus if it exists
+            const focusedBlockId = window.localStorage.getItem(FOCUSED_ID);
+            if (focusedBlockId) {
+                this.props.plan.blocks.forEach(block => {
+                    if (focusedBlockId === block.id) {
+                        this.setFocusBlock(block);
+                    }
+                });
+            }
+            const localCachedPositionData = window.localStorage.getItem(POSITIONING_DATA);
+            if (localCachedPositionData) {
+                this.cachedPositions = JSON.parse(localCachedPositionData) as BlockPositionCache;
+            }
+        });
     }
 
+    @observable
     private getNodeStatus = (runningBlock: { status: InstanceStatus }, failedBlock: { status: FailedBlockMessage }) => {
         if (failedBlock) {
             return InstanceStatus.EXITED;
@@ -476,24 +514,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             return runningBlock.status;
         } else {
             return InstanceStatus.STOPPED
-        }
-    }
-
-    private viewBoxAnimationValues() {
-        let newCanvasW = Math.round(this.plannerCanvasSize.width * this.zoom);
-        let newCanvasH = Math.round(this.plannerCanvasSize.height * this.zoom);
-
-        let oldCanvasW = Math.round(this.plannerCanvasSize.width * this.lastZoomLevel);
-        let oldCanvasH = Math.round(this.plannerCanvasSize.height * this.lastZoomLevel);
-
-        return `0 0 ${oldCanvasW}  ${oldCanvasH}; 0 0 ${newCanvasW}  ${newCanvasH}`;
-    }
-
-    private updateAnimation() {
-        //There is some async behavior with updating the viewBox 
-        //it seems that the invocation of beginElement is also calling the viewBoxAnimationValues
-        if (this.planAnimator.current) {
-            this.planAnimator.current.beginElement();
         }
     }
 
@@ -507,11 +527,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         } else if (this.zoom <= 0.4) {
             this.zoom = 0.4
         }
-
-        this.updateAnimation();
     }
 
-    scrollPlannerTo(x?: number, y?: number) {
+    private scrollPlannerTo(x?: number, y?: number) {
         if (this.canvasContainerElement.current) {
             this.canvasContainerElement.current.scrollTo({top: x ? x : 0, left: y ? y : 0})
         }
@@ -524,7 +542,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             this.plan.focusedBlock = undefined;
         }
         this.zoom = 1;
-        this.updateAnimation();
     }
 
     @action
@@ -540,6 +557,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         this.reorderForFocus();
     }
 
+    @observable
     private reorderForFocus() {
         this.scrollPlannerTo();
         this.zoom = this.focusHelper.getFocusZoomLevel(this.zoomLevelAreas, this.nodeSize);
@@ -584,8 +602,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             }, this.zoom))
 
         }
-
-        this.updateAnimation();
     }
 
     private getZoomDivDimensions = () => {
@@ -625,9 +641,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             'node-size-full': this.state.size === PlannerNodeSize.FULL,
             'dragging': this.plan.isDragging(),
             'read-only': this.plan.isReadOnly(),
-            'view-only': this.plan.isViewing()
+            'view-only': this.plan.isViewing(),
+            'editing-item': !!this.currentItem
         });
-
 
         const plannerScrollClassnames = toClass({
             'planner-area-scroll': true,
@@ -642,7 +658,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
         const canvasSize = this.getZoomDivDimensions();
 
-
         return (
             <>
                 {this.state.editableItem &&
@@ -654,7 +669,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
                 <ItemEditorPanel ref={(ref) => this.itemEditorPanel = ref}
                                  onClosed={this.editPanelHelper.onClosed}
-                                 editableItem={this.editPanelHelper.current}
+                                 editableItem={this.currentItem}
                                  onBlockSaved={this.onBlockSaved}
                                  onBlockRemoved={this.onBlockRemoved}
                                  onConnectionSaved={this.onConnectionSaved}
@@ -729,9 +744,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                                                 size={this.state.size}
                                                                 focusBlock={this.plan.focusedBlock}
                                                                 handleInspectClick={this.handleInspection}
-                                                                setItemToEdit={(item, type) => this.editPanelHelper.edit(item, type, false)}
-                                                                onFocus={() => this.plan.moveConnectionToTop(connection)}
-                                                                onDelete={() => this.plan.removeConnection(connection)}
+                                                                setItemToEdit={this.setEditItem}
+                                                                onFocus={this.plan.moveConnectionToTop.bind(this.plan, connection)}
+                                                                onDelete={this.plan.removeConnection.bind(this.plan, connection)}
                                                                 connection={connection}/>
 
                                                     )
@@ -778,7 +793,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                                         }}
                                                         status={this.getNodeStatus(runningBlock, failedToRunBlock)}
                                                         size={(block === this.plan.focusedBlock) ? PlannerNodeSize.MEDIUM : this.state.size}
-                                                        setItemToEdit={(item, type) => this.editPanelHelper.edit(item, type, false)}
+                                                        setItemToEdit={this.setEditItem}
                                                         setItemToInspect={(item, type) => this.blockInspectorPanelHelper.show(item, type, false)}
                                                         planner={this.plan}
                                                     />
@@ -789,7 +804,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                             <PlannerTempResourceItem
                                                 planner={this.plan}
                                                 size={this.state.size}
-                                                setItemToEdit={(item, type, creating) => this.editPanelHelper.edit(item, type, creating)}
+                                                setItemToEdit={this.setEditOrCreateItem}
                                                 selectedResource={this.plan.selectedResource}
                                                 zoom={this.zoom}
                                                 index={-1}

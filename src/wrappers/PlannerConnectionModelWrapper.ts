@@ -1,4 +1,4 @@
-import {action, makeObservable, observable, toJS} from "mobx";
+import {action, computed, makeObservable, observable, runInAction, toJS} from "mobx";
 import _ from 'lodash';
 
 import type { Point, BlockConnectionSpec, DataWrapper } from "@blockware/ui-web-types";
@@ -32,34 +32,37 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
 
     static createFromData(data: BlockConnectionSpec, planner: PlannerModelWrapper) {
 
-        const fromBlock = planner.findBlockById(data.from.blockId);
-        if (!fromBlock) {
-            throw new Error('Source Block not found: ' + data.from.blockId);
-        }
+        return runInAction(() => {
+            const fromBlock = planner.findBlockById(data.from.blockId);
+            if (!fromBlock) {
+                throw new Error('Source Block not found: ' + data.from.blockId);
+            }
 
-        const toBlock = planner.findBlockById(data.to.blockId);
+            const toBlock = planner.findBlockById(data.to.blockId);
 
-        if (!toBlock) {
-            throw new Error('Target Block not found: ' + data.from.blockId);
-        }
+            if (!toBlock) {
+                throw new Error('Target Block not found: ' + data.from.blockId);
+            }
 
-        const fromResource = fromBlock.findResourceById(ResourceRole.PROVIDES, data.from.resourceName);
+            const fromResource = fromBlock.findResourceById(ResourceRole.PROVIDES, data.from.resourceName);
 
-        if (!fromResource) {
-            throw new Error('Provider resource not found: ' + data.from.resourceName);
-        }
+            if (!fromResource) {
+                throw new Error('Provider resource not found: ' + data.from.resourceName);
+            }
 
-        const toResource = toBlock.findResourceById(ResourceRole.CONSUMES, data.to.resourceName);
+            const toResource = toBlock.findResourceById(ResourceRole.CONSUMES, data.to.resourceName);
 
-        if (!toResource) {
-            throw new Error('Consumer resource not found: ' + data.to.resourceName);
-        }
+            if (!toResource) {
+                throw new Error('Consumer resource not found: ' + data.to.resourceName);
+            }
 
-        return makeObservable(new PlannerConnectionModelWrapper(data, fromResource, toResource));
+            return makeObservable(new PlannerConnectionModelWrapper(data, fromResource, toResource));
+        });
     }
 
+
     static createFromResources(fromResource: PlannerResourceModelWrapper, toResource: PlannerResourceModelWrapper) {
-        return new PlannerConnectionModelWrapper({
+        return makeObservable(new PlannerConnectionModelWrapper({
             from: {
                 blockId: fromResource.block.id,
                 resourceName: fromResource.id
@@ -68,11 +71,10 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
                 blockId: toResource.block.id,
                 resourceName: toResource.id
             },
-        }, fromResource, toResource);
+        }, fromResource, toResource));
     }
 
     constructor(connection: BlockConnectionSpec, fromResource: PlannerResourceModelWrapper, toResource: PlannerResourceModelWrapper) {
-        makeObservable(this);
         this.data = connection;
         this.id = [
             connection.from.blockId,
@@ -85,8 +87,10 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
         this.toResource = toResource;
 
         this.recalculateMapping();
+        makeObservable(this);
     }
 
+    @observable
     getData(): BlockConnectionSpec {
         return { ...toJS(this.data) };
     }
@@ -98,14 +102,17 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
         this.validate();
     }
 
+    @computed
     get from() {
         return this.data.from;
     }
 
+    @computed
     get to() {
         return this.data.to;
     }
 
+    @computed
     get mapping() {
         return this.data.mapping;
     }
@@ -115,6 +122,7 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
         this.editing = editing;
     }
 
+    @observable
     isValid() {
         return this.errors.length === 0;
     }
@@ -193,6 +201,7 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
         this.validate();
     }
 
+    @observable
     getPoints(size:number){
         if(this.fromResource.dimensions && this.toResource.dimensions){
             let points:Point[] = this.getCurveMainPoints(this.fromResource.getConnectionPoint(size),this.toResource.getConnectionPoint(size));
@@ -237,15 +246,15 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
         return curve.toString();
     }
 
+    @observable
     calculatePath(size:PlannerNodeSize,points?:Point[]) {
         if(!points){
             points = this.getCurveMainPoints(this.fromResource.getConnectionPoint(size),this.toResource.getConnectionPoint(size))
         }
         return PlannerConnectionModelWrapper.getCurveFromPoints(points);
     }
-   
 
-
+    @observable
     private getConverter() {
         return ResourceTypeProvider.getConverterFor(this.fromResource.getKind(), this.toResource.getKind());
     }

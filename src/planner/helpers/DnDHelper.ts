@@ -1,4 +1,4 @@
-import {action} from "mobx";
+import {action, observable} from "mobx";
 import {Guid} from "guid-typescript";
 
 import type {
@@ -28,8 +28,10 @@ import {EditPanelHelper} from "./EditPanelHelper";
  */
 export class DnDHelper {
 
+    @observable
     private planner: Planner;
 
+    @observable
     private editPanel: EditPanelHelper;
 
     constructor(planner: Planner, editPanel: EditPanelHelper) {
@@ -37,6 +39,7 @@ export class DnDHelper {
         this.editPanel = editPanel;
     }
 
+    @observable
     private adjustForScrollAndZoom(dimensions:Dimensions):Dimensions {
         let zoom = this.planner.getZoom();
         let scroll = this.planner.getScroll();

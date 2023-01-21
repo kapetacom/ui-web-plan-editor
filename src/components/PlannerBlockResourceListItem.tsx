@@ -22,6 +22,7 @@ import { ResourceMode } from "../wrappers/wrapperHelpers";
 import { BlockResource} from "./BlockResource";
 
 import './PlannerBlockResourceListItem.less';
+import {action, computed, makeObservable, observable, runInAction} from "mobx";
 
 
 export const RESOURCE_SPACE = 4; //Vertical distance between resources
@@ -56,7 +57,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
 
     constructor(props: PlannerBlockResourceListItemProps) {
         super(props);
-
+        makeObservable(this);
         this.state = {
             clickDown: false,
             dragging: false,
@@ -68,14 +69,14 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
     }
 
     componentDidMount() {
-        this.attachListeners();
+        runInAction(() => this.attachListeners());
     }
 
     componentWillUnmount() {
-        this.detachListeners();
+        runInAction(() => this.detachListeners());
     }
 
-
+    @action
     editHandler = () => {
 
         this.setState({ dragging: false, editMode: true });
@@ -84,6 +85,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         }
     };
 
+    @action
     deleteHandler = () => {
 
         DialogControl.show("Delete resource?", this.props.resource.getName(), () => {
@@ -95,10 +97,12 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         }, DialogTypes.DELETE);
     };
 
+    @observable
     private getBlock() {
         return this.props.resource.block;
     }
 
+    @observable
     getXPosition(resource: PlannerResourceModelWrapper) {
         let extension = 0;
 
@@ -114,6 +118,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
 
     };
 
+    @observable
     renderClipPath(height: number) {
         const resource = this.props.resource;
         let top = 0,
@@ -133,6 +138,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
     }
 
 
+    @action
     handleResourceDragging = (evt: MouseEvent) => {
         if (this.props.resource.mode === ResourceMode.HIGHLIGHT) {
             return;
@@ -177,6 +183,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         return 1;
     }
 
+    @action
     openResourceDrawerWithOptions = () => {
         if (this.ignoreMouseMovement()) {
             return;
@@ -185,6 +192,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         this.props.resource.setMode(ResourceMode.SHOW_OPTIONS);
     };
 
+    @action
     openResourceDrawer = () => {
         if (this.ignoreMouseMovement()) {
             return;
@@ -194,6 +202,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         
     };
 
+    @action
     closeResourcesDrawer = () => {
         if (this.ignoreMouseMovement()) {
             return;
@@ -202,11 +211,13 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         this.props.resource.setMode(ResourceMode.HIDDEN);
     };
 
+    @observable
     private ignoreMouseMovement() {
         return this.props.resource.mode === ResourceMode.HIGHLIGHT ||
                 this.props.resource.mode === ResourceMode.SHOW_FIXED;
     }
 
+    @observable
     detachListeners = () => {
 
         if (this.container) {
@@ -220,6 +231,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         }
     };
 
+    @observable
     attachListeners = () => {
 
         if (this.container) {
@@ -232,6 +244,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         }
     };
 
+    @observable
     calculateCounterPosition(height: number) {
         const width = this.getBlock().width;
 
@@ -248,6 +261,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         };
     }
 
+    @observable
     getId() {
         return [
             'resource',
