@@ -1,4 +1,13 @@
-import {action, makeObservable, observable, toJS} from "mobx";
+import {
+    action,
+    computed,
+    isObservable,
+    isObservableProp,
+    makeAutoObservable,
+    makeObservable,
+    observable,
+    toJS
+} from "mobx";
 import { DataWrapper, ItemType } from "@blockware/ui-web-types";
 
 import {Planner} from "../Planner";
@@ -9,6 +18,8 @@ import {
     PlannerConnectionModelWrapper
 } from "../../wrappers/PlannerConnectionModelWrapper";
 import type {EditableItemInterface} from "../../wrappers/models";
+import {observer} from "mobx-react";
+import {compact} from "lodash";
 
 
 /**
@@ -18,18 +29,14 @@ export class EditPanelHelper {
 
     private planner:Planner;
 
-    @observable
-    public current?: EditableItemInterface;
-
     constructor(planner:Planner) {
         this.planner = planner;
-        makeObservable(this);
     }
 
     @action
     private reset() {
-        if (this.current) {
-            const item = this.current.item;
+        if (this.planner.currentItem) {
+            const item = this.planner.currentItem.item;
 
             if (item instanceof PlannerResourceModelWrapper) {
                 item.setMode(ResourceMode.HIDDEN);
@@ -49,7 +56,7 @@ export class EditPanelHelper {
 
     @action
     public edit(item: DataWrapper | any | undefined, type: ItemType, creating?: boolean) {
-        
+
         this.reset();
 
         if (item instanceof PlannerResourceModelWrapper) {
@@ -66,11 +73,12 @@ export class EditPanelHelper {
             item.fromResource.setMode(ResourceMode.HIGHLIGHT);
         }
 
-        this.current = toJS({ item: item, type: type, creating: !!creating });
+        this.planner.setCurrentItem(toJS({ item: item, type: type, creating: !!creating }));
 
         this.open();
     }
 
+    @action
     public open() {
         const itemEditorPanel = this.planner.getItemEditorPanel();
         const inspectConnectionPanel = this.planner.getInspectConnectionPanel();
@@ -84,6 +92,7 @@ export class EditPanelHelper {
         }
     }
 
+    @action
     onClosed = () => {
         this.reset();
     }
