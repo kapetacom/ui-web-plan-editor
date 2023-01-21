@@ -149,7 +149,7 @@ export class Planner extends React.Component<PlannerProps> {
 
     }
 
-    private get nodeSize():PlannerNodeSize {
+    public get nodeSize():PlannerNodeSize {
         return this.props.size || PlannerNodeSize.MEDIUM;
     }
 
