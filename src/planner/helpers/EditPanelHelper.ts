@@ -33,7 +33,6 @@ export class EditPanelHelper {
         this.planner = planner;
     }
 
-    @action
     private reset() {
         if (this.planner.currentItem) {
             const item = this.planner.currentItem.item;
@@ -51,10 +50,11 @@ export class EditPanelHelper {
                 item.toResource.setMode(ResourceMode.HIDDEN);
                 item.fromResource.setMode(ResourceMode.HIDDEN);
             }
+
+            this.planner.setCurrentItem(undefined);
         }
     }
 
-    @action
     public edit(item: DataWrapper | any | undefined, type: ItemType, creating?: boolean) {
 
         this.reset();
@@ -78,7 +78,6 @@ export class EditPanelHelper {
         this.open();
     }
 
-    @action
     public open() {
         const itemEditorPanel = this.planner.getItemEditorPanel();
         const inspectConnectionPanel = this.planner.getInspectConnectionPanel();
@@ -92,8 +91,7 @@ export class EditPanelHelper {
         }
     }
 
-    @action
-    onClosed = () => {
+    public onClosed = () => {
         this.reset();
     }
 

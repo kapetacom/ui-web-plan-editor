@@ -31,19 +31,14 @@ import {PlannerToolbox} from "./components/PlannerToolbox";
 import {InspectConnectionPanel} from './components/InspectConnectionPanel';
 import {ItemEditorPanel} from "./components/ItemEditorPanel";
 import {BlockInspectorPanel} from "./components/BlockInspectorPanel";
-
 import {FOCUSED_ID, FocusHelper, POSITIONING_DATA} from "./helpers/FocusHelper";
 import {DnDHelper} from "./helpers/DnDHelper";
 import {EditPanelHelper} from "./helpers/EditPanelHelper";
 import {InspectBlockPanelHelper} from "./helpers/InspectBlockPanelHelper";
-
 import {SVGDropShadow} from "../utils/SVGDropShadow";
-
-
-import "./Planner.less";
 import { ZoomButtons } from '../components/ZoomButtons';
 import {EditableItemInterface} from "../wrappers/models";
-
+import "./Planner.less";
 
 interface BlockObserver {
     blockObserverDisposer: Lambda
@@ -130,6 +125,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     private plannerCanvasSize: Size = {width: 0, height: 0};
 
     @observable
+    private currentItem: EditableItemInterface|null = null;
+
+    @observable
     private canvasSize = {
         x: 0,
         y: 0,
@@ -137,8 +135,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         height: 0
     };
 
-    @observable
-    public currentItem?: EditableItemInterface;
 
     constructor(props: PlannerProps) {
         super(props);
@@ -158,7 +154,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         this.connectionListObserver = reaction(() => this.plan.connections, this.onConnectionsChange);
         this.blockListObserver = reaction(() => this.plan.blocks, this.onBlocksChange);
 
+
         makeObservable(this);
+
         this.init();
     }
 
@@ -448,33 +446,37 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
 
     componentWillUnmount() {
-        this.blockListObserver();//flush the block observers
-        while (this.blockObservers.length > 0) {
-            const observer = this.blockObservers.pop();
-            if (observer) {
-                observer.blockObserverDisposer();
-                observer.blockInstanceObserverDisposer();
+        runInAction(() => {
+            this.blockListObserver();//flush the block observers
+            while (this.blockObservers.length > 0) {
+                const observer = this.blockObservers.pop();
+                if (observer) {
+                    observer.blockObserverDisposer();
+                    observer.blockInstanceObserverDisposer();
+                }
             }
-        }
 
-        this.connectionListObserver();//flush the connection observers
-        while (this.connectionObservers.length > 0) {
-            const observer = this.connectionObservers.pop();
-            if (observer) {
-                observer.connectionInstanceObserverDisposer();
+            this.connectionListObserver();//flush the connection observers
+            while (this.connectionObservers.length > 0) {
+                const observer = this.connectionObservers.pop();
+                if (observer) {
+                    observer.connectionInstanceObserverDisposer();
+                }
             }
-        }
-        if (this.instanceServiceUnsubscriber) {
-            this.instanceServiceUnsubscriber();
-        }
 
-        if (this.instanceServiceExitedUnsubscribers) {
-            this.instanceServiceExitedUnsubscribers.forEach(unsubscriber => {
-                unsubscriber();
-            });
-        }
+            if (this.instanceServiceUnsubscriber) {
+                this.instanceServiceUnsubscriber();
+            }
 
-        window.removeEventListener('resize', this.handleWindowResized);
+            if (this.instanceServiceExitedUnsubscribers) {
+                this.instanceServiceExitedUnsubscribers.forEach(unsubscriber => {
+                    unsubscriber();
+                });
+            }
+
+            window.removeEventListener('resize', this.handleWindowResized);
+
+        });
     }
 
     componentDidMount() {
