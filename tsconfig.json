@@ -6,6 +6,8 @@
         "strict": false,
         "outDir": "dist",
         "moduleResolution": "node",
+        "useDefineForClassFields": true,
+        "strictNullChecks": true,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "skipLibCheck": true,

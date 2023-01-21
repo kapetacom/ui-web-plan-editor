@@ -51,8 +51,6 @@ interface PlannerBlockResourceListItemState {
 
 @observer
 export class PlannerBlockResourceListItem extends Component<PlannerBlockResourceListItemProps, PlannerBlockResourceListItemState>{
-
-
     private container: SVGSVGElement | null = null;
 
     constructor(props: PlannerBlockResourceListItemProps) {
@@ -155,6 +153,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         if (this.props.resource) {
 
             let scroll:Point = {x:0,y:0};
+            let offset:Point = {x:0,y:0};
             if (this.container) {
                 const container = this.container.closest('.planner-area-scroll');
                 if (container) {
@@ -162,11 +161,18 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
                         x: container.scrollLeft,
                         y: container.scrollTop
                     }
+
+                    const bbox = container.getBoundingClientRect();
+
+                    offset = {
+                        y: bbox.y,
+                        x: bbox.x
+                    }
                 }
             }
 
             const tmpResource = new PlannerResourceModelWrapper(this.props.resource.role, this.props.resource.getData(), this.getBlock());
-            tmpResource.updateDimensionsFromEvent(this.props.size || PlannerNodeSize.MEDIUM, evt, this.getZoom(), scroll);
+            tmpResource.updateDimensionsFromEvent(this.props.size || PlannerNodeSize.MEDIUM, evt, this.getZoom(), scroll, offset);
             this.setState({ dragging: true });
 
             if (this.props.planner) {

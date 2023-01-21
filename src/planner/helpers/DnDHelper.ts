@@ -109,7 +109,7 @@ export class DnDHelper {
             const resourceConfig: ResourceConfig = data;
 
             if (activeBlock && activeBlock.isReadOnly()) {
-                activeBlock = null;
+                activeBlock = undefined;
             }
 
             this.planner.plan.blocks.forEach((block:PlannerBlockModelWrapper) => {

@@ -128,10 +128,10 @@ export class FocusHelper {
     public renderTopBar = (props: { setFocusBlock: (block: PlannerBlockModelWrapper) => void }) => {
         return (
             <div>
-                <div className="focus-toolbox-back" onClick={() => {
+                <div className="focus-toolbox-back" onClick={action(() => {
                     this.plan.focusedBlock &&
                     props.setFocusBlock(this.plan.focusedBlock);
-                }}>
+                })}>
                     <svg width="10" height="10" viewBox="0 0 8 13" fill="none">
                         <path d="M6.5351 11.6896L1.31038 6.46523" stroke="#544B49" strokeLinecap="round"/>
                         <path d="M1.31042 6.46518L6.53482 1.34477" stroke="#544B49" strokeLinecap="round"/>
@@ -189,8 +189,7 @@ export class FocusHelper {
 
     public renderSideBar = (props: {
         onNeighboringBlockHover: (block?: PlannerBlockModelWrapper) => void,
-        setFocusZoom: (block: PlannerBlockModelWrapper) => void,
-        sidePanelOpen: boolean
+        setFocusZoom: (block: PlannerBlockModelWrapper) => void
     }) => {
 
         const close = action(() => {
@@ -198,13 +197,10 @@ export class FocusHelper {
             props.setFocusZoom(this.plan.focusedBlock)
         });
 
-        console.log('Rendering helper sidebar');
-
         return (
             <PlannerFocusSideBar block={this.plan.focusedBlock}
                                  onBlockItemHover={props.onNeighboringBlockHover}
                                  onFocusChange={props.setFocusZoom}
-                                 open={props.sidePanelOpen}
                                  blurFocus={close}
                                  plan={this.plan}
                                  onClose={close}

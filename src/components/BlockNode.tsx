@@ -7,6 +7,7 @@ import './BlockNode.less';
 import {PlannerBlockWarningTag} from "./PlannerBlockWarningTag";
 import { Guid } from "guid-typescript";
 import { Point } from "@blockware/ui-web-types";
+import {observer} from "mobx-react";
 
 interface BlockNodeProps {
     name: string
@@ -25,7 +26,7 @@ interface BlockNodeProps {
     onInstanceNameChange?: (newName: string) => void
 }
 
-export function BlockNode(props: BlockNodeProps) {
+export const BlockNode = (props: BlockNodeProps) => {
     const maxWidth = props.width - 20;
     const typeFullName = props.typeName || 'unknown/unknown';
     const [typeHandle, typeName] = typeFullName.split('/');
@@ -108,4 +109,4 @@ export function BlockNode(props: BlockNodeProps) {
             </g>
         </>
     )
-}
+};

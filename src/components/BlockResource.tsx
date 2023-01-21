@@ -6,6 +6,7 @@ import {ResourceRole} from "@blockware/ui-web-types";
 
 import {PlannerNodeSize } from "../types";
 import './BlockResource.less';
+import {observer} from "mobx-react";
 
 interface PlannerResourceProps {
     size?: PlannerNodeSize;
@@ -19,7 +20,8 @@ interface PlannerResourceProps {
 
 }
 
-export function BlockResource(props:PlannerResourceProps) {
+
+export const BlockResource = observer((props:PlannerResourceProps) => {
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const isSmall = nodeSize === PlannerNodeSize.SMALL;
@@ -54,4 +56,4 @@ export function BlockResource(props:PlannerResourceProps) {
                   value={props.typeName || props.type}/>
         </g>
     )
-}
+});

@@ -46,7 +46,6 @@ export class InspectConnectionPanel extends Component<InspectConnectionWrapperPr
 
     @action
     private onTrafficStart = (payload: Traffic) => {
-        console.log("got ", payload);
         this.trafficLines.push(payload);
 
     };

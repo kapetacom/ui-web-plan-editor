@@ -22,6 +22,7 @@ import {BlockMode} from "../wrappers/wrapperHelpers";
 import {BlockNode} from "./BlockNode";
 
 import './PlannerBlockNode.less';
+import {action} from "mobx";
 
 interface PlannerBlockNodeProps {
     block: PlannerBlockModelWrapper
@@ -47,16 +48,19 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         super(props);
     }
 
+    @action
     inspectHandler = () => {
         this.props.setItemToInspect &&
         this.props.setItemToInspect(this.props.block, ItemType.BLOCK);
     };
 
+    @action
     editHandler = () => {
         this.props.setItemToEdit &&
         this.props.setItemToEdit(this.props.block, ItemType.BLOCK);
     };
 
+    @action
     deleteHandler = () => {
         DialogControl.show("Delete block?", this.props.block.name, () => {
             if (BlockMode.HIGHLIGHT === this.props.block.mode) {
@@ -69,6 +73,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         }, DialogTypes.DELETE);
     };
 
+    @action
     mouseDownHandler = () => {
         if (!this.props.readOnly) {
             this.props.block.setMode(BlockMode.SHOW);
@@ -76,6 +81,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         }
     };
 
+    @action
     mouseUpHandler = () => {
         if (!this.props.readOnly) {
             this.props.block.setMode(BlockMode.HIDDEN);
@@ -86,12 +92,14 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         }
     };
 
+    @action
     dragStartHandler = () => {
         if (!this.props.readOnly) {
             this.props.block.setDragging(true);
         }
     };
 
+    @action
     dragMoveHandler = (dimensions: Dimensions) => {
         if (!this.props.readOnly) {
             this.updatePosition(dimensions);
@@ -99,6 +107,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         return false;
     };
 
+    @action
     dragStopHandler = (dimensions: Dimensions) => {
         if (!this.props.readOnly) {
             this.updatePosition(dimensions);
@@ -108,6 +117,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         return true;
     };
 
+    @action
     private updatePosition(dimensions: Dimensions) {
         //Needed to adjust for SVG strangeness
 

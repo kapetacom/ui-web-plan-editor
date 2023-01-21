@@ -567,7 +567,6 @@ export class Planner extends React.Component<PlannerProps> {
             window.localStorage.setItem(FOCUSED_ID, "")
         }
 
-        console.log('focusing block', this.focusSideBarOpen);
         this.reorderForFocus();
     }
 
@@ -674,9 +673,6 @@ export class Planner extends React.Component<PlannerProps> {
         });
 
         const canvasSize = this.getZoomDivDimensions();
-
-
-        console.log('render plan');
 
         return (
             <>

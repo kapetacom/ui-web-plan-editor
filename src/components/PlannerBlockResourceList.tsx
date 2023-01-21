@@ -10,6 +10,7 @@ import {PlannerResourceModelWrapper} from "../wrappers/PlannerResourceModelWrapp
 import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 import { PlannerModelWrapper } from "../wrappers/PlannerModelWrapper";
 import {BlockMode} from "../wrappers/wrapperHelpers";
+import {observable} from "mobx";
 
 
 export interface PlannerBlockResourceListProps {
@@ -39,15 +40,18 @@ export class PlannerBlockResourceList extends Component<PlannerBlockResourceList
         };
     }
 
+    @observable
     getYOffset(size:PlannerNodeSize) {
         const block = this.props.blockData;
         return block.calculateOffsetTop(size, this.props.role);
     }
 
+    @observable
     getPlaceholderYOffset(size:PlannerNodeSize) {
         return this.props.blockData.getResourceHeight(size);
     }
 
+    @observable
     showPlaceholder() {
 
         if (this.props.role === ResourceRole.PROVIDES &&

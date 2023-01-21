@@ -42,7 +42,7 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
 
     @computed
     private get connectionValid():boolean {
-        return (this.props.connection && this.props.connection.isValid())
+        return !!(this.props.connection && this.props.connection.isValid());
     }
 
     @computed
@@ -116,7 +116,7 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
 
     render() {
 
-        let path = null;
+        let path:string|null = null;
         let middlePoint: Point | undefined = undefined;
 
         if (this.props.path) {

@@ -62,6 +62,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
     @action
     private updateDimensionsFromEvent(evt: MouseEvent) {
         let scroll:Point = {x:0,y:0};
+        let offset:Point = {x:0,y:0};
         if (this.elm) {
             const container = this.elm.closest('.planner-area-scroll');
             if (container) {
@@ -69,10 +70,15 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
                     x: container.scrollLeft,
                     y: container.scrollTop
                 }
+                const bbox = container.getBoundingClientRect();
+                offset = {
+                    y: bbox.y,
+                    x: bbox.x
+                }
             }
         }
 
-        this.resource.updateDimensionsFromEvent(this.props.size, evt, this.props.zoom ? this.props.zoom : 1, scroll);
+        this.resource.updateDimensionsFromEvent(this.props.size, evt, this.props.zoom ? this.props.zoom : 1, scroll, offset);
     }
 
     @observable
@@ -85,8 +91,8 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         return this.props.planner.findValidBlockTargetFromDimensionsAndResource(this.props.size, hoverDimensions, this.resource);
     }
 
-    @observable
-    private getResourcesPosition() {
+    @computed
+    private get xPosition() {
         if (this.resource.dimensions) {
             return this.resource.dimensions.left;
         }
@@ -99,8 +105,8 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         return this.block.getResourceHeight(this.props.size);
     }
 
-    @observable
-    private getTopPadding(index: number) {
+    @computed
+    private get yPosition() {
         if (this.resource.dimensions) {
             return this.resource.dimensions.top;
         }
@@ -116,8 +122,6 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
             return;
         }
 
-        console.log('dimensions', this, this.resource.dimensions);
-
         const hoverDimensions = this.resource.dimensions;
 
         let activeResource: PlannerResourceModelWrapper | undefined,
@@ -127,7 +131,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         if (!activeResource) {
             activeBlock = this.findValidBlockFromDimensions(hoverDimensions);
             if (activeBlock && activeBlock.isReadOnly()) {
-                activeBlock = null;
+                activeBlock = undefined;
             }
         }
 
@@ -230,8 +234,8 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         const resourceConfig = ResourceTypeProvider.get(this.resource.getKind());
 
         const position = {
-            x: this.getResourcesPosition(),
-            y: this.getTopPadding(this.props.index)
+            x: this.xPosition,
+            y: this.yPosition
         }
 
         return (

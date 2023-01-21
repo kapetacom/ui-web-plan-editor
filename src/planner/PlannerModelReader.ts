@@ -67,9 +67,11 @@ export class PlannerModelReader {
 
         if (planKind.spec.connections) {
             runInAction(() => {
-                out.connections = planKind.spec.connections.map((data) =>
-                    PlannerConnectionModelWrapper.createFromData(data, out)
-                );
+                out.connections = planKind.spec.connections ?
+                    planKind.spec.connections.map((data) =>
+                        PlannerConnectionModelWrapper.createFromData(data, out)
+                    )
+                    : [];
             });
         }
 

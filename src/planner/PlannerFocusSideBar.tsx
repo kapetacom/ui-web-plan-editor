@@ -9,10 +9,10 @@ import {BlockTree} from "./components/BlockTree";
 
 import "./PlannerFocusSideBar.less";
 import {observer} from "mobx-react";
+import {runInAction} from "mobx";
 
 interface Props {
     plan: PlannerModelWrapper,
-    open: boolean
     block?: PlannerBlockModelWrapper
     blurFocus: () => void
     onBlockItemHover: (block?: PlannerBlockModelWrapper) => void
@@ -23,26 +23,12 @@ interface Props {
 
 export const PlannerFocusSideBar = observer((props: Props) => {
 
-    const focusPanel = useRef<SidePanel>();
-
-    useEffect(() => {
-
-        if (focusPanel.current) {
-            if (props.plan.focusedBlock) {
-                focusPanel.current.open()
-            } else {
-                focusPanel.current.close()
-            }
-        }
-    }, [props.plan.focusedBlock?.id])
-
     return (
         <SidePanel
             title="Blocks in view"
             closable={false}
             className={"focus-side-panel"}
-            ref={focusPanel}
-            open={props.open}
+            open={!!props.block}
             side={PanelAlignment.right}
             size={PanelSize.small}
             onClose={props.onClose}

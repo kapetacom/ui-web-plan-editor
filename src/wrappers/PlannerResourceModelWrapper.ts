@@ -4,10 +4,10 @@ import {PlannerNodeSize} from "../types";
 import {PlannerBlockModelWrapper} from "./PlannerBlockModelWrapper";
 
 
-import type {DataWrapper, ResourceKind, Dimensions, Point} from "@blockware/ui-web-types";
-import {BlockMode, ResourceMode} from "./wrapperHelpers";
+import type {DataWrapper, Dimensions, Point, ResourceKind} from "@blockware/ui-web-types";
 import {ResourceRole} from "@blockware/ui-web-types";
-import { ResourceTypeProvider } from "@blockware/ui-web-context";
+import {BlockMode, ResourceMode} from "./wrapperHelpers";
+import {ResourceTypeProvider} from "@blockware/ui-web-context";
 import {PlannerConnectionModelWrapper} from "./PlannerConnectionModelWrapper";
 
 const DEFAULT_EXTENSION_SIZE = 110;
@@ -16,19 +16,19 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
 
     readonly block:PlannerBlockModelWrapper;
 
-    readonly instanceId:string;
+    readonly instanceId:string = '';
 
     @observable
-    id: string;
+    id: string = '';
 
     @observable
-    role: ResourceRole;
+    role: ResourceRole = ResourceRole.CONSUMES;
 
     @observable
-    mode: ResourceMode;
+    mode: ResourceMode = ResourceMode.HIDDEN;
 
-    @observable.struct
-    dimensions?: Dimensions;
+    @observable
+    dimensions?: Dimensions = undefined;
 
     @observable
     errors: string[] = [];
@@ -213,7 +213,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     }
 
     @action
-    updateDimensionsFromEvent(size:PlannerNodeSize, evt:MouseEvent, zoom: number, scroll?: Point) {
+    updateDimensionsFromEvent(size:PlannerNodeSize, evt:MouseEvent, zoom: number, scroll?: Point, offset?: Point) {
         const height = this.block.getResourceHeight(size) - 4;
         const width = 150;
 
@@ -227,9 +227,8 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         }
 
         //Adjust for main container - hardcoded for now
-        //TODO: Fix
-        x -= 0;
-        y -= 35;
+        x -= offset ? offset.x : 0;
+        y -= offset ? offset.y : 35;
 
         //Adjust for zoom
 

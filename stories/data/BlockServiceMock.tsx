@@ -79,6 +79,7 @@ BlockServiceMock.list = async () => {
     ]
 };
 
+// @ts-ignore
 BlockServiceMock.get = async (ref) => {
     const out = blocks.find(a => a.ref === ref.split(':')[0]);
     if (!out) {

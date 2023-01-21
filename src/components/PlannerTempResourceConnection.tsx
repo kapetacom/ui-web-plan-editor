@@ -16,7 +16,6 @@ export interface PlannerTempResourceConnectionProps {
     selectedResource: SelectedResourceItem;
 }
 
-
 @observer
 export class PlannerTempResourceConnection extends Component<PlannerTempResourceConnectionProps> {
 
@@ -40,7 +39,7 @@ export class PlannerTempResourceConnection extends Component<PlannerTempResource
     }
 
     render() {
-        let path = null;
+        let path:string|null = null;
         if (this.resource.dimensions) {   
             const tempPoint ={
                 x: this.resource.dimensions.left,
