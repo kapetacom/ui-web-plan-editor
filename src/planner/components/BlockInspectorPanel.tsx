@@ -58,7 +58,7 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
         }
         this.setLoading(true);
         try {
-            const result = await InstanceService.getInstanceLogs(this.props.planRef, this.props.block?.getRef());
+            const result = await InstanceService.getInstanceLogs(this.props.planRef, this.props.block?.id);
             this.setLogs(result.ok === false ? [] : result.logs);
         } finally {
             this.setLoading(false);
