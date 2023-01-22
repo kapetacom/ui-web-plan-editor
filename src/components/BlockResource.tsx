@@ -1,7 +1,6 @@
 import React from "react";
 import {toClass, createHexagonPath, Orientation} from "@blockware/ui-web-utils";
 
-import {SVGText} from "@blockware/ui-web-components";
 import {ResourceRole} from "@blockware/ui-web-types";
 
 import {PlannerNodeSize } from "../types";
@@ -32,28 +31,34 @@ export const BlockResource = observer((props:PlannerResourceProps) => {
     const resourceClass = toClass({
         'block-resource': true,
         [props.type]: true,
-        'read-only': !!props.readOnly
+        'read-only': !!props.readOnly,
+        small:isSmall
     });
 
     const maxTextWidth = props.width - 50;
 
+    const padding = 2;
+    const heightWithoutPadding = props.height - (padding*2);
 
     return (
         <g className={resourceClass} >
 
             <path className={'block-resource-body'} d={hexagonPath} />
+            <foreignObject width={maxTextWidth}
+                           className={'block-resource-text'}
+                           y={padding}
+                           x={textX}>
+                <span>
+                    {props.name}
+                </span>
+            </foreignObject>
 
-            <SVGText className={'block-resource-text'}
-                  maxWidth={maxTextWidth}
-                  y={isSmall ? 17 : 14}
-                  x={textX}
-                  value={props.name} />
-
-            <SVGText className={'block-resource-text sub'}
-                  maxWidth={maxTextWidth}
-                  y={props.height - 8}
-                  x={textX}
-                  value={props.typeName || props.type}/>
+            <foreignObject  width={maxTextWidth}
+                            className={'block-resource-text sub'}
+                           y={heightWithoutPadding / 2}
+                           x={textX}>
+                <span>{props.typeName || props.type}</span>
+            </foreignObject>
         </g>
     )
 });

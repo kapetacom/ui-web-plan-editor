@@ -19,12 +19,21 @@
     .block-resource-text {
         .no-select();
         stroke-width: 1;
-        font-size: 12px;
-        fill: #FFFFFF;
+        color: #FFFFFF;
         text-anchor: start;
+        height: 18px;
 
+        font-size: 12px;
+        line-height: 18px;
+        span {
+            width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
         &.sub {
-            fill-opacity: 0.7;
+            opacity: 0.7;
         }
     }
 
