@@ -40,7 +40,7 @@ export const PlannerData: PlanKind = {
                 id: "todo",
                 name: "Todo service",
                 block: {
-                    ref: 'blockware/todo:1.0.2'
+                    ref: 'blockware://blockware/todo:1.2.3'
                 },
 
                 dimensions: {

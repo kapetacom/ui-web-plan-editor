@@ -12,3 +12,10 @@ export interface EditableItemInterface {
     item: DataWrapper|any|undefined
     creating: boolean
 }
+
+
+export interface BlockConfigurationData {
+    version:string
+    name:string
+    configuration?: {[key:string]:string}
+}

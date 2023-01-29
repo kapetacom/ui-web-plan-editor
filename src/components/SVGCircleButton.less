@@ -1,0 +1,81 @@
+@import "~@blockware/ui-web-components/styles/values";
+@import "~@blockware/ui-web-components/styles/functions";
+
+.svg-circle-button {
+  overflow: visible;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+
+  .container {
+    .transition();
+    border-radius: 13px;
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 14px;
+    color: white;
+    background-color: @gray-xdark;
+    box-sizing: border-box;
+
+    i {
+      font-weight: inherit;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    &:hover {
+      background: @gray-dark;
+    }
+
+    &:active {
+      background-color: @gray-xdark;
+      color: white;
+    }
+  }
+
+  &.primary .container {
+    background-color: @cyan-dark;
+    color: white;
+    border:0;
+
+    &:hover {
+      background: @cyan-light;
+      border-color: @cyan-light;
+    }
+
+    &:active {
+      background: @cyan-dark;
+    }
+  }
+
+  &.secondary .container {
+    background: @btn-friendly-bg;
+    color: white;
+    border:0;
+
+    &:hover {
+      background: @btn-friendly-bg-active;
+    }
+
+    &:active {
+      background: @btn-friendly-bg;
+    }
+  }
+
+  &.danger .container {
+    background: @btn-cancel-bg;
+    color: white;
+    border:0;
+
+    &:hover {
+      background: @btn-cancel-bg-active;
+    }
+
+    &:active {
+      background: @btn-cancel-bg;
+    }
+  }
+}

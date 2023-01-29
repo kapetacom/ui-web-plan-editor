@@ -9,7 +9,7 @@ import {
     SVGButtonDelete,
     SVGButtonEdit,
     DialogTypes,
-    SVGButtonInspect
+    SVGButtonInspect, ButtonStyle, showDelete
 } from '@blockware/ui-web-components';
 
 
@@ -23,6 +23,7 @@ import { BlockResource} from "./BlockResource";
 
 import './PlannerBlockResourceListItem.less';
 import {action, computed, makeObservable, observable, runInAction} from "mobx";
+import {SVGCircleButton} from "./SVGCircleButton";
 
 
 export const RESOURCE_SPACE = 4; //Vertical distance between resources
@@ -51,7 +52,8 @@ interface PlannerBlockResourceListItemState {
 
 @observer
 export class PlannerBlockResourceListItem extends Component<PlannerBlockResourceListItemProps, PlannerBlockResourceListItemState>{
-    private container: SVGSVGElement | null = null;
+    private dragContainer: SVGSVGElement | null = null;
+    private mouseOverContainer: SVGSVGElement | null = null;
 
     constructor(props: PlannerBlockResourceListItemProps) {
         super(props);
@@ -76,7 +78,6 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
 
     @action
     editHandler = () => {
-
         this.setState({ dragging: false, editMode: true });
         if (this.props.setItemToEdit) {
             this.props.setItemToEdit(this.props.resource, ItemType.RESOURCE, this.getBlock());
@@ -84,15 +85,18 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
     };
 
     @action
-    deleteHandler = () => {
+    deleteHandler = async () => {
 
-        DialogControl.show("Delete resource?", this.props.resource.getName(), () => {
-            this.setState({ dragging: false });
-            this.getBlock().removeResource(this.props.resource.id, this.props.resource.role);
-            if (this.props.planner) {
-                this.props.planner.removeConnectionByResourceId(this.props.resource.id);
-            }
-        }, DialogTypes.DELETE);
+        const ok = await showDelete('Delete resource', `Are you sure  you want to delete ${this.props.resource.getName()}`);
+        if (!ok) {
+            return;
+        }
+
+        this.setState({ dragging: false });
+        this.getBlock().removeResource(this.props.resource.id, this.props.resource.role);
+        if (this.props.planner) {
+            this.props.planner.removeConnectionByResourceId(this.props.resource.id);
+        }
     };
 
     @observable
@@ -154,8 +158,8 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
 
             let scroll:Point = {x:0,y:0};
             let offset:Point = {x:0,y:0};
-            if (this.container) {
-                const container = this.container.closest('.planner-area-scroll');
+            if (this.dragContainer) {
+                const container = this.dragContainer.closest('.planner-area-scroll');
                 if (container) {
                     scroll = {
                         x: container.scrollLeft,
@@ -226,27 +230,33 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
     @observable
     detachListeners = () => {
 
-        if (this.container) {
+        if (this.dragContainer) {
 
             if (this.props.resource.role === ResourceRole.PROVIDES) {
-                this.container.addEventListener("mousedown", this.handleResourceDragging);
+                this.dragContainer.removeEventListener("mousedown", this.handleResourceDragging);
             }
+        }
 
-            this.container.removeEventListener("mousemove", this.openResourceDrawer);
-            this.container.addEventListener("mouseleave", this.closeResourcesDrawer, false);
+        if (this.mouseOverContainer) {
+            this.mouseOverContainer.removeEventListener("mousemove", this.openResourceDrawer);
+            this.mouseOverContainer.removeEventListener("mouseleave", this.closeResourcesDrawer, false);
         }
     };
 
     @observable
     attachListeners = () => {
 
-        if (this.container) {
+        if (this.dragContainer) {
             if (this.props.resource.role === ResourceRole.PROVIDES) {
-                this.container.addEventListener("mousedown", this.handleResourceDragging);
+                this.dragContainer.addEventListener("mousedown", this.handleResourceDragging);
             }
 
-            this.container.addEventListener("mousemove", this.openResourceDrawerWithOptions);
-            this.container.addEventListener("mouseleave", this.closeResourcesDrawer, false);
+
+        }
+
+        if (this.mouseOverContainer) {
+            this.mouseOverContainer.addEventListener("mousemove", this.openResourceDrawerWithOptions);
+            this.mouseOverContainer.addEventListener("mouseleave", this.closeResourcesDrawer, false);
         }
     };
 
@@ -345,7 +355,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
                             clipPath={'url(#' + fixedClipPathId + ')'}
                             x={0}
                             y={0}
-                            ref={(elm) => { this.container = elm }}>
+                            ref={(elm) => { this.mouseOverContainer = elm }}>
 
                             <clipPath id={clipPathId}>
                                 {this.renderClipPath(height)}
@@ -370,7 +380,8 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
                                 </svg>
 
                                 <svg clipPath={'url(#' + clipPathId + ')'}
-                                    style={{ cursor: consumer ? '' : 'grab' }}>
+                                    style={{ cursor: consumer ? '' : 'grab' }}
+                                    ref={(elm) => { this.dragContainer = elm }}>
                                     <BlockResource
                                         role={this.props.resource.role}
                                         size={this.props.size}
@@ -413,26 +424,35 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         if (this.props.readOnly) {
             return (
                 <g className={'resource-actions'}>
-                    <SVGButtonInspect
-                        onClick={this.editHandler}
+                    <SVGCircleButton
                         x={0}
-                        y={0} />
+                        y={0}
+                        className={'inspect'}
+                        style={ButtonStyle.PRIMARY}
+                        icon={'fa fa-search'}
+                        onClick={this.editHandler} />
                 </g>
             )
         }
         return (
             <g className={'resource-actions'}>
 
-                <SVGButtonDelete
-                    onClick={this.deleteHandler}
+                <SVGCircleButton
                     x={0}
                     y={0}
-                />
+                    className={'delete'}
+                    style={ButtonStyle.DANGER}
+                    icon={'fa fa-trash'}
+                    onClick={this.deleteHandler} />
 
-                <SVGButtonEdit
-                    onClick={this.editHandler}
+                <SVGCircleButton
                     x={consumer ? -30 : 30}
-                    y={0} />
+                    y={0}
+                    className={'edit'}
+                    style={ButtonStyle.SECONDARY}
+                    icon={'fa fa-pencil'}
+                    onClick={this.editHandler} />
+
             </g>
         )
     }

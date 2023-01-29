@@ -13,8 +13,9 @@ import type {
     Size
 } from "@blockware/ui-web-types";
 import {isSchemaEntityCompatible, ResourceRole} from "@blockware/ui-web-types";
+import {parseBlockwareUri,BlockwareURI} from '@blockware/nodejs-utils';
 
-import {BlockTypeProvider} from '@blockware/ui-web-context';
+import {BlockService, BlockTypeProvider} from '@blockware/ui-web-context';
 
 import {NeighboringBlocks, PlannerNodeSize} from "../types";
 import {PlannerResourceModelWrapper} from "./PlannerResourceModelWrapper";
@@ -36,8 +37,6 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
     @observable
     name: string;
-
-    readonly version: string;
 
     @observable
     mode: BlockMode = BlockMode.HIDDEN;
@@ -61,9 +60,6 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     private dragging = false;
 
     @observable
-    private readonly = false;
-
-    @observable
     consumes = [] as PlannerResourceModelWrapper[];
 
     @observable
@@ -71,6 +67,9 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
     @observable
     blockReference: BlockReference;
+
+    @observable
+    private readonly blockReferenceUri: BlockwareURI;
 
     @observable
     private data!: BlockKind;
@@ -95,14 +94,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         this.name = blockInstance.name || blockDefinition?.metadata?.title || '';
 
         this.blockReference = blockInstance.block;
-
-        this.version = 'local';
-        if (this.blockReference?.ref &&
-            this.blockReference.ref.indexOf(':') > -1) {
-            this.version = this.blockReference.ref.split(':')[1];
-        }
-
-        this.readonly = this.version !== 'local';
+        this.blockReferenceUri = parseBlockwareUri(this.blockReference.ref);
 
         if (blockInstance.dimensions) {
             this.size = {
@@ -132,14 +124,25 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
     }
 
-    @observable
-    isReadOnly():boolean {
-        return this.readonly;
+    get version() {
+        return this.blockReferenceUri.version;
     }
 
-    @observable
-    getRef(): string {
+    get readonly() {
+        return this.version !== 'local';
+    }
+
+    @computed
+    get ref() {
         return this.blockReference.ref;
+    }
+
+    @action
+    async setVersion(version:string):Promise<void> {
+        this.blockReferenceUri.version = version;
+        this.blockReference.ref = this.blockReferenceUri.id;
+        const block = await BlockService.get(this.blockReference.ref);
+        this.setData(block.data);
     }
 
     @observable
@@ -202,6 +205,9 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         return this.data.spec.entities.types.map(entity => entity.name);
     }
+
+
+
 
     @action
     setFocus(focus: boolean) {
@@ -525,11 +531,6 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     @observable
     getBlockName() {
         return this.data.metadata.name;
-    }
-
-    @observable
-    getBlockVersion() {
-        return this.version;
     }
 
     @observable

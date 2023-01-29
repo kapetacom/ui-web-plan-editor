@@ -110,7 +110,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     @observable
     getExtensionSize() {
         let extensionSize = DEFAULT_EXTENSION_SIZE;
-        const readOnly = this.block?.isReadOnly() || this.block?.plan?.isReadOnly();
+        const readOnly = this.block?.readonly || this.block?.plan?.isReadOnly();
         const viewing = this.block?.plan?.isViewing();
         if (readOnly) {
             extensionSize -= 30;

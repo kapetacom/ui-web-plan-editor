@@ -12,8 +12,7 @@ import { observer } from "mobx-react";
 import {PlannerConnectionButtons} from "./PlannerConnectionButtons";
 import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
 import {action, computed, makeObservable, observable} from "mobx";
-import {Simulate} from "react-dom/test-utils";
-import mouseOver = Simulate.mouseOver;
+
 
 interface PlannerConnectionProps {
     size: PlannerNodeSize;

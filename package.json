@@ -1,6 +1,6 @@
 {
     "name": "@blockware/ui-web-plan-editor",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "main": "src/index.ts",
     "files": [
         "package.json",
@@ -28,16 +28,17 @@
         "@blockware/ui-web-types": "<2",
         "@blockware/ui-web-utils": "<2",
         "guid-typescript": "*",
+        "less": ">=4",
         "lodash": ">=4",
-        "react": ">=18",
-        "react-dom": ">=18",
         "mobx": ">=6",
         "mobx-react": ">=7",
+        "react": ">=18",
+        "react-dom": ">=18",
         "react-tabs": ">=6",
-        "react-use": ">=17",
-        "less": ">=4"
+        "react-use": ">=17"
     },
     "dependencies": {
+        "@blockware/nodejs-utils": "<2",
         "@types/lodash": "^4.14.185",
         "@types/node": "^18.7.18",
         "@types/react": ">=18",
@@ -52,8 +53,8 @@
         "json-loader": "^0.5.7",
         "less-loader": "^11.0.0",
         "style-loader": "^3.3.1",
-        "yaml-loader": "^0.8.0",
         "typescript": "^4.8.3",
-        "yaml": "^2.1.1"
+        "yaml": "^2.1.1",
+        "yaml-loader": "^0.8.0"
     }
 }

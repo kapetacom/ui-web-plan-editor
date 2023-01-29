@@ -8,13 +8,15 @@ import {
     FormContainer,
     FormButtons,
     SidePanel,
-    ButtonStyle
+    ButtonStyle, FormSelect
 } from "@blockware/ui-web-components";
 
 import {
     BlockTypeProvider,
     ResourceTypeProvider
 } from "@blockware/ui-web-context";
+
+import {parseBlockwareUri} from '@blockware/nodejs-utils';
 
 import type {BlockConnectionSpec, SchemaKind, DataWrapper, BlockMetadata, SchemaEntity} from "@blockware/ui-web-types";
 import {ResourceKind} from "@blockware/ui-web-types";
@@ -182,9 +184,19 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
     private onSchemaChanged = (metadata: BlockMetadata, spec: any) => {
         const item = this.props.editableItem.item;
         this.editedSchema = {
-            kind: item.getData().kind,
+            kind: this.editedSchema?.kind ?? item.getData().kind,
             metadata,
             spec
+        };
+    }
+
+    @action
+    private onKindChanged = (kind:string) => {
+        const item = this.props.editableItem.item;
+        this.editedSchema = {
+            kind: kind,
+            metadata: item.metadata,
+            spec: item.spec
         };
     }
 
@@ -272,7 +284,30 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
             const data = (!this.editedSchema || this.editedSchema.kind !== definition.kind) ?
                 definition : this.editedSchema;
 
+            const blockwareUri = parseBlockwareUri(data.kind);
+
+            const versions:{[key:string]:string} = {};
+            const versionAlternatives = ResourceTypeProvider.getVersionsFor(blockwareUri.fullName);
+            console.log('lists', versionAlternatives);
+            versionAlternatives.forEach(resourceType => {
+                const versionName = resourceType.version === 'local' ? 'Local Disk' : resourceType.version;
+                versions[resourceType.version] = `${resourceType.title} [${versionName}]`;
+            })
+            console.log('versions', versions);
+
             return <>
+                <FormSelect options={versions}
+                            value={blockwareUri.version}
+                            help={'Current version'}
+                            validation={['required']}
+                            name={'version'}
+                            onChange={(name, newVersion) => {
+                                const kindUri = parseBlockwareUri(data.kind);
+                                if (kindUri.version !== newVersion) {
+                                    kindUri.version = newVersion;
+                                    this.onKindChanged(kindUri.id)
+                                }
+                            }} />
                 <resourceType.componentType
                     key={editableItem.item.id}
                     {...data}

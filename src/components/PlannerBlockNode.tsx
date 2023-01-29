@@ -2,14 +2,15 @@ import React from 'react';
 import {observer} from "mobx-react";
 
 import {toClass} from "@blockware/ui-web-utils";
-import {ItemType, ResourceRole, BlockKind, DataWrapper, Dimensions} from "@blockware/ui-web-types";
-import {BlockTypeProvider, InstanceStatus} from "@blockware/ui-web-context";
+import {BlockKind, DataWrapper, Dimensions, ItemType, ResourceRole} from "@blockware/ui-web-types";
+import {InstanceStatus} from "@blockware/ui-web-context";
 import {
+    ButtonStyle,
     DialogControl,
-    SVGButtonEdit,
-    SVGButtonDelete,
-    DnDDrag,
     DialogTypes,
+    DnDDrag, showDelete,
+    SVGButtonDelete,
+    SVGButtonEdit,
     SVGButtonInspect
 } from '@blockware/ui-web-components';
 
@@ -23,6 +24,7 @@ import {BlockNode} from "./BlockNode";
 
 import './PlannerBlockNode.less';
 import {action} from "mobx";
+import {SVGCircleButton} from "./SVGCircleButton";
 
 interface PlannerBlockNodeProps {
     block: PlannerBlockModelWrapper
@@ -35,6 +37,7 @@ interface PlannerBlockNodeProps {
     viewOnly?: boolean
     onDrop?: () => void
     setItemToEdit?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void
+    setItemToConfigure?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void
     setItemToInspect?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void
     planner?: PlannerModelWrapper
 }
@@ -61,16 +64,27 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
     };
 
     @action
-    deleteHandler = () => {
-        DialogControl.show("Delete block?", this.props.block.name, () => {
-            if (BlockMode.HIGHLIGHT === this.props.block.mode) {
-                return;
-            }
+    configHandler = () => {
+        this.props.setItemToConfigure &&
+        this.props.setItemToConfigure(this.props.block, ItemType.BLOCK);
+    };
 
-            if (this.props.planner) {
-                this.props.planner.removeBlock(this.props.block);
-            }
-        }, DialogTypes.DELETE);
+    @action
+    deleteHandler = async () => {
+        const ok = await showDelete(
+            'Delete block instance',
+            `Are you sure you want to delete ${this.props.block.name}?`
+        );
+        if (!ok) {
+            return;
+        }
+        if (BlockMode.HIGHLIGHT === this.props.block.mode) {
+            return;
+        }
+
+        if (this.props.planner) {
+            this.props.planner.removeBlock(this.props.block);
+        }
     };
 
     @action
@@ -137,53 +151,149 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         this.container.addEventListener('mousedown', this.mouseDownHandler);
     }
 
-    private isReadOnly() {
-        return this.props.readOnly ||
-            this.props.block.isReadOnly();
+    private isPlanReadOnly() {
+        return this.props.block.plan.isReadOnly();
+    }
+
+    private isPlanViewOnly() {
+        return this.props.block.plan.isViewing();
+    }
+
+    private isBlockReadOnly() {
+        return this.props.block.readonly;
     }
 
     renderBlockActions(block:PlannerBlockModelWrapper) {
-        if (this.props.viewOnly) {
+        if (this.isPlanViewOnly()) {
             return <g className={'block-actions'} />
         }
 
-        if (this.isReadOnly()) {
+        const offset = 11;
+
+
+        if (this.isPlanReadOnly() &&
+            this.isBlockReadOnly()) {
+            //Can't delete or edit
             return (
-                <g className={'block-actions'}>
+                <g className={'block-actions buttons-2'}>
 
-                    <SVGButtonInspect
-                        x={block.width - 92 - 11}
+                    <SVGCircleButton
+                        x={block.width - 97 - offset}
                         y={8}
-                        onClick={this.inspectHandler}
-                    />
+                        className={'inspect'}
+                        style={ButtonStyle.PRIMARY}
+                        icon={'fa fa-search'}
+                        onClick={this.inspectHandler} />
 
+                    <SVGCircleButton
+                        x={block.width - 57 - offset}
+                        y={8}
+                        className={'config'}
+                        style={ButtonStyle.DEFAULT}
+                        icon={'fa fa-tools'}
+                        onClick={this.configHandler} />
+                </g>
+            )
+        }
 
-                    <SVGButtonEdit
-                        onClick={this.editHandler}
-                        x={block.width - 62 - 11}
-                        y={8}/>
+        if (this.isPlanReadOnly()) {
+            //Can't delete
+            return (
+                <g className={'block-actions buttons-3'}>
+
+                    <SVGCircleButton
+                        x={block.width - 112 - offset}
+                        y={0}
+                        className={'inspect'}
+                        style={ButtonStyle.PRIMARY}
+                        icon={'fa fa-search'}
+                        onClick={this.inspectHandler} />
+
+                    <SVGCircleButton
+                        x={block.width - 77 - offset}
+                        y={13}
+                        className={'edit'}
+                        style={ButtonStyle.SECONDARY}
+                        icon={'fa fa-pencil'}
+                        onClick={this.editHandler} />
+
+                    <SVGCircleButton
+                        x={block.width - 42 - offset}
+                        y={0}
+                        className={'config'}
+                        style={ButtonStyle.DEFAULT}
+                        icon={'fa fa-tools'}
+                        onClick={this.configHandler} />
+                </g>
+            )
+        }
+
+        if (this.isBlockReadOnly()) {
+            //Can't edit
+            return (
+                <g className={'block-actions buttons-3'}>
+
+                    <SVGCircleButton
+                        x={block.width - 112 - offset}
+                        y={0}
+                        className={'inspect'}
+                        style={ButtonStyle.PRIMARY}
+                        icon={'fa fa-search'}
+                        onClick={this.inspectHandler} />
+
+                    <SVGCircleButton
+                        x={block.width - 77 - offset}
+                        y={13}
+                        className={'delete'}
+                        style={ButtonStyle.DANGER}
+                        icon={'fa fa-trash'}
+                        onClick={this.deleteHandler} />
+
+                    <SVGCircleButton
+                        x={block.width - 42 - offset}
+                        y={0}
+                        className={'config'}
+                        style={ButtonStyle.DEFAULT}
+                        icon={'fa fa-tools'}
+                        onClick={this.configHandler} />
                 </g>
             )
         }
 
         return (
-            <g className={'block-actions'}>
+            <g className={'block-actions buttons-4'}>
 
-                <SVGButtonInspect
-                    x={block.width - 112 - 11}
-                    y={0}
-                    onClick={this.inspectHandler}
-                />
+                <SVGCircleButton
+                    x={block.width - 132 - offset}
+                    y={-6}
+                    className={'inspect'}
+                    style={ButtonStyle.PRIMARY}
+                    icon={'fa fa-search'}
+                    onClick={this.inspectHandler} />
 
-                <SVGButtonDelete
-                    onClick={this.deleteHandler}
-                    x={block.width - 77 - 11}
-                    y={13}/>
+                <SVGCircleButton
+                    x={block.width - 97 - offset}
+                    y={8}
+                    className={'delete'}
+                    style={ButtonStyle.DANGER}
+                    icon={'fa fa-trash'}
+                    onClick={this.deleteHandler} />
 
-                <SVGButtonEdit
-                    onClick={this.editHandler}
-                    x={block.width - 42 - 11}
-                    y={0}/>
+                <SVGCircleButton
+                    x={block.width - 57 - offset}
+                    y={8}
+                    className={'edit'}
+                    style={ButtonStyle.SECONDARY}
+                    icon={'fa fa-pencil'}
+                    onClick={this.editHandler} />
+
+                <SVGCircleButton
+                    x={block.width - 22 - offset}
+                    y={-6}
+                    className={'config'}
+                    style={ButtonStyle.DEFAULT}
+                    icon={'fa fa-tools'}
+                    onClick={this.configHandler} />
             </g>
         )
     }
@@ -205,7 +315,9 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
             'highlight': highlight,
             'focused-link': isLinkedFocused,
             'block-dragging': this.props.block.isDragging(),
-            'invalid': !block.isValid()
+            'invalid': !block.isValid(),
+            'block-read-only': this.isBlockReadOnly(),
+            'plan-read-only': this.isPlanReadOnly()
         });
 
 
@@ -215,7 +327,6 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
         })
 
         const variant = highlight ? 'highlight' : '';
-
 
         return (
             <>
@@ -260,7 +371,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
                                     size={this.props.size}
                                     planner={this.props.planner}
                                     role={ResourceRole.CONSUMES}
-                                    readOnly={this.isReadOnly()}
+                                    readOnly={this.isBlockReadOnly()}
                                     viewOnly={this.props.viewOnly}
                                     list={block.consumes}
                                     zoom={this.props.zoom}
@@ -272,7 +383,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
                                     size={this.props.size}
                                     blockData={block}
                                     role={ResourceRole.PROVIDES}
-                                    readOnly={this.isReadOnly()}
+                                    readOnly={this.isBlockReadOnly()}
                                     viewOnly={this.props.viewOnly}
                                     list={block.provides}
                                     zoom={this.props.zoom}/>
@@ -291,7 +402,7 @@ export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any
                                     instanceName={block.name}
                                     onInstanceNameChange={(newName) => block.name = newName}
                                     name={block.getBlockName()}
-                                    version={block.getBlockVersion()}
+                                    version={block.version}
 
                                 />
                             </g>

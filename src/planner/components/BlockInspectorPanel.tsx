@@ -53,7 +53,7 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
 
     @action
     private async loadLogs() {
-        if (!this.props.block?.getRef()) {
+        if (!this.props.block?.ref) {
             return;
         }
         this.setLoading(true);
@@ -116,7 +116,7 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
             return;
         }
         this.stopListening();
-        InstanceService.subscribe(this.props.block.getRef(), InstanceEventType.EVENT_INSTANCE_LOG, this.onInstanceLog);
+        InstanceService.subscribe(this.props.block.ref, InstanceEventType.EVENT_INSTANCE_LOG, this.onInstanceLog);
     }
 
     private stopListening() {
@@ -124,17 +124,17 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
             return;
         }
 
-        InstanceService.unsubscribe(this.props.block.getRef(), InstanceEventType.EVENT_INSTANCE_LOG, this.onInstanceLog);
+        InstanceService.unsubscribe(this.props.block.ref, InstanceEventType.EVENT_INSTANCE_LOG, this.onInstanceLog);
     }
 
     componentDidUpdate(prevProps: Readonly<BlockInspectorPanelProps>, prevState: Readonly<{}>, snapshot?: any) {
         this.startListening();
 
-        if (!this.props.block?.getRef()) {
+        if (!this.props.block?.ref) {
             return;
         }
 
-        if (this.props.block?.getRef() == prevProps.block?.getRef()) {
+        if (this.props.block?.ref == prevProps.block?.ref) {
             return;
         }
 
@@ -158,10 +158,10 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
                     <div className={'item-inspector-panel'}>
                         <TabContainer>
                             <TabPage id={'logs'} title={'Logs'}>
-                                <LogPanel key={this.props.block.getRef() + '_logs'} logs={this.logs} emitter={this.logEmitter}/>
+                                <LogPanel key={this.props.block.ref + '_logs'} logs={this.logs} emitter={this.logEmitter}/>
                             </TabPage>
                             <TabPage id={'issues'} title={'Issues'}>
-                                <div className={'issues-container'} key={this.props.block.getRef() + '_issues'}>
+                                <div className={'issues-container'} key={this.props.block.ref + '_issues'}>
                                     {!this.props.block.isValid() && (
                                         <>
                                             <span>

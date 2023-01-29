@@ -14,33 +14,65 @@
         cursor: move;
     }
 
-
     .block-actions {
-        .svg-button {
+        overflow: visible;
+        .svg-circle-button {
             .transition(transform 200ms);
+        }
 
+        &.buttons-2 {
+            .svg-circle-button {
 
-            &.inspect {
-                .transform(translate(25px, -40px));
-                .svg-button-background {
-                    fill: #00909e;
-                    stroke: #00909e
+                &:nth-child(1) {
+                    .transform(translate(15px, -40px));
+                }
+
+                &:nth-child(2) {
+                    .transform(translate(-15px, -40px));
+                    transition-delay: 80ms;
                 }
             }
+        }
 
-            &.delete {
-                .transform(translate(0px, -40px));
-                transition-delay: 80ms;
+        &.buttons-3 {
+            .svg-circle-button {
+
+                &:nth-child(1) {
+                    .transform(translate(25px, -40px));
+                }
+
+                &:nth-child(2) {
+                    .transform(translate(0px, -40px));
+                    transition-delay: 60ms;
+                }
+
+                &:nth-child(3) {
+                    .transform(translate(-25px, -40px));
+                    transition-delay: 120ms;
+                }
             }
+        }
 
-            &.edit {
-                .transform(translate(-25px, -40px));
-                transition-delay: 160ms;
-            }
+        &.buttons-4 {
+            .svg-circle-button {
 
-            &:hover {
-                .svg-button-background {
-                    fill: white;
+                &:nth-child(1) {
+                    .transform(translate(25px, -40px));
+                }
+
+                &:nth-child(2) {
+                    .transform(translate(15px, -40px));
+                    transition-delay: 40ms;
+                }
+
+                &:nth-child(3) {
+                    .transform(translate(-15px, -40px));
+                    transition-delay: 80ms;
+                }
+
+                &:nth-child(4) {
+                    .transform(translate(-25px, -40px));
+                    transition-delay: 120ms;
                 }
             }
         }
@@ -81,13 +113,8 @@
         .block-action-container:hover,
         &.buttons-visible {
             .block-actions {
-                .svg-button {
-
-                    &.edit,
-                    &.delete,
-                    &.inspect {
-                        .transform(translate(0,0));
-                    }
+                .svg-circle-button {
+                    .transform(translate(0,0));
                 }
             }
         }

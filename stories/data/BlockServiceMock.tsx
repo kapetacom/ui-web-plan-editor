@@ -1,6 +1,7 @@
 import React from 'react';
 import {BlockService, BlockTypeProvider, ResourceTypeProvider} from "@blockware/ui-web-context";
 import {ResourceRole, ResourceType} from "@blockware/ui-web-types";
+import {parseBlockwareUri} from '@blockware/nodejs-utils';
 
 export const BlockServiceMock = BlockService;
 
@@ -10,7 +11,7 @@ const blocks = [
     require('./blocks/blockware-images.json')
 ].map(data => {
     return {
-        ref: data.metadata.name,
+        ref: data.metadata.name + ':1.2.3',
         path: '.',
         kind: data.kind,
         data: data,
@@ -20,6 +21,40 @@ const blocks = [
         editable: true
     }
 });
+
+blocks.push(...[
+    require('./blocks/blockware-user.json'),
+    require('./blocks/blockware-todo.json'),
+    require('./blocks/blockware-images.json')
+].map(data => {
+    return {
+        ref: data.metadata.name + ':1.0.2',
+        path: '.',
+        kind: data.kind,
+        data: data,
+        exists: true,
+        ymlPath: '.',
+        version: '1.0.2',
+        editable: true
+    }
+}));
+
+blocks.push(...[
+    require('./blocks/blockware-user.json'),
+    require('./blocks/blockware-todo.json'),
+    require('./blocks/blockware-images.json')
+].map(data => {
+    return {
+        ref: data.metadata.name + ':local',
+        path: '.',
+        kind: data.kind,
+        data: data,
+        exists: true,
+        ymlPath: '.',
+        version: 'local',
+        editable: true
+    }
+}));
 
 [
     require('./blocks/blockware-resource-type-mongodb.json'),
@@ -81,7 +116,11 @@ BlockServiceMock.list = async () => {
 
 // @ts-ignore
 BlockServiceMock.get = async (ref) => {
-    const out = blocks.find(a => a.ref === ref.split(':')[0]);
+    const uri = parseBlockwareUri(ref);
+    const out = blocks.find(a => {
+        const aUri = parseBlockwareUri(a.ref);
+        return uri.fullName === aUri.fullName;
+    });
     if (!out) {
         console.error('Could not find ref: ', ref);
     }

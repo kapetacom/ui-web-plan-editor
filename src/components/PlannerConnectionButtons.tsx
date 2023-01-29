@@ -1,12 +1,19 @@
 import React from 'react';
 
 import { toClass } from "@blockware/ui-web-utils";
-import { SVGButtonEdit, SVGButtonDelete, SVGButtonWarning, SVGButtonInspect } from "@blockware/ui-web-components";
+import {
+    SVGButtonEdit,
+    SVGButtonDelete,
+    SVGButtonWarning,
+    SVGButtonInspect,
+    ButtonStyle
+} from "@blockware/ui-web-components";
 import { ResourceTypeProvider } from "@blockware/ui-web-context";
 
 import './PlannerConnectionButtons.less';
 import {PlannerConnectionModelWrapper} from "../wrappers/PlannerConnectionModelWrapper";
 import {observer} from "mobx-react";
+import {SVGCircleButton} from "./SVGCircleButton";
 
 function makeButtonBg(x:number, y:number, height:number, lineLength:number) {
 
@@ -153,18 +160,42 @@ export class PlannerConnectionButtons extends React.Component<PlannerConnectionB
 
                     <svg clipPath={`url(#${clipId})`} >
                         {!this.props.connection.isValid() &&
-                            <SVGButtonWarning x={warningX} y={warningY} onClick={this.props.onEdit} />
+                            <SVGCircleButton
+                                x={warningX}
+                                y={warningY}
+                                className={'warning'}
+                                style={ButtonStyle.DEFAULT}
+                                icon={'fa fa-exclamation-triangle'}
+                                onClick={this.props.onEdit} />
                         }
                         {hasMapping && this.props.connection.isValid() &&
-                            <SVGButtonEdit x={editX} y={-buttonHeight} onClick={this.props.onEdit} />
+                            <SVGCircleButton
+                                x={editX}
+                                y={-buttonHeight}
+                                className={'edit'}
+                                style={ButtonStyle.SECONDARY}
+                                icon={'fa fa-pencil'}
+                                onClick={this.props.onEdit} />
                         }
 
                         {showInspect &&
-                            <SVGButtonInspect x={inspectX} y={-buttonHeight} onClick={this.props.onInspect} />
+                            <SVGCircleButton
+                                x={inspectX}
+                                y={-buttonHeight}
+                                className={'inspect'}
+                                style={ButtonStyle.PRIMARY}
+                                icon={'fa fa-search'}
+                                onClick={this.props.onInspect} />
                         }
 
                         {showDelete &&
-                            <SVGButtonDelete x={deleteX} y={-buttonHeight} onClick={this.props.onDelete} />
+                            <SVGCircleButton
+                                x={deleteX}
+                                y={-buttonHeight}
+                                className={'delete'}
+                                style={ButtonStyle.DANGER}
+                                icon={'fa fa-trash'}
+                                onClick={this.props.onDelete} />
                         }
                     </svg>
                 </g>
