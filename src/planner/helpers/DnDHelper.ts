@@ -108,7 +108,7 @@ export class DnDHelper {
             let activeBlock = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
             const resourceConfig: ResourceConfig = data;
 
-            if (activeBlock && activeBlock.isReadOnly()) {
+            if (activeBlock && activeBlock.readonly) {
                 activeBlock = undefined;
             }
 
@@ -167,13 +167,14 @@ export class DnDHelper {
             });
 
             const block = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
-            if (!block || block.isReadOnly()) {
+            if (!block || block.readonly) {
                 return;
             }
 
             const resourceConfig: ResourceConfig = asset;
+
             const resourceKind: ResourceKind = {
-                kind: asset.kind,
+                kind: `${resourceConfig.kind}:${resourceConfig.version}`,
                 metadata: {
                     name: 'MyResource'
                 },

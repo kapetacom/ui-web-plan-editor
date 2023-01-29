@@ -192,11 +192,11 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
 
     @action
     private onKindChanged = (kind:string) => {
-        const item = this.props.editableItem.item;
+        const itemData = this.editedSchema ?? toJS(this.props.editableItem.item.getData());
         this.editedSchema = {
             kind: kind,
-            metadata: item.metadata,
-            spec: item.spec
+            metadata: itemData.metadata,
+            spec: itemData.spec
         };
     }
 
@@ -281,25 +281,31 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
                 return <></>;
             }
 
-            const data = (!this.editedSchema || this.editedSchema.kind !== definition.kind) ?
-                definition : this.editedSchema;
+            const kindUri = parseBlockwareUri(definition.kind);
+            const editedKindUri = this.editedSchema?.kind ?
+                parseBlockwareUri(this.editedSchema.kind) : null;
 
-            const blockwareUri = parseBlockwareUri(data.kind);
+            const data = (this.editedSchema && editedKindUri.fullName === kindUri.fullName) ?
+                this.editedSchema : definition;
+
+            const dataKindUri = parseBlockwareUri(data.kind);
 
             const versions:{[key:string]:string} = {};
-            const versionAlternatives = ResourceTypeProvider.getVersionsFor(blockwareUri.fullName);
-            console.log('lists', versionAlternatives);
-            versionAlternatives.forEach(resourceType => {
-                const versionName = resourceType.version === 'local' ? 'Local Disk' : resourceType.version;
-                versions[resourceType.version] = `${resourceType.title} [${versionName}]`;
-            })
-            console.log('versions', versions);
+            const versionAlternatives = ResourceTypeProvider.getVersionsFor(dataKindUri.fullName);
+            versionAlternatives.forEach(version => {
+                const versionName = version === 'local' ? 'Local Disk' : version;
+                const resourceType = ResourceTypeProvider.get(`${dataKindUri.fullName}:${version}`);
+                versions[version] = resourceType && resourceType.title ?
+                    `${resourceType.title} [${versionName}]` :
+                    versionName;
+            });
 
             return <>
                 <FormSelect options={versions}
-                            value={blockwareUri.version}
-                            help={'Current version'}
+                            value={dataKindUri.version}
+                            help={'The kind and version of this resource'}
                             validation={['required']}
+                            label={'Resource kind'}
                             name={'version'}
                             onChange={(name, newVersion) => {
                                 const kindUri = parseBlockwareUri(data.kind);
