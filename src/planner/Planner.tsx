@@ -211,9 +211,10 @@ export class Planner extends React.Component<PlannerProps> {
 
     @observable
     private setupInstanceService() {
-        InstanceService.getInstanceCurrentStatus()
+        InstanceService.getInstanceStatusForPlan(this.plan.getRef())
             .then(instanceStatuses => this.updateRunningBlockStatus(instanceStatuses))
-            .catch(() => {
+            .catch((err) => {
+                console.warn('Failed to get current status', err);
             });
 
 
