@@ -39,6 +39,7 @@ interface PlannerBlockResourceListItemProps {
     readOnly?: boolean
     viewOnly?: boolean
     setItemToEdit?: (res: PlannerResourceModelWrapper | PlannerBlockModelWrapper | any | undefined, type: ItemType, block?: PlannerBlockModelWrapper) => void
+    setItemToInspect?: (res: PlannerResourceModelWrapper , type: ItemType) => void
 }
 
 interface PlannerBlockResourceListItemState {
@@ -81,6 +82,14 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         this.setState({ dragging: false, editMode: true });
         if (this.props.setItemToEdit) {
             this.props.setItemToEdit(this.props.resource, ItemType.RESOURCE, this.getBlock());
+        }
+    };
+
+    @action
+    inspectHandler = () => {
+        this.setState({ dragging: false, editMode: true });
+        if (this.props.setItemToInspect) {
+            this.props.setItemToInspect(this.props.resource, ItemType.RESOURCE);
         }
     };
 
@@ -416,12 +425,14 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
     }
 
     private renderActions(consumer:boolean) {
-        if (this.props.viewOnly) {
+        if (this.props.readOnly && !this.props.setItemToInspect ||
+            this.props.viewOnly) {
             return (
                 <g className={'resource-actions'}></g>
             )
         }
-        if (this.props.readOnly) {
+
+        if (this.props.readOnly && this.props.setItemToInspect) {
             return (
                 <g className={'resource-actions'}>
                     <SVGCircleButton
@@ -430,7 +441,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
                         className={'inspect'}
                         style={ButtonStyle.PRIMARY}
                         icon={'fa fa-search'}
-                        onClick={this.editHandler} />
+                        onClick={this.inspectHandler} />
                 </g>
             )
         }
