@@ -217,10 +217,13 @@ export class PlannerModelWrapper {
 
     @action
     removeConnection(connection: PlannerConnectionModelWrapper) {
-
-        _.pull(this.connections, connection);
-
+        const ix = this.connections.indexOf(connection);
+        if (ix === -1) {
+            return false;
+        }
+        this.connections.splice(ix, 1);
         this.validate();
+        return true;
 
     }
 
@@ -260,6 +263,7 @@ export class PlannerModelWrapper {
         const entityNames = ResourceTypeProvider.resolveEntities(fromResource.getData());
 
         //Convert resource to consumable resource
+
         const data = ResourceTypeProvider.convertToConsumable(fromResource.getData());
 
         entityNames.forEach((entityName) => {

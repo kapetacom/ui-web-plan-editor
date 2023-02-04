@@ -65,6 +65,20 @@
     }
   }
 
+  &.warning .container {
+    background: @yellow-alert;
+    color: white;
+    border:0;
+
+    &:hover {
+      background: lighten(@yellow-alert, 10%);
+    }
+
+    &:active {
+      background: @yellow-alert;
+    }
+  }
+
   &.danger .container {
     background: @btn-cancel-bg;
     color: white;

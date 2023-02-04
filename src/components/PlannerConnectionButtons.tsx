@@ -73,11 +73,10 @@ export class PlannerConnectionButtons extends React.Component<PlannerConnectionB
 
     render() {
 
-        let editX = 5,
-            inspectX = 35,
-            deleteX = 65,
-            warningX = 2,
-            warningY = -14;
+
+        let inspectX = -25,
+            editX = 5,
+            deleteX = 35;
         let clipHeight = 12;
         let buttonHeight = 12;
         let length = this.state.over ? 60 : 0;
@@ -111,32 +110,49 @@ export class PlannerConnectionButtons extends React.Component<PlannerConnectionB
 
         }
 
-        if (!hasInspector) {
-            deleteX -= 30;
-            if (this.state.over){
+        const readOnly = this.props.connection.fromResource.block.plan.isReadOnly()
+        const showEditBtn =
+            !readOnly && (!this.props.connection.isValid() || hasMapping);
+        let showDelete = !readOnly;
+        let showInspect = hasInspector;
+
+
+        if (!showDelete) {
+            if (this.state.over) {
                 length -= 30;
                 x += 15;
             }
         }
 
-        if (this.state.over) {
-            warningX = 5;
+        if (!showEditBtn) {
+            inspectX += 30;
+            if (this.state.over) {
+                length -= 30;
+                x += 15;
+            }
         }
+
+        if (!showEditBtn && !showInspect && showDelete) {
+            deleteX = 5;
+        }
+
 
         const bgPath = makeButtonBg(x, 0, this.props.open ? clipHeight +2 : 0, length);
         const bgPathClip = makeButtonBg(x, 0, this.props.open ? clipHeight : 0, length);
-
-        const showEditBtn =
-            !this.props.connection.isValid() || hasMapping;
-
-        const showInspect = hasInspector;
-
-        const showDelete = !this.props.readOnly;
 
         if (!showDelete &&
             !showEditBtn &&
             !showInspect) {
             return <></>
+        }
+
+        if (!this.state.over) {
+            if (showInspect || showEditBtn) {
+                showDelete = false;
+            }
+            if (showEditBtn) {
+                showInspect = false;
+            }
         }
 
         return (
@@ -159,16 +175,16 @@ export class PlannerConnectionButtons extends React.Component<PlannerConnectionB
                     </clipPath>
 
                     <svg clipPath={`url(#${clipId})`} >
-                        {!this.props.connection.isValid() &&
+                        {showEditBtn && !this.props.connection.isValid() &&
                             <SVGCircleButton
-                                x={warningX}
-                                y={warningY}
+                                x={editX}
+                                y={-buttonHeight}
                                 className={'warning'}
                                 style={ButtonStyle.DEFAULT}
                                 icon={'fa fa-exclamation-triangle'}
                                 onClick={this.props.onEdit} />
                         }
-                        {hasMapping && this.props.connection.isValid() &&
+                        {showEditBtn && this.props.connection.isValid() &&
                             <SVGCircleButton
                                 x={editX}
                                 y={-buttonHeight}
@@ -187,7 +203,6 @@ export class PlannerConnectionButtons extends React.Component<PlannerConnectionB
                                 icon={'fa fa-search'}
                                 onClick={this.props.onInspect} />
                         }
-
                         {showDelete &&
                             <SVGCircleButton
                                 x={deleteX}

@@ -141,16 +141,12 @@ export class Planner extends React.Component<PlannerProps> {
         this.dnd = new DnDHelper(this, this.editPanelHelper);
         this.blockInspectorPanelHelper = new InspectBlockPanelHelper(this);
 
-        this.connectionListObserver = reaction(() => this.plan.connections, this.onConnectionsChange);
-        this.blockListObserver = reaction(() => this.plan.blocks, this.onBlocksChange);
-
-        this.focusHelper = new FocusHelper(this.plan);
-
         makeObservable(this);
 
+        this.connectionListObserver = reaction(() => this.plan.connections.length, this.onConnectionsChange);
+        this.blockListObserver = reaction(() => this.plan.blocks.length, this.onBlocksChange);
+        this.focusHelper = new FocusHelper(this.plan);
         this.init();
-
-
     }
 
     public get nodeSize(): PlannerNodeSize {
@@ -164,7 +160,7 @@ export class Planner extends React.Component<PlannerProps> {
             this.runningBlocks[block.id] = {status: InstanceStatus.STOPPED};
         });
 
-        this.observerConnections(this.plan.connections);
+        this.addConnectionObservers(this.plan.connections);
         this.observerBlocks(Object.values(this.plan.blocks));
 
         this.plan.validate();
@@ -287,7 +283,7 @@ export class Planner extends React.Component<PlannerProps> {
         this.plannerCanvasSize = newCanvas;
     }
 
-    private observerConnections(connections: PlannerConnectionModelWrapper[]) {
+    private addConnectionObservers(connections: PlannerConnectionModelWrapper[]) {
         connections.forEach((connection) => {
             this.connectionObservers.push({
                 connection,
@@ -372,25 +368,25 @@ export class Planner extends React.Component<PlannerProps> {
     /**
      * Handles when connections change
      */
-    private onConnectionsChange = async (change: any) => {
-        if (change.removedCount > 0) {
-            const removed = this.connectionObservers.filter((observer) => {
-                return this.plan.connections.indexOf(observer.connection) === -1;
-            });
+    private onConnectionsChange = async () => {
 
-            while (removed.length > 0) {
-                const observer = removed.pop();
-                if (observer) {
-                    observer.connectionInstanceObserverDisposer();
-                    _.pull(this.connectionObservers, observer);
-                }
+        const removedConnections = this.connectionObservers.filter((observer) => {
+            return this.plan.connections.indexOf(observer.connection) === -1;
+        });
+
+        while (removedConnections.length > 0) {
+            const observer = removedConnections.pop();
+            if (observer) {
+                observer.connectionInstanceObserverDisposer();
+                _.pull(this.connectionObservers, observer);
             }
         }
 
-        if (change.added &&
-            change.added.length > 0) {
-            this.observerConnections(change.added);
-        }
+        const newConnections = this.plan.connections.filter((connection) => {
+            return !this.connectionObservers.some((observer) => observer.connection === connection);
+        });
+
+        this.addConnectionObservers(newConnections);
 
         await this.onPlanChange();
     };
@@ -446,18 +442,22 @@ export class Planner extends React.Component<PlannerProps> {
         return {x: oldSize.x * nextZoom, y: oldSize.y * nextZoom}
     }
 
+    @action
     private onBlockSaved = async (block: PlannerBlockModelWrapper) => {
         this.plan.updateBlock(block);
     };
 
+    @action
     private onConnectionSaved = async (connection: PlannerConnectionModelWrapper) => {
         this.plan.updateConnection(connection);
     };
 
+    @action
     private onBlockRemoved = async (block: PlannerBlockModelWrapper) => {
         this.plan.removeBlock(block);
     };
 
+    @action
     private onConnectionRemoved = async (connection: PlannerConnectionModelWrapper) => {
         this.plan.removeConnection(connection);
     };
@@ -795,8 +795,8 @@ export class Planner extends React.Component<PlannerProps> {
                                                             focusBlock={this.plan.focusedBlock}
                                                             handleInspectClick={this.handleInspection}
                                                             setItemToEdit={this.setEditItem}
-                                                            onFocus={this.plan.moveConnectionToTop.bind(this.plan, connection)}
-                                                            onDelete={this.plan.removeConnection.bind(this.plan, connection)}
+                                                            onFocus={() => runInAction(() => this.plan.moveConnectionToTop(connection))}
+                                                            onDelete={this.onConnectionRemoved}
                                                             connection={connection}/>
 
                                                     )
