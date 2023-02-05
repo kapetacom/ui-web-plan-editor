@@ -38,19 +38,21 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
     @observable
     private readonly compatibleResources: PlannerResourceModelWrapper[] = [];
 
-    @observable
-    private readonly resource: PlannerResourceModelWrapper
-
-    @observable
-    private readonly original: PlannerResourceModelWrapper
-
     private elm: DOMElement | null = null;
 
     constructor(props: PlannerTempResourceItemProps) {
         super(props);
-        this.resource = this.props.selectedResource.resource;
-        this.original = this.props.selectedResource.original;
         makeObservable(this);
+    }
+
+    @computed
+    private get resource() {
+        return this.props.selectedResource.resource;
+    }
+
+    @computed
+    private get original() {
+        return this.props.selectedResource.original
     }
 
     @computed

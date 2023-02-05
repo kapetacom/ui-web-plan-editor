@@ -263,7 +263,6 @@ export class PlannerModelWrapper {
         const entityNames = ResourceTypeProvider.resolveEntities(fromResource.getData());
 
         //Convert resource to consumable resource
-
         const data = ResourceTypeProvider.convertToConsumable(fromResource.getData());
 
         entityNames.forEach((entityName) => {
@@ -307,7 +306,24 @@ export class PlannerModelWrapper {
 
         const toResource = new PlannerResourceModelWrapper(ResourceRole.CONSUMES, data, toBlock);
         toBlock.addResource(toResource);
-        this.addConnection(PlannerConnectionModelWrapper.createFromResources(fromResource, toResource));
+        const connection = PlannerConnectionModelWrapper.createFromResources(fromResource, toResource);
+
+        const converter = ResourceTypeProvider.getConverterFor(fromResource.getKind(), toResource.getKind())
+        if (converter && converter.createMapping) {
+            let mapping = converter.createMapping(
+                fromResource.getData(),
+                toResource.getData(),
+                fromBlock.getEntities(),
+                toBlock.getEntities()
+            );
+            //Updates mapping
+            connection.setData({
+                ...connection.getData(),
+                mapping
+            });
+        }
+
+        this.addConnection(connection);
 
         return true;
     }

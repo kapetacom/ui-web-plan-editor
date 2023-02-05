@@ -67,11 +67,23 @@ export class PlannerModelReader {
 
         if (planKind.spec.connections) {
             runInAction(() => {
-                out.connections = planKind.spec.connections ?
-                    planKind.spec.connections.map((data) =>
-                        PlannerConnectionModelWrapper.createFromData(data, out)
-                    )
-                    : [];
+                out.connections = [];
+                if (planKind.spec.connections) {
+                    const connections = [...planKind.spec.connections];
+                    connections.forEach((data) => {
+                        try {
+                            out.connections.push(PlannerConnectionModelWrapper.createFromData(data, out));
+                        } catch (e) {
+                            //Ignore and remove connections
+                            if (planKind.spec.connections) {
+                                const ix = planKind.spec.connections.indexOf(data);
+                                if (ix > -1) {
+                                    planKind.spec.connections.splice(ix, 1);
+                                }
+                            }
+                        }
+                    })
+                }
             });
         }
 

@@ -11,7 +11,6 @@ import type {
 
 import {
     ItemType,
-    BlockType,
     ResourceKind
 } from "@blockware/ui-web-types";
 import {BlockTypeProvider, ResourceTypeProvider} from "@blockware/ui-web-context";
@@ -136,8 +135,7 @@ export class DnDHelper {
                 spec: {
                     target: {
                         kind: ''
-                    },
-                    type: BlockType.SERVICE
+                    }
                 }
             };
 
@@ -182,7 +180,6 @@ export class DnDHelper {
             };
 
             const wrapper = new PlannerResourceModelWrapper(resourceConfig.role, resourceKind, block);
-            wrapper.id = Guid.create().toString();
             block.addResource(wrapper);
 
             this.editPanel.edit(wrapper, ItemType.RESOURCE, true);

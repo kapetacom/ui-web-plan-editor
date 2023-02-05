@@ -38,7 +38,6 @@ const emptyBlockDefinition: BlockKind = {
         name: "blockware/todo"
     },
     spec: {
-        type: BlockType.SERVICE,
         target: {
             kind: 'my-target'
         },
@@ -69,7 +68,6 @@ const emptyBlockDefinition2: BlockKind = {
         name: "test/demo"
     },
     spec: {
-        type: BlockType.SERVICE,
         target: {
             kind: 'my-target'
         },

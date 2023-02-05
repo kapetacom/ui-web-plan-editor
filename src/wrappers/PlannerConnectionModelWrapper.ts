@@ -12,9 +12,6 @@ import { PlannerNodeSize } from "../types";
 
 export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectionSpec> {
     @observable
-    id: string;
-
-    @observable
     readonly fromResource: PlannerResourceModelWrapper;
 
     @observable
@@ -76,18 +73,20 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
 
     constructor(connection: BlockConnectionSpec, fromResource: PlannerResourceModelWrapper, toResource: PlannerResourceModelWrapper) {
         this.data = connection;
-        this.id = [
-            connection.from.blockId,
-            connection.from.resourceName,
-            connection.to.blockId,
-            connection.to.resourceName
-        ].join('_');
-
         this.fromResource = fromResource;
         this.toResource = toResource;
-
         this.recalculateMapping();
         makeObservable(this);
+    }
+
+    @computed
+    get id() {
+        return [
+            this.data.from.blockId,
+            this.data.from.resourceName,
+            this.data.to.blockId,
+            this.data.to.resourceName
+        ].join('_');
     }
 
     @observable
@@ -178,6 +177,8 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
     recalculateMapping() {
 
         const converter = this.getConverter();
+        this.data.from.resourceName = this.fromResource.id;
+        this.data.to.resourceName = this.toResource.id;
 
         if (!converter ||
             !converter.updateMapping) {
@@ -193,6 +194,7 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
             this.fromResource.block.getEntities(),
             this.toResource.block.getEntities()
         );
+
 
         if (!_.isEqual(data.mapping, newMapping)) {
             this.data.mapping = newMapping;

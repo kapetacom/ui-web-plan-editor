@@ -1,4 +1,4 @@
-import {action, makeObservable, observable, toJS} from "mobx";
+import {action, computed, makeObservable, observable, toJS} from "mobx";
 import {PlannerNodeSize} from "../types";
 
 import {PlannerBlockModelWrapper} from "./PlannerBlockModelWrapper";
@@ -17,9 +17,6 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     readonly block:PlannerBlockModelWrapper;
 
     readonly instanceId:string = '';
-
-    @observable
-    id: string = '';
 
     @observable
     role: ResourceRole = ResourceRole.CONSUMES;
@@ -42,13 +39,17 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
 
     constructor(role:ResourceRole, resource: ResourceKind, block:PlannerBlockModelWrapper) {
         this.instanceId = crypto.randomUUID();
-        this.id = PlannerResourceModelWrapper.GetResourceID(resource);
         this.role = role;
         this.mode = ResourceMode.HIDDEN;
         this.data = resource;
         this.block = block;
         this.validate();
         makeObservable(this);
+    }
+
+    @computed
+    get id() {
+        return PlannerResourceModelWrapper.GetResourceID(this.data);
     }
 
     openLinkedResource (){
@@ -73,7 +74,6 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     @action
     setData(data:ResourceKind) {
         this.data = toJS(data);
-
         this.block.plan.getConnectionsFor(this).forEach((connection:PlannerConnectionModelWrapper) => {
             connection.recalculateMapping(); //The connection will try to adjust to the changes made in the resource
         });
@@ -199,12 +199,6 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     @action
     setMode(mode: ResourceMode) {
         this.mode = mode;
-    }
-
-    @action
-    setId(val: string) {
-        this.id = val;
-        this.validate();
     }
 
     @action

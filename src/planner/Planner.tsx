@@ -302,22 +302,27 @@ export class Planner extends React.Component<PlannerProps> {
         })
     }
 
+    @action
     private onInspectorPanelClosed = () => {
         this.connectionToInspect = undefined;
     };
 
+    @action
     private onInstanceStatusChanged = (message: any) => {
         this.runningBlocks[message.instanceId] = {
             status: message.status
         }
         this.removeFromFailed(message)
     };
+
+    @action
     private removeFromFailed = (message: FailedBlockMessage) => {
         if (this.failedToRunBlocks[message.instanceId]) {
             delete this.failedToRunBlocks[message.instanceId];
         }
     };
 
+    @action
     private onInstanceStatusExited = (message: FailedBlockMessage) => {
         const failedBlocks = this.plan.blocks.filter((blockInst) => blockInst.id === message.instanceId);
         if (failedBlocks.length <= 0 || (!message)) {
@@ -340,6 +345,7 @@ export class Planner extends React.Component<PlannerProps> {
      * Handles when number of blocks change
      * @param change
      */
+    @action
     private onBlocksChange = async (change: any) => {
 
         if (change.removedCount > 0) {
@@ -368,6 +374,7 @@ export class Planner extends React.Component<PlannerProps> {
     /**
      * Handles when connections change
      */
+    @action
     private onConnectionsChange = async () => {
 
         const removedConnections = this.connectionObservers.filter((observer) => {
@@ -416,6 +423,7 @@ export class Planner extends React.Component<PlannerProps> {
     };
 
     // Handle connection changes (mapping)
+    @action
     private onConnectionInstanceChange = async (connection: PlannerConnectionModelWrapper) => {
         if (this.plan.connections.indexOf(connection) > -1) {
             this.plan.connections = this.plan.connections.map((con: PlannerConnectionModelWrapper) => {
