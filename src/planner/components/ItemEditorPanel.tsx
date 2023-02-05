@@ -8,7 +8,7 @@ import {
     FormContainer,
     FormButtons,
     SidePanel,
-    ButtonStyle, FormSelect
+    ButtonStyle, FormSelect, FormInput
 } from "@blockware/ui-web-components";
 
 import {
@@ -31,6 +31,11 @@ import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWr
 
 import './ItemEditorPanel.less';
 
+function validateBlockName(field:string, value:string) {
+    if (!/^[a-z][a-z0-9_-]*\/[a-z][a-z0-9_-]*$/i.test(value)) {
+        throw new Error('Invalid block name. Expected format is <handle>/<name>');
+    }
+}
 
 interface BlockConnectionEditData {
     connection: BlockConnectionSpec
@@ -216,6 +221,58 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
         };
     }
 
+    private renderBlockFields(data:SchemaKind) {
+        const kindUri = parseBlockwareUri(data.kind);
+        const versions = BlockTypeProvider.getVersionsFor(kindUri.fullName);
+        const options:{[key:string]:string} = {};
+
+        versions.forEach(version => {
+            const id = `${kindUri.fullName}:${version}`;
+            const typeProvider = BlockTypeProvider.get(id);
+            const title = typeProvider.title ?? typeProvider.kind;
+            options[id] = `${title} [${version}]`
+        })
+
+        return (
+            <>
+                <FormSelect
+                    name={"kind"}
+                    value={kindUri.id}
+                    label={"Type"}
+                    validation={['required']}
+                    help={"The block type and version"}
+                    options={options}
+                    onChange={(name, value) => {
+                        this.onKindChanged(value);
+                    }}
+                />
+
+                <FormInput name={'name'}
+                           validation={['required', validateBlockName]}
+                           value={data.metadata.name}
+                           onChange={(name,value) => {
+                               data.metadata[name] = value;
+                               this.onSchemaChanged(data.metadata, data.spec);
+                           }}
+                           label={'Name'}
+                           help={'The name of this block - e.g. "myhandle/my-block"'}
+
+                />
+
+                <FormInput name={'title'}
+                           label={'Title'}
+                           value={data.metadata.title}
+                           onChange={(name,value) => {
+                               data.metadata[name] = value;
+                               this.onSchemaChanged(data.metadata, data.spec);
+                           }}
+                           help={'This blocks human-friendly title'}
+
+                />
+            </>
+        )
+    }
+
     private renderEditableItemForm(editableItem: EditableItemInterface): any {
 
         if (editableItem.item instanceof PlannerConnectionModelWrapper) {
@@ -252,24 +309,31 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
 
         if (editableItem.item instanceof PlannerBlockModelWrapper) {
             const definition = editableItem.item.getData();
-            const BlockTypeConfig = BlockTypeProvider.get(definition.kind);
 
-            if (!BlockTypeConfig.componentType) {
-                return <></>;
+            let data:SchemaKind;
+            if (this.editedSchema &&
+                parseBlockwareUri(this.editedSchema.kind).fullName === parseBlockwareUri(definition.kind).fullName) {
+                data = this.editedSchema
+            } else {
+                data = definition;
             }
 
-            const data = (!this.editedSchema || this.editedSchema.kind !== definition.kind) ?
-                definition : this.editedSchema;
+            const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
-            return <>
+            if (!BlockTypeConfig.componentType) {
+                return <div key={editableItem.item.id}>
+                    {this.renderBlockFields(data)}
+                </div>;
+            }
+
+            return <div key={editableItem.item.id}>
+                {this.renderBlockFields(data)}
                 <BlockTypeConfig.componentType
-                    key={editableItem.item.id}
                     {...data}
                     creating={editableItem.creating}
                     onDataChanged={(metadata, spec) => this.onSchemaChanged(metadata, spec)}
                 />
-            </>;
-
+            </div>;
         }
 
         if (editableItem.item instanceof PlannerResourceModelWrapper) {
