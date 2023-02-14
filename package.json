@@ -19,6 +19,7 @@
     "scripts": {
         "prebuild": "rm -rf dist",
         "storybook": "start-storybook",
+        "build-storybook": "build-storybook",
         "prepublishOnly": "npm run build",
         "build": "tsc"
     },
