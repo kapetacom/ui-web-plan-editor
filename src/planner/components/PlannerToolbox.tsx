@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {ComponentType} from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 import { SidePanel, PanelAlignment, PanelSize, DnDDrag } from "@blockware/ui-web-components";
 import {ResourceTypeProvider} from "@blockware/ui-web-context";
-import { ResourceConfig, ComponentType, ResourceRole } from "@blockware/ui-web-types";
+import { ResourceConfig, ResourceRole } from "@blockware/ui-web-types";
 import { toClass, SVGCornersHelper, ResourceTagSide } from "@blockware/ui-web-utils";
 
 import {PlannerToolboxResource} from "./PlannerToolboxResource";

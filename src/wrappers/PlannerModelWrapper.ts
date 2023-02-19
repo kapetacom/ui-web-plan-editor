@@ -1,4 +1,4 @@
-import {action, makeAutoObservable, makeObservable, observable} from "mobx";
+import {action, isObservable, makeAutoObservable, makeObservable, observable} from "mobx";
 import {PlannerNodeSize} from "../types";
 import _ from "lodash";
 import type {SelectedResourceItem} from "./models";
@@ -341,6 +341,9 @@ export class PlannerModelWrapper {
 
     @action
     addBlock(block: PlannerBlockModelWrapper) {
+        if (!isObservable(block)) {
+            block = makeObservable(block);
+        }
         this.blocks.push(block);
 
         this.validate();

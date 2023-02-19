@@ -1,35 +1,33 @@
 import React, {Component} from "react";
 import {observer} from "mobx-react";
-import {action, toJS, observable, makeObservable} from "mobx";
+import {action, makeObservable, observable, toJS} from "mobx";
 import {
     Button,
+    ButtonStyle,
     ButtonType,
-    PanelSize,
-    FormContainer,
     FormButtons,
-    SidePanel,
-    ButtonStyle, FormSelect, FormInput
+    FormContainer,
+    FormField,
+    FormFieldType,
+    PanelSize,
+    SidePanel
 } from "@blockware/ui-web-components";
 
-import {
-    BlockTypeProvider,
-    ResourceTypeProvider
-} from "@blockware/ui-web-context";
+import {BlockTypeProvider, ResourceTypeProvider} from "@blockware/ui-web-context";
 
 import {parseBlockwareUri} from '@blockware/nodejs-utils';
 
-import type {BlockConnectionSpec, SchemaKind, DataWrapper, BlockMetadata, SchemaEntity} from "@blockware/ui-web-types";
+import type {BlockConnectionSpec, BlockMetadata, DataWrapper, SchemaEntity, SchemaKind} from "@blockware/ui-web-types";
 import {ResourceKind} from "@blockware/ui-web-types";
 
 
 import {EditableItemInterface} from "../../wrappers/models";
-import {
-    PlannerConnectionModelWrapper
-} from "../../wrappers/PlannerConnectionModelWrapper";
+import {PlannerConnectionModelWrapper} from "../../wrappers/PlannerConnectionModelWrapper";
 import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
 import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
 
 import './ItemEditorPanel.less';
+import {ErrorBoundary} from "react-error-boundary";
 
 function validateBlockName(field:string, value:string) {
     if (!/^[a-z][a-z0-9_-]*\/[a-z][a-z0-9_-]*$/i.test(value)) {
@@ -54,11 +52,12 @@ interface ItemEditorPanelProps {
     onConnectionRemoved: (item: PlannerConnectionModelWrapper) => void
 }
 
-@observer
-export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
+interface State {
+    entry?:SchemaKind
+}
 
-    @observable
-    private editedSchema?: SchemaKind;
+@observer
+export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
 
     @observable
     private editedConnection?: BlockConnectionEditData;
@@ -67,6 +66,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
 
     constructor(props: ItemEditorPanelProps) {
         super(props);
+        this.state = {entry: undefined};
         makeObservable(this);
     }
 
@@ -77,7 +77,6 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
                 return;
             }
 
-            this.editedSchema = undefined;
             this.editedConnection = undefined;
 
             if (this.saved) {
@@ -115,11 +114,10 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
     };
 
     @action
-    private saveAndClose = () => {
+    private saveAndClose = (data:any) => {
         try {
             this.saved = true;
-            this.save();
-            this.editedSchema = undefined;
+            this.save(data);
             this.editedConnection = undefined;
         } catch (e) {
             console.log(e);
@@ -129,9 +127,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
     }
 
     @action
-    private save(): void {
-
-
+    private save(data:SchemaKind): void {
         if (!this.props.editableItem) {
             return;
         }
@@ -166,13 +162,12 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
             return;
         }
 
-        if (!this.editedSchema) {
+        if (!data) {
             return;
         }
 
         //Resource is being saved
-        item.setData(this.editedSchema);
-        this.editedSchema = undefined;
+        item.setData(data);
 
         if (item instanceof PlannerBlockModelWrapper) {
             //We always overwrite the instance name for now.
@@ -182,27 +177,6 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
 
             this.props.onBlockSaved(item);
         }
-    }
-
-
-    @action
-    private onSchemaChanged = (metadata: BlockMetadata, spec: any) => {
-        const item = this.props.editableItem.item;
-        this.editedSchema = {
-            kind: this.editedSchema?.kind ?? item.getData().kind,
-            metadata,
-            spec
-        };
-    }
-
-    @action
-    private onKindChanged = (kind:string) => {
-        const itemData = this.editedSchema ?? toJS(this.props.editableItem.item.getData());
-        this.editedSchema = {
-            kind: kind,
-            metadata: itemData.metadata,
-            spec: itemData.spec
-        };
     }
 
     @action
@@ -231,46 +205,46 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
             const typeProvider = BlockTypeProvider.get(id);
             const title = typeProvider.title ?? typeProvider.kind;
             options[id] = `${title} [${version}]`
-        })
+        });
 
         return (
             <>
-                <FormSelect
+                <FormField
                     name={"kind"}
-                    value={kindUri.id}
+                    type={FormFieldType.ENUM}
                     label={"Type"}
                     validation={['required']}
                     help={"The block type and version"}
                     options={options}
-                    onChange={(name, value) => {
-                        this.onKindChanged(value);
-                    }}
                 />
 
-                <FormInput name={'name'}
+                <FormField name={'metadata.name'}
                            validation={['required', validateBlockName]}
-                           value={data.metadata.name}
-                           onChange={(name,value) => {
-                               data.metadata[name] = value;
-                               this.onSchemaChanged(data.metadata, data.spec);
-                           }}
                            label={'Name'}
                            help={'The name of this block - e.g. "myhandle/my-block"'}
-
                 />
 
-                <FormInput name={'title'}
+                <FormField name={'metadata.title'}
                            label={'Title'}
-                           value={data.metadata.title}
-                           onChange={(name,value) => {
-                               data.metadata[name] = value;
-                               this.onSchemaChanged(data.metadata, data.spec);
-                           }}
                            help={'This blocks human-friendly title'}
 
                 />
             </>
         )
+    }
+
+    private getData():SchemaKind {
+        const definition = this.props.editableItem.item.getData();
+
+        let data:SchemaKind;
+        if (this.state.entry &&
+            parseBlockwareUri(this.state.entry.kind).fullName === parseBlockwareUri(definition.kind).fullName) {
+            data = {...this.state.entry};
+        } else {
+            data = definition;
+        }
+
+        return data;
     }
 
     private renderEditableItemForm(editableItem: EditableItemInterface): any {
@@ -292,31 +266,20 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
                 return <></>;
             }
 
-            return <>
-                <MappingComponent
-                    key={connection.id}
-                    title={'mapping-editor'}
-                    source={connection.fromResource.getData()}
-                    target={connection.toResource.getData()}
-                    sourceEntities={connection.fromResource.block.getEntities()}
-                    targetEntities={connection.toResource.block.getEntities()}
-                    value={toJS(connection.mapping)}
-                    onDataChanged={(change) => this.onMappingChanged(change)}
-                />
-            </>;
-
+            return <MappingComponent
+                key={connection.id}
+                title={'mapping-editor'}
+                source={connection.fromResource.getData()}
+                target={connection.toResource.getData()}
+                sourceEntities={connection.fromResource.block.getEntities()}
+                targetEntities={connection.toResource.block.getEntities()}
+                value={toJS(connection.mapping)}
+                onDataChanged={(change) => this.onMappingChanged(change)}
+            />;
         }
 
         if (editableItem.item instanceof PlannerBlockModelWrapper) {
-            const definition = editableItem.item.getData();
-
-            let data:SchemaKind;
-            if (this.editedSchema &&
-                parseBlockwareUri(this.editedSchema.kind).fullName === parseBlockwareUri(definition.kind).fullName) {
-                data = this.editedSchema
-            } else {
-                data = definition;
-            }
+            const data = this.getData()
 
             const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
@@ -328,29 +291,21 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
 
             return <div key={editableItem.item.id}>
                 {this.renderBlockFields(data)}
-                <BlockTypeConfig.componentType
-                    {...data}
-                    creating={editableItem.creating}
-                    onDataChanged={(metadata, spec) => this.onSchemaChanged(metadata, spec)}
-                />
+                <ErrorBoundary
+                    fallbackRender={(props) => <div>Failed to render block type: {data.kind}. <br/>Error: {props.error.message}</div>}>
+                    <BlockTypeConfig.componentType creating={editableItem.creating} />
+                </ErrorBoundary>
             </div>;
         }
 
         if (editableItem.item instanceof PlannerResourceModelWrapper) {
 
-            const definition = editableItem.item.getData();
-            const resourceType = ResourceTypeProvider.get(definition.kind);
+            const data = this.getData()
+            const resourceType = ResourceTypeProvider.get(data.kind);
 
             if (!resourceType.componentType) {
                 return <></>;
             }
-
-            const kindUri = parseBlockwareUri(definition.kind);
-            const editedKindUri = this.editedSchema?.kind ?
-                parseBlockwareUri(this.editedSchema.kind) : null;
-
-            const data = (this.editedSchema && editedKindUri.fullName === kindUri.fullName) ?
-                this.editedSchema : definition;
 
             const dataKindUri = parseBlockwareUri(data.kind);
 
@@ -359,38 +314,29 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
             versionAlternatives.forEach(version => {
                 const versionName = version === 'local' ? 'Local Disk' : version;
                 const resourceType = ResourceTypeProvider.get(`${dataKindUri.fullName}:${version}`);
-                versions[version] = resourceType && resourceType.title ?
+                versions[`${dataKindUri.fullName}:${version}`] = resourceType && resourceType.title ?
                     `${resourceType.title} [${versionName}]` :
                     versionName;
             });
 
             return <>
-                <FormSelect options={versions}
-                            value={dataKindUri.version}
+                <FormField  options={versions}
+                            type={FormFieldType.ENUM}
                             help={'The kind and version of this resource'}
                             validation={['required']}
                             label={'Resource kind'}
-                            name={'version'}
-                            onChange={(name, newVersion) => {
-                                const kindUri = parseBlockwareUri(data.kind);
-                                if (kindUri.version !== newVersion) {
-                                    kindUri.version = newVersion;
-                                    this.onKindChanged(kindUri.id)
-                                }
-                            }} />
-                <resourceType.componentType
-                    key={editableItem.item.id}
-                    {...data}
-                    block={editableItem.item.block}
-                    creating={editableItem.creating}
-                    onDataChanged={(metadata, spec) => this.onSchemaChanged(metadata, spec)}
-                />
+                            name={'kind'} />
+                <ErrorBoundary fallbackRender={(props) => <div>Failed to render resource type: {data.kind}. <br/>Error: {props.error.message}</div>}>
+                    <resourceType.componentType
+                        key={editableItem.item.id}
+                        block={editableItem.item.block}
+                        creating={editableItem.creating}
+                    />
+                </ErrorBoundary>
             </>;
         }
 
-        return <>
-        </>
-
+        return <></>;
     }
 
     render() {
@@ -411,7 +357,10 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps> {
 
             {this.props.editableItem &&
                 <div className={'item-editor-panel'}>
-                    <FormContainer onSubmit={() => this.saveAndClose()}>
+                    <FormContainer
+                        initialValue={this.getData()}
+                        onChange={(data) => this.setState({entry: data as SchemaKind})}
+                        onSubmitData={(data) => this.saveAndClose(data)}>
                         <div className={'item-form'}>
                             {
                                 this.renderEditableItemForm(this.props.editableItem)
