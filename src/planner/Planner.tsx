@@ -346,26 +346,26 @@ export class Planner extends React.Component<PlannerProps> {
      * @param change
      */
     @action
-    private onBlocksChange = async (change: any) => {
+    private onBlocksChange = async () => {
+        const removed = this.blockObservers.filter((observer) => {
+            return this.plan.blocks.indexOf(observer.block) === -1;
+        });
 
-        if (change.removedCount > 0) {
-            const removed = this.blockObservers.filter((observer) => {
-                return this.plan.blocks.indexOf(observer.block) === -1;
-            });
-
-            while (removed.length > 0) {
-                const observer = removed.pop();
-                if (observer) {
-                    observer.blockObserverDisposer();
-                    observer.blockInstanceObserverDisposer();
-                    _.pull(this.blockObservers, observer);
-                }
+        while (removed.length > 0) {
+            const observer = removed.pop();
+            if (observer) {
+                observer.blockObserverDisposer();
+                observer.blockInstanceObserverDisposer();
+                _.pull(this.blockObservers, observer);
             }
         }
 
-        if (change.added &&
-            change.added.length > 0) {
-            this.observerBlocks(change.added);
+        const added = this.plan.blocks.filter((block) => {
+            return !this.blockObservers.some((observer) => observer.block === block);
+        });
+
+        if (added.length > 0) {
+            this.observerBlocks(added);
         }
 
         await this.onPlanChange();

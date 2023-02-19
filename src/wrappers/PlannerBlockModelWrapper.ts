@@ -121,7 +121,6 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         this.validate();
         makeObservable(this);
-
     }
 
     get version() {

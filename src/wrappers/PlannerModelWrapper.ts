@@ -341,9 +341,6 @@ export class PlannerModelWrapper {
 
     @action
     addBlock(block: PlannerBlockModelWrapper) {
-        if (!isObservable(block)) {
-            block = makeObservable(block);
-        }
         this.blocks.push(block);
 
         this.validate();
