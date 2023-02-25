@@ -12,7 +12,7 @@
                 "basePackage": "org.mycompany.services.todo"
             }
         },
-        "entities": [ ],
+        "entities": [],
         "consumers": [
             {
                 "kind": "blockware/resource-type-mongodb",
@@ -72,6 +72,6 @@
                 }
             }
         ],
-        "providers": [ ]
+        "providers": []
     }
 }

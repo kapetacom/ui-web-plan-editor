@@ -1,11 +1,12 @@
-import React from "react";
-import {ResourceConfig} from "@blockware/ui-web-types";
+import React from 'react';
+import { ResourceConfig } from '@blockware/ui-web-types';
 
-import {PlannerToolboxPainterProps} from "./PlannerToolbox";
-import {BlockResource} from "../../components/BlockResource";
+import { PlannerToolboxPainterProps } from './PlannerToolbox';
+import { BlockResource } from '../../components/BlockResource';
 
-export function PlannerToolboxResource(props:PlannerToolboxPainterProps<ResourceConfig>) {
-
+export function PlannerToolboxResource(
+    props: PlannerToolboxPainterProps<ResourceConfig>
+) {
     return (
         <svg width={125} height={35}>
             <BlockResource
@@ -15,5 +16,5 @@ export function PlannerToolboxResource(props:PlannerToolboxPainterProps<Resource
                 name={props.item.title}
             />
         </svg>
-    )
+    );
 }

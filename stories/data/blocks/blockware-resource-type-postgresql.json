@@ -4,7 +4,5 @@
         "name": "blockware/resource-type-postgresql",
         "title": "Postgres"
     },
-    "spec": {
-
-    }
+    "spec": {}
 }

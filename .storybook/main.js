@@ -1,10 +1,6 @@
-
-
 module.exports = {
-    stories: [
-        '../stories/**/*.stories.tsx'
-    ],
+    stories: ['../stories/**/*.stories.tsx'],
     core: {
-        builder: 'webpack5'
-    }
-}
+        builder: 'webpack5',
+    },
+};

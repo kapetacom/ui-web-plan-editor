@@ -1,35 +1,38 @@
-import React, { Component } from "react";
-import {observable, action, makeObservable} from "mobx";
-import { observer } from "mobx-react";
+import React, { Component } from 'react';
+import { observable, action, makeObservable } from 'mobx';
+import { observer } from 'mobx-react';
 
-import { Modal, ModalSize } from "@blockware/ui-web-components";
-import {TrafficService, TrafficEventType,  ResourceTypeProvider} from "@blockware/ui-web-context";
-import { ConnectionMethodsMapping, Traffic } from "@blockware/ui-web-types";
-
+import { Modal, ModalSize } from '@blockware/ui-web-components';
 import {
-    PlannerConnectionModelWrapper
-} from "../../wrappers/PlannerConnectionModelWrapper"
+    TrafficService,
+    TrafficEventType,
+    ResourceTypeProvider,
+} from '@blockware/ui-web-context';
+import { ConnectionMethodsMapping, Traffic } from '@blockware/ui-web-types';
+
+import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
 
 interface InspectConnectionWrapperProps {
-    connection: PlannerConnectionModelWrapper,
-    onClose: () => void
+    connection: PlannerConnectionModelWrapper;
+    onClose: () => void;
 }
 
 interface InspectConnectionWrapperState {
-    selectedMethod?: string
-    selectedPayload?: Traffic
+    selectedMethod?: string;
+    selectedPayload?: Traffic;
 }
 
 @observer
-export class InspectConnectionPanel extends Component<InspectConnectionWrapperProps, InspectConnectionWrapperState>{
-
+export class InspectConnectionPanel extends Component<
+    InspectConnectionWrapperProps,
+    InspectConnectionWrapperState
+> {
     @observable
-    private trafficLines: Traffic[] = []
+    private trafficLines: Traffic[] = [];
 
     private unsubscribers: Function[] = [];
 
     private modal: Modal | null = null;
-
 
     constructor(props: InspectConnectionWrapperProps) {
         super(props);
@@ -47,12 +50,11 @@ export class InspectConnectionPanel extends Component<InspectConnectionWrapperPr
     @action
     private onTrafficStart = (payload: Traffic) => {
         this.trafficLines.push(payload);
-
     };
 
     @action
     private onTrafficEnd = (payload: Traffic) => {
-        const trafficLine = this.findInTrafficLines(payload.id)
+        const trafficLine = this.findInTrafficLines(payload.id);
         if (trafficLine) {
             Object.assign(trafficLine, payload);
         }
@@ -87,8 +89,16 @@ export class InspectConnectionPanel extends Component<InspectConnectionWrapperPr
         this.unsubscribeAll();
         let { connection } = this.props;
         this.unsubscribers = [
-            TrafficService.subscribe(connection.id, TrafficEventType.TRAFFIC_START, this.onTrafficStart),
-            TrafficService.subscribe(connection.id, TrafficEventType.TRAFFIC_END, this.onTrafficEnd)
+            TrafficService.subscribe(
+                connection.id,
+                TrafficEventType.TRAFFIC_START,
+                this.onTrafficStart
+            ),
+            TrafficService.subscribe(
+                connection.id,
+                TrafficEventType.TRAFFIC_END,
+                this.onTrafficEnd
+            ),
         ];
     }
 
@@ -102,35 +112,29 @@ export class InspectConnectionPanel extends Component<InspectConnectionWrapperPr
             this.props.connection.toResource.getKind()
         );
 
-        if (!converter || 
-            !converter.inspectComponentType) {
-            return (
-                <div>
-                    No traffic inspector defined for connection type
-                </div>
-            );
+        if (!converter || !converter.inspectComponentType) {
+            return <div>No traffic inspector defined for connection type</div>;
         }
 
         const Inspector = converter.inspectComponentType;
 
-        const mapping:ConnectionMethodsMapping = this.props.connection.mapping || {};
+        const mapping: ConnectionMethodsMapping =
+            this.props.connection.mapping || {};
 
-        return (
-            <Inspector
-                trafficLines={this.trafficLines}
-                mapping={mapping} />
-        )
+        return <Inspector trafficLines={this.trafficLines} mapping={mapping} />;
     }
 
     render() {
-
-        return ( <Modal ref={(ref) => this.modal = ref}
-                        openInitially={true}
-                   title="Connection Traffic Inspector"
-                   onClose={this.props.onClose}
-                   size={ModalSize.large}  >
+        return (
+            <Modal
+                ref={(ref) => (this.modal = ref)}
+                openInitially={true}
+                title="Connection Traffic Inspector"
+                onClose={this.props.onClose}
+                size={ModalSize.large}
+            >
                 {this.renderContent()}
             </Modal>
-        )
+        );
     }
 }

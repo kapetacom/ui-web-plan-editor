@@ -1,22 +1,27 @@
-import {action, computed, makeObservable, observable, toJS} from "mobx";
-import {PlannerNodeSize} from "../types";
+import { action, computed, makeObservable, observable, toJS } from 'mobx';
+import { PlannerNodeSize } from '../types';
 
-import {PlannerBlockModelWrapper} from "./PlannerBlockModelWrapper";
+import { PlannerBlockModelWrapper } from './PlannerBlockModelWrapper';
 
-
-import type {DataWrapper, Dimensions, Point, ResourceKind} from "@blockware/ui-web-types";
-import {ResourceRole} from "@blockware/ui-web-types";
-import {BlockMode, ResourceMode} from "./wrapperHelpers";
-import {ResourceTypeProvider} from "@blockware/ui-web-context";
-import {PlannerConnectionModelWrapper} from "./PlannerConnectionModelWrapper";
+import type {
+    DataWrapper,
+    Dimensions,
+    Point,
+    ResourceKind,
+} from '@blockware/ui-web-types';
+import { ResourceRole } from '@blockware/ui-web-types';
+import { BlockMode, ResourceMode } from './wrapperHelpers';
+import { ResourceTypeProvider } from '@blockware/ui-web-context';
+import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 
 const DEFAULT_EXTENSION_SIZE = 110;
 
-export class PlannerResourceModelWrapper<T = any> implements DataWrapper<ResourceKind> {
+export class PlannerResourceModelWrapper<T = any>
+    implements DataWrapper<ResourceKind>
+{
+    readonly block: PlannerBlockModelWrapper;
 
-    readonly block:PlannerBlockModelWrapper;
-
-    readonly instanceId:string = '';
+    readonly instanceId: string = '';
 
     @observable
     role: ResourceRole = ResourceRole.CONSUMES;
@@ -37,7 +42,11 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         return resource.metadata.name;
     }
 
-    constructor(role:ResourceRole, resource: ResourceKind, block:PlannerBlockModelWrapper) {
+    constructor(
+        role: ResourceRole,
+        resource: ResourceKind,
+        block: PlannerBlockModelWrapper
+    ) {
         this.instanceId = crypto.randomUUID();
         this.role = role;
         this.mode = ResourceMode.HIDDEN;
@@ -52,40 +61,42 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         return PlannerResourceModelWrapper.GetResourceID(this.data);
     }
 
-    openLinkedResource (){
-        this.block.plan.getConnectionsFor(this).forEach((connection)=>{
-            if(this.id === connection.fromResource.id){
-                connection.toResource.setMode(ResourceMode.SHOW)
-            }else{
-                connection.fromResource.setMode(ResourceMode.SHOW)
+    openLinkedResource() {
+        this.block.plan.getConnectionsFor(this).forEach((connection) => {
+            if (this.id === connection.fromResource.id) {
+                connection.toResource.setMode(ResourceMode.SHOW);
+            } else {
+                connection.fromResource.setMode(ResourceMode.SHOW);
             }
-        })
+        });
     }
-    closeLinkedResource (){
-        this.block.plan.getConnectionsFor(this).forEach((connection)=>{
-            if(this.id === connection.fromResource.id){
-                connection.toResource.setMode(ResourceMode.HIDDEN)
-            }else{
-                connection.fromResource.setMode(ResourceMode.HIDDEN)
+    closeLinkedResource() {
+        this.block.plan.getConnectionsFor(this).forEach((connection) => {
+            if (this.id === connection.fromResource.id) {
+                connection.toResource.setMode(ResourceMode.HIDDEN);
+            } else {
+                connection.fromResource.setMode(ResourceMode.HIDDEN);
             }
-        })
+        });
     }
 
     @action
-    setData(data:ResourceKind) {
+    setData(data: ResourceKind) {
         this.data = toJS(data);
-        this.block.plan.getConnectionsFor(this).forEach((connection:PlannerConnectionModelWrapper) => {
-            connection.recalculateMapping(); //The connection will try to adjust to the changes made in the resource
-        });
+        this.block.plan
+            .getConnectionsFor(this)
+            .forEach((connection: PlannerConnectionModelWrapper) => {
+                connection.recalculateMapping(); //The connection will try to adjust to the changes made in the resource
+            });
 
         this.validate();
     }
 
     @observable
-    getData():ResourceKind {
-        return {...toJS(this.data)};
+    getData(): ResourceKind {
+        return { ...toJS(this.data) };
     }
-    
+
     //X point calculations
     @observable
     calculateXOffsetFromBlock() {
@@ -139,15 +150,16 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     //Y calculations
     @observable
     calculateYOffset(size: PlannerNodeSize) {
-
         const block = this.block;
 
         const resourceHeight = this.block.getResourceHeight(size);
 
         const offsetTop = this.block.calculateOffsetTop(size, this.role) - 2;
 
-        const resources = (this.role === ResourceRole.CONSUMES) ?
-            block.consumes : block.provides;
+        const resources =
+            this.role === ResourceRole.CONSUMES
+                ? block.consumes
+                : block.provides;
 
         let index = resources.indexOf(this);
 
@@ -155,12 +167,20 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
             index = 0;
         }
 
-        return offsetTop + this.calculateYOffsetFromBlock(index, resourceHeight, block) + (resourceHeight / 2);
+        return (
+            offsetTop +
+            this.calculateYOffsetFromBlock(index, resourceHeight, block) +
+            resourceHeight / 2
+        );
     }
 
     @observable
-    calculateYOffsetFromBlock(index: number, resourceHeight: number, block: PlannerBlockModelWrapper) {
-        return (index * resourceHeight) + block.top;
+    calculateYOffsetFromBlock(
+        index: number,
+        resourceHeight: number,
+        block: PlannerBlockModelWrapper
+    ) {
+        return index * resourceHeight + block.top;
     }
 
     //point expansion
@@ -173,15 +193,15 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
             this.block.mode === BlockMode.FOCUSED ||
             this.mode === ResourceMode.SHOW_OPTIONS ||
             this.mode === ResourceMode.SHOW_FIXED ||
-            this.mode === ResourceMode.COMPATIBLE||
+            this.mode === ResourceMode.COMPATIBLE ||
             this.mode === ResourceMode.HOVER_COMPATIBLE
-        )
+        );
     }
 
     //resource connection point calculation
     @observable
-    getConnectionPoint(size:PlannerNodeSize){
-        return {x:this.calculateXOffset(),y:this.calculateYOffset(size)}
+    getConnectionPoint(size: PlannerNodeSize) {
+        return { x: this.calculateXOffset(), y: this.calculateYOffset(size) };
     }
 
     @action
@@ -207,7 +227,13 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     }
 
     @action
-    updateDimensionsFromEvent(size:PlannerNodeSize, evt:MouseEvent, zoom: number, scroll?: Point, offset?: Point) {
+    updateDimensionsFromEvent(
+        size: PlannerNodeSize,
+        evt: MouseEvent,
+        zoom: number,
+        scroll?: Point,
+        offset?: Point
+    ) {
         const height = this.block.getResourceHeight(size) - 4;
         const width = 150;
 
@@ -230,14 +256,14 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
         y *= zoom;
 
         //Center mouse offset on element
-        x -= (width-20)/2;
-        y -= height/2;
+        x -= (width - 20) / 2;
+        y -= height / 2;
 
         this.setDimensions({
             left: x,
             top: y,
             width: width,
-            height: height
+            height: height,
         });
     }
 
@@ -272,28 +298,41 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
             this.errors.push('No kind is defined for resource');
         }
 
-        const resourceType = this.getResourceType();
+        try {
+            const resourceType = this.getResourceType();
 
-        if (resourceType.validate) {
-            const typeErrors = resourceType.validate(this.data, this.block.getEntities());
-
-            this.errors.push(...typeErrors);
+            if (resourceType.validate) {
+                try {
+                    const typeErrors = resourceType.validate(
+                        this.data,
+                        this.block.getEntities()
+                    );
+                    this.errors.push(...typeErrors);
+                } catch (e) {
+                    this.errors.push(`Resource was invalid: ${e.message}`);
+                }
+            }
+        } catch (e) {
+            this.errors.push(`Failed for resource kind: ${e.message}`);
         }
     }
 
     @observable
     hasMethod(methodId: string) {
-        const resourceType = this.getResourceType();
-        if (!resourceType.hasMethod) {
+        try {
+            const resourceType = this.getResourceType();
+            if (!resourceType.hasMethod) {
+                return false;
+            }
+
+            return resourceType.hasMethod(this.data, methodId);
+        } catch (e) {
             return false;
         }
-
-        return resourceType.hasMethod(this.data, methodId);
     }
 
     @observable
     getResourceType() {
-        
         return ResourceTypeProvider.get(this.getKind());
     }
 }

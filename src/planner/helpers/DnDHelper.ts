@@ -1,32 +1,30 @@
-import {action, observable} from "mobx";
-import {Guid} from "guid-typescript";
+import { action, observable } from 'mobx';
+import { Guid } from 'guid-typescript';
 
 import type {
     Asset,
     BlockInstanceSpec,
     BlockKind,
     Dimensions,
-    ResourceConfig
-} from "@blockware/ui-web-types";
+    ResourceConfig,
+} from '@blockware/ui-web-types';
 
+import { ItemType, ResourceKind } from '@blockware/ui-web-types';
 import {
-    ItemType,
-    ResourceKind
-} from "@blockware/ui-web-types";
-import {BlockTypeProvider, ResourceTypeProvider} from "@blockware/ui-web-context";
+    BlockTypeProvider,
+    ResourceTypeProvider,
+} from '@blockware/ui-web-context';
 
-
-import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
-import {BlockMode} from "../../wrappers/wrapperHelpers";
-import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
-import {Planner} from "../Planner";
-import {EditPanelHelper} from "./EditPanelHelper";
+import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
+import { BlockMode } from '../../wrappers/wrapperHelpers';
+import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
+import { Planner } from '../Planner';
+import { EditPanelHelper } from './EditPanelHelper';
 
 /**
  * Helper class for handling drag-n-drop in the Planner UI
  */
 export class DnDHelper {
-
     @observable
     private planner: Planner;
 
@@ -39,7 +37,7 @@ export class DnDHelper {
     }
 
     @observable
-    private adjustForScrollAndZoom(dimensions:Dimensions):Dimensions {
+    private adjustForScrollAndZoom(dimensions: Dimensions): Dimensions {
         let zoom = this.planner.getZoom();
         let scroll = this.planner.getScroll();
 
@@ -85,15 +83,20 @@ export class DnDHelper {
         if (BlockTypeProvider.exists(data.kind)) {
             const blockDefinition: BlockKind = data.data;
             const blockInstanceId = Guid.create().toString();
-            const initialName = blockDefinition.metadata.title || blockDefinition.metadata.name;
+            const initialName =
+                blockDefinition.metadata.title || blockDefinition.metadata.name;
             const blockInstance: BlockInstanceSpec = {
                 id: blockInstanceId,
                 name: initialName,
                 block: {
-                    ref: data.ref
-                }
+                    ref: data.ref,
+                },
             };
-            const wrapper = new PlannerBlockModelWrapper(blockInstance, blockDefinition, this.planner.plan);
+            const wrapper = new PlannerBlockModelWrapper(
+                blockInstance,
+                blockDefinition,
+                this.planner.plan
+            );
             wrapper.top = dimensions.top - 60; //Adjustment for SVG
             wrapper.left = dimensions.left;
 
@@ -103,21 +106,30 @@ export class DnDHelper {
 
     @action
     private handleToolItemDragged(data: any, dimensions: Dimensions) {
-        if (ResourceTypeProvider.exists(data.kind) && !this.planner.plan.focusedBlock) {
-            let activeBlock = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
+        if (
+            ResourceTypeProvider.exists(data.kind) &&
+            !this.planner.plan.focusedBlock
+        ) {
+            let activeBlock =
+                this.planner.plan.findValidBlockTargetFromDimensions(
+                    this.planner.nodeSize,
+                    dimensions
+                );
             const resourceConfig: ResourceConfig = data;
 
             if (activeBlock && activeBlock.readonly) {
                 activeBlock = undefined;
             }
 
-            this.planner.plan.blocks.forEach((block:PlannerBlockModelWrapper) => {
-                if (activeBlock === block) {
-                    block.setHoverDropModeFromRole(resourceConfig.role);
-                } else {
-                    block.setMode(BlockMode.HIDDEN);
+            this.planner.plan.blocks.forEach(
+                (block: PlannerBlockModelWrapper) => {
+                    if (activeBlock === block) {
+                        block.setHoverDropModeFromRole(resourceConfig.role);
+                    } else {
+                        block.setMode(BlockMode.HIDDEN);
+                    }
                 }
-            });
+            );
         }
     }
 
@@ -130,25 +142,28 @@ export class DnDHelper {
             const blockDefinition: BlockKind = {
                 kind: asset.kind,
                 metadata: {
-                    name: initialName
+                    name: initialName,
                 },
                 spec: {
                     target: {
-                        kind: ''
-                    }
-                }
+                        kind: '',
+                    },
+                },
             };
 
             const blockInstance: BlockInstanceSpec = {
                 id: blockInstanceId,
                 name: initialName,
                 block: {
-                    ref: asset.ref
-                }
+                    ref: asset.ref,
+                },
             };
 
-
-            const wrapper = new PlannerBlockModelWrapper(blockInstance, blockDefinition, this.planner.plan);
+            const wrapper = new PlannerBlockModelWrapper(
+                blockInstance,
+                blockDefinition,
+                this.planner.plan
+            );
             wrapper.top = dimensions.top;
             wrapper.left = dimensions.left;
 
@@ -159,12 +174,16 @@ export class DnDHelper {
         }
 
         if (ResourceTypeProvider.exists(asset.kind)) {
+            this.planner.plan.blocks.forEach(
+                (block: PlannerBlockModelWrapper) => {
+                    block.setMode(BlockMode.HIDDEN);
+                }
+            );
 
-            this.planner.plan.blocks.forEach((block:PlannerBlockModelWrapper) => {
-                block.setMode(BlockMode.HIDDEN);
-            });
-
-            const block = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
+            const block = this.planner.plan.findValidBlockTargetFromDimensions(
+                this.planner.nodeSize,
+                dimensions
+            );
             if (!block || block.readonly) {
                 return;
             }
@@ -174,12 +193,16 @@ export class DnDHelper {
             const resourceKind: ResourceKind = {
                 kind: `${resourceConfig.kind}:${resourceConfig.version}`,
                 metadata: {
-                    name: 'MyResource'
+                    name: 'MyResource',
                 },
-                spec: {}
+                spec: {},
             };
 
-            const wrapper = new PlannerResourceModelWrapper(resourceConfig.role, resourceKind, block);
+            const wrapper = new PlannerResourceModelWrapper(
+                resourceConfig.role,
+                resourceKind,
+                block
+            );
             block.addResource(wrapper);
 
             this.editPanel.edit(wrapper, ItemType.RESOURCE, true);

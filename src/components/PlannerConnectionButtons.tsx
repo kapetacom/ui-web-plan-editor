@@ -1,22 +1,26 @@
 import React from 'react';
 
-import { toClass } from "@blockware/ui-web-utils";
+import { toClass } from '@blockware/ui-web-utils';
 import {
     SVGButtonEdit,
     SVGButtonDelete,
     SVGButtonWarning,
     SVGButtonInspect,
-    ButtonStyle
-} from "@blockware/ui-web-components";
-import { ResourceTypeProvider } from "@blockware/ui-web-context";
+    ButtonStyle,
+} from '@blockware/ui-web-components';
+import { ResourceTypeProvider } from '@blockware/ui-web-context';
 
 import './PlannerConnectionButtons.less';
-import {PlannerConnectionModelWrapper} from "../wrappers/PlannerConnectionModelWrapper";
-import {observer} from "mobx-react";
-import {SVGCircleButton} from "./SVGCircleButton";
+import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';
+import { observer } from 'mobx-react';
+import { SVGCircleButton } from './SVGCircleButton';
 
-function makeButtonBg(x:number, y:number, height:number, lineLength:number) {
-
+function makeButtonBg(
+    x: number,
+    y: number,
+    height: number,
+    lineLength: number
+) {
     const size = 18;
 
     if (height > 0) {
@@ -30,50 +34,50 @@ function makeButtonBg(x:number, y:number, height:number, lineLength:number) {
             q 0,-${height} ${-size},-${height}
             l -${lineLength},0
             q -${size},0 -${size},${height}
-            m ${(lineLength + (size*2)).toFixed()},0`;
+            m ${(lineLength + size * 2).toFixed()},0`;
 }
 
 let ID_IX = 1;
 
 interface PlannerConnectionButtonsProps {
-    connection: PlannerConnectionModelWrapper
-    open: boolean,
-    x:number,
-    y:number,
+    connection: PlannerConnectionModelWrapper;
+    open: boolean;
+    x: number;
+    y: number;
     readOnly?: boolean;
-    onEdit: () => void,
-    onDelete: () => void,
-    onInspect:()=> void
+    onEdit: () => void;
+    onDelete: () => void;
+    onInspect: () => void;
 }
 
 interface PlannerConnectionButtonsPropsState {
-    over: boolean
+    over: boolean;
 }
 
 @observer
-export class PlannerConnectionButtons extends React.Component<PlannerConnectionButtonsProps, PlannerConnectionButtonsPropsState> {
-
-    private ix:number = ID_IX++;
+export class PlannerConnectionButtons extends React.Component<
+    PlannerConnectionButtonsProps,
+    PlannerConnectionButtonsPropsState
+> {
+    private ix: number = ID_IX++;
 
     constructor(props: any) {
         super(props);
 
         this.state = {
-            over: false
+            over: false,
         };
     }
 
     onMouseOver = () => {
-        this.setState({over:true});
+        this.setState({ over: true });
     };
 
     onMouseOut = () => {
-        this.setState({over:false});
+        this.setState({ over: false });
     };
 
     render() {
-
-
         let inspectX = -25,
             editX = 5,
             deleteX = 35;
@@ -103,19 +107,18 @@ export class PlannerConnectionButtons extends React.Component<PlannerConnectionB
         if (!hasMapping) {
             inspectX -= 30;
             deleteX -= 30;
-            if (this.state.over){
+            if (this.state.over) {
                 length -= 30;
                 x += 15;
             }
-
         }
 
-        const readOnly = this.props.connection.fromResource.block.plan.isReadOnly()
+        const readOnly =
+            this.props.connection.fromResource.block.plan.isReadOnly();
         const showEditBtn =
             !readOnly && (!this.props.connection.isValid() || hasMapping);
         let showDelete = !readOnly;
         let showInspect = hasInspector;
-
 
         if (!showDelete) {
             if (this.state.over) {
@@ -136,14 +139,21 @@ export class PlannerConnectionButtons extends React.Component<PlannerConnectionB
             deleteX = 5;
         }
 
+        const bgPath = makeButtonBg(
+            x,
+            0,
+            this.props.open ? clipHeight + 2 : 0,
+            length
+        );
+        const bgPathClip = makeButtonBg(
+            x,
+            0,
+            this.props.open ? clipHeight : 0,
+            length
+        );
 
-        const bgPath = makeButtonBg(x, 0, this.props.open ? clipHeight +2 : 0, length);
-        const bgPathClip = makeButtonBg(x, 0, this.props.open ? clipHeight : 0, length);
-
-        if (!showDelete &&
-            !showEditBtn &&
-            !showInspect) {
-            return <></>
+        if (!showDelete && !showEditBtn && !showInspect) {
+            return <></>;
         }
 
         if (!this.state.over) {
@@ -156,66 +166,71 @@ export class PlannerConnectionButtons extends React.Component<PlannerConnectionB
         }
 
         return (
-            <g className={'buttons'} >
-                <g className={toClass({
+            <g className={'buttons'}>
+                <g
+                    className={toClass({
                         'planner-connection-buttons': true,
-                        'over': this.state.over,
-                        'open': this.props.open || !this.props.connection.isValid(),
+                        over: this.state.over,
+                        open:
+                            this.props.open || !this.props.connection.isValid(),
                         'no-inspect': !hasInspector,
-                        'no-mapping': !hasMapping
+                        'no-mapping': !hasMapping,
                     })}
                     transform={`translate(${this.props.x},${this.props.y})`}
                     onMouseOver={this.onMouseOver}
-                    onMouseOut={this.onMouseOut} >
-
+                    onMouseOut={this.onMouseOut}
+                >
                     <path className={'border'} d={bgPath} />
 
                     <clipPath id={clipId}>
                         <path className={'background'} d={bgPathClip} />
                     </clipPath>
 
-                    <svg clipPath={`url(#${clipId})`} >
-                        {showEditBtn && !this.props.connection.isValid() &&
+                    <svg clipPath={`url(#${clipId})`}>
+                        {showEditBtn && !this.props.connection.isValid() && (
                             <SVGCircleButton
                                 x={editX}
                                 y={-buttonHeight}
                                 className={'warning'}
                                 style={ButtonStyle.DEFAULT}
                                 icon={'fa fa-exclamation-triangle'}
-                                onClick={this.props.onEdit} />
-                        }
-                        {showEditBtn && this.props.connection.isValid() &&
+                                onClick={this.props.onEdit}
+                            />
+                        )}
+                        {showEditBtn && this.props.connection.isValid() && (
                             <SVGCircleButton
                                 x={editX}
                                 y={-buttonHeight}
                                 className={'edit'}
                                 style={ButtonStyle.SECONDARY}
                                 icon={'fa fa-pencil'}
-                                onClick={this.props.onEdit} />
-                        }
+                                onClick={this.props.onEdit}
+                            />
+                        )}
 
-                        {showInspect &&
+                        {showInspect && (
                             <SVGCircleButton
                                 x={inspectX}
                                 y={-buttonHeight}
                                 className={'inspect'}
                                 style={ButtonStyle.PRIMARY}
                                 icon={'fa fa-search'}
-                                onClick={this.props.onInspect} />
-                        }
-                        {showDelete &&
+                                onClick={this.props.onInspect}
+                            />
+                        )}
+                        {showDelete && (
                             <SVGCircleButton
                                 x={deleteX}
                                 y={-buttonHeight}
                                 className={'delete'}
                                 style={ButtonStyle.DANGER}
                                 icon={'fa fa-trash'}
-                                onClick={this.props.onDelete} />
-                        }
+                                onClick={this.props.onDelete}
+                            />
+                        )}
                     </svg>
                 </g>
             </g>
         );
     }
 }
-

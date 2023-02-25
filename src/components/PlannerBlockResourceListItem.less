@@ -1,11 +1,10 @@
-@import "~@blockware/ui-web-components/styles/values";
-@import "~@blockware/ui-web-components/styles/functions";
+@import '~@blockware/ui-web-components/styles/values';
+@import '~@blockware/ui-web-components/styles/functions';
 
 @action-transition: transform 300ms;
 @action-delay: 200ms;
 
 .planner-block-resource-list-item {
-
     .resource-mask,
     .resource-item-body,
     .resource-counter {
@@ -96,7 +95,6 @@
             }
 
             &.database {
-
                 .block-resource-body {
                     fill: lighten(@bw-green, 20%);
                 }
@@ -116,7 +114,6 @@
         }
     }
 
-
     &.buttons-visible {
         .svg-circle-button.edit,
         .svg-circle-button.delete,
@@ -132,20 +129,16 @@
     }
 }
 
-
 .planner-area-container.dragging-resource {
-
     .planner-temp-resource-item {
         .block-resource-body {
-            filter:url(#drop-shadow);
+            filter: url(#drop-shadow);
         }
     }
 }
 
 .planner-area-container {
-
     .planner-block-node {
-
         .block-body-text,
         .block-resource-text,
         .block-body-container {
@@ -153,7 +146,6 @@
         }
 
         .block-body-text {
-
             &.block-version,
             &.block-name {
                 transition-delay: @action-delay;
@@ -162,9 +154,7 @@
     }
 
     &.node-size-small {
-
         .planner-block-node {
-
             .block-resource {
                 .block-resource-text.sub {
                     opacity: 0;
@@ -173,7 +163,6 @@
 
             .block-node {
                 .block-body-text {
-
                     &.block-version,
                     &.block-name {
                         opacity: 0;
@@ -186,14 +175,11 @@
                     }
                 }
             }
-
         }
     }
 }
 
-
 .planner-resource-list {
-
     .resource-placeholder {
         rect {
             opacity: 0;
@@ -224,7 +210,6 @@
         fill: @bw-orange;
     }
 }
-
 
 @keyframes planner-block-resource-compatible-hover {
     0% {

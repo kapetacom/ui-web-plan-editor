@@ -1,9 +1,9 @@
-@import "~@blockware/ui-web-components/styles/values";
-@import "~@blockware/ui-web-components/styles/functions";
+@import '~@blockware/ui-web-components/styles/values';
+@import '~@blockware/ui-web-components/styles/functions';
 
 .planner-connection {
-
-    .mouse-catcher,.line {
+    .mouse-catcher,
+    .line {
         stroke-linejoin: miter;
         fill: none;
     }
@@ -11,7 +11,7 @@
     .mouse-catcher {
         cursor: pointer;
         stroke: black;
-        fill:transparent;
+        fill: transparent;
         stroke-width: 30;
         opacity: 0;
     }
@@ -24,7 +24,7 @@
     }
 
     .background {
-        fill:transparent;
+        fill: transparent;
         .transition();
         stroke: @bw-planner-background;
         stroke-width: 12;
@@ -47,7 +47,8 @@
 .planner-area-container {
     &.dragging {
         .planner-connection {
-            .line,.background {
+            .line,
+            .background {
                 .transition(none);
             }
         }

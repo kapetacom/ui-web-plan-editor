@@ -1,6 +1,6 @@
 {
     "name": "@blockware/ui-web-plan-editor",
-    "version": "0.0.28",
+    "version": "0.0.29",
     "main": "src/index.ts",
     "files": [
         "package.json",
@@ -21,7 +21,12 @@
         "storybook": "start-storybook",
         "build-storybook": "build-storybook",
         "prepublishOnly": "npm run build",
-        "build": "tsc"
+        "build": "tsc",
+        "format": "prettier --write ."
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "singleQuote": true
     },
     "peerDependencies": {
         "@blockware/ui-web-components": "<2",
@@ -46,6 +51,7 @@
         "@types/react-dom": ">=18"
     },
     "devDependencies": {
+        "prettier": "^2.8.4",
         "@sambego/storybook-state": "^2.0.1",
         "@storybook/builder-webpack5": "^6.5.10",
         "@storybook/manager-webpack5": "^6.5.0-rc.1",

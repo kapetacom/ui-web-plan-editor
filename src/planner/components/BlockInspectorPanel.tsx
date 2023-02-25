@@ -1,27 +1,31 @@
-import React, {Component} from "react";
-import {observer} from "mobx-react";
-import {action, makeObservable, observable} from "mobx";
-import {PanelSize, SidePanel, TabContainer, TabPage} from "@blockware/ui-web-components";
-import {InstanceEventType, InstanceService} from "@blockware/ui-web-context";
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import { action, makeObservable, observable } from 'mobx';
+import {
+    PanelSize,
+    SidePanel,
+    TabContainer,
+    TabPage,
+} from '@blockware/ui-web-components';
+import { InstanceEventType, InstanceService } from '@blockware/ui-web-context';
 
-import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
-import {LogEmitter, LogEntry, LogPanel} from "../../logs/LogPanel";
+import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
+import { LogEmitter, LogEntry, LogPanel } from '../../logs/LogPanel';
 
 import './BlockInspectorPanel.less';
 
 interface BlockInspectorPanelProps {
-    block?: PlannerBlockModelWrapper
-    planRef: string
-    title: string
-    onClosed: () => void
+    block?: PlannerBlockModelWrapper;
+    planRef: string;
+    title: string;
+    onClosed: () => void;
 }
 
 @observer
 export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
-
     private sidePanel: SidePanel | null = null;
 
-    private logListener?: ((entry: LogEntry) => void);
+    private logListener?: (entry: LogEntry) => void;
 
     private logEmitter: LogEmitter;
 
@@ -38,8 +42,8 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
         this.logEmitter = {
             onLog: (listener: (entry: LogEntry) => void) => {
                 this.logListener = listener;
-            }
-        }
+            },
+        };
     }
 
     @action
@@ -58,7 +62,10 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
         }
         this.setLoading(true);
         try {
-            const result = await InstanceService.getInstanceLogs(this.props.planRef, this.props.block?.id);
+            const result = await InstanceService.getInstanceLogs(
+                this.props.planRef,
+                this.props.block?.id
+            );
             this.setLogs(result.ok === false ? [] : result.logs);
         } finally {
             this.setLoading(false);
@@ -90,7 +97,6 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
             if (!this.props.block) {
                 return;
             }
-
         } finally {
             this.props.onClosed();
         }
@@ -104,19 +110,22 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
         this.close();
     };
 
-
     private onInstanceLog = (log: any) => {
         if (this.logListener) {
             this.logListener(log);
         }
-    }
+    };
 
     private startListening() {
         if (!this.props.block) {
             return;
         }
         this.stopListening();
-        InstanceService.subscribe(this.props.block.ref, InstanceEventType.EVENT_INSTANCE_LOG, this.onInstanceLog);
+        InstanceService.subscribe(
+            this.props.block.ref,
+            InstanceEventType.EVENT_INSTANCE_LOG,
+            this.onInstanceLog
+        );
     }
 
     private stopListening() {
@@ -124,10 +133,18 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
             return;
         }
 
-        InstanceService.unsubscribe(this.props.block.ref, InstanceEventType.EVENT_INSTANCE_LOG, this.onInstanceLog);
+        InstanceService.unsubscribe(
+            this.props.block.ref,
+            InstanceEventType.EVENT_INSTANCE_LOG,
+            this.onInstanceLog
+        );
     }
 
-    componentDidUpdate(prevProps: Readonly<BlockInspectorPanelProps>, prevState: Readonly<{}>, snapshot?: any) {
+    componentDidUpdate(
+        prevProps: Readonly<BlockInspectorPanelProps>,
+        prevState: Readonly<{}>,
+        snapshot?: any
+    ) {
         this.startListening();
 
         if (!this.props.block?.ref) {
@@ -148,49 +165,86 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
     }
 
     render() {
-        return (<SidePanel ref={(ref) => this.sidePanel = ref}
-                           title={this.props.title}
-                           size={PanelSize.large}
-                           onClose={this.onPanelClosed}
+        return (
+            <SidePanel
+                ref={(ref) => (this.sidePanel = ref)}
+                title={this.props.title}
+                size={PanelSize.large}
+                onClose={this.onPanelClosed}
             >
-
-                {this.props.block &&
+                {this.props.block && (
                     <div className={'item-inspector-panel'}>
                         <TabContainer>
                             <TabPage id={'logs'} title={'Logs'}>
-                                <LogPanel key={this.props.block.ref + '_logs'} logs={this.logs} emitter={this.logEmitter}/>
+                                <LogPanel
+                                    key={this.props.block.ref + '_logs'}
+                                    logs={this.logs}
+                                    emitter={this.logEmitter}
+                                />
                             </TabPage>
                             <TabPage id={'issues'} title={'Issues'}>
-                                <div className={'issues-container'} key={this.props.block.ref + '_issues'}>
-                                    {!this.props.block.isValid() && (
+                                <div
+                                    className={'issues-container'}
+                                    key={this.props.block.ref + '_issues'}
+                                >
+                                    {(!this.props.block.isValid() && (
                                         <>
                                             <span>
-                                                Found the following issues in block
+                                                Found the following issues in
+                                                block
                                             </span>
                                             <ul className={'issues-list'}>
-                                                {this.props.block.getIssues().map((issue) => {
-                                                    return (
-                                                        <li>
-                                                            <div className={'issue-context'}>
-                                                                <span className={'level'}>{issue.level}</span>
-                                                                :
-                                                                <span className={'name'}>{issue.name}</span>
-                                                            </div>
-                                                            <div className={'issue-message'}>{issue.issue}</div>
-                                                        </li>
-                                                    )
-                                                })}
+                                                {this.props.block
+                                                    .getIssues()
+                                                    .map((issue) => {
+                                                        return (
+                                                            <li>
+                                                                <div
+                                                                    className={
+                                                                        'issue-context'
+                                                                    }
+                                                                >
+                                                                    <span
+                                                                        className={
+                                                                            'level'
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            issue.level
+                                                                        }
+                                                                    </span>
+                                                                    :
+                                                                    <span
+                                                                        className={
+                                                                            'name'
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            issue.name
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                                <div
+                                                                    className={
+                                                                        'issue-message'
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        issue.issue
+                                                                    }
+                                                                </div>
+                                                            </li>
+                                                        );
+                                                    })}
                                             </ul>
                                         </>
-                                    ) || <span>No issues found</span>}
+                                    )) || <span>No issues found</span>}
                                 </div>
                             </TabPage>
                         </TabContainer>
-
                     </div>
-                }
+                )}
             </SidePanel>
-        )
+        );
     }
-
 }

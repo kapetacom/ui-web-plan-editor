@@ -1,16 +1,17 @@
-import React from "react";
-import { BlockConfig } from "@blockware/ui-web-types";
-import {InstanceStatus} from "@blockware/ui-web-context";
+import React from 'react';
+import { BlockConfig } from '@blockware/ui-web-types';
+import { InstanceStatus } from '@blockware/ui-web-context';
 
-import { PlannerToolboxPainterProps } from "./PlannerToolbox";
-import {BlockNode} from "../../components/BlockNode";
+import { PlannerToolboxPainterProps } from './PlannerToolbox';
+import { BlockNode } from '../../components/BlockNode';
 
-
-export function PlannerToolboxBlock(props: PlannerToolboxPainterProps<BlockConfig>) {
-
+export function PlannerToolboxBlock(
+    props: PlannerToolboxPainterProps<BlockConfig>
+) {
     return (
         <svg width={120} height={120}>
-            <BlockNode name={'Block'}
+            <BlockNode
+                name={'Block'}
                 valid={true}
                 status={InstanceStatus.STOPPED}
                 instanceName={props.item.title}
@@ -21,5 +22,5 @@ export function PlannerToolboxBlock(props: PlannerToolboxPainterProps<BlockConfi
                 pointSize={20}
             />
         </svg>
-    )
+    );
 }
