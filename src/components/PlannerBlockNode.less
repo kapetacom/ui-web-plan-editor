@@ -1,12 +1,12 @@
-@import "~@blockware/ui-web-components/styles/values";
-@import "~@blockware/ui-web-components/styles/functions";
+@import '~@blockware/ui-web-components/styles/values';
+@import '~@blockware/ui-web-components/styles/functions';
 
 .planner-block-node {
     .transition(d 100ms);
     .transition(transform 150ms);
     overflow: visible;
 
-    &.block-dragging{
+    &.block-dragging {
         .transition(transform 0ms);
     }
 
@@ -22,7 +22,6 @@
 
         &.buttons-2 {
             .svg-circle-button {
-
                 &:nth-child(1) {
                     .transform(translate(15px, -40px));
                 }
@@ -36,7 +35,6 @@
 
         &.buttons-3 {
             .svg-circle-button {
-
                 &:nth-child(1) {
                     .transform(translate(25px, -40px));
                 }
@@ -55,7 +53,6 @@
 
         &.buttons-4 {
             .svg-circle-button {
-
                 &:nth-child(1) {
                     .transform(translate(25px, -40px));
                 }
@@ -80,7 +77,6 @@
 
     .block-body-text.instance-name {
         .pointer-event-all();
-
     }
 
     .block-node:not(.read-only) {
@@ -90,7 +86,7 @@
 
             &:hover {
                 .background {
-                    fill: rgba(255,255,255, 0.1);
+                    fill: rgba(255, 255, 255, 0.1);
                 }
 
                 .edit {
@@ -109,7 +105,7 @@
         }
     }
 
-    &:not(.highlight,.focused-link) {
+    &:not(.highlight, .focused-link) {
         .block-action-container:hover,
         &.buttons-visible {
             .block-actions {

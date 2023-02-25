@@ -1,5 +1,4 @@
-import { ResourceRole } from "@blockware/ui-web-types";
-
+import { ResourceRole } from '@blockware/ui-web-types';
 
 export enum ResourceMode {
     HIDDEN = 0,
@@ -18,9 +17,13 @@ export enum BlockMode {
     HOVER_DROP_PROVIDER = 4,
     SHOW_RESOURCES = 5,
     HIGHLIGHT = 6,
-    FOCUSED = 7
+    FOCUSED = 7,
 }
 
-export function createResourceId(blockId:string, role:ResourceRole, ix:number) {
+export function createResourceId(
+    blockId: string,
+    role: ResourceRole,
+    ix: number
+) {
     return `${blockId}_${role}_${ix}`;
 }

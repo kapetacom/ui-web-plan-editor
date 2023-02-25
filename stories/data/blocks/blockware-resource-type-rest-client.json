@@ -4,7 +4,5 @@
         "name": "blockware/resource-type-rest-client",
         "title": "REST Client"
     },
-    "spec": {
-
-    }
+    "spec": {}
 }

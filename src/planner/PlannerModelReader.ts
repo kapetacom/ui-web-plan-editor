@@ -1,11 +1,16 @@
-import {BlockStore} from "@blockware/ui-web-context";
-import {BlockReference, BlockInstanceSpec, PlanKind, BlockKind} from "@blockware/ui-web-types";
+import { BlockStore } from '@blockware/ui-web-context';
+import {
+    BlockReference,
+    BlockInstanceSpec,
+    PlanKind,
+    BlockKind,
+} from '@blockware/ui-web-types';
 
-import {PlannerModelWrapper} from "../wrappers/PlannerModelWrapper";
-import {PlannerBlockModelWrapper} from "../wrappers/PlannerBlockModelWrapper";
-import {PlannerConnectionModelWrapper} from "../wrappers/PlannerConnectionModelWrapper";
+import { PlannerModelWrapper } from '../wrappers/PlannerModelWrapper';
+import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
+import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';
 import Path from 'path';
-import {runInAction} from "mobx";
+import { runInAction } from 'mobx';
 
 function toReferenceId(block: BlockReference) {
     return block.ref;
@@ -19,15 +24,22 @@ export class PlannerModelReader {
     }
 
     private resolveReference(blockRef: string, planRef: string): string {
-        if (blockRef.startsWith('file://') &&
-            planRef.startsWith('file://')) {
-            return 'file://' + Path.resolve(Path.dirname(planRef.substring(7)), blockRef.substring(7));
+        if (blockRef.startsWith('file://') && planRef.startsWith('file://')) {
+            return (
+                'file://' +
+                Path.resolve(
+                    Path.dirname(planRef.substring(7)),
+                    blockRef.substring(7)
+                )
+            );
         }
         return blockRef;
     }
 
-    private async loadBlockDefinitions(blockInstances: BlockInstanceSpec[], plan: PlannerModelWrapper) {
-
+    private async loadBlockDefinitions(
+        blockInstances: BlockInstanceSpec[],
+        plan: PlannerModelWrapper
+    ) {
         const definitions: { [key: string]: BlockKind } = {};
 
         for (let i = 0; i < blockInstances.length; i++) {
@@ -35,7 +47,10 @@ export class PlannerModelReader {
             const refId = toReferenceId(blockInstance.block);
             let blockDefinition = definitions[refId];
             if (!blockDefinition) {
-                const blockRef = this.resolveReference(blockInstance.block.ref, plan.getRef());
+                const blockRef = this.resolveReference(
+                    blockInstance.block.ref,
+                    plan.getRef()
+                );
                 const asset: any = await this.blockStore.get(blockRef);
                 if (asset.error) {
                     throw new Error(asset.error);
@@ -54,13 +69,24 @@ export class PlannerModelReader {
             }
 
             runInAction(() => {
-                plan.blocks.push(new PlannerBlockModelWrapper(blockInstance, blockDefinition, plan));
-            })
+                plan.blocks.push(
+                    new PlannerBlockModelWrapper(
+                        blockInstance,
+                        blockDefinition,
+                        plan
+                    )
+                );
+            });
         }
     }
 
-    async load(planKind: PlanKind, planRef: string): Promise<PlannerModelWrapper> {
-        const out = runInAction(() => new PlannerModelWrapper(planRef, planKind.metadata.name));
+    async load(
+        planKind: PlanKind,
+        planRef: string
+    ): Promise<PlannerModelWrapper> {
+        const out = runInAction(
+            () => new PlannerModelWrapper(planRef, planKind.metadata.name)
+        );
         if (planKind.spec.blocks) {
             await this.loadBlockDefinitions(planKind.spec.blocks, out);
         }
@@ -72,17 +98,23 @@ export class PlannerModelReader {
                     const connections = [...planKind.spec.connections];
                     connections.forEach((data) => {
                         try {
-                            out.connections.push(PlannerConnectionModelWrapper.createFromData(data, out));
+                            out.connections.push(
+                                PlannerConnectionModelWrapper.createFromData(
+                                    data,
+                                    out
+                                )
+                            );
                         } catch (e) {
                             //Ignore and remove connections
                             if (planKind.spec.connections) {
-                                const ix = planKind.spec.connections.indexOf(data);
+                                const ix =
+                                    planKind.spec.connections.indexOf(data);
                                 if (ix > -1) {
                                     planKind.spec.connections.splice(ix, 1);
                                 }
                             }
                         }
-                    })
+                    });
                 }
             });
         }

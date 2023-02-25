@@ -1,52 +1,52 @@
-@import "~@blockware/ui-web-components/styles/values";
+@import '~@blockware/ui-web-components/styles/values';
 
 .log-panel {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  overflow-y: auto;
-  overflow-x: hidden;
-  font-size: 12px;
-  background-color: #333;
-  color: white;
-
-  .log-entry {
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    vertical-align: top;
-    padding:10px 0;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    font-size: 12px;
+    background-color: #333;
+    color: white;
 
-    &:nth-child(2n) {
-      background-color: @gray-xdark;
-    }
+    .log-entry {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        vertical-align: top;
+        padding: 10px 0;
 
-    &.status-error {
-      color: @red-light;
-    }
+        &:nth-child(2n) {
+            background-color: @gray-xdark;
+        }
 
-    > * {
-      white-space: pre;
-      vertical-align: top;
-      box-sizing: border-box;
-    }
-    .date {
-      max-width:160px;
-      min-width:160px;
-      flex: 0;
-      padding:0 5px;
-    }
+        &.status-error {
+            color: @red-light;
+        }
 
-    .type {
-      min-width: 60px;
-      max-width: 60px;
-      flex: 0;
-    }
+        > * {
+            white-space: pre;
+            vertical-align: top;
+            box-sizing: border-box;
+        }
+        .date {
+            max-width: 160px;
+            min-width: 160px;
+            flex: 0;
+            padding: 0 5px;
+        }
 
-    .message {
-      flex-shrink: 1;
-      font-family: monospace;
-      overflow-x: auto;
+        .type {
+            min-width: 60px;
+            max-width: 60px;
+            flex: 0;
+        }
+
+        .message {
+            flex-shrink: 1;
+            font-family: monospace;
+            overflow-x: auto;
+        }
     }
-  }
 }

@@ -1,6 +1,6 @@
-import React, {Component} from "react";
-import {observer} from "mobx-react";
-import {action, makeObservable, observable, toJS} from "mobx";
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import { action, makeObservable, observable, toJS } from 'mobx';
 import {
     AssetNameInput,
     Button,
@@ -13,15 +13,15 @@ import {
     PanelSize,
     SidePanel,
     SimpleLoader,
-} from "@blockware/ui-web-components";
+} from '@blockware/ui-web-components';
 
 import {
     BlockTypeProvider,
     IdentityService,
     ResourceTypeProvider,
-} from "@blockware/ui-web-context";
+} from '@blockware/ui-web-context';
 
-import {parseBlockwareUri} from "@blockware/nodejs-utils";
+import { parseBlockwareUri } from '@blockware/nodejs-utils';
 
 import type {
     BlockConnectionSpec,
@@ -29,24 +29,26 @@ import type {
     DataWrapper,
     SchemaEntity,
     SchemaKind,
-} from "@blockware/ui-web-types";
-import {ResourceKind} from "@blockware/ui-web-types";
+} from '@blockware/ui-web-types';
+import { ResourceKind } from '@blockware/ui-web-types';
 
-import {EditableItemInterface} from "../../wrappers/models";
-import {PlannerConnectionModelWrapper} from "../../wrappers/PlannerConnectionModelWrapper";
-import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
-import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
+import { EditableItemInterface } from '../../wrappers/models';
+import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
+import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
+import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
 
-import "./ItemEditorPanel.less";
-import {ErrorBoundary} from "react-error-boundary";
-import {useAsync} from "react-use";
+import './ItemEditorPanel.less';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useAsync } from 'react-use';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (Component) => {
     return (props) => {
-        const {value: namespaces, loading} = useAsync(async () => {
+        const { value: namespaces, loading } = useAsync(async () => {
             const identity = await IdentityService.getCurrent();
-            const memberships = await IdentityService.getMemberships(identity.id);
+            const memberships = await IdentityService.getMemberships(
+                identity.id
+            );
             return [
                 identity.handle,
                 ...memberships.map((membership) => membership.identity.handle),
@@ -54,7 +56,7 @@ const withNamespaces = (Component) => {
         });
         return (
             <SimpleLoader loading={loading}>
-                <Component {...props} namespaces={namespaces || []}/>
+                <Component {...props} namespaces={namespaces || []} />
             </SimpleLoader>
         );
     };
@@ -91,7 +93,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
 
     constructor(props: ItemEditorPanelProps) {
         super(props);
-        this.state = {entry: undefined};
+        this.state = { entry: undefined };
         makeObservable(this);
     }
 
@@ -114,16 +116,22 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
             }
 
             if (
-                this.props.editableItem.item instanceof PlannerConnectionModelWrapper
+                this.props.editableItem.item instanceof
+                PlannerConnectionModelWrapper
             ) {
                 this.props.onConnectionRemoved(this.props.editableItem.item);
             }
 
-            if (this.props.editableItem.item instanceof PlannerBlockModelWrapper) {
+            if (
+                this.props.editableItem.item instanceof PlannerBlockModelWrapper
+            ) {
                 this.props.onBlockRemoved(this.props.editableItem.item);
             }
 
-            if (this.props.editableItem.item instanceof PlannerResourceModelWrapper) {
+            if (
+                this.props.editableItem.item instanceof
+                PlannerResourceModelWrapper
+            ) {
                 this.props.editableItem.item.remove();
             }
         } finally {
@@ -236,24 +244,24 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
         return (
             <>
                 <FormField
-                    name={"kind"}
+                    name={'kind'}
                     type={FormFieldType.ENUM}
-                    label={"Type"}
-                    validation={["required"]}
-                    help={"The block type and version"}
+                    label={'Type'}
+                    validation={['required']}
+                    help={'The block type and version'}
                     options={options}
                 />
 
                 <AutoLoadAssetNameInput
-                    name={"metadata.name"}
-                    label={"Name"}
+                    name={'metadata.name'}
+                    label={'Name'}
                     help={'The name of this block - e.g. "myhandle/my-block"'}
                 />
 
                 <FormField
-                    name={"metadata.title"}
-                    label={"Title"}
-                    help={"This blocks human-friendly title"}
+                    name={'metadata.title'}
+                    label={'Title'}
+                    help={'This blocks human-friendly title'}
                 />
             </>
         );
@@ -266,7 +274,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
         if (
             this.state.entry &&
             parseBlockwareUri(this.state.entry.kind).fullName ===
-            parseBlockwareUri(definition.kind).fullName
+                parseBlockwareUri(definition.kind).fullName
         ) {
             data = this.state.entry;
         } else {
@@ -300,7 +308,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
             return (
                 <MappingComponent
                     key={connection.id}
-                    title={"mapping-editor"}
+                    title={'mapping-editor'}
                     source={connection.fromResource.getData()}
                     target={connection.toResource.getData()}
                     sourceEntities={connection.fromResource.block.getEntities()}
@@ -318,7 +326,9 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
 
             if (!BlockTypeConfig.componentType) {
                 return (
-                    <div key={editableItem.item.id}>{this.renderBlockFields(data)}</div>
+                    <div key={editableItem.item.id}>
+                        {this.renderBlockFields(data)}
+                    </div>
                 );
             }
 
@@ -328,12 +338,14 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
                     <ErrorBoundary
                         fallbackRender={(props) => (
                             <div>
-                                Failed to render block type: {data.kind}. <br/>
+                                Failed to render block type: {data.kind}. <br />
                                 Error: {props.error.message}
                             </div>
                         )}
                     >
-                        <BlockTypeConfig.componentType creating={editableItem.creating}/>
+                        <BlockTypeConfig.componentType
+                            creating={editableItem.creating}
+                        />
                     </ErrorBoundary>
                 </div>
             );
@@ -354,7 +366,8 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
                 dataKindUri.fullName
             );
             versionAlternatives.forEach((version) => {
-                const versionName = version === "local" ? "Local Disk" : version;
+                const versionName =
+                    version === 'local' ? 'Local Disk' : version;
                 const resourceType = ResourceTypeProvider.get(
                     `${dataKindUri.fullName}:${version}`
                 );
@@ -369,15 +382,16 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
                     <FormField
                         options={versions}
                         type={FormFieldType.ENUM}
-                        help={"The kind and version of this resource"}
-                        validation={["required"]}
-                        label={"Resource kind"}
-                        name={"kind"}
+                        help={'The kind and version of this resource'}
+                        validation={['required']}
+                        label={'Resource kind'}
+                        name={'kind'}
                     />
                     <ErrorBoundary
                         fallbackRender={(props) => (
                             <div>
-                                Failed to render resource type: {data.kind}. <br/>
+                                Failed to render resource type: {data.kind}.{' '}
+                                <br />
                                 Error: {props.error.message}
                             </div>
                         )}
@@ -398,7 +412,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
     render() {
         const panelHeader = () => {
             if (!this.props.editableItem) {
-                return "";
+                return '';
             }
             return `Edit ${this.props.editableItem.type.toLowerCase()}`;
         };
@@ -412,14 +426,18 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
                 onClose={this.onPanelClosed}
             >
                 {this.props.editableItem && (
-                    <div className={"item-editor-panel"}>
+                    <div className={'item-editor-panel'}>
                         <FormContainer
                             initialValue={this.getData()}
-                            onChange={(data) => this.setState({entry: data as SchemaKind})}
+                            onChange={(data) =>
+                                this.setState({ entry: data as SchemaKind })
+                            }
                             onSubmitData={(data) => this.saveAndClose(data)}
                         >
-                            <div className={"item-form"}>
-                                {this.renderEditableItemForm(this.props.editableItem)}
+                            <div className={'item-form'}>
+                                {this.renderEditableItemForm(
+                                    this.props.editableItem
+                                )}
                             </div>
                             <FormButtons>
                                 <Button

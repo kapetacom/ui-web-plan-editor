@@ -1,10 +1,9 @@
-import {PlannerModelReader} from "../../src/planner/PlannerModelReader";
-import {BlockServiceMock} from "./BlockServiceMock";
-import {PlannerData} from './PlannerData';
-import {PlannerModelWrapper} from "../../src";
+import { PlannerModelReader } from '../../src/planner/PlannerModelReader';
+import { BlockServiceMock } from './BlockServiceMock';
+import { PlannerData } from './PlannerData';
+import { PlannerModelWrapper } from '../../src';
 
-export function readPlan():Promise<PlannerModelWrapper> {
-
+export function readPlan(): Promise<PlannerModelWrapper> {
     const reader = new PlannerModelReader(BlockServiceMock);
     try {
         return reader.load(PlannerData, 'blockware/my-todo-system');

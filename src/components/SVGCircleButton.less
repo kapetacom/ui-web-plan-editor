@@ -1,95 +1,95 @@
-@import "~@blockware/ui-web-components/styles/values";
-@import "~@blockware/ui-web-components/styles/functions";
+@import '~@blockware/ui-web-components/styles/values';
+@import '~@blockware/ui-web-components/styles/functions';
 
 .svg-circle-button {
-  overflow: visible;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-
-  .container {
-    .transition();
-    border-radius: 13px;
+    overflow: visible;
     width: 26px;
     height: 26px;
-    line-height: 26px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 14px;
-    color: white;
-    background-color: @gray-xdark;
-    box-sizing: border-box;
+    cursor: pointer;
 
-    i {
-      font-weight: inherit;
-      color: inherit;
-      font-size: inherit;
+    .container {
+        .transition();
+        border-radius: 13px;
+        width: 26px;
+        height: 26px;
+        line-height: 26px;
+        text-align: center;
+        font-weight: 800;
+        font-size: 14px;
+        color: white;
+        background-color: @gray-xdark;
+        box-sizing: border-box;
+
+        i {
+            font-weight: inherit;
+            color: inherit;
+            font-size: inherit;
+        }
+
+        &:hover {
+            background: @gray-dark;
+        }
+
+        &:active {
+            background-color: @gray-xdark;
+            color: white;
+        }
     }
 
-    &:hover {
-      background: @gray-dark;
+    &.primary .container {
+        background-color: @cyan-dark;
+        color: white;
+        border: 0;
+
+        &:hover {
+            background: @cyan-light;
+            border-color: @cyan-light;
+        }
+
+        &:active {
+            background: @cyan-dark;
+        }
     }
 
-    &:active {
-      background-color: @gray-xdark;
-      color: white;
-    }
-  }
+    &.secondary .container {
+        background: @btn-friendly-bg;
+        color: white;
+        border: 0;
 
-  &.primary .container {
-    background-color: @cyan-dark;
-    color: white;
-    border:0;
+        &:hover {
+            background: @btn-friendly-bg-active;
+        }
 
-    &:hover {
-      background: @cyan-light;
-      border-color: @cyan-light;
+        &:active {
+            background: @btn-friendly-bg;
+        }
     }
 
-    &:active {
-      background: @cyan-dark;
-    }
-  }
+    &.warning .container {
+        background: @yellow-alert;
+        color: white;
+        border: 0;
 
-  &.secondary .container {
-    background: @btn-friendly-bg;
-    color: white;
-    border:0;
+        &:hover {
+            background: lighten(@yellow-alert, 10%);
+        }
 
-    &:hover {
-      background: @btn-friendly-bg-active;
-    }
-
-    &:active {
-      background: @btn-friendly-bg;
-    }
-  }
-
-  &.warning .container {
-    background: @yellow-alert;
-    color: white;
-    border:0;
-
-    &:hover {
-      background: lighten(@yellow-alert, 10%);
+        &:active {
+            background: @yellow-alert;
+        }
     }
 
-    &:active {
-      background: @yellow-alert;
-    }
-  }
+    &.danger .container {
+        background: @btn-cancel-bg;
+        color: white;
+        border: 0;
 
-  &.danger .container {
-    background: @btn-cancel-bg;
-    color: white;
-    border:0;
+        &:hover {
+            background: @btn-cancel-bg-active;
+        }
 
-    &:hover {
-      background: @btn-cancel-bg-active;
+        &:active {
+            background: @btn-cancel-bg;
+        }
     }
-
-    &:active {
-      background: @btn-cancel-bg;
-    }
-  }
 }
