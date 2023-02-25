@@ -1,5 +1,5 @@
 import React from 'react';
-import {BlockService, BlockTypeProvider, ResourceTypeProvider} from "@blockware/ui-web-context";
+import {BlockService, BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider} from "@blockware/ui-web-context";
 import {ResourceRole, ResourceType} from "@blockware/ui-web-types";
 import {parseBlockwareUri} from '@blockware/nodejs-utils';
 
@@ -93,7 +93,43 @@ blocks.push(...[
         title: resource.metadata.title,
         type: ResourceType.SERVICE,
         role: ResourceRole.PROVIDES,
+        validate: (data) => {
+            const errors:string[] = [];
+            parseBlockwareUri(data.kind);
+
+            if (!data.spec.methods) {
+                errors.push('No methods defined!')
+            }
+
+            if (data.spec.throw) {
+                throw Error('Thrown from type provider!')
+            }
+
+            return errors;
+        }
     });
+});
+
+['blockware/language-target-java-spring-boot',
+    'blockware/language-target-test'].forEach(targetKind => {
+    BlockTargetProvider.register({
+        kind: targetKind,
+        version: '1.2.3',
+        title: 'Test',
+        blockKinds: ['blockware/block-type-service']
+    })
+});
+
+['blockware/language-target-fails'].forEach(targetKind => {
+    BlockTargetProvider.register({
+        kind: targetKind,
+        version: '1.2.3',
+        title: 'Test',
+        blockKinds: ['blockware/block-type-service'],
+        validate: () => {
+            return ['Fail target always fails']
+        }
+    })
 });
 
 [
@@ -102,9 +138,21 @@ blocks.push(...[
     BlockTypeProvider.register({
         kind: resource.metadata.name,
         version: '1.2.3',
-        componentType: null as any
+        componentType: null as any,
+        validate: (block) => {
+            const errors:string[] = [];
+            if (!block?.spec?.target?.kind) {
+                errors.push('Missing target kind');
+            } else {
+                parseBlockwareUri(block?.spec?.target?.kind);
+                BlockTargetProvider.get(block?.spec?.target?.kind, block.kind);
+            }
+
+            return errors;
+        }
     });
 })
+
 
 
 //Mock getter

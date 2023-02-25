@@ -13,7 +13,7 @@ import type {
     Size
 } from "@blockware/ui-web-types";
 import {isSchemaEntityCompatible, ResourceRole} from "@blockware/ui-web-types";
-import {parseBlockwareUri,BlockwareURI} from '@blockware/nodejs-utils';
+import {parseBlockwareUri, BlockwareURI} from '@blockware/nodejs-utils';
 
 import {BlockService, BlockTypeProvider} from '@blockware/ui-web-context';
 
@@ -69,7 +69,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     blockReference: BlockReference;
 
     @observable
-    private readonly blockReferenceUri: BlockwareURI;
+    private readonly blockReferenceUri?: BlockwareURI;
 
     @observable
     private data!: BlockKind;
@@ -94,7 +94,9 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         this.name = blockInstance.name || blockDefinition?.metadata?.title || '';
 
         this.blockReference = blockInstance.block;
-        this.blockReferenceUri = parseBlockwareUri(this.blockReference.ref);
+        try {
+            this.blockReferenceUri = parseBlockwareUri(this.blockReference.ref);
+        } catch (e) {}
 
         if (blockInstance.dimensions) {
             this.size = {
@@ -124,7 +126,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     get version() {
-        return this.blockReferenceUri.version;
+        return this.blockReferenceUri ? this.blockReferenceUri.version : 'unknown';
     }
 
     get readonly() {
@@ -137,7 +139,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @action
-    async setVersion(version:string):Promise<void> {
+    async setVersion(version: string): Promise<void> {
         this.blockReferenceUri.version = version;
         this.blockReference.ref = this.blockReferenceUri.id;
         const block = await BlockService.get(this.blockReference.ref);
@@ -204,8 +206,6 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         return this.data.spec.entities.types.map(entity => entity.name);
     }
-
-
 
 
     @action
@@ -488,6 +488,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         this.validate();
     }
+
     @observable
     getResources(role: ResourceRole) {
         if (role === ResourceRole.CONSUMES) {
@@ -496,6 +497,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         return this.provides;
     }
+
     @observable
     getResourceLength(role: ResourceRole) {
         let length = this.getResources(role).length;
@@ -517,6 +519,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         const resources = this.getResources(role);
         return _.find(resources, {id: resourceId});
     }
+
     @observable
     getDimensions(size: PlannerNodeSize): Dimensions {
         return {
@@ -610,7 +613,6 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     isValid() {
-
         if (this.errors.length > 0) {
             return false;
         }
@@ -642,19 +644,33 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
             this.errors.push('No name is defined for instance');
         }
 
-        if (this.blockReference &&
-            !this.blockReference.ref) {
+        if (!this.blockReference?.ref) {
             this.errors.push('No block reference found for instance');
         }
 
-        const blockType = BlockTypeProvider.get(this.data.kind);
-
-        if (blockType.validate) {
-            const typeErrors = blockType.validate(this.data);
-
-            this.errors.push(...typeErrors);
+        try {
+            if (this.blockReference.ref) {
+                parseBlockwareUri(this.blockReference.ref);
+            }
+        } catch (e) {
+            this.errors.push(`Block reference was invalid: ${e.message}`);
         }
 
+        try {
+            const blockType = BlockTypeProvider.get(this.data.kind);
+            if (blockType?.validate) {
+                try {
+                    const typeErrors = blockType.validate(this.data);
+
+                    this.errors.push(...typeErrors);
+                } catch (e) {
+                    this.errors.push(`Kind-specific validation failed: ${e.message}`);
+                }
+            }
+
+        } catch (e) {
+            this.errors.push(`Failed to validate kind: ${e.message}`);
+        }
 
         this.consumes.forEach((resource) => {
             resource.validate();

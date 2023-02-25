@@ -272,23 +272,34 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
             this.errors.push('No kind is defined for resource');
         }
 
-        const resourceType = this.getResourceType();
+        try {
+            const resourceType = this.getResourceType();
 
-        if (resourceType.validate) {
-            const typeErrors = resourceType.validate(this.data, this.block.getEntities());
-
-            this.errors.push(...typeErrors);
+            if (resourceType.validate) {
+                try {
+                    const typeErrors = resourceType.validate(this.data, this.block.getEntities());
+                    this.errors.push(...typeErrors);
+                } catch (e) {
+                    this.errors.push(`Resource was invalid: ${e.message}`);
+                }
+            }
+        } catch (e) {
+            this.errors.push(`Failed for resource kind: ${e.message}`);
         }
     }
 
     @observable
     hasMethod(methodId: string) {
-        const resourceType = this.getResourceType();
-        if (!resourceType.hasMethod) {
+        try {
+            const resourceType = this.getResourceType();
+            if (!resourceType.hasMethod) {
+                return false;
+            }
+
+            return resourceType.hasMethod(this.data, methodId);
+        } catch (e) {
             return false;
         }
-
-        return resourceType.hasMethod(this.data, methodId);
     }
 
     @observable

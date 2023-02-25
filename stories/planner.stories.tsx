@@ -16,66 +16,6 @@ import {
 
 import {readPlan} from "./data/planReader";
 
-const emptyBlockInstance: BlockInstanceSpec = {
-    id: "demoBlock1",
-    name: "Robot Execution Service From Dexi Which is Cool",
-
-    block: {
-        ref: 'demoBlock1'
-    },
-
-    dimensions: {
-        top: 100,
-        width: 150,
-        left: 150,
-        height: -1
-    }
-};
-
-const emptyBlockDefinition: BlockKind = {
-    kind: 'blockware/block-type-service',
-    metadata: {
-        name: "blockware/todo"
-    },
-    spec: {
-        target: {
-            kind: 'my-target'
-        },
-        consumers: [],
-        providers: []
-    }
-};
-
-const emptyBlockInstance2: BlockInstanceSpec = {
-    id: "demoBlock2",
-    name: "Robot",
-
-    block: {
-        ref: 'demoBlock2'
-    },
-
-    dimensions: {
-        top: 100,
-        width: 150,
-        left: 500,
-        height: -1
-    }
-};
-
-const emptyBlockDefinition2: BlockKind = {
-    kind: 'blockware/block-type-service',
-    metadata: {
-        name: "test/demo"
-    },
-    spec: {
-        target: {
-            kind: 'my-target'
-        },
-        consumers: [],
-        providers: []
-    }
-};
-
 export default {
     title: 'Planner',
     parameters: {
@@ -98,6 +38,7 @@ export const StandAloneBlocks = () => {
         )}/>
     )
 }
+
 
 
 export const PlannerEditor = () => {

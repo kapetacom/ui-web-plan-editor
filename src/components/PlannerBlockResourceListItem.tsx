@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from "mobx-react";
 
-import {ItemType, Point, ResourceRole} from "@blockware/ui-web-types";
+import {ItemType, Point, ResourceConfig, ResourceRole, ResourceType} from "@blockware/ui-web-types";
 import {toClass} from "@blockware/ui-web-utils";
 import {ResourceTypeProvider} from '@blockware/ui-web-context';
 import {
@@ -306,12 +306,19 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         const heightInner = height - RESOURCE_SPACE;
         const yOffset = height * this.props.index;
         const buttonsVisible = this.props.resource.mode === ResourceMode.SHOW_OPTIONS;
-        const resourceConfig = ResourceTypeProvider.get(this.props.resource.getKind());
-        const type = resourceConfig.type.toString().toLowerCase();
-        const title = resourceConfig.title || resourceConfig.kind
-        const typeName = title.toString().toLowerCase();
+        let resourceConfig:ResourceConfig|null = null;
+        let errors:string[] = [];
+        try {
+            resourceConfig = ResourceTypeProvider.get(this.props.resource.getKind());
+        } catch (e) {
+            errors.push(`Failed to read resource kind: ${e.message}`);
+        }
 
-        const counterValue = resourceConfig.getCounterValue ?
+        const type = resourceConfig?.type.toString().toLowerCase() ?? ResourceType.SERVICE;
+        const title = resourceConfig?.title || resourceConfig?.kind
+        const typeName = title?.toString().toLowerCase() ?? 'unknown';
+
+        const counterValue = resourceConfig?.getCounterValue ?
             resourceConfig.getCounterValue(this.props.resource.getData()) : 0;
 
         const buttonY = ((height - BUTTON_HEIGHT) / 2) - (RESOURCE_SPACE / 2);
@@ -319,6 +326,8 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
         const counterPoint = this.calculateCounterPosition(heightInner);
         const counterVisible = counterValue > 0 && buttonsVisible;
         const mouseCatcherWidth = this.getBlock().width + 60;
+
+        const valid = errors.length === 0 && this.props.resource.isValid();
 
         this.props.resource.setDimensions({
             height: heightInner,
@@ -345,7 +354,7 @@ export class PlannerBlockResourceListItem extends Component<PlannerBlockResource
             'highlight': this.props.resource.mode === ResourceMode.HIGHLIGHT,
             'compatible': this.props.resource.mode === ResourceMode.COMPATIBLE,
             'compatible hover': this.props.resource.mode === ResourceMode.HOVER_COMPATIBLE,
-            'invalid': !this.props.resource.isValid()
+            'invalid': !valid
         });
 
         return (
