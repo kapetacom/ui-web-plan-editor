@@ -71,7 +71,7 @@ interface BlockConnectionEditData {
     sourceEntities?: SchemaEntity[];
 }
 
-interface ItemEditorPanelProps {
+interface Props {
     editableItem: DataWrapper | any | undefined;
     onClosed: () => void;
     onBlockSaved: (item: PlannerBlockModelWrapper) => void;
@@ -82,18 +82,21 @@ interface ItemEditorPanelProps {
 
 interface State {
     entry?: SchemaKind;
+    initialValue?: SchemaKind;
 }
 
 @observer
-export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
+export class ItemEditorPanel extends Component<Props, State> {
     @observable
     private editedConnection?: BlockConnectionEditData;
 
     private saved: boolean = false;
 
-    constructor(props: ItemEditorPanelProps) {
+    constructor(props: Props) {
         super(props);
-        this.state = { entry: undefined };
+        this.state = {
+            initialValue: this.props.editableItem?.item?.getData(),
+        };
         makeObservable(this);
     }
 
@@ -409,6 +412,16 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
         return <></>;
     }
 
+    componentDidUpdate(prevProps: Readonly<Props>) {
+        if (this.props.editableItem !== prevProps.editableItem) {
+            //When we change editableItem - reset
+            this.setState({
+                entry: undefined,
+                initialValue: this.props.editableItem?.item?.getData(),
+            });
+        }
+    }
+
     render() {
         const panelHeader = () => {
             if (!this.props.editableItem) {
@@ -428,7 +441,7 @@ export class ItemEditorPanel extends Component<ItemEditorPanelProps, State> {
                 {this.props.editableItem && (
                     <div className={'item-editor-panel'}>
                         <FormContainer
-                            initialValue={this.getData()}
+                            initialValue={this.state.initialValue}
                             onChange={(data) =>
                                 this.setState({ entry: data as SchemaKind })
                             }
