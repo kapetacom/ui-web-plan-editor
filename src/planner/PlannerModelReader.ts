@@ -47,25 +47,33 @@ export class PlannerModelReader {
             const refId = toReferenceId(blockInstance.block);
             let blockDefinition = definitions[refId];
             if (!blockDefinition) {
-                const blockRef = this.resolveReference(
-                    blockInstance.block.ref,
-                    plan.getRef()
-                );
-                const asset: any = await this.blockStore.get(blockRef);
-                if (asset.error) {
-                    throw new Error(asset.error);
-                }
+                try {
+                    const blockRef = this.resolveReference(
+                        blockInstance.block.ref,
+                        plan.getRef()
+                    );
 
-                if (asset.data) {
-                    blockDefinition = asset.data;
-                } else {
-                    blockDefinition = asset;
-                }
+                    const asset: any = await this.blockStore.get(blockRef);
+                    if (asset.error) {
+                        console.error(asset.error);
+                        continue;
+                    }
 
-                if (!blockDefinition) {
-                    throw new Error(`Block definition not available: ${refId}`);
+                    if (asset.data) {
+                        blockDefinition = asset.data;
+                    } else {
+                        blockDefinition = asset;
+                    }
+
+                    if (!blockDefinition) {
+                        console.error(`Block definition not available: ${refId}`);
+                        continue;
+                    }
+                    definitions[refId] = blockDefinition;
+                } catch (e) {
+                    console.error(e);
+                    continue;
                 }
-                definitions[refId] = blockDefinition;
             }
 
             runInAction(() => {

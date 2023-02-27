@@ -76,7 +76,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     blockReference: BlockReference;
 
     @observable
-    private readonly blockReferenceUri?: BlockwareURI;
+    private blockReferenceUri?: BlockwareURI;
 
     @observable
     private data!: BlockKind;
@@ -157,6 +157,14 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         this.blockReference.ref = this.blockReferenceUri.id;
         const block = await BlockService.get(this.blockReference.ref);
         this.setData(block.data);
+    }
+
+    @action
+    setBlockReference(reference:string) {
+        this.blockReference = {ref:reference};
+        try {
+            this.blockReferenceUri = parseBlockwareUri(this.blockReference.ref);
+        } catch (e) {}
     }
 
     @observable

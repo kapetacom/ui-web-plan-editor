@@ -10,7 +10,7 @@ import {
     reaction,
     runInAction,
 } from 'mobx';
-
+import { parseBlockwareUri } from '@blockware/nodejs-utils';
 import { toClass } from '@blockware/ui-web-utils';
 import {
     DnDContainer,
@@ -481,6 +481,13 @@ export class Planner extends React.Component<PlannerProps> {
 
     private async saveBlock(block: PlannerBlockModelWrapper) {
         await AssetService.update(block.blockReference.ref, block.getData());
+
+        //Check if we should update the reference in the plan as well (if the name changed)
+        const currentRef = parseBlockwareUri(`${block.getData().metadata.name}:${block.version}`);
+        const oldRef = parseBlockwareUri(block.ref);
+        if (!oldRef.equals(currentRef)) {
+            block.setBlockReference(currentRef.id);
+        }
     }
 
     private async savePlan() {
