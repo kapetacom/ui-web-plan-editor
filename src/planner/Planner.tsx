@@ -83,8 +83,12 @@ export interface PlannerProps {
 
 const zoomStep = 0.25;
 
+interface PlannerState {
+    cachedPositions: BlockPositionCache;
+}
+
 @observer
-export class Planner extends React.Component<PlannerProps> {
+export class Planner extends React.Component<PlannerProps, PlannerState> {
     private readonly blockListObserver: Lambda;
     private readonly connectionListObserver: Lambda;
     private instanceServiceUnsubscriber?: () => void;
@@ -110,9 +114,6 @@ export class Planner extends React.Component<PlannerProps> {
 
     @observable
     private readonly connectionObservers: ConnectionObserver[] = [];
-
-    @observable
-    private cachedPositions: BlockPositionCache = {};
 
     @observable
     private hoveredBlock?: PlannerBlockModelWrapper = undefined;
@@ -162,6 +163,10 @@ export class Planner extends React.Component<PlannerProps> {
         this.blockInspectorPanelHelper = new InspectBlockPanelHelper(this);
 
         makeObservable(this);
+
+        this.state = {
+            cachedPositions: {},
+        };
 
         this.connectionListObserver = reaction(
             () => this.plan.connections.length,
@@ -483,7 +488,9 @@ export class Planner extends React.Component<PlannerProps> {
         await AssetService.update(block.blockReference.ref, block.getData());
 
         //Check if we should update the reference in the plan as well (if the name changed)
-        const currentRef = parseBlockwareUri(`${block.getData().metadata.name}:${block.version}`);
+        const currentRef = parseBlockwareUri(
+            `${block.getData().metadata.name}:${block.version}`
+        );
         const oldRef = parseBlockwareUri(block.ref);
         if (!oldRef.equals(currentRef)) {
             block.setBlockReference(currentRef.id);
@@ -617,9 +624,11 @@ export class Planner extends React.Component<PlannerProps> {
             const localCachedPositionData =
                 window.localStorage.getItem(POSITIONING_DATA);
             if (localCachedPositionData) {
-                this.cachedPositions = JSON.parse(
-                    localCachedPositionData
-                ) as BlockPositionCache;
+                this.setState({
+                    cachedPositions: JSON.parse(
+                        localCachedPositionData
+                    ) as BlockPositionCache,
+                });
             }
         });
     }
@@ -697,17 +706,17 @@ export class Planner extends React.Component<PlannerProps> {
             !this.plan.focusedBlock &&
             window.localStorage.getItem(FOCUSED_ID) !== null
         ) {
-            Object.keys(this.cachedPositions).forEach((key: string) => {
+            Object.keys(this.state.cachedPositions).forEach((key: string) => {
                 if (this.plan.findBlockById(key)) {
                     this.plan
                         .findBlockById(key)
                         .setPosition(
-                            this.cachedPositions[key].x,
-                            this.cachedPositions[key].y
+                            this.state.cachedPositions[key].x,
+                            this.state.cachedPositions[key].y
                         );
                 }
             });
-            this.cachedPositions = {};
+            this.setState({ cachedPositions: {} });
             window.localStorage.setItem(FOCUSED_ID, '');
             window.localStorage.setItem(POSITIONING_DATA, '');
 
@@ -719,16 +728,19 @@ export class Planner extends React.Component<PlannerProps> {
             window.localStorage.getItem(POSITIONING_DATA) === null ||
             window.localStorage.getItem(POSITIONING_DATA) === ''
         ) {
+            const cachedPositions = {} as BlockPositionCache;
             this.plan.blocks.forEach((block: PlannerBlockModelWrapper) => {
-                this.cachedPositions[block.id] = {
+                cachedPositions[block.id] = {
                     x: block.getDimensions(this.nodeSize).left,
                     y: block.getDimensions(this.nodeSize).top,
                 };
             });
             window.localStorage.setItem(
                 POSITIONING_DATA,
-                JSON.stringify(this.cachedPositions)
+                JSON.stringify(cachedPositions)
             );
+            this.setState({ cachedPositions });
+
             if (
                 this.plan.focusedBlock &&
                 (window.localStorage.getItem(FOCUSED_ID) === '' ||
