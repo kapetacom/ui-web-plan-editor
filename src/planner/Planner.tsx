@@ -1,3 +1,4 @@
+/* eslint-disable react/sort-comp */
 import React from 'react';
 import { observer } from 'mobx-react';
 import * as _ from 'lodash';
@@ -18,10 +19,9 @@ import {
     showToasty,
     ToastType,
 } from '@blockware/ui-web-components';
-import type { DataWrapper, Point, Size } from '@blockware/ui-web-types';
+import type { Point, Size } from '@blockware/ui-web-types';
 import {
     AssetService,
-    BlockService,
     FailedBlockMessage,
     InstanceEventType,
     InstanceService,
@@ -83,8 +83,12 @@ export interface PlannerProps {
 
 const zoomStep = 0.25;
 
+interface PlannerState {
+    cachedPositions: BlockPositionCache;
+}
+
 @observer
-export class Planner extends React.Component<PlannerProps> {
+export class Planner extends React.Component<PlannerProps, PlannerState> {
     private readonly blockListObserver: Lambda;
     private readonly connectionListObserver: Lambda;
     private instanceServiceUnsubscriber?: () => void;
@@ -110,9 +114,6 @@ export class Planner extends React.Component<PlannerProps> {
 
     @observable
     private readonly connectionObservers: ConnectionObserver[] = [];
-
-    @observable
-    private cachedPositions: BlockPositionCache = {};
 
     @observable
     private hoveredBlock?: PlannerBlockModelWrapper = undefined;
@@ -163,6 +164,10 @@ export class Planner extends React.Component<PlannerProps> {
 
         makeObservable(this);
 
+        this.state = {
+            cachedPositions: {},
+        };
+
         this.connectionListObserver = reaction(
             () => this.plan.connections.length,
             this.onConnectionsChange
@@ -198,20 +203,20 @@ export class Planner extends React.Component<PlannerProps> {
     @action
     public setEditingItem(item?: EditableItemInterface) {
         if (this.editingItem) {
-            //Reset existing item first
-            const { item } = this.editingItem;
-            if (item instanceof PlannerResourceModelWrapper) {
-                item.setMode(ResourceMode.HIDDEN);
+            // Reset existing item first
+            const { item: existingItem } = this.editingItem;
+            if (existingItem instanceof PlannerResourceModelWrapper) {
+                existingItem.setMode(ResourceMode.HIDDEN);
             }
 
-            if (item instanceof PlannerBlockModelWrapper) {
-                item.setMode(BlockMode.HIDDEN);
+            if (existingItem instanceof PlannerBlockModelWrapper) {
+                existingItem.setMode(BlockMode.HIDDEN);
             }
 
-            if (item instanceof PlannerConnectionModelWrapper) {
-                item.setEditing(false);
-                item.toResource.setMode(ResourceMode.HIDDEN);
-                item.fromResource.setMode(ResourceMode.HIDDEN);
+            if (existingItem instanceof PlannerConnectionModelWrapper) {
+                existingItem.setEditing(false);
+                existingItem.toResource.setMode(ResourceMode.HIDDEN);
+                existingItem.fromResource.setMode(ResourceMode.HIDDEN);
             }
         }
 
@@ -236,6 +241,7 @@ export class Planner extends React.Component<PlannerProps> {
                 this.updateRunningBlockStatus(instanceStatuses)
             )
             .catch((err) => {
+                // eslint-disable-next-line no-console
                 console.warn('Failed to get current status', err);
             });
 
@@ -405,22 +411,22 @@ export class Planner extends React.Component<PlannerProps> {
      */
     @action
     private onBlocksChange = async () => {
-        const removed = this.blockObservers.filter((observer) => {
-            return this.plan.blocks.indexOf(observer.block) === -1;
+        const removed = this.blockObservers.filter((blockObserver) => {
+            return this.plan.blocks.indexOf(blockObserver.block) === -1;
         });
 
         while (removed.length > 0) {
-            const observer = removed.pop();
-            if (observer) {
-                observer.blockObserverDisposer();
-                observer.blockInstanceObserverDisposer();
-                _.pull(this.blockObservers, observer);
+            const blockObserver = removed.pop();
+            if (blockObserver) {
+                blockObserver.blockObserverDisposer();
+                blockObserver.blockInstanceObserverDisposer();
+                _.pull(this.blockObservers, blockObserver);
             }
         }
 
         const added = this.plan.blocks.filter((block) => {
             return !this.blockObservers.some(
-                (observer) => observer.block === block
+                (blockObserver) => blockObserver.block === block
             );
         });
 
@@ -437,24 +443,27 @@ export class Planner extends React.Component<PlannerProps> {
     @action
     private onConnectionsChange = async () => {
         const removedConnections = this.connectionObservers.filter(
-            (observer) => {
+            (connectionObserver) => {
                 return (
-                    this.plan.connections.indexOf(observer.connection) === -1
+                    this.plan.connections.indexOf(
+                        connectionObserver.connection
+                    ) === -1
                 );
             }
         );
 
         while (removedConnections.length > 0) {
-            const observer = removedConnections.pop();
-            if (observer) {
-                observer.connectionInstanceObserverDisposer();
-                _.pull(this.connectionObservers, observer);
+            const connectionObserver = removedConnections.pop();
+            if (connectionObserver) {
+                connectionObserver.connectionInstanceObserverDisposer();
+                _.pull(this.connectionObservers, connectionObserver);
             }
         }
 
         const newConnections = this.plan.connections.filter((connection) => {
             return !this.connectionObservers.some(
-                (observer) => observer.connection === connection
+                (connectionObserver) =>
+                    connectionObserver.connection === connection
             );
         });
 
@@ -482,8 +491,10 @@ export class Planner extends React.Component<PlannerProps> {
     private async saveBlock(block: PlannerBlockModelWrapper) {
         await AssetService.update(block.blockReference.ref, block.getData());
 
-        //Check if we should update the reference in the plan as well (if the name changed)
-        const currentRef = parseBlockwareUri(`${block.getData().metadata.name}:${block.version}`);
+        // Check if we should update the reference in the plan as well (if the name changed)
+        const currentRef = parseBlockwareUri(
+            `${block.getData().metadata.name}:${block.version}`
+        );
         const oldRef = parseBlockwareUri(block.ref);
         if (!oldRef.equals(currentRef)) {
             block.setBlockReference(currentRef.id);
@@ -555,20 +566,20 @@ export class Planner extends React.Component<PlannerProps> {
 
     componentWillUnmount() {
         runInAction(() => {
-            this.blockListObserver(); //flush the block observers
+            this.blockListObserver(); // flush the block observers
             while (this.blockObservers.length > 0) {
-                const observer = this.blockObservers.pop();
-                if (observer) {
-                    observer.blockObserverDisposer();
-                    observer.blockInstanceObserverDisposer();
+                const blockObserver = this.blockObservers.pop();
+                if (blockObserver) {
+                    blockObserver.blockObserverDisposer();
+                    blockObserver.blockInstanceObserverDisposer();
                 }
             }
 
-            this.connectionListObserver(); //flush the connection observers
+            this.connectionListObserver(); // flush the connection observers
             while (this.connectionObservers.length > 0) {
-                const observer = this.connectionObservers.pop();
-                if (observer) {
-                    observer.connectionInstanceObserverDisposer();
+                const connectionObserver = this.connectionObservers.pop();
+                if (connectionObserver) {
+                    connectionObserver.connectionInstanceObserverDisposer();
                 }
             }
 
@@ -592,12 +603,12 @@ export class Planner extends React.Component<PlannerProps> {
         runInAction(() => {
             window.addEventListener('resize', this.handleWindowResized);
 
-            //Calculate the init canvas size after canvasContainerElement ref has been retrieved.
+            // Calculate the init canvas size after canvasContainerElement ref has been retrieved.
             this.recalculateCanvas();
 
             let zoom = 0.5;
             do {
-                //populate the zoomLevelArea with all possible sizes after mounting
+                // populate the zoomLevelArea with all possible sizes after mounting
                 zoom += zoomStep;
                 this.zoomLevelAreas[zoom] = this.focusHelper.getFocusArea(
                     zoom,
@@ -605,7 +616,7 @@ export class Planner extends React.Component<PlannerProps> {
                 );
             } while (zoom < 3);
 
-            //Fetch the focused block id from local storage anf focus if it exists
+            // Fetch the focused block id from local storage anf focus if it exists
             const focusedBlockId = window.localStorage.getItem(FOCUSED_ID);
             if (focusedBlockId) {
                 this.props.plan.blocks.forEach((block) => {
@@ -617,9 +628,11 @@ export class Planner extends React.Component<PlannerProps> {
             const localCachedPositionData =
                 window.localStorage.getItem(POSITIONING_DATA);
             if (localCachedPositionData) {
-                this.cachedPositions = JSON.parse(
-                    localCachedPositionData
-                ) as BlockPositionCache;
+                this.setState({
+                    cachedPositions: JSON.parse(
+                        localCachedPositionData
+                    ) as BlockPositionCache,
+                });
             }
         });
     }
@@ -633,9 +646,8 @@ export class Planner extends React.Component<PlannerProps> {
             return InstanceStatus.EXITED;
         } else if (runningBlock) {
             return runningBlock.status;
-        } else {
-            return InstanceStatus.STOPPED;
         }
+        return InstanceStatus.STOPPED;
     };
 
     @action
@@ -672,7 +684,7 @@ export class Planner extends React.Component<PlannerProps> {
 
     @action
     private setFocusBlock = (block: PlannerBlockModelWrapper) => {
-        //sets the focus block or removes if the block double clicked is the same as the previous one
+        // sets the focus block or removes if the block double clicked is the same as the previous one
         this.plan.setFocusedBlock(block);
         if (this.plan.focusedBlock) {
             this.focusSideBarOpen = true;
@@ -697,17 +709,17 @@ export class Planner extends React.Component<PlannerProps> {
             !this.plan.focusedBlock &&
             window.localStorage.getItem(FOCUSED_ID) !== null
         ) {
-            Object.keys(this.cachedPositions).forEach((key: string) => {
+            Object.keys(this.state.cachedPositions).forEach((key: string) => {
                 if (this.plan.findBlockById(key)) {
                     this.plan
                         .findBlockById(key)
                         .setPosition(
-                            this.cachedPositions[key].x,
-                            this.cachedPositions[key].y
+                            this.state.cachedPositions[key].x,
+                            this.state.cachedPositions[key].y
                         );
                 }
             });
-            this.cachedPositions = {};
+            this.setState({ cachedPositions: {} });
             window.localStorage.setItem(FOCUSED_ID, '');
             window.localStorage.setItem(POSITIONING_DATA, '');
 
@@ -719,16 +731,19 @@ export class Planner extends React.Component<PlannerProps> {
             window.localStorage.getItem(POSITIONING_DATA) === null ||
             window.localStorage.getItem(POSITIONING_DATA) === ''
         ) {
+            const cachedPositions = {} as BlockPositionCache;
             this.plan.blocks.forEach((block: PlannerBlockModelWrapper) => {
-                this.cachedPositions[block.id] = {
+                cachedPositions[block.id] = {
                     x: block.getDimensions(this.nodeSize).left,
                     y: block.getDimensions(this.nodeSize).top,
                 };
             });
             window.localStorage.setItem(
                 POSITIONING_DATA,
-                JSON.stringify(this.cachedPositions)
+                JSON.stringify(cachedPositions)
             );
+            this.setState({ cachedPositions });
+
             if (
                 this.plan.focusedBlock &&
                 (window.localStorage.getItem(FOCUSED_ID) === '' ||
@@ -895,7 +910,7 @@ export class Planner extends React.Component<PlannerProps> {
                     onClosed={this.blockInspectorPanelHelper.onClosed}
                 />
 
-                <DnDContainer overflowX={true} overflowY={true}>
+                <DnDContainer overflowX overflowY>
                     <div className={containerClass}>
                         <div className={focusToolbar}>
                             {this.focusHelper.renderTopBar({
@@ -906,7 +921,7 @@ export class Planner extends React.Component<PlannerProps> {
                         {!this.props.plan.isReadOnly() && (
                             <PlannerToolbox
                                 blockStore={this.props.blockStore}
-                                open={true}
+                                open
                             />
                         )}
 
@@ -918,7 +933,7 @@ export class Planner extends React.Component<PlannerProps> {
 
                         <div
                             ref={this.canvasContainerElement}
-                            className={'planner-area-position-parent'}
+                            className="planner-area-position-parent"
                         >
                             <div className={plannerScrollClassnames}>
                                 <DnDDrop
@@ -943,7 +958,7 @@ export class Planner extends React.Component<PlannerProps> {
                                     }}
                                 >
                                     <div
-                                        className={'planner-area-canvas'}
+                                        className="planner-area-canvas"
                                         style={{
                                             ...canvasSize,
                                             transform: `scale(${
@@ -956,7 +971,7 @@ export class Planner extends React.Component<PlannerProps> {
                                             y={0}
                                             width={canvasSize.width}
                                             height={canvasSize.height}
-                                            className={'planner-connections'}
+                                            className="planner-connections"
                                         >
                                             <SVGDropShadow />
 
@@ -979,11 +994,7 @@ export class Planner extends React.Component<PlannerProps> {
                                                             }
                                                             readOnly={this.plan.isReadOnly()}
                                                             viewOnly={this.plan.isViewing()}
-                                                            key={
-                                                                connection.id +
-                                                                '_link_' +
-                                                                index
-                                                            }
+                                                            key={`${connection.id}_link_${index}`}
                                                             size={this.nodeSize}
                                                             focusBlock={
                                                                 this.plan

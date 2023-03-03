@@ -25,13 +25,10 @@ export class PlannerModelReader {
 
     private resolveReference(blockRef: string, planRef: string): string {
         if (blockRef.startsWith('file://') && planRef.startsWith('file://')) {
-            return (
-                'file://' +
-                Path.resolve(
-                    Path.dirname(planRef.substring(7)),
-                    blockRef.substring(7)
-                )
-            );
+            return `file://${Path.resolve(
+                Path.dirname(planRef.substring(7)),
+                blockRef.substring(7)
+            )}`;
         }
         return blockRef;
     }
@@ -55,6 +52,7 @@ export class PlannerModelReader {
 
                     const asset: any = await this.blockStore.get(blockRef);
                     if (asset.error) {
+                        // eslint-disable-next-line no-console
                         console.error(asset.error);
                         continue;
                     }
@@ -66,11 +64,15 @@ export class PlannerModelReader {
                     }
 
                     if (!blockDefinition) {
-                        console.error(`Block definition not available: ${refId}`);
+                        // eslint-disable-next-line no-console
+                        console.error(
+                            `Block definition not available: ${refId}`
+                        );
                         continue;
                     }
                     definitions[refId] = blockDefinition;
                 } catch (e) {
+                    // eslint-disable-next-line no-console
                     console.error(e);
                     continue;
                 }
@@ -113,7 +115,7 @@ export class PlannerModelReader {
                                 )
                             );
                         } catch (e) {
-                            //Ignore and remove connections
+                            // Ignore and remove connections
                             if (planKind.spec.connections) {
                                 const ix =
                                     planKind.spec.connections.indexOf(data);

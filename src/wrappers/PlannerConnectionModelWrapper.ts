@@ -46,13 +46,13 @@ export class PlannerConnectionModelWrapper
         return runInAction(() => {
             const fromBlock = planner.findBlockById(data.from.blockId);
             if (!fromBlock) {
-                throw new Error('Source Block not found: ' + data.from.blockId);
+                throw new Error(`Source Block not found: ${data.from.blockId}`);
             }
 
             const toBlock = planner.findBlockById(data.to.blockId);
 
             if (!toBlock) {
-                throw new Error('Target Block not found: ' + data.from.blockId);
+                throw new Error(`Target Block not found: ${data.from.blockId}`);
             }
 
             const fromResource = fromBlock.findResourceById(
@@ -62,7 +62,7 @@ export class PlannerConnectionModelWrapper
 
             if (!fromResource) {
                 throw new Error(
-                    'Provider resource not found: ' + data.from.resourceName
+                    `Provider resource not found: ${data.from.resourceName}`
                 );
             }
 
@@ -73,7 +73,7 @@ export class PlannerConnectionModelWrapper
 
             if (!toResource) {
                 throw new Error(
-                    'Consumer resource not found: ' + data.to.resourceName
+                    `Consumer resource not found: ${data.to.resourceName}`
                 );
             }
 
@@ -200,8 +200,8 @@ export class PlannerConnectionModelWrapper
         }
 
         if (this.errors.length > 0) {
-            //TODO: Do something about these
-            //console.log('connection errors', toJS(this.errors));
+            // TODO: Do something about these
+            // console.log('connection errors', toJS(this.errors));
         }
     }
 
@@ -240,7 +240,7 @@ export class PlannerConnectionModelWrapper
     @observable
     getPoints(size: number) {
         if (this.fromResource.dimensions && this.toResource.dimensions) {
-            let points: Point[] = this.getCurveMainPoints(
+            const points: Point[] = this.getCurveMainPoints(
                 this.fromResource.getConnectionPoint(size),
                 this.toResource.getConnectionPoint(size)
             );
@@ -249,12 +249,12 @@ export class PlannerConnectionModelWrapper
         return [];
     }
 
-    //the dragging resource is calculating the points in the PlannerTempResourceItem component
-    //but utilizes getCurveFromPoints from the current class
+    // the dragging resource is calculating the points in the PlannerTempResourceItem component
+    // but utilizes getCurveFromPoints from the current class
     getCurveMainPoints(fromPoint: Point, toPoint: Point) {
         const indent = 40;
 
-        let points = [
+        const points = [
             { x: fromPoint.x, y: fromPoint.y },
             { x: fromPoint.x + indent, y: fromPoint.y },
             { x: toPoint.x - indent, y: toPoint.y },
@@ -266,7 +266,7 @@ export class PlannerConnectionModelWrapper
 
     static calculatePathBetweenPoints(fromPoint: Point, toPoint: Point) {
         const indent = 40;
-        let points = [
+        const points = [
             { x: fromPoint.x, y: fromPoint.y },
             { x: fromPoint.x + indent, y: fromPoint.y },
             { x: toPoint.x - indent, y: toPoint.y },
@@ -278,7 +278,7 @@ export class PlannerConnectionModelWrapper
     static getCurveFromPoints(points: Point[]) {
         const curve = new BasisCurve();
         curve.lineStart();
-        points.forEach(function (point) {
+        points.forEach((point) => {
             curve.point(point);
         });
         curve.lineEnd();
@@ -288,6 +288,7 @@ export class PlannerConnectionModelWrapper
     @observable
     calculatePath(size: PlannerNodeSize, points?: Point[]) {
         if (!points) {
+            // eslint-disable-next-line no-param-reassign
             points = this.getCurveMainPoints(
                 this.fromResource.getConnectionPoint(size),
                 this.toResource.getConnectionPoint(size)

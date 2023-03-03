@@ -49,12 +49,12 @@ export const BlockConfigurationPanel = (props: Props) => {
             version: props.block.version,
             name: props.block.name,
         };
-    }, [props.open, props.block?.ref]);
+    }, [props.block]);
 
     const loader = async () => {
         if (!props.block) {
             setLoading(false);
-            return {};
+            return;
         }
         setLoading(true);
         try {
@@ -90,30 +90,28 @@ export const BlockConfigurationPanel = (props: Props) => {
                 loading={loading}
                 key={props.block?.ref ?? 'unknown-block'}
                 loader={loader}
-                text={'Loading details... Please wait'}
+                text="Loading details... Please wait"
             >
-                <div className={'block-configuration-panel'}>
+                <div className="block-configuration-panel">
                     <FormContainer
                         initialValue={data}
-                        onSubmitData={(data) =>
-                            props.onSave(data as BlockConfigurationData)
+                        onSubmitData={(formData) =>
+                            props.onSave(formData as BlockConfigurationData)
                         }
                     >
                         <FormField
-                            name={'name'}
-                            label={'Instance name'}
-                            help={
-                                'This related only to the instance of the block and not the block itself.'
-                            }
+                            name="name"
+                            label="Instance name"
+                            help="This related only to the instance of the block and not the block itself."
                             readOnly={props.block?.plan.isReadOnly()}
                             type={FormFieldType.STRING}
                         />
 
                         <FormField
-                            name={'version'}
-                            label={'Version'}
+                            name="version"
+                            label="Version"
                             options={versionOptions}
-                            help={'The current version used by this plan'}
+                            help="The current version used by this plan"
                             readOnly={props.block?.plan.isReadOnly()}
                             type={FormFieldType.ENUM}
                         />

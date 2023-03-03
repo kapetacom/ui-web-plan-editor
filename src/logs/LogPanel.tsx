@@ -40,7 +40,7 @@ const DEFAULT_MAX_ENTRIES = 200;
 
 export const LogPanel = (props: LogPanelProps) => {
     const maxEntries = props.maxEntries || DEFAULT_MAX_ENTRIES;
-    let [logs, logListHandler] = useList(props.logs || []);
+    const [logs, logListHandler] = useList(props.logs || []);
 
     if (props.emitter) {
         const logListener = (entry: LogEntry) => {
@@ -64,29 +64,27 @@ export const LogPanel = (props: LogPanelProps) => {
 
     useEffect(() => {
         logListHandler.clear();
-    }, [props.emitter]);
+    }, [props.emitter, logListHandler]);
 
     useEffect(() => {
         logListHandler.set(props.logs ? props.logs : []);
-    }, [props.logs]);
+    }, [props.logs, logListHandler]);
 
     return (
-        <div className={'log-panel'}>
+        <div className="log-panel">
             {logs.map((logEntry, ix) => {
                 const className = toClass({
                     'log-entry': true,
-                    ['status-' + logEntry.level.toLowerCase()]: true,
+                    [`status-${logEntry.level.toLowerCase()}`]: true,
                 });
 
                 return (
                     <div className={className} key={`log_entry_${ix}`}>
-                        <div className={'date'}>
+                        <div className="date">
                             {new Date(logEntry.time).toISOString()}
                         </div>
-                        <div className={'type'}>{logEntry.level}</div>
-                        <div className={'message'}>
-                            {logEntry.message.trim()}
-                        </div>
+                        <div className="type">{logEntry.level}</div>
+                        <div className="message">{logEntry.message.trim()}</div>
                     </div>
                 );
             })}

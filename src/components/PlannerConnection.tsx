@@ -1,3 +1,4 @@
+/* eslint-disable react/sort-comp */
 import React from 'react';
 import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';
 
@@ -90,10 +91,7 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
         if (this.props.onDelete && this.props.connection) {
             DialogControl.show(
                 'Delete connection?',
-                'from ' +
-                    this.props.connection.from.resourceName +
-                    ' to ' +
-                    this.props.connection.to.resourceName,
+                `from ${this.props.connection.from.resourceName} to ${this.props.connection.to.resourceName}`,
                 () => {
                     if (this.props.onDelete && this.props.connection) {
                         this.props.onDelete(this.props.connection);
@@ -117,7 +115,7 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
     };
 
     private getMiddlePoint(list: Point[]) {
-        //don't calculate it if the list is empty, to avoid setting the initial value to 0,0
+        // don't calculate it if the list is empty, to avoid setting the initial value to 0,0
         if (list.length <= 0) {
             return;
         }
@@ -127,6 +125,7 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
             sumX += point.x;
             sumY += point.y;
         });
+        // eslint-disable-next-line consistent-return
         return {
             x: sumX / list.length - 15,
             y: sumY / list.length,
@@ -159,7 +158,7 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
         });
 
         if (this.props.className) {
-            className += ' ' + this.props.className;
+            className += ` ${this.props.className}`;
         }
 
         return (
@@ -169,8 +168,8 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
                     onMouseOver={this.onMouseOver}
                     onMouseOut={this.onMouseOut}
                 >
-                    <path className={'background'} d={path} />
-                    <path className={'line'} d={path} />
+                    <path className="background" d={path} />
+                    <path className="line" d={path} />
 
                     {this.props.connection &&
                         middlePoint &&

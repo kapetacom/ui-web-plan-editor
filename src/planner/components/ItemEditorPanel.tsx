@@ -25,7 +25,6 @@ import { parseBlockwareUri } from '@blockware/nodejs-utils';
 
 import type {
     BlockConnectionSpec,
-    BlockMetadata,
     DataWrapper,
     SchemaEntity,
     SchemaKind,
@@ -42,7 +41,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useAsync } from 'react-use';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
-const withNamespaces = (Component) => {
+const withNamespaces = (ChildComponent) => {
     return (props) => {
         const { value: namespaces, loading } = useAsync(async () => {
             const identity = await IdentityService.getCurrent();
@@ -56,7 +55,7 @@ const withNamespaces = (Component) => {
         });
         return (
             <SimpleLoader loading={loading}>
-                <Component {...props} namespaces={namespaces || []} />
+                <ChildComponent {...props} namespaces={namespaces || []} />
             </SimpleLoader>
         );
     };
@@ -98,6 +97,16 @@ export class ItemEditorPanel extends Component<Props, State> {
             initialValue: this.props.editableItem?.item?.getData(),
         };
         makeObservable(this);
+    }
+
+    componentDidUpdate(prevProps: Readonly<Props>) {
+        if (this.props.editableItem !== prevProps.editableItem) {
+            // When we change editableItem - reset
+            this.setState({
+                entry: undefined,
+                initialValue: this.props.editableItem?.item?.getData(),
+            });
+        }
     }
 
     @action
@@ -151,12 +160,46 @@ export class ItemEditorPanel extends Component<Props, State> {
     };
 
     @action
+    private onMappingChanged = (change: any) => {
+        const connection = this.props.editableItem.item;
+        this.editedConnection = {
+            target: change.target,
+            targetEntities: toJS(change.targetEntities),
+            source: change.source,
+            sourceEntities: toJS(change.sourceEntities),
+            connection: {
+                from: toJS(connection.from),
+                to: toJS(connection.to),
+                mapping: change.data,
+            },
+        };
+    };
+
+    private getData(): SchemaKind {
+        const definition = this.props.editableItem.item.getData();
+
+        let data: SchemaKind;
+        if (
+            this.state.entry &&
+            parseBlockwareUri(this.state.entry.kind).fullName ===
+                parseBlockwareUri(definition.kind).fullName
+        ) {
+            data = this.state.entry;
+        } else {
+            data = definition;
+        }
+
+        return data;
+    }
+
+    @action
     private saveAndClose = (data: any) => {
         try {
             this.saved = true;
             this.save(data);
             this.editedConnection = undefined;
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.log(e);
         } finally {
             this.onPanelClosed();
@@ -203,11 +246,11 @@ export class ItemEditorPanel extends Component<Props, State> {
             return;
         }
 
-        //Resource is being saved
+        // Resource is being saved
         item.setData(data);
 
         if (item instanceof PlannerBlockModelWrapper) {
-            //We always overwrite the instance name for now.
+            // We always overwrite the instance name for now.
             if (!item.name) {
                 item.name = item.getBlockName();
             }
@@ -215,22 +258,6 @@ export class ItemEditorPanel extends Component<Props, State> {
             this.props.onBlockSaved(item);
         }
     }
-
-    @action
-    private onMappingChanged = (change: any) => {
-        const connection = this.props.editableItem.item;
-        this.editedConnection = {
-            target: change.target,
-            targetEntities: toJS(change.targetEntities),
-            source: change.source,
-            sourceEntities: toJS(change.sourceEntities),
-            connection: {
-                from: toJS(connection.from),
-                to: toJS(connection.to),
-                mapping: change.data,
-            },
-        };
-    };
 
     private renderBlockFields(data: SchemaKind) {
         const kindUri = parseBlockwareUri(data.kind);
@@ -247,44 +274,27 @@ export class ItemEditorPanel extends Component<Props, State> {
         return (
             <>
                 <FormField
-                    name={'kind'}
+                    name="kind"
                     type={FormFieldType.ENUM}
-                    label={'Type'}
+                    label="Type"
                     validation={['required']}
-                    help={'The block type and version'}
+                    help="The block type and version"
                     options={options}
                 />
 
                 <AutoLoadAssetNameInput
-                    name={'metadata.name'}
-                    label={'Name'}
+                    name="metadata.name"
+                    label="Name"
                     help={'The name of this block - e.g. "myhandle/my-block"'}
                 />
 
                 <FormField
-                    name={'metadata.title'}
-                    label={'Title'}
-                    help={'This blocks human-friendly title'}
+                    name="metadata.title"
+                    label="Title"
+                    help="This blocks human-friendly title"
                 />
             </>
         );
-    }
-
-    private getData(): SchemaKind {
-        const definition = this.props.editableItem.item.getData();
-
-        let data: SchemaKind;
-        if (
-            this.state.entry &&
-            parseBlockwareUri(this.state.entry.kind).fullName ===
-                parseBlockwareUri(definition.kind).fullName
-        ) {
-            data = this.state.entry;
-        } else {
-            data = definition;
-        }
-
-        return data;
     }
 
     private renderEditableItemForm(editableItem: EditableItemInterface): any {
@@ -311,7 +321,7 @@ export class ItemEditorPanel extends Component<Props, State> {
             return (
                 <MappingComponent
                     key={connection.id}
-                    title={'mapping-editor'}
+                    title="mapping-editor"
                     source={connection.fromResource.getData()}
                     target={connection.toResource.getData()}
                     sourceEntities={connection.fromResource.block.getEntities()}
@@ -371,12 +381,12 @@ export class ItemEditorPanel extends Component<Props, State> {
             versionAlternatives.forEach((version) => {
                 const versionName =
                     version === 'local' ? 'Local Disk' : version;
-                const resourceType = ResourceTypeProvider.get(
+                const altResourceType = ResourceTypeProvider.get(
                     `${dataKindUri.fullName}:${version}`
                 );
                 versions[`${dataKindUri.fullName}:${version}`] =
-                    resourceType && resourceType.title
-                        ? `${resourceType.title} [${versionName}]`
+                    altResourceType && altResourceType.title
+                        ? `${altResourceType.title} [${versionName}]`
                         : versionName;
             });
 
@@ -385,10 +395,10 @@ export class ItemEditorPanel extends Component<Props, State> {
                     <FormField
                         options={versions}
                         type={FormFieldType.ENUM}
-                        help={'The kind and version of this resource'}
+                        help="The kind and version of this resource"
                         validation={['required']}
-                        label={'Resource kind'}
-                        name={'kind'}
+                        label="Resource kind"
+                        name="kind"
                     />
                     <ErrorBoundary
                         fallbackRender={(props) => (
@@ -412,16 +422,6 @@ export class ItemEditorPanel extends Component<Props, State> {
         return <></>;
     }
 
-    componentDidUpdate(prevProps: Readonly<Props>) {
-        if (this.props.editableItem !== prevProps.editableItem) {
-            //When we change editableItem - reset
-            this.setState({
-                entry: undefined,
-                initialValue: this.props.editableItem?.item?.getData(),
-            });
-        }
-    }
-
     render() {
         const panelHeader = () => {
             if (!this.props.editableItem) {
@@ -439,7 +439,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                 onClose={this.onPanelClosed}
             >
                 {this.props.editableItem && (
-                    <div className={'item-editor-panel'}>
+                    <div className="item-editor-panel">
                         <FormContainer
                             initialValue={this.state.initialValue}
                             onChange={(data) =>
@@ -447,7 +447,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                             }
                             onSubmitData={(data) => this.saveAndClose(data)}
                         >
-                            <div className={'item-form'}>
+                            <div className="item-form">
                                 {this.renderEditableItemForm(
                                     this.props.editableItem
                                 )}

@@ -112,7 +112,7 @@ export class PlannerBlockResourceList extends Component<
                             viewOnly={this.props.viewOnly}
                             setItemToEdit={this.props.setItemToEdit}
                             size={this.props.size}
-                            key={resource.id + '_' + index}
+                            key={`${resource.id}_${index}`}
                             resource={resource}
                             index={index}
                             zoom={this.props.zoom}
@@ -122,7 +122,7 @@ export class PlannerBlockResourceList extends Component<
                 })}
 
                 <svg
-                    className={'resource-placeholder'}
+                    className="resource-placeholder"
                     x={placeholderX}
                     y={resourceRight * this.props.list.length}
                 >

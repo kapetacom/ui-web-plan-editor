@@ -11,12 +11,12 @@ export function PlannerToolboxBlock(
     return (
         <svg width={120} height={120}>
             <BlockNode
-                name={'Block'}
-                valid={true}
+                name="Block"
+                valid
                 status={InstanceStatus.STOPPED}
                 instanceName={props.item.title}
-                version={'0.0.1'}
-                variant={'new'}
+                version="0.0.1"
+                variant="new"
                 height={120}
                 width={120}
                 pointSize={20}

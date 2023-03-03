@@ -108,7 +108,9 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         this.blockReference = blockInstance.block;
         try {
             this.blockReferenceUri = parseBlockwareUri(this.blockReference.ref);
-        } catch (e) {}
+        } catch (e) {
+            // TODO: can we ignore this?
+        }
 
         if (blockInstance.dimensions) {
             this.size = {
@@ -160,11 +162,13 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @action
-    setBlockReference(reference:string) {
-        this.blockReference = {ref:reference};
+    setBlockReference(reference: string) {
+        this.blockReference = { ref: reference };
         try {
             this.blockReferenceUri = parseBlockwareUri(this.blockReference.ref);
-        } catch (e) {}
+        } catch (e) {
+            // TODO: can we ignore this?
+        }
     }
 
     @observable
@@ -253,12 +257,12 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         const wrappers =
             role === ResourceRole.CONSUMES ? this.consumes : this.provides;
 
-        //Get rid of wrappers for resources that no longer exist
+        // Get rid of wrappers for resources that no longer exist
         wrappers
             .filter((wrapper) => {
                 return !resources.some((resource) => {
                     const id =
-                        PlannerResourceModelWrapper.GetResourceID(resource);
+                        PlannerResourceModelWrapper.getResourceID(resource);
                     return id === wrapper.id;
                 });
             })
@@ -266,10 +270,10 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
                 wrappers.splice(wrappers.indexOf(wrapper), 1);
             });
 
-        //Update or add resources
+        // Update or add resources
         resources.forEach((resource, ix) => {
-            const id = PlannerResourceModelWrapper.GetResourceID(resource);
-            let existingWrapper = wrappers.find((c) => c.id === id);
+            const id = PlannerResourceModelWrapper.getResourceID(resource);
+            const existingWrapper = wrappers.find((c) => c.id === id);
             if (existingWrapper) {
                 existingWrapper.setData(resource);
                 return;
@@ -293,8 +297,8 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
      */
     @observable
     getConnectedBlocks(): NeighboringBlocks {
-        let consumerBlocks: PlannerBlockModelWrapper[] = []; //blocks to the right
-        let providerBlocks: PlannerBlockModelWrapper[] = []; //blocks to the left
+        const consumerBlocks: PlannerBlockModelWrapper[] = []; // blocks to the right
+        const providerBlocks: PlannerBlockModelWrapper[] = []; // blocks to the left
         this.provides.forEach((resource: PlannerResourceModelWrapper) => {
             this.plan
                 .getConnectionsFor(resource)
@@ -385,8 +389,8 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
             return this.heightCache[size];
         }
 
-        let consumesCount = this.getResourceLength(ResourceRole.CONSUMES);
-        let providesCount = this.getResourceLength(ResourceRole.PROVIDES);
+        const consumesCount = this.getResourceLength(ResourceRole.CONSUMES);
+        const providesCount = this.getResourceLength(ResourceRole.PROVIDES);
 
         const resourceCount = Math.max(consumesCount, providesCount);
 
@@ -482,6 +486,8 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
                 break;
             case ResourceRole.CONSUMES:
                 this.setMode(BlockMode.HOVER_DROP_CONSUMER);
+                break;
+            default:
                 break;
         }
     }
@@ -595,22 +601,19 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         entity: SchemaEntity,
         sourceEntities: SchemaEntity[]
     ): SchemaEntity | undefined {
-        const matchedEntity = this.getEntityByName(entity.name);
-        if (!matchedEntity) {
-            return;
-        }
-
-        const entities = this.getEntities();
+        const namedEntity = this.getEntityByName(entity.name);
+        let matchedEntity;
 
         if (
-            !isSchemaEntityCompatible(
+            namedEntity &&
+            isSchemaEntityCompatible(
                 entity,
-                matchedEntity,
+                namedEntity,
                 sourceEntities,
-                entities
+                this.getEntities()
             )
         ) {
-            return;
+            matchedEntity = namedEntity;
         }
 
         return matchedEntity;
@@ -621,22 +624,19 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         entity: SchemaEntity,
         sourceEntities: SchemaEntity[]
     ): SchemaEntity | undefined {
-        const conflictingEntity = this.getEntityByName(entity.name);
-        if (!conflictingEntity) {
-            return;
-        }
-
-        const entities = this.getEntities();
+        const namedEntity = this.getEntityByName(entity.name);
+        let conflictingEntity;
 
         if (
+            namedEntity &&
             isSchemaEntityCompatible(
                 entity,
-                conflictingEntity,
+                namedEntity,
                 sourceEntities,
-                entities
+                this.getEntities()
             )
         ) {
-            return;
+            conflictingEntity = namedEntity;
         }
 
         return conflictingEntity;
@@ -756,8 +756,8 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         });
 
         if (this.errors.length > 0) {
-            //TODO: Handle block errors
-            //console.log('block errors', toJS(this.errors));
+            // TODO: Handle block errors
+            // console.log('block errors', toJS(this.errors));
         }
     }
 

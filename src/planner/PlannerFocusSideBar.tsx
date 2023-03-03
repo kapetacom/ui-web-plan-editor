@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 import {
     SidePanel,
@@ -14,7 +14,6 @@ import { BlockTree } from './components/BlockTree';
 
 import './PlannerFocusSideBar.less';
 import { observer } from 'mobx-react';
-import { runInAction } from 'mobx';
 
 interface Props {
     plan: PlannerModelWrapper;
@@ -30,14 +29,14 @@ export const PlannerFocusSideBar = observer((props: Props) => {
         <SidePanel
             title="Blocks in view"
             closable={false}
-            className={'focus-side-panel'}
+            className="focus-side-panel"
             open={!!props.block}
             side={PanelAlignment.right}
             size={PanelSize.small}
             onClose={props.onClose}
             header={
                 <SidePanelHeader
-                    title={'Blocks in use'}
+                    title="Blocks in use"
                     onIconPress={props.blurFocus}
                     icon={
                         <svg

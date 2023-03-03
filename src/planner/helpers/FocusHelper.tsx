@@ -38,7 +38,7 @@ export class FocusHelper {
         positionData: FocusPositioningData,
         nodeSize: PlannerNodeSize
     ) => {
-        let x = positionData.plannerWidth / 2 - block.width / 2;
+        const x = positionData.plannerWidth / 2 - block.width / 2;
         const y =
             positionData.plannerHeight / 2 -
             block.calculateHeight(nodeSize) / 2;
@@ -51,17 +51,14 @@ export class FocusHelper {
     ) => {
         if (!this.plan.focusedBlock) {
             return false;
-        } else {
-            if (
-                connection.fromResource.block.id ===
-                    this.plan.focusedBlock.id ||
-                connection.toResource.block.id === this.plan.focusedBlock.id
-            ) {
-                return true;
-            } else {
-                return false;
-            }
         }
+        if (
+            connection.fromResource.block.id === this.plan.focusedBlock.id ||
+            connection.toResource.block.id === this.plan.focusedBlock.id
+        ) {
+            return true;
+        }
+        return false;
     };
 
     @observable
@@ -86,15 +83,15 @@ export class FocusHelper {
         availableSize: Point,
         nodeSize: PlannerNodeSize
     ): FocusPositioningData => {
-        //having a x and y as size we can precalculate fitting items before we adjust the zoom level
+        // having a x and y as size we can precalculate fitting items before we adjust the zoom level
         const connectedToFocusBlocks = focusedBlock.getConnectedBlocks();
         let availableHeight = availableSize.y - 100 - OFFSET_FROM_TOP;
-        //remove the focused block width first as no blocks may be over or below
+        // remove the focused block width first as no blocks may be over or below
         let verticalBlockNumberLeft = 0;
         let verticalBlockNumberRight = 0;
-        //since we don't know what the height of the blocks are we calculate for the worst case scenario
-        //starting from the tallest block and adding
-        for (let block of connectedToFocusBlocks.providingBlocks) {
+        // since we don't know what the height of the blocks are we calculate for the worst case scenario
+        // starting from the tallest block and adding
+        for (const block of connectedToFocusBlocks.providingBlocks) {
             const blockHeight = block.calculateHeight(nodeSize);
             if (availableHeight - blockHeight > 0) {
                 verticalBlockNumberLeft++;
@@ -103,7 +100,7 @@ export class FocusHelper {
                 break;
             }
         }
-        for (let block of connectedToFocusBlocks.consumingBlocks) {
+        for (const block of connectedToFocusBlocks.consumingBlocks) {
             const blockHeight = block.calculateHeight(nodeSize);
             if (availableHeight - blockHeight > 0) {
                 verticalBlockNumberRight++;
@@ -141,7 +138,7 @@ export class FocusHelper {
         zoomLevelAreas: ZoomAreaMap,
         nodeSize: PlannerNodeSize
     ): number => {
-        let positioningMap: { [key: string]: FocusPositioningData } = {};
+        const positioningMap: { [key: string]: FocusPositioningData } = {};
         let fittingZoomLevels: number[] = [1];
 
         if (this.plan.focusedBlock) {
@@ -164,7 +161,7 @@ export class FocusHelper {
                 .map((key) => {
                     return +key;
                 })
-                .filter((key) => key > 0.75); //We dont want to further in than 1
+                .filter((key) => key > 0.75); // We dont want to further in than 1
         }
 
         return Math.min(...fittingZoomLevels);
@@ -175,11 +172,13 @@ export class FocusHelper {
     }) => {
         return (
             <div>
+                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
                 <div
                     className="focus-toolbox-back"
                     onClick={action(() => {
-                        this.plan.focusedBlock &&
+                        if (this.plan.focusedBlock) {
                             props.setFocusBlock(this.plan.focusedBlock);
+                        }
                     })}
                 >
                     <svg width="10" height="10" viewBox="0 0 8 13" fill="none">
@@ -235,12 +234,12 @@ export class FocusHelper {
     ) {
         let point;
         if (this.plan.focusedBlock) {
-            let positioningData = this.getBlocksFitToScreen(
+            const positioningData = this.getBlocksFitToScreen(
                 this.plan.focusedBlock,
                 plannerSize,
                 nodeSize
             );
-            let focusedColumn = 2;
+            const focusedColumn = 2;
             const { providingBlocks, consumingBlocks, all } =
                 this.plan.focusedBlock.getConnectedBlocks();
             if (this.plan.focusedBlock.id === block.id) {
@@ -255,6 +254,7 @@ export class FocusHelper {
             ) {
                 point = this.getFocusedLinkedBlockPosition(
                     block.id,
+                    // eslint-disable-next-line no-nested-ternary
                     providingBlocks.filter(
                         (providingBlock) => providingBlock.id === block.id
                     ).length > 0
@@ -282,8 +282,9 @@ export class FocusHelper {
         setFocusZoom: (block: PlannerBlockModelWrapper) => void;
     }) => {
         const close = action(() => {
-            this.plan.focusedBlock &&
+            if (this.plan.focusedBlock) {
                 props.setFocusZoom(this.plan.focusedBlock);
+            }
         });
 
         return (
@@ -323,7 +324,7 @@ export class FocusHelper {
         let usedHeight = 0;
         const currentBlock = allBlocks.all[blockIndex];
         if (side === ResourceRole.CONSUMES) {
-            //get columns for blocks on the left
+            // get columns for blocks on the left
             blockIndex = allBlocks.providingBlocks.indexOf(currentBlock);
             x = currentBlock.width;
             usedHeight =
@@ -339,24 +340,23 @@ export class FocusHelper {
             }
             y = usedHeight + OFFSET_FROM_TOP;
             return { x, y };
-        } else {
-            //get columns for blocks on the right
-            blockIndex = allBlocks.consumingBlocks.indexOf(currentBlock);
-            usedHeight =
-                (positionData.plannerHeight -
-                    this.getBlockListTotalHeight(
-                        allBlocks.consumingBlocks,
-                        nodeSize
-                    )) /
-                2;
-            for (let i = 0; i < blockIndex; i++) {
-                usedHeight +=
-                    allBlocks.consumingBlocks[i].calculateHeight(nodeSize);
-            }
-            x = positionData.plannerWidth - currentBlock.width * 2;
-            y = usedHeight + OFFSET_FROM_TOP;
-            return { x, y };
         }
+        // get columns for blocks on the right
+        blockIndex = allBlocks.consumingBlocks.indexOf(currentBlock);
+        usedHeight =
+            (positionData.plannerHeight -
+                this.getBlockListTotalHeight(
+                    allBlocks.consumingBlocks,
+                    nodeSize
+                )) /
+            2;
+        for (let i = 0; i < blockIndex; i++) {
+            usedHeight +=
+                allBlocks.consumingBlocks[i].calculateHeight(nodeSize);
+        }
+        x = positionData.plannerWidth - currentBlock.width * 2;
+        y = usedHeight + OFFSET_FROM_TOP;
+        return { x, y };
     }
 
     @observable
@@ -367,7 +367,7 @@ export class FocusHelper {
     ): boolean => {
         let fitLeft = false;
         let fitRight = false;
-        let positioningInfo = this.getBlocksFitToScreen(
+        const positioningInfo = this.getBlocksFitToScreen(
             focusedBlock,
             {
                 x: dimensions.plannerWidth,
