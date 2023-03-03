@@ -75,7 +75,6 @@ interface ConnectionObserver {
 export interface PlannerProps {
     plan: PlannerModelWrapper;
     size?: PlannerNodeSize;
-    routing?: any;
     enableInstanceListening?: boolean;
     systemId: string;
     blockStore?: React.ComponentType;
@@ -992,14 +991,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                                             className={
                                                                 connectionClass
                                                             }
-                                                            readOnly={this.plan.isReadOnly()}
                                                             viewOnly={this.plan.isViewing()}
                                                             key={`${connection.id}_link_${index}`}
                                                             size={this.nodeSize}
-                                                            focusBlock={
-                                                                this.plan
-                                                                    .focusedBlock
-                                                            }
                                                             handleInspectClick={
                                                                 this
                                                                     .handleInspection
@@ -1157,7 +1151,6 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                                     this.plan.selectedResource
                                                 }
                                                 zoom={this.zoom}
-                                                index={-1}
                                             />
                                         )}
                                     </div>

@@ -39,7 +39,6 @@ interface PlannerConnectionButtonsProps {
     open: boolean;
     x: number;
     y: number;
-    readOnly?: boolean;
     onEdit: () => void;
     onDelete: () => void;
     onInspect: () => void;

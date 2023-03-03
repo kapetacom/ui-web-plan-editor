@@ -31,7 +31,6 @@ import { action, computed, makeObservable, observable } from 'mobx';
 
 export interface PlannerTempResourceItemProps {
     selectedResource: SelectedResourceItem;
-    index: number;
     size: PlannerNodeSize;
     setItemToEdit?: (
         res: DataWrapper<BlockConnectionSpec>,
