@@ -33,7 +33,7 @@ export const SVGCircleButton = (props: Props) => {
                 props.onClick(evt);
             }}
         >
-            <div className={'container'}>
+            <div className="container">
                 <i className={props.icon} />
             </div>
         </foreignObject>

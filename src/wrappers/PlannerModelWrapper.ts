@@ -277,18 +277,18 @@ export class PlannerModelWrapper {
         let resourceName = fromResource.getName();
 
         while (toBlock.findResourceById(ResourceRole.CONSUMES, resourceName)) {
-            resourceName = fromResource.getName() + '_' + counter;
+            resourceName = `${fromResource.getName()  }_${  counter}`;
             counter++;
         }
         const fromBlock = fromResource.block;
         const fromEntities = fromBlock.getEntities();
 
-        //Get entities in use by resource being copied
+        // Get entities in use by resource being copied
         const entityNames = ResourceTypeProvider.resolveEntities(
             fromResource.getData()
         );
 
-        //Convert resource to consumable resource
+        // Convert resource to consumable resource
         const data = ResourceTypeProvider.convertToConsumable(
             fromResource.getData()
         );
@@ -299,35 +299,35 @@ export class PlannerModelWrapper {
                 return;
             }
 
-            //See if target block already has an entity that is identical to this one
+            // See if target block already has an entity that is identical to this one
             const existingEntity = toBlock.getMatchingEntity(
                 entity,
                 fromEntities
             );
             if (existingEntity) {
-                //If already there no need to do anything
+                // If already there no need to do anything
                 return;
             }
 
-            let conflictingEntity,
-                conflictCount = 1,
-                originalName = entity.name;
+            let conflictingEntity;
+                let conflictCount = 1;
+                const originalName = entity.name;
             do {
-                //Check if an entity exists of the same name - but different properties
+                // Check if an entity exists of the same name - but different properties
                 conflictingEntity = toBlock.getConflictingEntity(
                     entity,
                     fromEntities
                 );
 
                 if (conflictingEntity) {
-                    //We need to rename the new entity and all references to it to be able to add it to the target block.
-                    entity.name = originalName + '_' + conflictCount;
+                    // We need to rename the new entity and all references to it to be able to add it to the target block.
+                    entity.name = `${originalName  }_${  conflictCount}`;
                     conflictCount++;
                 }
             } while (conflictingEntity);
 
             if (entity.name !== originalName) {
-                //We need to change our references
+                // We need to change our references
                 ResourceTypeProvider.renameEntityReferences(
                     data,
                     originalName,
@@ -356,13 +356,13 @@ export class PlannerModelWrapper {
             toResource.getKind()
         );
         if (converter && converter.createMapping) {
-            let mapping = converter.createMapping(
+            const mapping = converter.createMapping(
                 fromResource.getData(),
                 toResource.getData(),
                 fromBlock.getEntities(),
                 toBlock.getEntities()
             );
-            //Updates mapping
+            // Updates mapping
             connection.setData({
                 ...connection.getData(),
                 mapping,
@@ -377,7 +377,7 @@ export class PlannerModelWrapper {
     @action
     updateBlock(block: PlannerBlockModelWrapper) {
         if (this.blocks.indexOf(block) === -1) {
-            //Add block if its a new one
+            // Add block if its a new one
             this.addBlock(block);
             return;
         }
@@ -466,8 +466,8 @@ export class PlannerModelWrapper {
             this.blocks.forEach((block: any) => {
                 const bottom = block.top + block.calculateHeight(size);
                 const right = block.left + block.width;
-                let y = block.top;
-                let x = block.left;
+                const y = block.top;
+                const x = block.left;
                 if (maxHeight < bottom) {
                     maxHeight = bottom;
                 }
@@ -508,7 +508,7 @@ export class PlannerModelWrapper {
     }
 
     getAvailableConsumables() {
-        let consumables: PlannerResourceModelWrapper[] = [];
+        const consumables: PlannerResourceModelWrapper[] = [];
         this.blocks.forEach((element) => {
             element.provides.forEach((prov) => {
                 consumables.push(prov);
@@ -609,10 +609,10 @@ export class PlannerModelWrapper {
         dimensionsA: Dimensions,
         dimensionsB: Dimensions
     ) {
-        let r1Right = dimensionsA.left + dimensionsA.width;
-        let r2Right = dimensionsB.left + dimensionsB.width;
-        let r1Bottom = dimensionsA.top + dimensionsA.height;
-        let r2Bottom = dimensionsB.top + dimensionsB.height;
+        const r1Right = dimensionsA.left + dimensionsA.width;
+        const r2Right = dimensionsB.left + dimensionsB.width;
+        const r1Bottom = dimensionsA.top + dimensionsA.height;
+        const r2Bottom = dimensionsB.top + dimensionsB.height;
 
         return !(
             dimensionsB.left > r1Right ||
@@ -635,7 +635,7 @@ export class PlannerModelWrapper {
             return false;
         }
 
-        for (let connection of this.connections) {
+        for (const connection of this.connections) {
             if (
                 connection.from.blockId === fromBlock.id &&
                 connection.from.resourceName === fromResource.id &&

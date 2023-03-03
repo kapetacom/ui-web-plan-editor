@@ -38,8 +38,8 @@ import {
 } from 'mobx';
 import { SVGCircleButton } from './SVGCircleButton';
 
-export const RESOURCE_SPACE = 4; //Vertical distance between resources
-const BUTTON_HEIGHT = 24; //Height of edit and delete buttons
+export const RESOURCE_SPACE = 4; // Vertical distance between resources
+const BUTTON_HEIGHT = 24; // Height of edit and delete buttons
 const COUNTER_SIZE = 8;
 
 interface PlannerBlockResourceListItemProps {
@@ -100,6 +100,65 @@ export class PlannerBlockResourceListItem extends Component<
     componentWillUnmount() {
         runInAction(() => this.detachListeners());
     }
+
+    @action
+    handleResourceDragging = (evt: MouseEvent) => {
+        if (this.props.resource.mode === ResourceMode.HIGHLIGHT) {
+            return;
+        }
+
+        evt.stopPropagation();
+        evt.preventDefault();
+
+        if (this.getBlock()?.plan?.isReadOnly()) {
+            return;
+        }
+
+        this.setState({ dragging: false, clickDown: true });
+        if (this.props.resource) {
+            let scroll: Point = { x: 0, y: 0 };
+            let offset: Point = { x: 0, y: 0 };
+            if (this.dragContainer) {
+                const container = this.dragContainer.closest(
+                    '.planner-area-scroll'
+                );
+                if (container) {
+                    scroll = {
+                        x: container.scrollLeft,
+                        y: container.scrollTop,
+                    };
+
+                    const bbox = container.getBoundingClientRect();
+
+                    offset = {
+                        y: bbox.y,
+                        x: bbox.x,
+                    };
+                }
+            }
+
+            const tmpResource = new PlannerResourceModelWrapper(
+                this.props.resource.role,
+                this.props.resource.getData(),
+                this.getBlock()
+            );
+            tmpResource.updateDimensionsFromEvent(
+                this.props.size || PlannerNodeSize.MEDIUM,
+                evt,
+                this.getZoom(),
+                scroll,
+                offset
+            );
+            this.setState({ dragging: true });
+
+            if (this.props.planner) {
+                this.props.planner.setSelectedResources(
+                    tmpResource,
+                    this.props.resource
+                );
+            }
+        }
+    };
 
     @action
     editHandler = () => {
@@ -164,11 +223,22 @@ export class PlannerBlockResourceListItem extends Component<
     }
 
     @observable
+    getId() {
+        return [
+            'resource',
+            this.props.resource.block.id,
+            this.props.resource.role.toString(),
+            this.props.resource.id,
+        ].join('_');
+    }
+
+    // eslint-disable-next-line react/sort-comp
+    @observable
     renderClipPath(height: number) {
         const resource = this.props.resource;
-        let top = 0,
-            width = 250,
-            left = 0;
+        const top = 0;
+        let width = 250;
+        let left = 0;
 
         const expanded = resource.isExtended();
 
@@ -180,7 +250,7 @@ export class PlannerBlockResourceListItem extends Component<
 
         return (
             <rect
-                className={'resource-mask'}
+                className="resource-mask"
                 width={width}
                 height={height}
                 x={left}
@@ -188,65 +258,6 @@ export class PlannerBlockResourceListItem extends Component<
             />
         );
     }
-
-    @action
-    handleResourceDragging = (evt: MouseEvent) => {
-        if (this.props.resource.mode === ResourceMode.HIGHLIGHT) {
-            return;
-        }
-
-        evt.stopPropagation();
-        evt.preventDefault();
-
-        if (this.getBlock()?.plan?.isReadOnly()) {
-            return;
-        }
-
-        this.setState({ dragging: false, clickDown: true });
-        if (this.props.resource) {
-            let scroll: Point = { x: 0, y: 0 };
-            let offset: Point = { x: 0, y: 0 };
-            if (this.dragContainer) {
-                const container = this.dragContainer.closest(
-                    '.planner-area-scroll'
-                );
-                if (container) {
-                    scroll = {
-                        x: container.scrollLeft,
-                        y: container.scrollTop,
-                    };
-
-                    const bbox = container.getBoundingClientRect();
-
-                    offset = {
-                        y: bbox.y,
-                        x: bbox.x,
-                    };
-                }
-            }
-
-            const tmpResource = new PlannerResourceModelWrapper(
-                this.props.resource.role,
-                this.props.resource.getData(),
-                this.getBlock()
-            );
-            tmpResource.updateDimensionsFromEvent(
-                this.props.size || PlannerNodeSize.MEDIUM,
-                evt,
-                this.getZoom(),
-                scroll,
-                offset
-            );
-            this.setState({ dragging: true });
-
-            if (this.props.planner) {
-                this.props.planner.setSelectedResources(
-                    tmpResource,
-                    this.props.resource
-                );
-            }
-        }
-    };
 
     private getZoom() {
         if (this.props.zoom) {
@@ -358,14 +369,49 @@ export class PlannerBlockResourceListItem extends Component<
         };
     }
 
-    @observable
-    getId() {
-        return [
-            'resource',
-            this.props.resource.block.id,
-            this.props.resource.role.toString(),
-            this.props.resource.id,
-        ].join('_');
+    private renderActions(consumer: boolean) {
+        if (
+            (this.props.readOnly && !this.props.setItemToInspect) ||
+            this.props.viewOnly
+        ) {
+            return <g className="resource-actions" />;
+        }
+
+        if (this.props.readOnly && this.props.setItemToInspect) {
+            return (
+                <g className="resource-actions">
+                    <SVGCircleButton
+                        x={0}
+                        y={0}
+                        className="inspect"
+                        style={ButtonStyle.PRIMARY}
+                        icon="fa fa-search"
+                        onClick={this.inspectHandler}
+                    />
+                </g>
+            );
+        }
+        return (
+            <g className="resource-actions">
+                <SVGCircleButton
+                    x={0}
+                    y={0}
+                    className="delete"
+                    style={ButtonStyle.DANGER}
+                    icon="fa fa-trash"
+                    onClick={this.deleteHandler}
+                />
+
+                <SVGCircleButton
+                    x={consumer ? -30 : 30}
+                    y={0}
+                    className="edit"
+                    style={ButtonStyle.SECONDARY}
+                    icon="fa fa-pencil"
+                    onClick={this.editHandler}
+                />
+            </g>
+        );
     }
 
     render() {
@@ -373,8 +419,8 @@ export class PlannerBlockResourceListItem extends Component<
             this.props.size !== undefined
                 ? this.props.size
                 : PlannerNodeSize.MEDIUM;
-        const clipPathId = this.getId() + '_clippath';
-        const fixedClipPathId = clipPathId + '_fixed';
+        const clipPathId = `${this.getId()}_clippath`;
+        const fixedClipPathId = `${clipPathId}_fixed`;
 
         const consumer = this.props.resource.role === ResourceRole.CONSUMES;
         const height = this.getBlock().getResourceHeight(nodeSize);
@@ -383,7 +429,7 @@ export class PlannerBlockResourceListItem extends Component<
         const buttonsVisible =
             this.props.resource.mode === ResourceMode.SHOW_OPTIONS;
         let resourceConfig: ResourceConfig | null = null;
-        let errors: string[] = [];
+        const errors: string[] = [];
         try {
             resourceConfig = ResourceTypeProvider.get(
                 this.props.resource.getKind()
@@ -447,7 +493,7 @@ export class PlannerBlockResourceListItem extends Component<
                 <svg x={0} y={yOffset}>
                     <clipPath id={fixedClipPathId}>
                         <rect
-                            className={'container-mask'}
+                            className="container-mask"
                             width={mouseCatcherWidth}
                             height={height}
                             x={
@@ -461,7 +507,7 @@ export class PlannerBlockResourceListItem extends Component<
 
                     <svg
                         className={containerClass}
-                        clipPath={'url(#' + fixedClipPathId + ')'}
+                        clipPath={`url(#${fixedClipPathId})`}
                         x={0}
                         y={0}
                         ref={(elm) => {
@@ -474,28 +520,26 @@ export class PlannerBlockResourceListItem extends Component<
 
                         <g
                             className={bodyClass}
-                            transform={
-                                'translate(' +
-                                this.getXPosition(this.props.resource) +
-                                ',0)'
-                            }
+                            transform={`translate(${this.getXPosition(
+                                this.props.resource
+                            )},0)`}
                             height={heightInner}
                         >
                             <rect
-                                className={'mouse-catcher'}
+                                className="mouse-catcher"
                                 opacity="0"
                                 width={mouseCatcherWidth}
                                 height={heightInner}
                                 x={consumer ? -60 : -30}
                                 y={0}
-                            ></rect>
+                            />
 
                             <svg x={buttonX} y={buttonY}>
                                 {this.renderActions(consumer)}
                             </svg>
 
                             <svg
-                                clipPath={'url(#' + clipPathId + ')'}
+                                clipPath={`url(#${clipPathId})`}
                                 style={{ cursor: consumer ? '' : 'grab' }}
                                 ref={(elm) => {
                                     this.dragContainer = elm;
@@ -519,16 +563,16 @@ export class PlannerBlockResourceListItem extends Component<
                                 x={counterPoint.x}
                                 y={counterPoint.y}
                             >
-                                <g className={'resource-counter'}>
+                                <g className="resource-counter">
                                     <circle
                                         cx={COUNTER_SIZE}
                                         cy={COUNTER_SIZE}
                                         r={COUNTER_SIZE}
-                                        className={'background'}
+                                        className="background"
                                     />
                                     <text
-                                        textAnchor={'middle'}
-                                        className={'foreground'}
+                                        textAnchor="middle"
+                                        className="foreground"
                                         y={12}
                                         x={COUNTER_SIZE}
                                     >
@@ -540,51 +584,6 @@ export class PlannerBlockResourceListItem extends Component<
                     </svg>
                 </svg>
             </>
-        );
-    }
-
-    private renderActions(consumer: boolean) {
-        if (
-            (this.props.readOnly && !this.props.setItemToInspect) ||
-            this.props.viewOnly
-        ) {
-            return <g className={'resource-actions'}></g>;
-        }
-
-        if (this.props.readOnly && this.props.setItemToInspect) {
-            return (
-                <g className={'resource-actions'}>
-                    <SVGCircleButton
-                        x={0}
-                        y={0}
-                        className={'inspect'}
-                        style={ButtonStyle.PRIMARY}
-                        icon={'fa fa-search'}
-                        onClick={this.inspectHandler}
-                    />
-                </g>
-            );
-        }
-        return (
-            <g className={'resource-actions'}>
-                <SVGCircleButton
-                    x={0}
-                    y={0}
-                    className={'delete'}
-                    style={ButtonStyle.DANGER}
-                    icon={'fa fa-trash'}
-                    onClick={this.deleteHandler}
-                />
-
-                <SVGCircleButton
-                    x={consumer ? -30 : 30}
-                    y={0}
-                    className={'edit'}
-                    style={ButtonStyle.SECONDARY}
-                    icon={'fa fa-pencil'}
-                    onClick={this.editHandler}
-                />
-            </g>
         );
     }
 }

@@ -16,7 +16,7 @@ const blocks = [
     require('./blocks/blockware-images.json'),
 ].map((data) => {
     return {
-        ref: data.metadata.name + ':1.2.3',
+        ref: `${data.metadata.name}:1.2.3`,
         path: '.',
         kind: data.kind,
         data: data,
@@ -34,7 +34,7 @@ blocks.push(
         require('./blocks/blockware-images.json'),
     ].map((data) => {
         return {
-            ref: data.metadata.name + ':1.0.2',
+            ref: `${data.metadata.name}:1.0.2`,
             path: '.',
             kind: data.kind,
             data: data,
@@ -53,7 +53,7 @@ blocks.push(
         require('./blocks/blockware-images.json'),
     ].map((data) => {
         return {
-            ref: data.metadata.name + ':local',
+            ref: `${data.metadata.name}:local`,
             path: '.',
             kind: data.kind,
             data: data,
@@ -160,7 +160,7 @@ blocks.push(
     });
 });
 
-//Mock getter
+// Mock getter
 BlockServiceMock.list = async () => {
     return [...blocks];
 };
@@ -173,6 +173,7 @@ BlockServiceMock.get = async (ref) => {
         return uri.fullName === aUri.fullName;
     });
     if (!out) {
+        // eslint-disable-next-line no-console
         console.error('Could not find ref: ', ref);
     }
     return out;

@@ -8,6 +8,7 @@ export function readPlan(): Promise<PlannerModelWrapper> {
     try {
         return reader.load(PlannerData, 'blockware/my-todo-system');
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Failed to get mock plan', e);
         throw e;
     }

@@ -1,3 +1,4 @@
+/* eslint-disable react/sort-comp */
 import React, { Component } from 'react';
 import {
     ItemType,
@@ -147,16 +148,16 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         this.updateDimensionsFromEvent(evt);
 
         if (!this.resource.dimensions) {
-            //TypeScript needs this
+            // TypeScript needs this
             return;
         }
 
         const hoverDimensions = this.resource.dimensions;
 
-        let activeResource: PlannerResourceModelWrapper | undefined,
-            activeBlock: PlannerBlockModelWrapper | undefined;
+        let activeBlock: PlannerBlockModelWrapper | undefined;
 
-        activeResource = this.findValidResourceFromDimensions(hoverDimensions);
+        const activeResource =
+            this.findValidResourceFromDimensions(hoverDimensions);
         if (!activeResource) {
             activeBlock = this.findValidBlockFromDimensions(hoverDimensions);
             if (activeBlock && activeBlock.readonly) {
@@ -192,16 +193,16 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         this.updateDimensionsFromEvent(evt);
 
         if (!this.resource.dimensions) {
-            //TypeScript needs this
+            // TypeScript needs this
             return;
         }
 
         const hoverDimensions = this.resource.dimensions;
 
-        let activeResource: PlannerResourceModelWrapper | undefined,
-            activeBlock: PlannerBlockModelWrapper | undefined;
+        let activeBlock: PlannerBlockModelWrapper | undefined;
 
-        activeResource = this.findValidResourceFromDimensions(hoverDimensions);
+        const activeResource =
+            this.findValidResourceFromDimensions(hoverDimensions);
         if (!activeResource) {
             activeBlock = this.findValidBlockFromDimensions(hoverDimensions);
         }
@@ -241,7 +242,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
     private dragstart = () => {
         this.props.planner.blocks
             .filter((block) => {
-                //remove the current block from the pool to find compatible landing resources
+                // remove the current block from the pool to find compatible landing resources
                 return this.block.id !== block.id;
             })
             .forEach((block) => {
@@ -300,7 +301,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
             <>
                 {this.resource.dimensions && (
                     <svg
-                        className={'planner-temp-resource-item'}
+                        className="planner-temp-resource-item"
                         style={{ left: position.x, top: position.y }}
                         ref={(ref: SVGSVGElement) => {
                             this.elm = asHTMLElement(ref);

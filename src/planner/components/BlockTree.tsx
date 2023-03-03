@@ -45,26 +45,25 @@ export class BlockTree extends React.Component<Props> {
                     </svg>
                 </div>
             );
-        } else {
-            return (
-                <div className="block-icon">
-                    <svg width="11" height="14" viewBox="0 0 11 14" fill="none">
-                        <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M4.48146 1.53616L0.814811 2.91155V7.81763L1.22213 7.97569V8.8497L0.365885 8.51744C0.145629 8.43197 0 8.21628 0 7.97553V2.75164C0 2.50853 0.148452 2.29126 0.371789 2.20748L4.28598 0.739241C4.41218 0.6919 4.55074 0.6919 4.67695 0.739241L8.59113 2.20748C8.81447 2.29126 8.96292 2.50853 8.96292 2.75164V4.01475L8.14811 3.71116V2.91155L4.48146 1.53616Z"
-                            fill="#99928F"
-                        />
-                        <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M2.82643 6.15294L6.51854 4.768L10.2107 6.15294V11.0941L6.51854 12.5268L2.82643 11.0941V6.15294ZM10.6282 5.46651C10.8515 5.55029 11 5.76757 11 6.01067V11.2346C11 11.4753 10.8544 11.691 10.6341 11.7765L6.71993 13.2953C6.59019 13.3457 6.44689 13.3457 6.31715 13.2953L2.40296 11.7765C2.18271 11.691 2.03708 11.4753 2.03708 11.2346V6.01067C2.03708 5.76757 2.18553 5.55029 2.40887 5.46651L6.32305 3.99827C6.44926 3.95093 6.58782 3.95093 6.71402 3.99827L10.6282 5.46651Z"
-                            fill="#99928F"
-                        />
-                    </svg>
-                </div>
-            );
         }
+        return (
+            <div className="block-icon">
+                <svg width="11" height="14" viewBox="0 0 11 14" fill="none">
+                    <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M4.48146 1.53616L0.814811 2.91155V7.81763L1.22213 7.97569V8.8497L0.365885 8.51744C0.145629 8.43197 0 8.21628 0 7.97553V2.75164C0 2.50853 0.148452 2.29126 0.371789 2.20748L4.28598 0.739241C4.41218 0.6919 4.55074 0.6919 4.67695 0.739241L8.59113 2.20748C8.81447 2.29126 8.96292 2.50853 8.96292 2.75164V4.01475L8.14811 3.71116V2.91155L4.48146 1.53616Z"
+                        fill="#99928F"
+                    />
+                    <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M2.82643 6.15294L6.51854 4.768L10.2107 6.15294V11.0941L6.51854 12.5268L2.82643 11.0941V6.15294ZM10.6282 5.46651C10.8515 5.55029 11 5.76757 11 6.01067V11.2346C11 11.4753 10.8544 11.691 10.6341 11.7765L6.71993 13.2953C6.59019 13.3457 6.44689 13.3457 6.31715 13.2953L2.40296 11.7765C2.18271 11.691 2.03708 11.4753 2.03708 11.2346V6.01067C2.03708 5.76757 2.18553 5.55029 2.40887 5.46651L6.32305 3.99827C6.44926 3.95093 6.58782 3.95093 6.71402 3.99827L10.6282 5.46651Z"
+                        fill="#99928F"
+                    />
+                </svg>
+            </div>
+        );
     }
 
     @observable
@@ -76,7 +75,7 @@ export class BlockTree extends React.Component<Props> {
             return (
                 <div className={`resource-icon ${type}`}>
                     <svg
-                        transform="scale(-1, 1)" //mirrors the svg
+                        transform="scale(-1, 1)" // mirrors the svg
                         width="10"
                         height="11"
                         viewBox="0 0 10 11"
@@ -91,25 +90,24 @@ export class BlockTree extends React.Component<Props> {
                     </svg>
                 </div>
             );
-        } else {
-            return (
-                <div className={`resource-icon ${type}`}>
-                    <svg
-                        width="10 "
-                        height="11"
-                        viewBox="0 0 10 11"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            opacity="0.6"
-                            d="M6.98571 10.5285C6.80262 10.8195 6.45524 11 6.07824 11L1.03811 11C0.464779 11 -9.17796e-07 10.5896 -8.73537e-07 10.0833L-7.21614e-08 0.916667C-2.79027e-08 0.410406 0.46478 1.20079e-07 1.03811 1.70201e-07L6.07824 6.10823e-07C6.45525 6.43782e-07 6.80262 0.180485 6.98571 0.471495L9.86936 5.05483C10.0435 5.33168 10.0435 5.66832 9.86936 5.94517L6.98571 10.5285Z"
-                            fill="#CFCBC1"
-                        />
-                    </svg>
-                </div>
-            );
         }
+        return (
+            <div className={`resource-icon ${type}`}>
+                <svg
+                    width="10 "
+                    height="11"
+                    viewBox="0 0 10 11"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        opacity="0.6"
+                        d="M6.98571 10.5285C6.80262 10.8195 6.45524 11 6.07824 11L1.03811 11C0.464779 11 -9.17796e-07 10.5896 -8.73537e-07 10.0833L-7.21614e-08 0.916667C-2.79027e-08 0.410406 0.46478 1.20079e-07 1.03811 1.70201e-07L6.07824 6.10823e-07C6.45525 6.43782e-07 6.80262 0.180485 6.98571 0.471495L9.86936 5.05483C10.0435 5.33168 10.0435 5.66832 9.86936 5.94517L6.98571 10.5285Z"
+                        fill="#CFCBC1"
+                    />
+                </svg>
+            </div>
+        );
     }
 
     @action
@@ -128,6 +126,7 @@ export class BlockTree extends React.Component<Props> {
                     .getConnectedBlocks()
                     .all.map((block, index) => {
                         return (
+                            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
                             <div
                                 key={block.id + index}
                                 className="connected-block-line"
@@ -173,20 +172,12 @@ export class BlockTree extends React.Component<Props> {
                                                         );
                                                     }}
                                                 >
-                                                    <div
-                                                        className={
-                                                            'resource-icon'
-                                                        }
-                                                    >
+                                                    <div className="resource-icon">
                                                         {this.getResourceIcon(
                                                             resource
                                                         )}
                                                     </div>
-                                                    <div
-                                                        className={
-                                                            'resource-name'
-                                                        }
-                                                    >
+                                                    <div className="resource-name">
                                                         {
                                                             resource.getData()
                                                                 .metadata.name

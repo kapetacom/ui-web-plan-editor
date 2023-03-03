@@ -34,7 +34,7 @@ export const StandAloneBlocks = () => {
             load={() =>
                 readPlan().then((plan) => (
                     <div
-                        className={'planner-canvas'}
+                        className="planner-canvas"
                         style={{ width: '800px', height: '800px' }}
                     >
                         <PlannerBlockNode
@@ -62,7 +62,7 @@ export const PlannerEditor = () => {
             <Loader
                 load={() =>
                     readPlan().then((plan) => (
-                        <Planner systemId={'my-system'} plan={plan} />
+                        <Planner systemId="my-system" plan={plan} />
                     ))
                 }
             />
@@ -77,7 +77,7 @@ export const PlannerViewer = () => {
                 load={() =>
                     readPlan().then((plan) => {
                         plan.setMode(PlannerMode.VIEW);
-                        return <Planner systemId={'my-system'} plan={plan} />;
+                        return <Planner systemId="my-system" plan={plan} />;
                     })
                 }
             />
@@ -92,7 +92,7 @@ export const PlannerConfig = () => {
                 load={() =>
                     readPlan().then((plan) => {
                         plan.setMode(PlannerMode.CONFIGURATION);
-                        return <Planner systemId={'my-system'} plan={plan} />;
+                        return <Planner systemId="my-system" plan={plan} />;
                     })
                 }
             />
@@ -113,7 +113,7 @@ export const BlockResourceProvider = () => {
                         <svg
                             width="800"
                             height="1400"
-                            className={'planner-canvas'}
+                            className="planner-canvas"
                         >
                             <PlannerBlockResourceListItem
                                 index={1}
@@ -140,7 +140,7 @@ export const BlockResourceConsumer = () => {
                         <svg
                             width="800"
                             height="1400"
-                            className={'planner-canvas'}
+                            className="planner-canvas"
                         >
                             <svg x={200} y={0} width={400} height={600}>
                                 <PlannerBlockResourceListItem
@@ -161,7 +161,7 @@ export const BlockResourceConsumerList = () => {
         <Loader
             load={() =>
                 readPlan().then((plan) => (
-                    <svg width="800" height="1400" className={'planner-canvas'}>
+                    <svg width="800" height="1400" className="planner-canvas">
                         <svg x={200} y={0} width={400} height={600}>
                             <PlannerBlockResourceList
                                 list={plan.blocks[2].consumes}
@@ -182,7 +182,7 @@ export const BlockResourceProviderList = () => {
         <Loader
             load={() =>
                 readPlan().then((plan) => (
-                    <svg width="800" height="1400" className={'planner-canvas'}>
+                    <svg width="800" height="1400" className="planner-canvas">
                         <PlannerBlockResourceList
                             list={plan.blocks[1].provides}
                             size={PlannerNodeSize.FULL}

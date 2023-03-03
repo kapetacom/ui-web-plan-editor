@@ -38,14 +38,14 @@ export class DnDHelper {
 
     @observable
     private adjustForScrollAndZoom(dimensions: Dimensions): Dimensions {
-        let zoom = this.planner.getZoom();
-        let scroll = this.planner.getScroll();
+        const zoom = this.planner.getZoom();
+        const scroll = this.planner.getScroll();
 
-        //Adjust for scroll
+        // Adjust for scroll
         dimensions.left += scroll.x;
         dimensions.top += scroll.y;
 
-        //Adjust for zoom
+        // Adjust for zoom
         dimensions.left *= zoom;
         dimensions.top *= zoom;
 
@@ -54,26 +54,31 @@ export class DnDHelper {
 
     @action
     public handleItemDragged(type: string, data: any, dimensions: Dimensions) {
-        dimensions = this.adjustForScrollAndZoom(dimensions);
+        const adjustedDimensions = this.adjustForScrollAndZoom(dimensions);
 
         switch (type) {
             case 'tool':
-                this.handleToolItemDragged(data, dimensions);
+                this.handleToolItemDragged(data, adjustedDimensions);
+                break;
+            default:
                 break;
         }
     }
 
     @action
     public handleItemDropped(type: string, data: any, dimensions: Dimensions) {
-        dimensions = this.adjustForScrollAndZoom(dimensions);
+        const adjustedDimensions = this.adjustForScrollAndZoom(dimensions);
 
         switch (type) {
             case 'tool':
-                this.handleToolItemDropped(data, dimensions);
+                this.handleToolItemDropped(data, adjustedDimensions);
                 break;
 
             case 'block':
-                this.handleBlockItemDropped(data, dimensions);
+                this.handleBlockItemDropped(data, adjustedDimensions);
+                break;
+
+            default:
                 break;
         }
     }
@@ -97,7 +102,7 @@ export class DnDHelper {
                 blockDefinition,
                 this.planner.plan
             );
-            wrapper.top = dimensions.top - 60; //Adjustment for SVG
+            wrapper.top = dimensions.top - 60; // Adjustment for SVG
             wrapper.left = dimensions.left;
 
             this.planner.plan.addBlock(wrapper);

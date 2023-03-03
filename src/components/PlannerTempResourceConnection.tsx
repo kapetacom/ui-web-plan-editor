@@ -17,10 +17,6 @@ export interface PlannerTempResourceConnectionProps {
 
 @observer
 export class PlannerTempResourceConnection extends Component<PlannerTempResourceConnectionProps> {
-    constructor(props: PlannerTempResourceConnectionProps) {
-        super(props);
-    }
-
     private get resource() {
         return this.props.selectedResource.resource;
     }
@@ -29,7 +25,7 @@ export class PlannerTempResourceConnection extends Component<PlannerTempResource
         return this.props.selectedResource.original;
     }
 
-    //path for dragging resource
+    // path for dragging resource
     calculateTempPath(toPoint: Point) {
         const fromPoint: Point = this.original.getConnectionPoint(
             this.props.size

@@ -50,10 +50,10 @@ export const BlockResource = observer((props: PlannerResourceProps) => {
 
     return (
         <g className={resourceClass}>
-            <path className={'block-resource-body'} d={hexagonPath} />
+            <path className="block-resource-body" d={hexagonPath} />
             <foreignObject
                 width={maxTextWidth}
-                className={'block-resource-text'}
+                className="block-resource-text"
                 y={padding}
                 x={textX}
             >
@@ -62,7 +62,7 @@ export const BlockResource = observer((props: PlannerResourceProps) => {
 
             <foreignObject
                 width={maxTextWidth}
-                className={'block-resource-text sub'}
+                className="block-resource-text sub"
                 y={heightWithoutPadding / 2}
                 x={textX}
             >

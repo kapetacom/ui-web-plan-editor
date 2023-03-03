@@ -24,7 +24,8 @@ function makeButtonBg(
     const size = 18;
 
     if (height > 0) {
-        height += 5; //More padding
+        // eslint-disable-next-line no-param-reassign
+        height += 5; // More padding
     }
 
     return `M ${x},${y}
@@ -78,18 +79,18 @@ export class PlannerConnectionButtons extends React.Component<
     };
 
     render() {
-        let inspectX = -25,
-            editX = 5,
-            deleteX = 35;
-        let clipHeight = 12;
-        let buttonHeight = 12;
+        let inspectX = -25;
+        const editX = 5;
+        let deleteX = 35;
+        const clipHeight = 12;
+        const buttonHeight = 12;
         let length = this.state.over ? 60 : 0;
         let x = this.state.over ? -30 : 0;
 
         const clipId = `planner_connection_buttons_${this.ix}`;
 
-        let hasMapping = true,
-            hasInspector = true;
+        let hasMapping = true;
+        let hasInspector = true;
 
         const converter = ResourceTypeProvider.getConverterFor(
             this.props.connection.fromResource.getKind(),
@@ -166,7 +167,7 @@ export class PlannerConnectionButtons extends React.Component<
         }
 
         return (
-            <g className={'buttons'}>
+            <g className="buttons">
                 <g
                     className={toClass({
                         'planner-connection-buttons': true,
@@ -180,10 +181,10 @@ export class PlannerConnectionButtons extends React.Component<
                     onMouseOver={this.onMouseOver}
                     onMouseOut={this.onMouseOut}
                 >
-                    <path className={'border'} d={bgPath} />
+                    <path className="border" d={bgPath} />
 
                     <clipPath id={clipId}>
-                        <path className={'background'} d={bgPathClip} />
+                        <path className="background" d={bgPathClip} />
                     </clipPath>
 
                     <svg clipPath={`url(#${clipId})`}>
@@ -191,9 +192,9 @@ export class PlannerConnectionButtons extends React.Component<
                             <SVGCircleButton
                                 x={editX}
                                 y={-buttonHeight}
-                                className={'warning'}
+                                className="warning"
                                 style={ButtonStyle.DEFAULT}
-                                icon={'fa fa-exclamation-triangle'}
+                                icon="fa fa-exclamation-triangle"
                                 onClick={this.props.onEdit}
                             />
                         )}
@@ -201,9 +202,9 @@ export class PlannerConnectionButtons extends React.Component<
                             <SVGCircleButton
                                 x={editX}
                                 y={-buttonHeight}
-                                className={'edit'}
+                                className="edit"
                                 style={ButtonStyle.SECONDARY}
-                                icon={'fa fa-pencil'}
+                                icon="fa fa-pencil"
                                 onClick={this.props.onEdit}
                             />
                         )}
@@ -212,9 +213,9 @@ export class PlannerConnectionButtons extends React.Component<
                             <SVGCircleButton
                                 x={inspectX}
                                 y={-buttonHeight}
-                                className={'inspect'}
+                                className="inspect"
                                 style={ButtonStyle.PRIMARY}
-                                icon={'fa fa-search'}
+                                icon="fa fa-search"
                                 onClick={this.props.onInspect}
                             />
                         )}
@@ -222,9 +223,9 @@ export class PlannerConnectionButtons extends React.Component<
                             <SVGCircleButton
                                 x={deleteX}
                                 y={-buttonHeight}
-                                className={'delete'}
+                                className="delete"
                                 style={ButtonStyle.DANGER}
-                                icon={'fa fa-trash'}
+                                icon="fa fa-trash"
                                 onClick={this.props.onDelete}
                             />
                         )}

@@ -38,7 +38,7 @@ export class PlannerResourceModelWrapper<T = any>
     @observable
     private data: ResourceKind<T>;
 
-    static GetResourceID(resource: ResourceKind) {
+    static getResourceID(resource: ResourceKind) {
         return resource.metadata.name;
     }
 
@@ -58,7 +58,7 @@ export class PlannerResourceModelWrapper<T = any>
 
     @computed
     get id() {
-        return PlannerResourceModelWrapper.GetResourceID(this.data);
+        return PlannerResourceModelWrapper.getResourceID(this.data);
     }
 
     openLinkedResource() {
@@ -86,7 +86,7 @@ export class PlannerResourceModelWrapper<T = any>
         this.block.plan
             .getConnectionsFor(this)
             .forEach((connection: PlannerConnectionModelWrapper) => {
-                connection.recalculateMapping(); //The connection will try to adjust to the changes made in the resource
+                connection.recalculateMapping(); // The connection will try to adjust to the changes made in the resource
             });
 
         this.validate();
@@ -97,7 +97,7 @@ export class PlannerResourceModelWrapper<T = any>
         return { ...toJS(this.data) };
     }
 
-    //X point calculations
+    // X point calculations
     @observable
     calculateXOffsetFromBlock() {
         const block = this.block;
@@ -147,7 +147,7 @@ export class PlannerResourceModelWrapper<T = any>
         return 0;
     }
 
-    //Y calculations
+    // Y calculations
     @observable
     calculateYOffset(size: PlannerNodeSize) {
         const block = this.block;
@@ -183,7 +183,7 @@ export class PlannerResourceModelWrapper<T = any>
         return index * resourceHeight + block.top;
     }
 
-    //point expansion
+    // point expansion
     @observable
     isExtended() {
         return (
@@ -198,7 +198,7 @@ export class PlannerResourceModelWrapper<T = any>
         );
     }
 
-    //resource connection point calculation
+    // resource connection point calculation
     @observable
     getConnectionPoint(size: PlannerNodeSize) {
         return { x: this.calculateXOffset(), y: this.calculateYOffset(size) };
@@ -240,22 +240,22 @@ export class PlannerResourceModelWrapper<T = any>
         let x = evt.pageX;
         let y = evt.pageY;
 
-        //Adjust for scroll
+        // Adjust for scroll
         if (scroll) {
             x += scroll.x;
             y += scroll.y;
         }
 
-        //Adjust for main container - hardcoded for now
+        // Adjust for main container - hardcoded for now
         x -= offset ? offset.x : 0;
         y -= offset ? offset.y : 35;
 
-        //Adjust for zoom
+        // Adjust for zoom
 
         x *= zoom;
         y *= zoom;
 
-        //Center mouse offset on element
+        // Center mouse offset on element
         x -= (width - 20) / 2;
         y -= height / 2;
 

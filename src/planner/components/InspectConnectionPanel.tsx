@@ -40,12 +40,26 @@ export class InspectConnectionPanel extends Component<
         this.state = {};
     }
 
-    private findInTrafficLines = (trafficId: string) => {
-        let exists = this.trafficLines.find((trafficLine: Traffic) => {
-            return trafficLine.id === trafficId;
-        });
-        return exists;
-    };
+    componentDidMount() {
+        this.unsubscribeAll();
+        const { connection } = this.props;
+        this.unsubscribers = [
+            TrafficService.subscribe(
+                connection.id,
+                TrafficEventType.TRAFFIC_START,
+                this.onTrafficStart
+            ),
+            TrafficService.subscribe(
+                connection.id,
+                TrafficEventType.TRAFFIC_END,
+                this.onTrafficEnd
+            ),
+        ];
+    }
+
+    componentWillUnmount() {
+        this.unsubscribeAll();
+    }
 
     @action
     private onTrafficStart = (payload: Traffic) => {
@@ -58,6 +72,13 @@ export class InspectConnectionPanel extends Component<
         if (trafficLine) {
             Object.assign(trafficLine, payload);
         }
+    };
+
+    private findInTrafficLines = (trafficId: string) => {
+        const exists = this.trafficLines.find((trafficLine: Traffic) => {
+            return trafficLine.id === trafficId;
+        });
+        return exists;
     };
 
     private unsubscribeAll() {
@@ -85,27 +106,6 @@ export class InspectConnectionPanel extends Component<
         this.modal.close();
     }
 
-    componentDidMount() {
-        this.unsubscribeAll();
-        let { connection } = this.props;
-        this.unsubscribers = [
-            TrafficService.subscribe(
-                connection.id,
-                TrafficEventType.TRAFFIC_START,
-                this.onTrafficStart
-            ),
-            TrafficService.subscribe(
-                connection.id,
-                TrafficEventType.TRAFFIC_END,
-                this.onTrafficEnd
-            ),
-        ];
-    }
-
-    componentWillUnmount() {
-        this.unsubscribeAll();
-    }
-
     renderContent() {
         const converter = ResourceTypeProvider.getConverterFor(
             this.props.connection.fromResource.getKind(),
@@ -128,7 +128,7 @@ export class InspectConnectionPanel extends Component<
         return (
             <Modal
                 ref={(ref) => (this.modal = ref)}
-                openInitially={true}
+                openInitially
                 title="Connection Traffic Inspector"
                 onClose={this.props.onClose}
                 size={ModalSize.large}

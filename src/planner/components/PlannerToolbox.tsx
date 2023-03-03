@@ -110,7 +110,7 @@ export class PlannerToolbox extends React.Component<
     render() {
         return (
             <SidePanel
-                className={'planner-toolbox-container'}
+                className="planner-toolbox-container"
                 size={PanelSize.small}
                 onClose={this.props.onClose}
                 closable={false}
@@ -121,7 +121,7 @@ export class PlannerToolbox extends React.Component<
                 <Tabs
                     className="toolbox-tabs"
                     defaultIndex={0}
-                    forceRenderTabPanel={true}
+                    forceRenderTabPanel
                 >
                     <TabList>
                         {this.props.blockStore && (
@@ -133,14 +133,10 @@ export class PlannerToolbox extends React.Component<
                     </TabList>
                     <TabPanel>
                         <div
-                            className={
-                                'consumer-resources-title resource-section'
-                            }
+                            className="consumer-resources-title resource-section"
                         >
                             <div
-                                className={
-                                    'consumer-resources resources-section-title-line'
-                                }
+                                className="consumer-resources resources-section-title-line"
                             >
                                 <div style={{ flex: 0.2 }}>
                                     <svg
@@ -179,11 +175,11 @@ export class PlannerToolbox extends React.Component<
                                         />
                                     </svg>
                                 </div>
-                                <div className={'resources-section-title'}>
+                                <div className="resources-section-title">
                                     <p>Consumers</p>
                                 </div>
                             </div>
-                            <div className={'resource-listing'}>
+                            <div className="resource-listing">
                                 {this.toolSections
                                     .filter(
                                         (section) =>
@@ -197,7 +193,7 @@ export class PlannerToolbox extends React.Component<
                                         ) => {
                                             return (
                                                 <DnDDrag
-                                                    type={'tool'}
+                                                    type="tool"
                                                     value={item.data}
                                                     key={index}
                                                 >
@@ -218,12 +214,12 @@ export class PlannerToolbox extends React.Component<
                                                                     .resourceTagHeight
                                                             }
                                                             viewBox={
-                                                                '0 0 ' +
+                                                                `0 0 ${ 
                                                                 this
-                                                                    .resourceTagWidth +
-                                                                ' ' +
+                                                                    .resourceTagWidth 
+                                                                } ${ 
                                                                 this
-                                                                    .resourceTagHeight
+                                                                    .resourceTagHeight}`
                                                             }
                                                         >
                                                             <path
@@ -238,11 +234,9 @@ export class PlannerToolbox extends React.Component<
                                                                     this
                                                                         .resourceTagAnglePercent
                                                                 )}
-                                                            ></path>
+                                                             />
                                                             <text
-                                                                className={
-                                                                    'resource-title'
-                                                                }
+                                                                className="resource-title"
                                                                 textAnchor="start"
                                                                 x="20"
                                                                 y="20"
@@ -250,9 +244,7 @@ export class PlannerToolbox extends React.Component<
                                                                 {item.title}
                                                             </text>
                                                             <text
-                                                                className={
-                                                                    'resource-type'
-                                                                }
+                                                                className="resource-type"
                                                                 textAnchor="start"
                                                                 x="20"
                                                                 y="35"
@@ -275,14 +267,10 @@ export class PlannerToolbox extends React.Component<
                             </div>
                         </div>
                         <div
-                            className={
-                                'provider-resources-title resource-section'
-                            }
+                            className="provider-resources-title resource-section"
                         >
                             <div
-                                className={
-                                    'provider-resources resources-section-title-line'
-                                }
+                                className="provider-resources resources-section-title-line"
                             >
                                 <div style={{ flex: 0.2 }}>
                                     <svg
@@ -322,11 +310,11 @@ export class PlannerToolbox extends React.Component<
                                         />
                                     </svg>
                                 </div>
-                                <div className={'resources-section-title'}>
+                                <div className="resources-section-title">
                                     <p>Providers</p>
                                 </div>
                             </div>
-                            <div className={'resource-listing'}>
+                            <div className="resource-listing">
                                 {this.toolSections
                                     .filter(
                                         (section) =>
@@ -340,7 +328,7 @@ export class PlannerToolbox extends React.Component<
                                         ) => {
                                             return (
                                                 <DnDDrag
-                                                    type={'tool'}
+                                                    type="tool"
                                                     value={item.data}
                                                     key={index}
                                                 >
@@ -361,12 +349,12 @@ export class PlannerToolbox extends React.Component<
                                                                     .resourceTagHeight
                                                             }
                                                             viewBox={
-                                                                '0 0 ' +
+                                                                `0 0 ${ 
                                                                 this
-                                                                    .resourceTagWidth +
-                                                                ' ' +
+                                                                    .resourceTagWidth 
+                                                                } ${ 
                                                                 this
-                                                                    .resourceTagHeight
+                                                                    .resourceTagHeight}`
                                                             }
                                                         >
                                                             <path
@@ -379,11 +367,9 @@ export class PlannerToolbox extends React.Component<
                                                                     this
                                                                         .resourceTagAnglePercent
                                                                 )}
-                                                            ></path>
+                                                             />
                                                             <text
-                                                                className={
-                                                                    'resource-title'
-                                                                }
+                                                                className="resource-title"
                                                                 textAnchor="start"
                                                                 x="10"
                                                                 y="18"
@@ -391,9 +377,7 @@ export class PlannerToolbox extends React.Component<
                                                                 {item.title}
                                                             </text>
                                                             <text
-                                                                className={
-                                                                    'resource-type'
-                                                                }
+                                                                className="resource-type"
                                                                 textAnchor="start"
                                                                 x="10"
                                                                 y="35"

@@ -52,7 +52,7 @@ export const BlockNode = (props: BlockNodeProps) => {
     });
     const pointSize = props.pointSize ? props.pointSize : 30;
     const clipWidth = 4;
-    const hexagonClipPath = 'hex_clip' + id;
+    const hexagonClipPath = `hex_clip${  id}`;
     const path = createHexagonPath(
         props.width,
         props.height,
@@ -87,14 +87,14 @@ export const BlockNode = (props: BlockNodeProps) => {
 
                 {props.status && (
                     <circle
-                        className={'instance_' + props.status}
+                        className={`instance_${  props.status}`}
                         r={4}
                         cx={props.width * 0.75}
                         cy={pointSize + 10}
                     />
                 )}
                 <SVGAutoSizeText
-                    className={'block-body-text instance-name'}
+                    className="block-body-text instance-name"
                     y={50}
                     x={props.width / 2}
                     lineHeight={24}
@@ -109,7 +109,7 @@ export const BlockNode = (props: BlockNodeProps) => {
                 />
 
                 <SVGAutoSizeText
-                    className={'block-body-text block-name'}
+                    className="block-body-text block-name"
                     y={85}
                     x={props.width / 2}
                     lineHeight={12}
@@ -121,7 +121,7 @@ export const BlockNode = (props: BlockNodeProps) => {
                 />
 
                 <SVGAutoSizeText
-                    className={'block-body-text block-handle'}
+                    className="block-body-text block-handle"
                     y={100}
                     x={props.width / 2}
                     lineHeight={10}
@@ -134,7 +134,7 @@ export const BlockNode = (props: BlockNodeProps) => {
 
                 {props.version && (
                     <SVGText
-                        className={'block-body-text block-version'}
+                        className="block-body-text block-version"
                         y={props.height - 24}
                         x={props.width / 2 - 4}
                         maxWidth={maxWidth}
