@@ -59,6 +59,7 @@
         "@storybook/react": "^6.5.12",
         "css-loader": "^6.7.1",
         "eslint": "^8.35.0",
+        "eslint-plugin-unused-imports": "^2.0.0",
         "json-loader": "^0.5.7",
         "less-loader": "^11.0.0",
         "prettier": "^2.8.4",
@@ -72,6 +73,12 @@
         "extends": [
             "@spotify"
         ],
+        "plugins": [
+            "unused-imports"
+        ],
+        "rules": {
+            "unused-imports/no-unused-imports": 1
+        },
         "ignorePatterns": [
             "dist/**"
         ]
