@@ -11,7 +11,6 @@ import './BlockNode.less';
 import { PlannerBlockWarningTag } from './PlannerBlockWarningTag';
 import { Guid } from 'guid-typescript';
 import { Point } from '@blockware/ui-web-types';
-import { observer } from 'mobx-react';
 
 interface BlockNodeProps {
     name: string;

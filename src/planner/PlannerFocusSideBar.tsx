@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 import {
     SidePanel,
@@ -14,7 +14,6 @@ import { BlockTree } from './components/BlockTree';
 
 import './PlannerFocusSideBar.less';
 import { observer } from 'mobx-react';
-import { runInAction } from 'mobx';
 
 interface Props {
     plan: PlannerModelWrapper;

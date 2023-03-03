@@ -2,12 +2,7 @@ import React from 'react';
 
 import { DefaultContext, Loader } from '@blockware/ui-web-components';
 import { InstanceStatus } from '@blockware/ui-web-context';
-import {
-    BlockInstanceSpec,
-    BlockKind,
-    BlockType,
-    ResourceRole,
-} from '@blockware/ui-web-types';
+import { ResourceRole } from '@blockware/ui-web-types';
 
 import {
     Planner,

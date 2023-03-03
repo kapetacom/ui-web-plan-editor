@@ -10,16 +10,7 @@ import {
     ResourceRole,
 } from '@blockware/ui-web-types';
 import { InstanceStatus } from '@blockware/ui-web-context';
-import {
-    ButtonStyle,
-    DialogControl,
-    DialogTypes,
-    DnDDrag,
-    showDelete,
-    SVGButtonDelete,
-    SVGButtonEdit,
-    SVGButtonInspect,
-} from '@blockware/ui-web-components';
+import { ButtonStyle, DnDDrag, showDelete } from '@blockware/ui-web-components';
 
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockResourceList } from './PlannerBlockResourceList';

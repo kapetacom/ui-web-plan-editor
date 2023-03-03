@@ -27,13 +27,7 @@ import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionMode
 import { SelectedResourceItem } from '../wrappers/models';
 import { asHTMLElement, DOMElement } from '@blockware/ui-web-utils';
 import { observer } from 'mobx-react';
-import {
-    action,
-    computed,
-    makeObservable,
-    observable,
-    runInAction,
-} from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 export interface PlannerTempResourceItemProps {
     selectedResource: SelectedResourceItem;

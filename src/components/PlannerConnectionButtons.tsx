@@ -1,13 +1,7 @@
 import React from 'react';
 
 import { toClass } from '@blockware/ui-web-utils';
-import {
-    SVGButtonEdit,
-    SVGButtonDelete,
-    SVGButtonWarning,
-    SVGButtonInspect,
-    ButtonStyle,
-} from '@blockware/ui-web-components';
+import { ButtonStyle } from '@blockware/ui-web-components';
 import { ResourceTypeProvider } from '@blockware/ui-web-context';
 
 import './PlannerConnectionButtons.less';

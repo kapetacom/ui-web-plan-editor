@@ -10,15 +10,7 @@ import {
 } from '@blockware/ui-web-types';
 import { toClass } from '@blockware/ui-web-utils';
 import { ResourceTypeProvider } from '@blockware/ui-web-context';
-import {
-    DialogControl,
-    SVGButtonDelete,
-    SVGButtonEdit,
-    DialogTypes,
-    SVGButtonInspect,
-    ButtonStyle,
-    showDelete,
-} from '@blockware/ui-web-components';
+import { ButtonStyle, showDelete } from '@blockware/ui-web-components';
 
 import { PlannerNodeSize } from '../types';
 import { PlannerResourceModelWrapper } from '../wrappers/PlannerResourceModelWrapper';
@@ -29,13 +21,7 @@ import { ResourceMode } from '../wrappers/wrapperHelpers';
 import { BlockResource } from './BlockResource';
 
 import './PlannerBlockResourceListItem.less';
-import {
-    action,
-    computed,
-    makeObservable,
-    observable,
-    runInAction,
-} from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 import { SVGCircleButton } from './SVGCircleButton';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources

@@ -25,7 +25,6 @@ import { parseBlockwareUri } from '@blockware/nodejs-utils';
 
 import type {
     BlockConnectionSpec,
-    BlockMetadata,
     DataWrapper,
     SchemaEntity,
     SchemaKind,

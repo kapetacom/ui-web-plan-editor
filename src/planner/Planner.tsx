@@ -19,10 +19,9 @@ import {
     showToasty,
     ToastType,
 } from '@blockware/ui-web-components';
-import type { DataWrapper, Point, Size } from '@blockware/ui-web-types';
+import type { Point, Size } from '@blockware/ui-web-types';
 import {
     AssetService,
-    BlockService,
     FailedBlockMessage,
     InstanceEventType,
     InstanceService,
