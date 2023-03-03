@@ -67,7 +67,6 @@ export const PlannerFocusSideBar = observer((props: Props) => {
                     onBlockClicked={(block) => {
                         props.onFocusChange(block);
                     }}
-                    plan={props.plan}
                     block={props.block}
                 />
             )}
