@@ -77,7 +77,8 @@
             "unused-imports"
         ],
         "rules": {
-            "unused-imports/no-unused-imports": 1
+            "react/no-unused-prop-types": "error",
+            "unused-imports/no-unused-imports": "error"
         },
         "ignorePatterns": [
             "dist/**"

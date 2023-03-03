@@ -29,10 +29,8 @@ interface PlannerConnectionProps {
     className?: string;
     connection?: PlannerConnectionModelWrapper;
     path?: string | null;
-    readOnly?: boolean;
     viewOnly?: boolean;
     onFocus?: () => void;
-    focusBlock?: PlannerBlockModelWrapper;
     onDelete?: (connection: PlannerConnectionModelWrapper) => void;
     setItemToEdit?: (
         res: DataWrapper<BlockConnectionSpec>,
@@ -177,7 +175,6 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
                             <PlannerConnectionButtons
                                 connection={this.props.connection}
                                 open={this.buttonsVisible}
-                                readOnly={this.props.readOnly}
                                 x={middlePoint.x}
                                 y={middlePoint.y}
                                 onDelete={this.handleDeleteClick}
