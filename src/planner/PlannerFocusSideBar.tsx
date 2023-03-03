@@ -8,15 +8,12 @@ import {
 } from '@blockware/ui-web-components';
 
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
-import { PlannerModelWrapper } from '../wrappers/PlannerModelWrapper';
 
 import { BlockTree } from './components/BlockTree';
 
 import './PlannerFocusSideBar.less';
-import { observer } from 'mobx-react';
 
 interface Props {
-    plan: PlannerModelWrapper;
     block?: PlannerBlockModelWrapper;
     blurFocus: () => void;
     onBlockItemHover: (block?: PlannerBlockModelWrapper) => void;
@@ -24,7 +21,7 @@ interface Props {
     onFocusChange: (block: PlannerBlockModelWrapper) => void;
 }
 
-export const PlannerFocusSideBar = observer((props: Props) => {
+export const PlannerFocusSideBar = (props: Props) => {
     return (
         <SidePanel
             title="Blocks in view"
@@ -62,7 +59,6 @@ export const PlannerFocusSideBar = observer((props: Props) => {
         >
             {props.block && (
                 <BlockTree
-                    key={props.plan.focusedBlock?.id}
                     onBlockItemHover={props.onBlockItemHover}
                     onBlockClicked={(block) => {
                         props.onFocusChange(block);
@@ -72,4 +68,4 @@ export const PlannerFocusSideBar = observer((props: Props) => {
             )}
         </SidePanel>
     );
-});
+};
