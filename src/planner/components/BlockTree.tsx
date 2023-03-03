@@ -3,13 +3,11 @@ import { ResourceRole } from '@blockware/ui-web-types';
 import { ResourceTypeProvider } from '@blockware/ui-web-context';
 
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
-import { PlannerModelWrapper } from '../../wrappers/PlannerModelWrapper';
 import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
 import { ResourceMode } from '../../wrappers/wrapperHelpers';
 
 export interface Props {
     block: PlannerBlockModelWrapper;
-    plan: PlannerModelWrapper;
     onBlockClicked: (block: PlannerBlockModelWrapper) => void;
     onBlockItemHover: (block?: PlannerBlockModelWrapper) => void;
 }
