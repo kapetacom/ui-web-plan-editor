@@ -25,8 +25,8 @@ const INITIAL_POINTS = [
 
 export const PlannerBlockWarningTag = (props: PlannerBlockWarningTagProps) => {
     const [id] = useState(Guid.create().toString());
-    const warningTag = `warning-tag_${  id}`;
-    const warningTagSign = `warning-tag-sign_${  id}`;
+    const warningTag = `warning-tag_${id}`;
+    const warningTagSign = `warning-tag-sign_${id}`;
     return (
         <svg x="88" y="5" fill="none" filter="url(#banner-shadow)">
             <defs>
@@ -80,7 +80,7 @@ export const PlannerBlockWarningTag = (props: PlannerBlockWarningTagProps) => {
                 </>
             )}
             <animate
-                xlinkHref={`#${  warningTag}`}
+                xlinkHref={`#${warningTag}`}
                 attributeName="d"
                 from={SVGCornersHelper.createRoundedPathString(
                     INITIAL_POINTS,
@@ -92,7 +92,7 @@ export const PlannerBlockWarningTag = (props: PlannerBlockWarningTagProps) => {
                 to={SVGCornersHelper.createRoundedPathString(END_POINTS, 2)}
             />
             <animate
-                xlinkHref={`#warning-tag-sign_${  props.blockName}`}
+                xlinkHref={`#warning-tag-sign_${props.blockName}`}
                 attributeName="opacity"
                 values="0;1;0;1"
                 keyTimes="0;0.3;0.6;1"

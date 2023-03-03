@@ -132,12 +132,8 @@ export class PlannerToolbox extends React.Component<
                         )}
                     </TabList>
                     <TabPanel>
-                        <div
-                            className="consumer-resources-title resource-section"
-                        >
-                            <div
-                                className="consumer-resources resources-section-title-line"
-                            >
+                        <div className="consumer-resources-title resource-section">
+                            <div className="consumer-resources resources-section-title-line">
                                 <div style={{ flex: 0.2 }}>
                                     <svg
                                         width="24"
@@ -213,14 +209,7 @@ export class PlannerToolbox extends React.Component<
                                                                 this
                                                                     .resourceTagHeight
                                                             }
-                                                            viewBox={
-                                                                `0 0 ${ 
-                                                                this
-                                                                    .resourceTagWidth 
-                                                                } ${ 
-                                                                this
-                                                                    .resourceTagHeight}`
-                                                            }
+                                                            viewBox={`0 0 ${this.resourceTagWidth} ${this.resourceTagHeight}`}
                                                         >
                                                             <path
                                                                 d={SVGCornersHelper.getResourceTagPath(
@@ -234,7 +223,7 @@ export class PlannerToolbox extends React.Component<
                                                                     this
                                                                         .resourceTagAnglePercent
                                                                 )}
-                                                             />
+                                                            />
                                                             <text
                                                                 className="resource-title"
                                                                 textAnchor="start"
@@ -266,12 +255,8 @@ export class PlannerToolbox extends React.Component<
                                     )}
                             </div>
                         </div>
-                        <div
-                            className="provider-resources-title resource-section"
-                        >
-                            <div
-                                className="provider-resources resources-section-title-line"
-                            >
+                        <div className="provider-resources-title resource-section">
+                            <div className="provider-resources resources-section-title-line">
                                 <div style={{ flex: 0.2 }}>
                                     <svg
                                         width="24"
@@ -348,14 +333,7 @@ export class PlannerToolbox extends React.Component<
                                                                 this
                                                                     .resourceTagHeight
                                                             }
-                                                            viewBox={
-                                                                `0 0 ${ 
-                                                                this
-                                                                    .resourceTagWidth 
-                                                                } ${ 
-                                                                this
-                                                                    .resourceTagHeight}`
-                                                            }
+                                                            viewBox={`0 0 ${this.resourceTagWidth} ${this.resourceTagHeight}`}
                                                         >
                                                             <path
                                                                 d={SVGCornersHelper.getResourceTag3_25(
@@ -367,7 +345,7 @@ export class PlannerToolbox extends React.Component<
                                                                     this
                                                                         .resourceTagAnglePercent
                                                                 )}
-                                                             />
+                                                            />
                                                             <text
                                                                 className="resource-title"
                                                                 textAnchor="start"

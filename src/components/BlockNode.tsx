@@ -52,7 +52,7 @@ export const BlockNode = (props: BlockNodeProps) => {
     });
     const pointSize = props.pointSize ? props.pointSize : 30;
     const clipWidth = 4;
-    const hexagonClipPath = `hex_clip${  id}`;
+    const hexagonClipPath = `hex_clip${id}`;
     const path = createHexagonPath(
         props.width,
         props.height,
@@ -87,7 +87,7 @@ export const BlockNode = (props: BlockNodeProps) => {
 
                 {props.status && (
                     <circle
-                        className={`instance_${  props.status}`}
+                        className={`instance_${props.status}`}
                         r={4}
                         cx={props.width * 0.75}
                         cy={pointSize + 10}

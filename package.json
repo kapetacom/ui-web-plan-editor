@@ -72,6 +72,8 @@
         "extends": [
             "@spotify"
         ],
-        "ignorePatterns": ["dist/**"]
+        "ignorePatterns": [
+            "dist/**"
+        ]
     }
 }

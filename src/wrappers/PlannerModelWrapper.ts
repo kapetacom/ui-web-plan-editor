@@ -277,7 +277,7 @@ export class PlannerModelWrapper {
         let resourceName = fromResource.getName();
 
         while (toBlock.findResourceById(ResourceRole.CONSUMES, resourceName)) {
-            resourceName = `${fromResource.getName()  }_${  counter}`;
+            resourceName = `${fromResource.getName()}_${counter}`;
             counter++;
         }
         const fromBlock = fromResource.block;
@@ -310,8 +310,8 @@ export class PlannerModelWrapper {
             }
 
             let conflictingEntity;
-                let conflictCount = 1;
-                const originalName = entity.name;
+            let conflictCount = 1;
+            const originalName = entity.name;
             do {
                 // Check if an entity exists of the same name - but different properties
                 conflictingEntity = toBlock.getConflictingEntity(
@@ -321,7 +321,7 @@ export class PlannerModelWrapper {
 
                 if (conflictingEntity) {
                     // We need to rename the new entity and all references to it to be able to add it to the target block.
-                    entity.name = `${originalName  }_${  conflictCount}`;
+                    entity.name = `${originalName}_${conflictCount}`;
                     conflictCount++;
                 }
             } while (conflictingEntity);
