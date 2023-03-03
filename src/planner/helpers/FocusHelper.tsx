@@ -293,7 +293,6 @@ export class FocusHelper {
                 onBlockItemHover={props.onNeighboringBlockHover}
                 onFocusChange={props.setFocusZoom}
                 blurFocus={close}
-                plan={this.plan}
                 onClose={close}
             />
         );
