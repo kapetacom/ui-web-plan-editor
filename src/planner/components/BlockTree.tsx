@@ -6,8 +6,6 @@ import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrappe
 import { PlannerModelWrapper } from '../../wrappers/PlannerModelWrapper';
 import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
 import { ResourceMode } from '../../wrappers/wrapperHelpers';
-import { observer } from 'mobx-react';
-import { action, makeObservable, observable } from 'mobx';
 
 export interface Props {
     block: PlannerBlockModelWrapper;
@@ -16,18 +14,16 @@ export interface Props {
     onBlockItemHover: (block?: PlannerBlockModelWrapper) => void;
 }
 
-@observer
-export class BlockTree extends React.Component<Props> {
-    @observable
-    private hoveredBlock?: PlannerBlockModelWrapper = undefined;
+export interface State {
+    hoveredBlock?: PlannerBlockModelWrapper;
+}
 
+export class BlockTree extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
-
-        makeObservable(this);
+        this.state = {};
     }
 
-    @observable
     private getBlockIcon(block: PlannerBlockModelWrapper) {
         if (block.id === this.props.block.id) {
             return (
@@ -66,7 +62,6 @@ export class BlockTree extends React.Component<Props> {
         );
     }
 
-    @observable
     private getResourceIcon(resource: PlannerResourceModelWrapper) {
         const resourceConfig = ResourceTypeProvider.get(resource.getKind());
         const type = resourceConfig.type.toString().toLowerCase();
@@ -110,9 +105,8 @@ export class BlockTree extends React.Component<Props> {
         );
     }
 
-    @action
     private showResourcesFor = (block?: PlannerBlockModelWrapper) => {
-        this.hoveredBlock = block;
+        this.setState({ hoveredBlock: block });
     };
 
     public render() {
@@ -144,8 +138,8 @@ export class BlockTree extends React.Component<Props> {
                             >
                                 {this.getBlockIcon(block)}
                                 <div className="block-name">{block.name} </div>
-                                {this.hoveredBlock &&
-                                    this.hoveredBlock.id === block.id &&
+                                {this.state.hoveredBlock &&
+                                    this.state.hoveredBlock.id === block.id &&
                                     [
                                         ...block.getResources(
                                             ResourceRole.CONSUMES
