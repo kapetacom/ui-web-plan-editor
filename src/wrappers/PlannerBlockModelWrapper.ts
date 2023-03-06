@@ -155,8 +155,8 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
     @action
     async setVersion(version: string): Promise<void> {
-        this.blockReferenceUri.version = version;
-        this.blockReference.ref = this.blockReferenceUri.id;
+        this.blockReferenceUri!.version = version;
+        this.blockReference.ref = this.blockReferenceUri!.id;
         const block = await BlockService.get(this.blockReference.ref);
         this.setData(block.data);
     }
@@ -238,6 +238,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     setFocus(focus: boolean) {
         this.focused = focus;
     }
+    v;
 
     @observable
     isFocused() {
