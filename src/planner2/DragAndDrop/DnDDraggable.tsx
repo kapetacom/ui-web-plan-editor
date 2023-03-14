@@ -41,6 +41,9 @@ const getDragEvent = (
     start: initialPosition,
 });
 
+const zeroPosition = { x: 0, y: 0 };
+const zeroDragEvent = getDragEvent(zeroPosition, zeroPosition);
+
 export const DnDDraggable: React.FC<DnDDraggableProps> = ({
     onDragStart,
     onDrag,
@@ -51,10 +54,10 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
     // Track state here, use state callbacks to ensure consistency
     const ctx = useContext(DnDContext);
     const [state, setState] = useState<{
-        position: PositionDiff;
+        dragEvent: DragEventInfo;
         status: DragStatus;
     }>({
-        position: { x: 0, y: 0 },
+        dragEvent: zeroDragEvent,
         status: DragStatus.IDLE,
     });
 
@@ -64,14 +67,14 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
                 x: downEvt.clientX,
                 y: downEvt.clientY,
             };
-
             const initialDragEvt = getDragEvent(
                 initialPosition,
                 initialPosition
             );
+
             setState({
                 status: DragStatus.DRAGGING,
-                position: initialDragEvt.diff,
+                dragEvent: initialDragEvt,
             });
             ctx.callbacks.onDragStart(data, initialDragEvt);
 
@@ -82,10 +85,8 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
                 );
                 setState({
                     status: DragStatus.DRAGGING,
-                    position: dragEvt.diff,
+                    dragEvent: dragEvt,
                 });
-
-                ctx.callbacks.onDrag(data, dragEvt);
             };
             const onMouseUp = (evt: MouseEvent) => {
                 const dragEvt = getDragEvent(
@@ -94,12 +95,10 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
                 );
 
                 setState({
-                    position: dragEvt.diff,
+                    dragEvent: dragEvt,
                     status: DragStatus.DROPPED,
                 });
-
                 window.removeEventListener('mousemove', onMouseMove);
-                ctx.callbacks.onDrop(data, dragEvt);
             };
             window.addEventListener('mousemove', onMouseMove);
             window.addEventListener('mouseup', onMouseUp, {
@@ -119,10 +118,13 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
 
     // Callback when position changes
     useEffect(() => {
-        if (isDragging && onDrag) {
-            onDrag(state.position);
+        if (isDragging) {
+            if (onDrag) {
+                onDrag(state.dragEvent.diff);
+            }
+            ctx.callbacks.onDrag(data, state.dragEvent);
         }
-    }, [state.position, isDragging, onDrag]);
+    });
 
     // Callback when a drag ends, then reset the state
     const isDropped = state.status === DragStatus.DROPPED;
@@ -130,19 +132,22 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
         if (isDropped) {
             // Wait with resetting the position state, so the state is consistent when triggering onDrop
             if (onDrop) {
-                onDrop(state.position);
+                onDrop(state.dragEvent.diff);
             }
+            ctx.callbacks.onDrop(data, state.dragEvent);
+
+            // Reset
             setState({
-                position: { x: 0, y: 0 },
+                dragEvent: zeroDragEvent,
                 status: DragStatus.IDLE,
             });
         }
-    }, [state.position, isDropped, onDrop]);
+    }, [state.dragEvent, ctx.callbacks, isDropped, onDrop, data]);
 
     // get single child
     return children({
         isDragging,
-        position: state.position,
+        position: state.dragEvent.diff,
         componentProps: { onMouseDown: mouseDownHandler },
     });
 };
