@@ -15,7 +15,7 @@ export const DnDContainer = <T extends unknown>(props) => {
         position: PositionDiff;
     }>(defaultState);
 
-    const isDragging = dragState.state === 'IDLE';
+    const isDragging = dragState.state !== 'IDLE';
 
     const { dzManager, callbacks } = useMemo(() => {
         return {

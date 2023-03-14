@@ -16,7 +16,7 @@ export const useDropZone = <T,>({
     onDragLeave,
     onDragEnter,
 }: DropZoneProps<T>) => {
-    const id = useMemo(() => `${Math.random() * 200}`, []);
+    const id = useMemo(() => crypto.randomUUID(), []);
     const { callbacks } = useContext(DnDContext);
     const [element, setElement] = useState<HTMLElement | null>(null);
 
