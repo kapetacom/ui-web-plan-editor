@@ -45,7 +45,7 @@
         "react-use": ">=17"
     },
     "dependencies": {
-        "@blockware/nodejs-utils": "<2",
+        "@blockware/nodejs-utils": ">=0.0.3 <2",
         "@types/lodash": "^4.14.185",
         "@types/node": "^18.7.18",
         "@types/react": ">=18",

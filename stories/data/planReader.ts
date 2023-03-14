@@ -2,6 +2,7 @@ import { PlannerModelReader } from '../../src/planner/PlannerModelReader';
 import { BlockServiceMock } from './BlockServiceMock';
 import { PlannerData } from './PlannerData';
 import { PlannerModelWrapper } from '../../src';
+import { Asset, BlockKind, PlanKind } from '@blockware/ui-web-types';
 
 export function readPlan(): Promise<PlannerModelWrapper> {
     const reader = new PlannerModelReader(BlockServiceMock);
@@ -12,4 +13,18 @@ export function readPlan(): Promise<PlannerModelWrapper> {
         console.error('Failed to get mock plan', e);
         throw e;
     }
+}
+
+export async function readPlanV2(): Promise<{
+    plan: PlanKind;
+    blockAssets: Asset<BlockKind>[];
+}> {
+    for (const block of PlannerData.spec.blocks || []) {
+        await BlockServiceMock.get(block.block.ref);
+    }
+
+    return {
+        plan: PlannerData,
+        blockAssets: await BlockServiceMock.list(),
+    };
 }

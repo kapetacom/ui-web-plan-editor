@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { MouseEventHandler, useState } from 'react';
 import {
     createHexagonPath,
     Orientation,
@@ -27,6 +27,7 @@ interface BlockNodeProps {
     readOnly?: boolean;
     blockRef?: (elm: SVGPathElement) => void;
     onInstanceNameChange?: (newName: string) => void;
+    onMouseDown?: MouseEventHandler;
 }
 
 export const BlockNode = (props: BlockNodeProps) => {
@@ -68,7 +69,7 @@ export const BlockNode = (props: BlockNodeProps) => {
     );
 
     return (
-        <>
+        <g onMouseDown={props.onMouseDown}>
             <clipPath id={hexagonClipPath}>
                 <path x={20} d={clipPath} fill="transparent" />
             </clipPath>
@@ -141,6 +142,6 @@ export const BlockNode = (props: BlockNodeProps) => {
                     />
                 )}
             </g>
-        </>
+        </g>
     );
 };
