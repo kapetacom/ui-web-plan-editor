@@ -4,24 +4,32 @@ import { DragAndDrop } from './DragAndDrop';
 import { useBoundingBox } from './hooks/boundingBox';
 import { calculateCanvasSize } from './utils/planUtils';
 import { toClass } from '@blockware/ui-web-utils';
-import { DragEventInfo } from './DragAndDrop/types';
+import { PositionDiff } from './DragAndDrop/types';
 import { BlockInstanceSpec } from '@blockware/ui-web-types';
+import { ZoomButtons } from '../components/ZoomButtons';
 
 const blockPositionUpdater =
-    (dragEvent: DragEventInfo) => (block: BlockInstanceSpec) => {
+    (diff: PositionDiff, zoom: number) => (block: BlockInstanceSpec) => {
         return {
             ...block,
             dimensions: {
                 ...block.dimensions!,
-                top: block.dimensions!.top + dragEvent.diff.y,
-                left: block.dimensions!.left + dragEvent.diff.x,
+                top: block.dimensions!.top + diff.y / zoom,
+                left: block.dimensions!.left + diff.x / zoom,
             },
         };
     };
 
 export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
-    const { size, zoom, mode, blockAssets, plan, updateBlockInstance } =
-        useContext(PlannerContext);
+    const {
+        size,
+        zoom,
+        setZoomLevel,
+        mode,
+        blockAssets,
+        plan,
+        updateBlockInstance,
+    } = useContext(PlannerContext);
 
     const classNames = toClass({
         'read-only': mode === PlannerMode.VIEW,
@@ -53,7 +61,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                         onDrop={(draggable, dragEvent) => {
                             updateBlockInstance(
                                 draggable.id,
-                                blockPositionUpdater(dragEvent)
+                                blockPositionUpdater(dragEvent.diff, zoom)
                             );
                         }}
                     >
@@ -62,7 +70,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                                 className="planner-area-canvas"
                                 style={{
                                     ...canvasSize,
-                                    transform: `scale(${1 / zoom})`,
+                                    transform: `scale(${zoom})`,
                                 }}
                                 ref={zoneRef}
                             >
@@ -71,6 +79,17 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                         )}
                     </DragAndDrop.DropZone>
                 </div>
+
+                <ZoomButtons
+                    currentZoom={zoom}
+                    onZoomIn={() =>
+                        setZoomLevel((currentZoom) => currentZoom + 0.25)
+                    }
+                    onZoomOut={() =>
+                        setZoomLevel((currentZoom) => currentZoom - 0.25)
+                    }
+                    onZoomReset={() => setZoomLevel(1)}
+                />
             </div>
         </div>
     );

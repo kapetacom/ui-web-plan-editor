@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
-    const { plan } = useContext(PlannerContext);
+    const { plan, zoom } = useContext(PlannerContext);
     const {
         blockInstance,
         instanceBlockHeight,
@@ -48,9 +48,11 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
                     className="planner-block-node-container"
                     style={{
                         left: `${
-                            blockInstance.dimensions!.left + position.x
+                            blockInstance.dimensions!.left + position.x / zoom
                         }px`,
-                        top: `${blockInstance.dimensions!.top + position.y}px`,
+                        top: `${
+                            blockInstance.dimensions!.top + position.y / zoom
+                        }px`,
                     }}
                     x={blockInstance.dimensions!.left}
                     y={blockInstance.dimensions!.top}

@@ -1,4 +1,4 @@
-import React, { Context, useEffect, useMemo, useState } from 'react';
+import React, { Context, useEffect, useState } from 'react';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import {
     Asset,
@@ -23,6 +23,7 @@ export interface PlannerContextData {
     focusedBlock?: PlannerBlockModelWrapper;
     mode?: PlannerMode;
     zoom: number;
+    setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
     size: PlannerNodeSize;
     getBlockByRef(ref: string): BlockKind | undefined;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
@@ -36,6 +37,7 @@ const defaultValue: PlannerContextData = {
     zoom: 1,
     size: PlannerNodeSize.MEDIUM,
     blockAssets: [],
+    setZoomLevel() {},
     getBlockByRef(_ref: string) {
         return undefined;
     },
@@ -57,63 +59,61 @@ const usePlannerContext = ({
     blockAssets: Asset<BlockKind>[];
     mode: PlannerMode;
 }): PlannerContextData => {
-    // focus block
+    // region View state
     const [focusedBlock, setFocusedBlock] =
         useState<PlannerBlockModelWrapper>();
+    const [viewMode, setViewMode] = useState(mode);
+    const [zoom, setZoomLevel] = useState(1);
+    // zoom
+    // size
+    // endregion
 
     const [currentPlan, setCurrentPlan] = useState(plan);
     useEffect(() => {
         setCurrentPlan(plan);
     }, [plan]);
 
-    const [viewMode, setViewMode] = useState(mode);
-
-    // zoom
-    // size
-
     // Plan:
     // connections
 
-    return useMemo(
-        () => ({
-            // view state
-            focusedBlock,
-            zoom: 1,
-            size: PlannerNodeSize.MEDIUM,
-            //
-            mode: viewMode,
-            //
-            plan: currentPlan,
-            blockAssets,
-            getBlockByRef(ref: string) {
-                const blockAsset = blockAssets.find((asset) =>
-                    parseBlockwareUri(asset.ref).compare(parseBlockwareUri(ref))
-                );
-                return blockAsset?.data;
-            },
-            updateBlockInstance(blockId: string, updater) {
-                // Use state callback to reference the previous state (avoid stale ref)
-                setCurrentPlan((prevState) => {
-                    const newPlan = cloneDeep(prevState);
-                    const blockIx =
-                        newPlan.spec.blocks?.findIndex(
-                            (pblock) => pblock.id === blockId
-                        ) ?? -1;
-                    if (blockIx === -1) {
-                        throw new Error(`Block #${blockId} not found`);
-                    }
+    return {
+        // view state
+        focusedBlock,
+        zoom,
+        setZoomLevel,
+        size: PlannerNodeSize.MEDIUM,
+        //
+        mode: viewMode,
+        //
+        plan: currentPlan,
+        blockAssets,
+        getBlockByRef(ref: string) {
+            const blockAsset = blockAssets.find((asset) =>
+                parseBlockwareUri(asset.ref).compare(parseBlockwareUri(ref))
+            );
+            return blockAsset?.data;
+        },
+        updateBlockInstance(blockId: string, updater) {
+            // Use state callback to reference the previous state (avoid stale ref)
+            setCurrentPlan((prevState) => {
+                const newPlan = cloneDeep(prevState);
+                const blockIx =
+                    newPlan.spec.blocks?.findIndex(
+                        (pblock) => pblock.id === blockId
+                    ) ?? -1;
+                if (blockIx === -1) {
+                    throw new Error(`Block #${blockId} not found`);
+                }
 
-                    const blocks = (newPlan.spec.blocks =
-                        newPlan.spec.blocks || []);
-                    blocks[blockIx] = updater(blocks[blockIx]);
-                    return newPlan;
-                });
+                const blocks = (newPlan.spec.blocks =
+                    newPlan.spec.blocks || []);
+                blocks[blockIx] = updater(blocks[blockIx]);
+                return newPlan;
+            });
 
-                // TODO: Save to disk / callback
-            },
-        }),
-        [focusedBlock, currentPlan, blockAssets, viewMode]
-    );
+            // TODO: Save to disk / callback
+        },
+    };
 };
 
 export const PlannerContextProvider: React.FC<
