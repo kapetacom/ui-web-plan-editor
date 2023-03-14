@@ -98,8 +98,9 @@ const usePlannerContext = ({
                     const blockIx =
                         newPlan.spec.blocks?.findIndex(
                             (pblock) => pblock.id === blockId
-                        ) || -1;
+                        ) ?? -1;
                     if (blockIx === -1) {
+                        debugger;
                         throw new Error(`Block #${blockId} not found`);
                     }
 
