@@ -36,6 +36,7 @@ export class DropZoneManager {
             zone,
             state: 'IDLE',
         };
+        entry.zone = zone;
         if (!this.zones.includes(entry)) {
             this.zones.push(entry);
         }
