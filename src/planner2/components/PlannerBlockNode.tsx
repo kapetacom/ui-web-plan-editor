@@ -48,10 +48,10 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
                     className="planner-block-node-container"
                     style={{
                         left: `${
-                            blockInstance.dimensions!.left + position.x * zoom
+                            blockInstance.dimensions!.left + position.x / zoom
                         }px`,
                         top: `${
-                            blockInstance.dimensions!.top + position.y * zoom
+                            blockInstance.dimensions!.top + position.y / zoom
                         }px`,
                     }}
                     x={blockInstance.dimensions!.left}

@@ -14,8 +14,8 @@ const blockPositionUpdater =
             ...block,
             dimensions: {
                 ...block.dimensions!,
-                top: block.dimensions!.top + diff.y * zoom,
-                left: block.dimensions!.left + diff.x * zoom,
+                top: block.dimensions!.top + diff.y / zoom,
+                left: block.dimensions!.left + diff.x / zoom,
             },
         };
     };
@@ -70,7 +70,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                                 className="planner-area-canvas"
                                 style={{
                                     ...canvasSize,
-                                    transform: `scale(${1 / zoom})`,
+                                    transform: `scale(${zoom})`,
                                 }}
                                 ref={zoneRef}
                             >
@@ -83,10 +83,10 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                 <ZoomButtons
                     currentZoom={zoom}
                     onZoomIn={() =>
-                        setZoomLevel((currentZoom) => currentZoom - 0.25)
+                        setZoomLevel((currentZoom) => currentZoom + 0.25)
                     }
                     onZoomOut={() =>
-                        setZoomLevel((currentZoom) => currentZoom + 0.25)
+                        setZoomLevel((currentZoom) => currentZoom - 0.25)
                     }
                     onZoomReset={() => setZoomLevel(1)}
                 />
