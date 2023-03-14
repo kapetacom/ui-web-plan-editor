@@ -12,6 +12,7 @@ import { PlannerCanvas } from './PlannerCanvas';
 interface Props {
     plan: PlanKind;
     blockAssets: Asset<BlockKind>[];
+    // eslint-disable-next-line react/no-unused-prop-types
     systemId: string;
     mode?: PlannerMode;
     size?: PlannerNodeSize;

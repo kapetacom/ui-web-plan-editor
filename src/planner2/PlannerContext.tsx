@@ -112,7 +112,7 @@ const usePlannerContext = ({
                 // TODO: Save to disk / callback
             },
         }),
-        [focusedBlock, currentPlan, blockAssets]
+        [focusedBlock, currentPlan, blockAssets, viewMode]
     );
 };
 

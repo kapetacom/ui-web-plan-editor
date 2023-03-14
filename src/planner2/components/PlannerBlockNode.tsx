@@ -71,6 +71,7 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
                         <BlockNode
                             name={blockInstance.name}
                             instanceName={blockInstance.name}
+                            // eslint-disable-next-line no-console
                             onInstanceNameChange={(name) => console.log(name)}
                             readOnly={viewOnly}
                             // TODO: Move this to block context

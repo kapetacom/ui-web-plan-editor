@@ -42,7 +42,7 @@ export const useDropZone = <T,>({
             //     Cleanup only
             callbacks.unregisterDropZone(id);
         },
-        [id]
+        [callbacks, id]
     );
 
     return {
