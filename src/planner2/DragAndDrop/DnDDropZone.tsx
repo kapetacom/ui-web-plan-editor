@@ -1,21 +1,58 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DropZoneEntity } from './DropZoneManager';
 import { DnDContext } from './DnDContext';
 
+type ScrollOffset = { top: number; left: number };
+class DnDZoneInstance {
+    private _listeners: ((offset: ScrollOffset) => void)[] = [];
+    scale = 1;
+    scrollOffset: ScrollOffset = { top: 0, left: 0 };
+
+    setOffset(offset: ScrollOffset) {
+        this.scrollOffset = offset;
+        this._listeners.forEach((listener) => listener(offset));
+    }
+
+    onScrollChange(callback: (offset: ScrollOffset) => void) {
+        this._listeners.push(callback);
+        return () => {
+            this._listeners.splice(this._listeners.indexOf(callback), 1);
+        };
+    }
+
+    getZoneCoordinates(coords: { y: number; x: number }) {
+        return {
+            x: coords.x + this.scrollOffset.left,
+            y: coords.y + this.scrollOffset.top,
+        };
+    }
+}
+export const DnDZoneContext = React.createContext(new DnDZoneInstance());
+
 interface DropZoneProps<T> {
+    scale?: number;
     accept?: DropZoneEntity<T>['accept'];
     onDragEnter?: DropZoneEntity<T>['onDragEnter'];
     onDragLeave?: DropZoneEntity<T>['onDragLeave'];
     onDragOver?: DropZoneEntity<T>['onDragOver'];
     onDrop?: DropZoneEntity<T>['onDrop'];
 }
-export const useDropZone = <T,>({
+
+export const DnDDropZone: <T>(
+    props: DropZoneProps<T> & {
+        children: (props: {
+            onRef: (elm: HTMLElement | null) => void;
+        }) => JSX.Element;
+    }
+) => JSX.Element = ({
+    scale = 1,
     accept,
     onDrop,
     onDragOver,
     onDragLeave,
     onDragEnter,
-}: DropZoneProps<T>) => {
+    children,
+}) => {
     const id = useMemo(() => crypto.randomUUID(), []);
     const { callbacks } = useContext(DnDContext);
     const [element, setElement] = useState<HTMLElement | null>(null);
@@ -45,16 +82,23 @@ export const useDropZone = <T,>({
         [callbacks, id]
     );
 
-    return {
-        onRef,
-    };
-};
+    const instance = useMemo(() => new DnDZoneInstance(), []);
+    useEffect(() => {
+        const cb = () => {
+            instance.setOffset({
+                top: element?.scrollTop || 0,
+                left: element?.scrollLeft || 0,
+            });
+        };
+        element?.addEventListener('scroll', cb);
+        return () => element?.removeEventListener('scroll', cb);
+    }, [element, instance]);
 
-export const DnDDropZone: <T>(
-    props: Parameters<typeof useDropZone<T>>[0] & {
-        children: (props: ReturnType<typeof useDropZone<T>>) => JSX.Element;
-    }
-) => JSX.Element = (props) => {
-    const zone = useDropZone(props);
-    return props.children(zone);
+    return (
+        <DnDZoneContext.Provider value={instance}>
+            {children({
+                onRef,
+            })}
+        </DnDZoneContext.Provider>
+    );
 };

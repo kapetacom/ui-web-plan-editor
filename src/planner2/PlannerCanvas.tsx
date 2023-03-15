@@ -52,33 +52,33 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
     return (
         <div className={`planner-area-container ${classNames}`}>
             <div className="planner-area-position-parent" ref={onRef}>
-                <div className="planner-area-scroll">
-                    <DragAndDrop.DropZone<{ id: string }>
-                        accept={(draggable) => {
-                            // Filter types
-                            return true;
-                        }}
-                        onDrop={(draggable, dragEvent) => {
-                            updateBlockInstance(
-                                draggable.id,
-                                blockPositionUpdater(dragEvent.diff, zoom)
-                            );
-                        }}
-                    >
-                        {({ onRef: zoneRef }) => (
+                <DragAndDrop.DropZone<{ id: string }>
+                    scale={zoom}
+                    accept={(draggable) => {
+                        // Filter types
+                        return true;
+                    }}
+                    onDrop={(draggable, dragEvent) => {
+                        updateBlockInstance(
+                            draggable.id,
+                            blockPositionUpdater(dragEvent.diff, zoom)
+                        );
+                    }}
+                >
+                    {({ onRef: zoneRef }) => (
+                        <div className="planner-area-scroll" ref={zoneRef}>
                             <div
                                 className="planner-area-canvas"
                                 style={{
                                     ...canvasSize,
                                     transform: `scale(${zoom})`,
                                 }}
-                                ref={zoneRef}
                             >
                                 {props.children}
                             </div>
-                        )}
-                    </DragAndDrop.DropZone>
-                </div>
+                        </div>
+                    )}
+                </DragAndDrop.DropZone>
 
                 <ZoomButtons
                     currentZoom={zoom}
