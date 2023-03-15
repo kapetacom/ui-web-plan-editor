@@ -2,9 +2,23 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DropZoneEntity } from './DropZoneManager';
 import { DnDContext } from './DnDContext';
 
+type ScrollOffset = { top: number; left: number };
 class DnDZoneInstance {
+    private _listeners: ((offset: ScrollOffset) => void)[] = [];
     scale = 1;
-    scrollOffset = { top: 0, left: 0 };
+    scrollOffset: ScrollOffset = { top: 0, left: 0 };
+
+    setOffset(offset: ScrollOffset) {
+        this.scrollOffset = offset;
+        this._listeners.forEach((listener) => listener(offset));
+    }
+
+    onScrollChange(callback: (offset: ScrollOffset) => void) {
+        this._listeners.push(callback);
+        return () => {
+            this._listeners.splice(this._listeners.indexOf(callback), 1);
+        };
+    }
 
     getZoneCoordinates(coords: { y: number; x: number }) {
         return {
@@ -71,8 +85,10 @@ export const DnDDropZone: <T>(
     const instance = useMemo(() => new DnDZoneInstance(), []);
     useEffect(() => {
         const cb = () => {
-            instance.scrollOffset.top = element?.scrollTop || 0;
-            instance.scrollOffset.left = element?.scrollLeft || 0;
+            instance.setOffset({
+                top: element?.scrollTop || 0,
+                left: element?.scrollLeft || 0,
+            });
         };
         element?.addEventListener('scroll', cb);
         return () => element?.removeEventListener('scroll', cb);

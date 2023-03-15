@@ -55,7 +55,7 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
 }) => {
     // Track state here, use state callbacks to ensure consistency
     const ctx = useContext(DnDContext);
-    const zoneCtx = useContext(DnDZoneContext);
+    const parentZone = useContext(DnDZoneContext);
 
     const [state, setState] = useState<{
         dragEvent: DragEventInfo;
@@ -67,7 +67,7 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
 
     const mouseDownHandler = useCallback<MouseEventHandler>(
         (downEvt) => {
-            const initialPosition = zoneCtx.getZoneCoordinates({
+            const initialPosition = parentZone.getZoneCoordinates({
                 y: downEvt.clientY,
                 x: downEvt.clientX,
             });
@@ -83,9 +83,25 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
             });
             ctx.callbacks.onDragStart(data, initialDragEvt);
 
-            const onMouseMove = (evt) => {
+            let lastEvt = downEvt;
+            // Transform scroll into drag events
+            const unsubscribeZone = parentZone.onScrollChange(() => {
                 const dragEvt = getDragEvent(
-                    zoneCtx.getZoneCoordinates({
+                    parentZone.getZoneCoordinates({
+                        x: lastEvt.clientX,
+                        y: lastEvt.clientY,
+                    }),
+                    initialPosition
+                );
+                setState({
+                    status: DragStatus.DRAGGING,
+                    dragEvent: dragEvt,
+                });
+            });
+            const onMouseMove = (evt) => {
+                lastEvt = evt;
+                const dragEvt = getDragEvent(
+                    parentZone.getZoneCoordinates({
                         x: evt.clientX,
                         y: evt.clientY,
                     }),
@@ -98,7 +114,7 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
             };
             const onMouseUp = (evt: MouseEvent) => {
                 const dragEvt = getDragEvent(
-                    zoneCtx.getZoneCoordinates({
+                    parentZone.getZoneCoordinates({
                         x: evt.clientX,
                         y: evt.clientY,
                     }),
@@ -110,13 +126,14 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
                     status: DragStatus.DROPPED,
                 });
                 window.removeEventListener('mousemove', onMouseMove);
+                unsubscribeZone();
             };
             window.addEventListener('mousemove', onMouseMove);
             window.addEventListener('mouseup', onMouseUp, {
                 once: true,
             });
         },
-        [ctx.callbacks, zoneCtx.getZoneCoordinates, data]
+        [ctx.callbacks, parentZone, data]
     );
 
     const isDragging = state.status === DragStatus.DRAGGING;
