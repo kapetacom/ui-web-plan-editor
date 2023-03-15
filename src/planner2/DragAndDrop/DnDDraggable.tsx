@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { DragEventInfo, PositionDiff } from './types';
 import { DnDContext } from './DnDContext';
+import { DnDZoneContext } from './DnDDropZone';
 
 interface DnDCallbackProps {
     isDragging: boolean;
@@ -29,6 +30,7 @@ enum DragStatus {
     DROPPED,
 }
 
+// TODO: change to include different coordinates: pageX/Y, zoneX/Y
 const getDragEvent = (
     windowPosition: PositionDiff,
     initialPosition: PositionDiff
@@ -53,6 +55,8 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
 }) => {
     // Track state here, use state callbacks to ensure consistency
     const ctx = useContext(DnDContext);
+    const zoneCtx = useContext(DnDZoneContext);
+
     const [state, setState] = useState<{
         dragEvent: DragEventInfo;
         status: DragStatus;
@@ -63,10 +67,11 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
 
     const mouseDownHandler = useCallback<MouseEventHandler>(
         (downEvt) => {
-            const initialPosition = {
-                x: downEvt.clientX,
+            const initialPosition = zoneCtx.getZoneCoordinates({
                 y: downEvt.clientY,
-            };
+                x: downEvt.clientX,
+            });
+
             const initialDragEvt = getDragEvent(
                 initialPosition,
                 initialPosition
@@ -80,7 +85,10 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
 
             const onMouseMove = (evt) => {
                 const dragEvt = getDragEvent(
-                    { x: evt.clientX, y: evt.clientY },
+                    zoneCtx.getZoneCoordinates({
+                        x: evt.clientX,
+                        y: evt.clientY,
+                    }),
                     initialPosition
                 );
                 setState({
@@ -90,7 +98,10 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
             };
             const onMouseUp = (evt: MouseEvent) => {
                 const dragEvt = getDragEvent(
-                    { x: evt.clientX, y: evt.clientY },
+                    zoneCtx.getZoneCoordinates({
+                        x: evt.clientX,
+                        y: evt.clientY,
+                    }),
                     initialPosition
                 );
 
@@ -105,7 +116,7 @@ export const DnDDraggable: React.FC<DnDDraggableProps> = ({
                 once: true,
             });
         },
-        [ctx.callbacks, data]
+        [ctx.callbacks, zoneCtx.getZoneCoordinates, data]
     );
 
     const isDragging = state.status === DragStatus.DRAGGING;

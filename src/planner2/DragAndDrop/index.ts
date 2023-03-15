@@ -8,6 +8,3 @@ export const DragAndDrop = {
     DropZone: DnDDropZone,
     Draggable: DnDDraggable,
 };
-
-// Hooks
-export { useDropZone } from './DnDDropZone';

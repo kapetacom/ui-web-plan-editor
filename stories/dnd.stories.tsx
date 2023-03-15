@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Simulate } from 'react-dom/test-utils';
 import drag = Simulate.drag;
-import { DragAndDrop, useDropZone } from '../src/planner2/DragAndDrop';
+import { DragAndDrop } from '../src/planner2/DragAndDrop';
 
 export default {
     title: 'Drag and drop',
@@ -17,32 +17,34 @@ const DropZoneWrapper = (props) => {
     });
     const [data, setData] = useState<any>(null);
 
-    const zone = useDropZone({
-        onDragEnter(payload) {
-            setActive({ isActive: true, data: payload });
-        },
-        onDragLeave(payload) {
-            setActive({ isActive: false, data: null });
-        },
-        onDrop(dropData) {
-            setData(dropData);
-        },
-    });
-
     return (
-        <div
-            ref={zone.onRef}
-            style={{
-                background: isActive ? '#ff3' : '#ff9',
-                padding: '20px',
-                margin: '48px auto',
-                width: '300px',
-                ...props.style,
+        <DragAndDrop.DropZone
+            onDragEnter={(payload) => {
+                setActive({ isActive: true, data: payload });
+            }}
+            onDragLeave={(payload) => {
+                setActive({ isActive: false, data: null });
+            }}
+            onDrop={(dropData) => {
+                setData(dropData);
             }}
         >
-            <pre>{isActive ? 'active' : 'inactive'}</pre>
-            <pre>{JSON.stringify(hoverData || data, null, 4)}</pre>
-        </div>
+            {({ onRef }) => (
+                <div
+                    ref={onRef}
+                    style={{
+                        background: isActive ? '#ff3' : '#ff9',
+                        padding: '20px',
+                        margin: '48px auto',
+                        width: '300px',
+                        ...props.style,
+                    }}
+                >
+                    <pre>{isActive ? 'active' : 'inactive'}</pre>
+                    <pre>{JSON.stringify(hoverData || data, null, 4)}</pre>
+                </div>
+            )}
+        </DragAndDrop.DropZone>
     );
 };
 
