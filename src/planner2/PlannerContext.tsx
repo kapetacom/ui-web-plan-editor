@@ -88,8 +88,11 @@ const usePlannerContext = ({
         plan: currentPlan,
         blockAssets,
         getBlockByRef(ref: string) {
-            const blockAsset = blockAssets.find((asset) =>
-                parseBlockwareUri(asset.ref).compare(parseBlockwareUri(ref))
+            const blockAsset = blockAssets.find(
+                (asset) =>
+                    parseBlockwareUri(asset.ref).compare(
+                        parseBlockwareUri(ref)
+                    ) === 0
             );
             return blockAsset?.data;
         },
