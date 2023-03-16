@@ -9,6 +9,7 @@ import { PlannerContext } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
 import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
 import { resourceHeight } from '../utils/planUtils';
+import { SVGLayoutNode } from '../LayoutContext';
 
 export interface PlannerBlockResourceListProps {
     role: ResourceRole;
@@ -59,7 +60,7 @@ export const PlannerBlockResourceList: React.FC<
     });
 
     return (
-        <svg
+        <SVGLayoutNode
             className={plannerResourceListClass}
             overflow="visible"
             x={0}
@@ -94,6 +95,6 @@ export const PlannerBlockResourceList: React.FC<
                     width={placeholderWidth - offsetX}
                 />
             </svg>
-        </svg>
+        </SVGLayoutNode>
     );
 };

@@ -8,6 +8,8 @@ import { DragAndDrop } from './DragAndDrop';
 import { Simulate } from 'react-dom/test-utils';
 import drag = Simulate.drag;
 import { PlannerCanvas } from './PlannerCanvas';
+import { PlannerConnection } from './components/PlannerConnection';
+import { getConnectionId } from './utils/connectionUtils';
 
 interface Props {
     plan: PlanKind;
@@ -35,6 +37,14 @@ export const Planner: React.FC<Props> = (props) => {
                         <BlockContextProvider key={block.id} blockId={block.id}>
                             <PlannerBlockNode size={size} />
                         </BlockContextProvider>
+                    ))}
+
+                    {props.plan.spec.connections?.map((connection) => (
+                        <PlannerConnection
+                            size={size}
+                            key={getConnectionId(connection)}
+                            connection={connection}
+                        />
                     ))}
                 </PlannerCanvas>
             </DragAndDrop.ContextProvider>

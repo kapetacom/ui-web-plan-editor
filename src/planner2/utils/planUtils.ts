@@ -79,3 +79,7 @@ export function getBlockHeightByResourceCount(
 ) {
     return Math.max(150, 70 + resourceCount * resourceHeight[size]);
 }
+
+export function getResourceId(blockId: string, resourceName: string) {
+    return `${blockId}__${resourceName}`;
+}
