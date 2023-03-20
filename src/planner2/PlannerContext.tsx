@@ -31,6 +31,7 @@ export interface PlannerContextData {
     connectionPoints: {
         addPoint(id: string, point: Point): void;
         getPointById(id: string): Point | null;
+        removePoint(pointId: string): void;
     };
 }
 
@@ -54,6 +55,7 @@ const defaultValue: PlannerContextData = {
         getPointById() {
             return null;
         },
+        removePoint() {},
     },
 };
 
@@ -78,6 +80,13 @@ const usePlannerContext = ({
             },
             getPointById(id: string) {
                 return points[id] || null;
+            },
+            removePoint(id: string) {
+                setPoints((prev) => {
+                    const newPoints = { ...prev };
+                    delete newPoints[id];
+                    return newPoints;
+                });
             },
         }),
         [points, setPoints]

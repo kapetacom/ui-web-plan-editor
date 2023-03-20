@@ -16,6 +16,11 @@ export const PlannerConnectionPoint: React.FC<{
         });
     }, [connectionPoints, offset.x, offset.y, pointId]);
 
+    useEffect(
+        () => () => connectionPoints.removePoint(pointId),
+        [pointId, connectionPoints]
+    );
+
     // This thing is not really a visual thing
     return null;
 };
