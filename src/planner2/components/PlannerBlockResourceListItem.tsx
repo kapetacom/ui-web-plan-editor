@@ -14,9 +14,11 @@ import { PlannerNodeSize } from '../../types';
 import { BlockResource } from '../../components/BlockResource';
 import { useBlockContext } from '../BlockContext';
 import { ResourceMode } from '../../wrappers/wrapperHelpers';
-import { resourceHeight } from '../utils/planUtils';
+import { getResourceId, resourceHeight } from '../utils/planUtils';
 import { SVGCircleButton } from '../../components/SVGCircleButton';
 import { ButtonStyle } from '@blockware/ui-web-components';
+import { PlannerConnectionPoint } from './PlannerConnectionPoint';
+import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const BUTTON_HEIGHT = 24; // Height of edit and delete buttons
@@ -118,6 +120,17 @@ const renderActions = (consumer: boolean) => {
     );
 };
 
+const getResourceConnectionPoint = ({
+    isConsumer,
+    isExpanded,
+    showButtons,
+}) => {
+    const baseOffset = isConsumer ? -20 : 170;
+    const expansionSign = isConsumer ? -1 : 1;
+    const expansionWidth = isExpanded ? 100 : 0;
+    return baseOffset + expansionWidth * expansionSign;
+};
+
 export const PlannerBlockResourceListItem: React.FC<
     PlannerBlockResourceListItemProps
 > = (props) => {
@@ -131,7 +144,13 @@ export const PlannerBlockResourceListItem: React.FC<
     const buttonsVisible = mode === ResourceMode.SHOW_OPTIONS;
     const isConsumer = props.role === ResourceRole.CONSUMES;
 
-    const clipPathId = `${blockInstance.id}_${props.role}_${props.index}_clippath`; // `${this.getId()}_clippath`;
+    const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
+    const clipPathId = `${resourceId}_clippath`; // `${this.getId()}_clippath`;
+
+    const connectionResourceId = getResourceId(
+        blockInstance.id,
+        props.resource.metadata.name
+    );
     const fixedClipPathId = `${clipPathId}_fixed`;
 
     // TODO: extended resources?
@@ -197,99 +216,110 @@ export const PlannerBlockResourceListItem: React.FC<
     });
 
     return (
-        <>
-            <svg x={0} y={yOffset}>
-                {/* Not sure what this one does */}
-                <clipPath id={fixedClipPathId}>
-                    <rect
-                        className="container-mask"
-                        width={mouseCatcherWidth}
-                        height={height}
-                        x={
-                            isConsumer
-                                ? -mouseCatcherWidth - 1
-                                : blockInstance.dimensions!.width + 1
-                        }
-                        y={0}
-                    />
+        <SVGLayoutNode x={0} y={yOffset}>
+            {/* Not sure what this one does */}
+            <clipPath id={fixedClipPathId}>
+                <rect
+                    className="container-mask"
+                    width={mouseCatcherWidth}
+                    height={height}
+                    x={
+                        isConsumer
+                            ? -mouseCatcherWidth - 1
+                            : blockInstance.dimensions!.width + 1
+                    }
+                    y={0}
+                />
+            </clipPath>
+
+            <svg
+                className={containerClass}
+                clipPath={`url(#${fixedClipPathId})`}
+                x={0}
+                y={0}
+                onMouseLeave={() => setHoverState(false)}
+                onMouseMove={() => setHoverState(true)}
+            >
+                {/* Clip the hexagon to create a straight edge */}
+                <clipPath id={clipPathId}>
+                    {renderClipPath(height, props.role, isExpanded)}
                 </clipPath>
 
-                <svg
-                    className={containerClass}
-                    clipPath={`url(#${fixedClipPathId})`}
-                    x={0}
-                    y={0}
-                    onMouseLeave={() => setHoverState(false)}
-                    onMouseMove={() => setHoverState(true)}
+                <g
+                    className={bodyClass}
+                    transform={`translate(${getXPosition()},0)`}
+                    height={heightInner}
                 >
-                    {/* Clip the hexagon to create a straight edge */}
-                    <clipPath id={clipPathId}>
-                        {renderClipPath(height, props.role, isExpanded)}
-                    </clipPath>
-
-                    <g
-                        className={bodyClass}
-                        transform={`translate(${getXPosition()},0)`}
+                    <rect
+                        className="mouse-catcher"
+                        opacity="0"
+                        width={mouseCatcherWidth}
                         height={heightInner}
+                        x={isConsumer ? -60 : -30}
+                        y={0}
+                    />
+
+                    <svg x={buttonX} y={buttonY}>
+                        {renderActions(isConsumer)}
+                    </svg>
+
+                    <LayoutNode
+                        x={getResourceConnectionPoint({
+                            isConsumer,
+                            isExpanded,
+                            showButtons: false,
+                        })}
+                        y={buttonY + BUTTON_HEIGHT / 2}
                     >
-                        <rect
-                            className="mouse-catcher"
-                            opacity="0"
-                            width={mouseCatcherWidth}
-                            height={heightInner}
-                            x={isConsumer ? -60 : -30}
-                            y={0}
+                        <PlannerConnectionPoint
+                            pointId={connectionResourceId}
                         />
+                    </LayoutNode>
 
-                        <svg x={buttonX} y={buttonY}>
-                            {renderActions(isConsumer)}
-                        </svg>
+                    <svg
+                        clipPath={`url(#${clipPathId})`}
+                        style={{ cursor: isConsumer ? '' : 'grab' }}
+                        // ref={(elm) => {
+                        //     this.dragContainer = elm;
+                        // }}
+                    >
+                        <BlockResource
+                            role={props.role}
+                            size={nodeSize}
+                            name={props.resource.metadata.name}
+                            readOnly={props.readOnly}
+                            type={type}
+                            typeName={typeName}
+                            width={blockInstance.dimensions!.width}
+                            height={heightInner}
+                        />
+                    </svg>
 
-                        <svg
-                            clipPath={`url(#${clipPathId})`}
-                            style={{ cursor: isConsumer ? '' : 'grab' }}
-                            // ref={(elm) => {
-                            //     this.dragContainer = elm;
-                            // }}
-                        >
-                            <BlockResource
-                                role={props.role}
-                                size={nodeSize}
-                                name={props.resource.metadata.name}
-                                readOnly={props.readOnly}
-                                type={type}
-                                typeName={typeName}
-                                width={blockInstance.dimensions!.width}
-                                height={heightInner}
+                    <svg
+                        width={COUNTER_SIZE * 2}
+                        height={COUNTER_SIZE * 2}
+                        x={counterPoint.x}
+                        y={counterPoint.y}
+                    >
+                        <g className="resource-counter">
+                            <circle
+                                cx={COUNTER_SIZE}
+                                cy={COUNTER_SIZE}
+                                r={COUNTER_SIZE}
+                                className="background"
                             />
-                        </svg>
-
-                        <svg
-                            width={COUNTER_SIZE * 2}
-                            height={COUNTER_SIZE * 2}
-                            x={counterPoint.x}
-                            y={counterPoint.y}
-                        >
-                            <g className="resource-counter">
-                                <circle
-                                    cx={COUNTER_SIZE}
-                                    cy={COUNTER_SIZE}
-                                    r={COUNTER_SIZE}
-                                    className="background"
-                                />
-                                <text
-                                    textAnchor="middle"
-                                    className="foreground"
-                                    y={12}
-                                    x={COUNTER_SIZE}
-                                >
-                                    {counterValue}
-                                </text>
-                            </g>
-                        </svg>
-                    </g>
-                </svg>
+                            <text
+                                textAnchor="middle"
+                                className="foreground"
+                                y={12}
+                                x={COUNTER_SIZE}
+                            >
+                                {counterValue}
+                            </text>
+                        </g>
+                    </svg>
+                </g>
             </svg>
-        </>
+        </SVGLayoutNode>
     );
 };

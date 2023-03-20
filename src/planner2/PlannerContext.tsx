@@ -1,10 +1,11 @@
-import React, { Context, useEffect, useState } from 'react';
+import React, { Context, useEffect, useMemo, useState } from 'react';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import {
     Asset,
     BlockInstanceSpec,
     BlockKind,
     PlanKind,
+    Point,
 } from '@blockware/ui-web-types';
 import { parseBlockwareUri } from '@blockware/nodejs-utils';
 import { PlannerNodeSize } from '../types';
@@ -27,6 +28,11 @@ export interface PlannerContextData {
     size: PlannerNodeSize;
     getBlockByRef(ref: string): BlockKind | undefined;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
+    connectionPoints: {
+        addPoint(id: string, point: Point): void;
+        getPointById(id: string): Point | null;
+        removePoint(pointId: string): void;
+    };
 }
 
 export interface PlannerContextType extends Context<PlannerContextData> {}
@@ -44,6 +50,13 @@ const defaultValue: PlannerContextData = {
     updateBlockInstance(blockId, callback) {
         // noop
     },
+    connectionPoints: {
+        addPoint() {},
+        getPointById() {
+            return null;
+        },
+        removePoint() {},
+    },
 };
 
 export const PlannerContext: PlannerContextType =
@@ -59,6 +72,26 @@ const usePlannerContext = ({
     blockAssets: Asset<BlockKind>[];
     mode: PlannerMode;
 }): PlannerContextData => {
+    const [points, setPoints] = useState<{ [id: string]: Point }>({});
+    const connectionPoints = useMemo(
+        () => ({
+            addPoint(id: string, point: Point) {
+                setPoints((ps) => ({ ...ps, [id]: point }));
+            },
+            getPointById(id: string) {
+                return points[id] || null;
+            },
+            removePoint(id: string) {
+                setPoints((prev) => {
+                    const newPoints = { ...prev };
+                    delete newPoints[id];
+                    return newPoints;
+                });
+            },
+        }),
+        [points, setPoints]
+    );
+
     // region View state
     const [focusedBlock, setFocusedBlock] =
         useState<PlannerBlockModelWrapper>();
@@ -88,8 +121,11 @@ const usePlannerContext = ({
         plan: currentPlan,
         blockAssets,
         getBlockByRef(ref: string) {
-            const blockAsset = blockAssets.find((asset) =>
-                parseBlockwareUri(asset.ref).compare(parseBlockwareUri(ref))
+            const blockAsset = blockAssets.find(
+                (asset) =>
+                    parseBlockwareUri(asset.ref).compare(
+                        parseBlockwareUri(ref)
+                    ) === 0
             );
             return blockAsset?.data;
         },
@@ -113,6 +149,7 @@ const usePlannerContext = ({
 
             // TODO: Save to disk / callback
         },
+        connectionPoints,
     };
 };
 
