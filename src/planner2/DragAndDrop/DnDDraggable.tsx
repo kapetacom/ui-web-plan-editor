@@ -1,11 +1,11 @@
-import React, {
+import {
     MouseEventHandler,
     useCallback,
     useContext,
     useEffect,
     useState,
 } from 'react';
-import { DragEventInfo, PositionDiff } from './types';
+import { DnDPayload, DragEventInfo, PositionDiff } from './types';
 import { DnDContext } from './DnDContext';
 import { DnDZoneContext } from './DnDDropZone';
 
@@ -16,9 +16,9 @@ interface DnDCallbackProps {
         onMouseDown;
     };
 }
-interface DnDDraggableProps {
+interface DnDDraggableProps<T> {
     // payload for drag events
-    data: any;
+    data: T;
     onDrag?: (diff: PositionDiff) => void;
     onDragStart?: () => void;
     onDrop?: (position: PositionDiff) => void;
@@ -46,13 +46,9 @@ const getDragEvent = (
 const zeroPosition = { x: 0, y: 0 };
 const zeroDragEvent = getDragEvent(zeroPosition, zeroPosition);
 
-export const DnDDraggable: React.FC<DnDDraggableProps> = ({
-    onDragStart,
-    onDrag,
-    onDrop,
-    data,
-    children,
-}) => {
+export const DnDDraggable: <T extends DnDPayload>(
+    props: DnDDraggableProps<T>
+) => JSX.Element = ({ onDragStart, onDrag, onDrop, data, children }) => {
     // Track state here, use state callbacks to ensure consistency
     const ctx = useContext(DnDContext);
     const parentZone = useContext(DnDZoneContext);

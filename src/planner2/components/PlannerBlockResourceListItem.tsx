@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import {
     ResourceConfig,
@@ -6,19 +6,23 @@ import {
     ResourceRole,
     ResourceType,
 } from '@kapeta/ui-web-types';
-import { toClass } from '@kapeta/ui-web-utils';
-import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
-import { BlockResource } from '../../components/BlockResource';
-import { useBlockContext } from '../BlockContext';
 import { ResourceMode } from '../../wrappers/wrapperHelpers';
 import { getResourceId, resourceHeight } from '../utils/planUtils';
 import { SVGCircleButton } from '../../components/SVGCircleButton';
 import { ButtonStyle } from '@kapeta/ui-web-components';
-import { PlannerConnectionPoint } from './PlannerConnectionPoint';
 import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
+import { PlannerConnectionPoint } from './PlannerConnectionPoint';
+import { BlockResource } from '../../components/BlockResource';
+import { DragAndDrop } from '../DragAndDrop';
+import { toClass } from '@kapeta/ui-web-utils';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { useBlockContext } from '../BlockContext';
+import { PlannerPayload } from '../types';
+import { DnDContext } from '../DragAndDrop/DnDContext';
+import { PlannerContext } from '../PlannerContext';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const BUTTON_HEIGHT = 24; // Height of edit and delete buttons
@@ -32,13 +36,6 @@ interface PlannerBlockResourceListItemProps {
     readOnly?: boolean;
     mode: ResourceMode;
     hoverMode?: ResourceMode;
-}
-
-interface PlannerBlockResourceListItemState {
-    dragging: boolean;
-    index: number;
-    editMode: boolean;
-    clickDown: boolean;
 }
 
 const renderClipPath = (
@@ -131,40 +128,54 @@ const getResourceConnectionPoint = ({
     return baseOffset + expansionWidth * expansionSign;
 };
 
+const TempResource = ({ resource, nodeSize, x, y }) => {
+    const height = resourceHeight[nodeSize];
+    const heightInner = height - RESOURCE_SPACE;
+    const mouseCatcherWidth = 210;
+
+    const clipPathId = 'temp-resource-clip';
+
+    return (
+        <SVGLayoutNode x={x + 150} y={y}>
+            {/* Clip the hexagon to create a straight edge */}
+            <clipPath id={clipPathId}>
+                {renderClipPath(height, ResourceRole.CONSUMES, true)}
+            </clipPath>
+
+            <g height={heightInner}>
+                <LayoutNode x={-10} y={height / 2}>
+                    <PlannerConnectionPoint
+                        pointId={getResourceId('temp-block', 'temp-resource')}
+                    />
+                </LayoutNode>
+
+                <svg
+                    clipPath="url(#temp-resource-clip)"
+                    style={{
+                        cursor: 'grab',
+                    }}
+                >
+                    <BlockResource
+                        role={ResourceRole.PROVIDES}
+                        size={nodeSize}
+                        name={resource.name}
+                        type={resource.type}
+                        typeName={resource.typeName}
+                        width={mouseCatcherWidth}
+                        height={heightInner}
+                    />
+                </svg>
+            </g>
+        </SVGLayoutNode>
+    );
+};
+
 export const PlannerBlockResourceListItem: React.FC<
     PlannerBlockResourceListItemProps
 > = (props) => {
+    const planner = useContext(PlannerContext);
     const { blockInstance } = useBlockContext();
-
-    const [isHovered, setHoverState] = useState(false);
-    const mode = isHovered ? props.hoverMode || props.mode : props.mode;
-
-    // Change to inclusion list if necessary
-    const isExpanded = mode !== ResourceMode.HIDDEN;
-    const buttonsVisible = mode === ResourceMode.SHOW_OPTIONS;
-    const isConsumer = props.role === ResourceRole.CONSUMES;
-
-    const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
-    const clipPathId = `${resourceId}_clippath`; // `${this.getId()}_clippath`;
-
-    const connectionResourceId = getResourceId(
-        blockInstance.id,
-        props.resource.metadata.name
-    );
-    const fixedClipPathId = `${clipPathId}_fixed`;
-
-    // TODO: extended resources?
-    const extension = isExpanded ? 100 : 0;
-    const getXPosition = () =>
-        props.role === ResourceRole.CONSUMES
-            ? -10.5 - extension
-            : 39 + extension;
-
-    const nodeSize =
-        props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
-    const height = resourceHeight[nodeSize];
-    const heightInner = height - RESOURCE_SPACE;
-    const yOffset = height * props.index;
+    const { draggable } = useContext(DnDContext);
 
     let resourceConfig: ResourceConfig | null = null;
     const errors: string[] = [];
@@ -184,7 +195,49 @@ export const PlannerBlockResourceListItem: React.FC<
         : 0;
     const valid = errors.length === 0 && true; // TODO props.resource.isValid();
 
-    // TODO
+    const [isHovered, setHoverState] = useState(false);
+    const mode = isHovered ? props.hoverMode || props.mode : props.mode;
+
+    const isConsumer = props.role === ResourceRole.CONSUMES;
+    const dragIsCompatible =
+        isConsumer &&
+        draggable?.type === 'resource' &&
+        draggable.data.block.id !== blockInstance.id &&
+        ResourceTypeProvider.canApplyResourceToKind(
+            draggable.data.resource.kind,
+            props.resource.kind
+        ) &&
+        !planner.hasConnections({
+            blockId: blockInstance.id,
+            resourceName: props.resource.metadata.name,
+        });
+
+    // Change to inclusion list if necessary
+    const isExpanded = mode !== ResourceMode.HIDDEN || dragIsCompatible;
+    const buttonsVisible = mode === ResourceMode.SHOW_OPTIONS;
+
+    const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
+    const clipPathId = `${resourceId}_clippath`;
+
+    const connectionResourceId = getResourceId(
+        blockInstance.id,
+        props.resource.metadata.name
+    );
+    const fixedClipPathId = `${clipPathId}_fixed`;
+
+    const extension = isExpanded ? 100 : 0;
+    const getXPosition = () =>
+        props.role === ResourceRole.CONSUMES
+            ? -10.5 - extension
+            : 39 + extension;
+
+    const nodeSize =
+        props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
+    const height = resourceHeight[nodeSize];
+    const heightInner = height - RESOURCE_SPACE;
+    const yOffset = height * props.index;
+
+    // TODO: Counter?
     const counterPoint = {
         x: 0,
         y: 0,
@@ -205,121 +258,189 @@ export const PlannerBlockResourceListItem: React.FC<
         consumes: isConsumer,
     });
 
+    const [dragOver, setDragOver] = useState(false);
     const bodyClass = toClass({
         'resource-item-body': true,
         [typeName]: true,
         // highlight: props.resource.mode === ResourceMode.HIGHLIGHT,
-        // compatible: props.resource.mode === ResourceMode.COMPATIBLE,
-        // 'compatible hover':
-        //     props.resource.mode === ResourceMode.HOVER_COMPATIBLE,
+        compatible: dragIsCompatible,
+        hover: dragIsCompatible && dragOver,
         invalid: !valid,
     });
 
     return (
         <SVGLayoutNode x={0} y={yOffset}>
-            {/* Not sure what this one does */}
-            <clipPath id={fixedClipPathId}>
-                <rect
-                    className="container-mask"
-                    width={mouseCatcherWidth}
-                    height={height}
-                    x={
-                        isConsumer
-                            ? -mouseCatcherWidth - 1
-                            : blockInstance.dimensions!.width + 1
+            <DragAndDrop.DropZone<PlannerPayload>
+                onDragEnter={() => setDragOver(true)}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={(payload) => {
+                    setDragOver(false);
+                    if (payload.type !== 'resource') {
+                        return;
                     }
-                    y={0}
-                />
-            </clipPath>
-
-            <svg
-                className={containerClass}
-                clipPath={`url(#${fixedClipPathId})`}
-                x={0}
-                y={0}
-                onMouseLeave={() => setHoverState(false)}
-                onMouseMove={() => setHoverState(true)}
+                    planner.addConnection({
+                        from: {
+                            blockId: payload.data.block.id,
+                            resourceName: payload.data.resource.metadata.name,
+                        },
+                        to: {
+                            blockId: blockInstance.id,
+                            resourceName: props.resource.metadata.name,
+                        },
+                    });
+                }}
+                // TODO: flip this around, pass down to children
+                accept={() => dragIsCompatible}
             >
-                {/* Clip the hexagon to create a straight edge */}
-                <clipPath id={clipPathId}>
-                    {renderClipPath(height, props.role, isExpanded)}
-                </clipPath>
-
-                <g
-                    className={bodyClass}
-                    transform={`translate(${getXPosition()},0)`}
-                    height={heightInner}
-                >
-                    <rect
-                        className="mouse-catcher"
-                        opacity="0"
-                        width={mouseCatcherWidth}
-                        height={heightInner}
-                        x={isConsumer ? -60 : -30}
-                        y={0}
-                    />
-
-                    <svg x={buttonX} y={buttonY}>
-                        {renderActions(isConsumer)}
-                    </svg>
-
-                    <LayoutNode
-                        x={getResourceConnectionPoint({
-                            isConsumer,
-                            isExpanded,
-                            showButtons: false,
-                        })}
-                        y={buttonY + BUTTON_HEIGHT / 2}
+                {({ onRef }) => (
+                    <DragAndDrop.Draggable<PlannerPayload>
+                        data={{
+                            type: 'resource',
+                            data: {
+                                resource: props.resource,
+                                block: blockInstance,
+                                role: ResourceRole.CONSUMES,
+                            },
+                        }}
                     >
-                        <PlannerConnectionPoint
-                            pointId={connectionResourceId}
-                        />
-                    </LayoutNode>
+                        {({ isDragging, position, componentProps }) => (
+                            <>
+                                <clipPath id={fixedClipPathId}>
+                                    <rect
+                                        className="container-mask"
+                                        width={mouseCatcherWidth}
+                                        height={height}
+                                        x={
+                                            isConsumer
+                                                ? -mouseCatcherWidth - 1
+                                                : blockInstance.dimensions!
+                                                      .width + 1
+                                        }
+                                        y={0}
+                                    />
+                                </clipPath>
 
-                    <svg
-                        clipPath={`url(#${clipPathId})`}
-                        style={{ cursor: isConsumer ? '' : 'grab' }}
-                        // ref={(elm) => {
-                        //     this.dragContainer = elm;
-                        // }}
-                    >
-                        <BlockResource
-                            role={props.role}
-                            size={nodeSize}
-                            name={props.resource.metadata.name}
-                            readOnly={props.readOnly}
-                            type={type}
-                            typeName={typeName}
-                            width={blockInstance.dimensions!.width}
-                            height={heightInner}
-                        />
-                    </svg>
+                                <svg
+                                    className={containerClass}
+                                    clipPath={`url(#${fixedClipPathId})`}
+                                    x={0}
+                                    y={0}
+                                    onMouseLeave={() => setHoverState(false)}
+                                    onMouseMove={() => setHoverState(true)}
+                                    // Only register the drag handler if the resource should be draggable (Providers only atm)
+                                    {...(props.role === ResourceRole.PROVIDES
+                                        ? componentProps
+                                        : {})}
+                                >
+                                    {/* Clip the hexagon to create a straight edge */}
+                                    <clipPath id={clipPathId}>
+                                        {renderClipPath(
+                                            height,
+                                            props.role,
+                                            isExpanded
+                                        )}
+                                    </clipPath>
 
-                    <svg
-                        width={COUNTER_SIZE * 2}
-                        height={COUNTER_SIZE * 2}
-                        x={counterPoint.x}
-                        y={counterPoint.y}
-                    >
-                        <g className="resource-counter">
-                            <circle
-                                cx={COUNTER_SIZE}
-                                cy={COUNTER_SIZE}
-                                r={COUNTER_SIZE}
-                                className="background"
-                            />
-                            <text
-                                textAnchor="middle"
-                                className="foreground"
-                                y={12}
-                                x={COUNTER_SIZE}
-                            >
-                                {counterValue}
-                            </text>
-                        </g>
-                    </svg>
-                </g>
-            </svg>
+                                    <g
+                                        className={bodyClass}
+                                        transform={`translate(${getXPosition()},0)`}
+                                        height={heightInner}
+                                    >
+                                        <rect
+                                            className="mouse-catcher"
+                                            opacity="0"
+                                            width={mouseCatcherWidth}
+                                            height={heightInner}
+                                            x={isConsumer ? -60 : -30}
+                                            y={0}
+                                            ref={onRef}
+                                        />
+
+                                        <svg x={buttonX} y={buttonY}>
+                                            {renderActions(isConsumer)}
+                                        </svg>
+
+                                        <LayoutNode
+                                            x={getResourceConnectionPoint({
+                                                isConsumer,
+                                                isExpanded,
+                                                showButtons: false,
+                                            })}
+                                            y={buttonY + BUTTON_HEIGHT / 2}
+                                        >
+                                            <PlannerConnectionPoint
+                                                pointId={connectionResourceId}
+                                            />
+                                        </LayoutNode>
+
+                                        <svg
+                                            clipPath={`url(#${clipPathId})`}
+                                            style={{
+                                                cursor: isConsumer
+                                                    ? ''
+                                                    : 'grab',
+                                            }}
+                                        >
+                                            <BlockResource
+                                                role={props.role}
+                                                size={nodeSize}
+                                                name={
+                                                    props.resource.metadata.name
+                                                }
+                                                readOnly={props.readOnly}
+                                                type={type}
+                                                typeName={typeName}
+                                                width={
+                                                    blockInstance.dimensions!
+                                                        .width
+                                                }
+                                                height={heightInner}
+                                            />
+                                        </svg>
+
+                                        <svg
+                                            width={COUNTER_SIZE * 2}
+                                            height={COUNTER_SIZE * 2}
+                                            x={counterPoint.x}
+                                            y={counterPoint.y}
+                                        >
+                                            <g className="resource-counter">
+                                                <circle
+                                                    cx={COUNTER_SIZE}
+                                                    cy={COUNTER_SIZE}
+                                                    r={COUNTER_SIZE}
+                                                    className="background"
+                                                />
+                                                <text
+                                                    textAnchor="middle"
+                                                    className="foreground"
+                                                    y={12}
+                                                    x={COUNTER_SIZE}
+                                                >
+                                                    {counterValue}
+                                                </text>
+                                            </g>
+                                        </svg>
+                                    </g>
+                                </svg>
+
+                                {/* Temp draggable resource */}
+                                {isDragging ? (
+                                    <TempResource
+                                        x={position.x}
+                                        y={position.y}
+                                        nodeSize={nodeSize}
+                                        resource={{
+                                            typeName,
+                                            name: props.resource.metadata.name,
+                                        }}
+                                    />
+                                ) : null}
+                            </>
+                        )}
+                    </DragAndDrop.Draggable>
+                )}
+            </DragAndDrop.DropZone>
         </SVGLayoutNode>
     );
 };

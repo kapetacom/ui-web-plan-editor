@@ -4,8 +4,8 @@ import {
     BlockKind,
     ResourceKind,
 } from '@kapeta/ui-web-types';
-import { parseBlockwareUri, BlockwareURI } from '@kapeta/nodejs-utils';
-import { PlannerContext } from './PlannerContext';
+import { BlockwareURI, parseBlockwareUri } from '@kapeta/nodejs-utils';
+import { PlannerContext, PlannerMode } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';
 
@@ -19,6 +19,7 @@ export interface PlannerBlockContextData {
 
     blockMode: BlockMode;
     setBlockMode: (mode: BlockMode) => void;
+    isReadOnly: boolean;
 }
 
 const defaultValue: PlannerBlockContextData = {
@@ -32,6 +33,7 @@ const defaultValue: PlannerBlockContextData = {
     setBlockMode(mode: BlockMode) {
         this.blockMode = mode;
     },
+    isReadOnly: false,
 };
 
 export const BlockContext = React.createContext(defaultValue);
@@ -43,7 +45,12 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
     blockId,
     children,
 }) => {
-    const { plan, size, getBlockByRef } = useContext(PlannerContext);
+    const {
+        plan,
+        size,
+        getBlockByRef,
+        mode: plannerMode,
+    } = useContext(PlannerContext);
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
 
     const value = useMemo(() => {
@@ -54,12 +61,19 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
         // calculate Resource height
         const consumers = blockDefinition?.spec.consumers || [];
         const providers = blockDefinition?.spec.providers || [];
-        const resourceCount = Math.max(consumers.length, providers.length);
+
+        const pendingConsumers =
+            blockMode === BlockMode.HOVER_DROP_CONSUMER ? 1 : 0;
+        const pendingProviders =
+            blockMode === BlockMode.HOVER_DROP_PROVIDER ? 1 : 0;
+        const resourceCount = Math.max(
+            consumers.length + pendingConsumers,
+            providers.length + pendingProviders
+        );
         const instanceBlockHeight = getBlockHeightByResourceCount(
             resourceCount,
             size
         );
-        // TODO: group layout helpers
         const blockReference =
             blockInstance && parseBlockwareUri(blockInstance?.block.ref);
 
@@ -72,8 +86,19 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
             instanceBlockHeight,
             blockMode,
             setBlockMode,
+            isReadOnly:
+                blockReference?.version !== 'local' ||
+                plannerMode === PlannerMode.VIEW,
         };
-    }, [plan, size, getBlockByRef, blockMode, setBlockMode, blockId]);
+    }, [
+        plan,
+        size,
+        getBlockByRef,
+        blockMode,
+        setBlockMode,
+        blockId,
+        plannerMode,
+    ]);
     return (
         <BlockContext.Provider value={value}>{children}</BlockContext.Provider>
     );

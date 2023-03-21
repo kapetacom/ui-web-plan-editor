@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Asset, BlockKind, PlanKind } from '@kapeta/ui-web-types';
-import { PlannerContextProvider, PlannerMode } from './PlannerContext';
+import {
+    PlannerContext,
+    PlannerMode,
+    usePlannerContext,
+} from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';
 import { BlockContextProvider } from './BlockContext';
 import { DragAndDrop } from './DragAndDrop';
-import { Simulate } from 'react-dom/test-utils';
-import drag = Simulate.drag;
 import { PlannerCanvas } from './PlannerCanvas';
 import { PlannerConnection } from './components/PlannerConnection';
 import { getConnectionId } from './utils/connectionUtils';
+import { DnDContext, DnDContextType } from './DragAndDrop/DnDContext';
+import { PlannerPayload } from './types';
 
 interface Props {
     plan: PlanKind;
@@ -20,34 +24,60 @@ interface Props {
     size?: PlannerNodeSize;
 }
 
+const renderTempResources: (
+    value: DnDContextType<PlannerPayload>
+) => ReactNode = ({ draggable }) => {
+    return draggable && draggable.type === 'resource' ? (
+        <PlannerConnection
+            size={PlannerNodeSize.MEDIUM}
+            connection={{
+                from: {
+                    blockId: draggable.data.block.id,
+                    resourceName: draggable.data.resource.metadata.name,
+                },
+                to: {
+                    blockId: 'temp-block',
+                    resourceName: 'temp-resource',
+                },
+            }}
+        />
+    ) : null;
+};
+
 export const Planner: React.FC<Props> = (props) => {
     const { size = PlannerNodeSize.MEDIUM, plan, blockAssets } = props;
+    const context = usePlannerContext({
+        plan,
+        blockAssets,
+        mode: props.mode || PlannerMode.VIEW,
+    });
 
     return (
-        <PlannerContextProvider
-            plan={plan}
-            blockAssets={blockAssets}
-            mode={props.mode || PlannerMode.VIEW}
-        >
+        <PlannerContext.Provider value={context}>
             {/* Overflow ?? */}
             <DragAndDrop.ContextProvider>
                 {/* Canvas and sidebars should be in the same dnd context */}
                 <PlannerCanvas>
-                    {props.plan.spec.blocks?.map((block, index) => (
+                    {context.plan?.spec.blocks?.map((block, index) => (
                         <BlockContextProvider key={block.id} blockId={block.id}>
                             <PlannerBlockNode size={size} />
                         </BlockContextProvider>
                     ))}
 
-                    {props.plan.spec.connections?.map((connection) => (
+                    {context.plan?.spec.connections?.map((connection) => (
                         <PlannerConnection
                             size={size}
                             key={getConnectionId(connection)}
                             connection={connection}
                         />
                     ))}
+
+                    {/* Render temp connections to dragged resources */}
+                    <DnDContext.Consumer>
+                        {renderTempResources}
+                    </DnDContext.Consumer>
                 </PlannerCanvas>
             </DragAndDrop.ContextProvider>
-        </PlannerContextProvider>
+        </PlannerContext.Provider>
     );
 };

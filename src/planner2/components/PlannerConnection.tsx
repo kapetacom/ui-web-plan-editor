@@ -25,6 +25,7 @@ export const PlannerConnection: React.FC<{
     );
     const from = connectionPoints.getPointById(fromId);
     const to = connectionPoints.getPointById(toId);
+
     if (!from || !to) {
         // TODO: Handle connection not found
         return null;
@@ -45,7 +46,7 @@ export const PlannerConnection: React.FC<{
     const path = calculatePathBetweenPoints(from, to);
 
     return (
-        <svg>
+        <svg style={{ position: 'absolute', zIndex: -1 }}>
             <g
                 className={className.trim()}
                 // onMouseOver={this.onMouseOver}

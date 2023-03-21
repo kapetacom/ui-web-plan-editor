@@ -2,8 +2,10 @@ import React, { Context, useEffect, useMemo, useState } from 'react';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import {
     Asset,
+    BlockConnectionSpec,
     BlockInstanceSpec,
     BlockKind,
+    BlockResourceReferenceSpec,
     PlanKind,
     Point,
 } from '@kapeta/ui-web-types';
@@ -28,6 +30,8 @@ export interface PlannerContextData {
     size: PlannerNodeSize;
     getBlockByRef(ref: string): BlockKind | undefined;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
+    addConnection(connection: BlockConnectionSpec): void;
+    hasConnections(connectionSpec: BlockResourceReferenceSpec): boolean;
     connectionPoints: {
         addPoint(id: string, point: Point): void;
         getPointById(id: string): Point | null;
@@ -41,14 +45,19 @@ const defaultValue: PlannerContextData = {
     focusedBlock: undefined,
     mode: PlannerMode.VIEW,
     zoom: 1,
+    setZoomLevel() {},
+
     size: PlannerNodeSize.MEDIUM,
     blockAssets: [],
-    setZoomLevel() {},
     getBlockByRef(_ref: string) {
         return undefined;
     },
     updateBlockInstance(blockId, callback) {
         // noop
+    },
+    addConnection(connection: BlockConnectionSpec) {},
+    hasConnections() {
+        return false;
     },
     connectionPoints: {
         addPoint() {},
@@ -63,8 +72,8 @@ export const PlannerContext: PlannerContextType =
     React.createContext(defaultValue);
 
 // Helper to make sure we memoize anything we can for the context
-const usePlannerContext = ({
-    plan,
+export const usePlannerContext = ({
+    plan: extPlan,
     blockAssets,
     mode = PlannerMode.VIEW,
 }: {
@@ -101,10 +110,10 @@ const usePlannerContext = ({
     // size
     // endregion
 
-    const [currentPlan, setCurrentPlan] = useState(plan);
+    const [plan, setPlan] = useState(extPlan);
     useEffect(() => {
-        setCurrentPlan(plan);
-    }, [plan]);
+        setPlan(extPlan);
+    }, [extPlan]);
 
     // Plan:
     // connections
@@ -118,7 +127,7 @@ const usePlannerContext = ({
         //
         mode: viewMode,
         //
-        plan: currentPlan,
+        plan: plan,
         blockAssets,
         getBlockByRef(ref: string) {
             const blockAsset = blockAssets.find(
@@ -131,7 +140,7 @@ const usePlannerContext = ({
         },
         updateBlockInstance(blockId: string, updater) {
             // Use state callback to reference the previous state (avoid stale ref)
-            setCurrentPlan((prevState) => {
+            setPlan((prevState) => {
                 const newPlan = cloneDeep(prevState);
                 const blockIx =
                     newPlan.spec.blocks?.findIndex(
@@ -149,17 +158,25 @@ const usePlannerContext = ({
 
             // TODO: Save to disk / callback
         },
+
+        addConnection({ from, to, mapping }: BlockConnectionSpec) {
+            setPlan((prevState) => {
+                const newPlan = cloneDeep(prevState);
+                newPlan.spec.connections?.push({ from, to, mapping });
+                return newPlan;
+            });
+        },
+        hasConnections(connectionSpec: BlockResourceReferenceSpec) {
+            return !!plan.spec.connections?.find(
+                (connection) =>
+                    (connection.from.blockId === connectionSpec.blockId &&
+                        connection.from.resourceName ===
+                            connectionSpec.resourceName) ||
+                    (connection.to.blockId === connectionSpec.blockId &&
+                        connection.to.resourceName ===
+                            connectionSpec.resourceName)
+            );
+        },
         connectionPoints,
     };
-};
-
-export const PlannerContextProvider: React.FC<
-    Parameters<typeof usePlannerContext>[0] & { children: React.ReactNode }
-> = (props) => {
-    const plannerContext = usePlannerContext(props);
-    return (
-        <PlannerContext.Provider value={plannerContext}>
-            {props.children}
-        </PlannerContext.Provider>
-    );
 };

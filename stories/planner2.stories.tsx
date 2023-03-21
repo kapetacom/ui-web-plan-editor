@@ -24,6 +24,7 @@ export const PlannerEditor2 = () => {
                             systemId="my-system"
                             plan={plan}
                             blockAssets={blockAssets}
+                            mode={PlannerMode.EDIT}
                         />
                     ))
                 }

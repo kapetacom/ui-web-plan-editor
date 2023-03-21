@@ -3,9 +3,9 @@ export type PositionDiff = {
     y: number;
 };
 
-export interface DnDPayload<T> {
+export interface DnDPayload {
     type: string;
-    data: T;
+    data: any;
 }
 
 export interface DragEventInfo {

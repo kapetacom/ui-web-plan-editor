@@ -10,6 +10,8 @@ import { useBlockContext } from '../BlockContext';
 import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
 import { resourceHeight } from '../utils/planUtils';
 import { SVGLayoutNode } from '../LayoutContext';
+import { DnDContext } from '../DragAndDrop/DnDContext';
+import { PlannerPayload } from '../types';
 
 export interface PlannerBlockResourceListProps {
     role: ResourceRole;
@@ -26,6 +28,7 @@ export const PlannerBlockResourceList: React.FC<
         instanceBlockHeight,
         blockMode,
     } = useBlockContext();
+    const { draggable } = useContext(DnDContext);
 
     const list = {
         [ResourceRole.CONSUMES]: consumers,
@@ -41,16 +44,20 @@ export const PlannerBlockResourceList: React.FC<
             ? blockInstance.dimensions!.width + offsetX
             : -placeholderWidth;
 
-    const totalHeight = list.length * resourceHeight[size];
-    const yPosition = (instanceBlockHeight - totalHeight) / 2 + 2;
-
     // Enable SHOW mode if the whole block is in SHOW mode
     const mode =
         blockMode === BlockMode.SHOW ? ResourceMode.SHOW : ResourceMode.HIDDEN;
 
     const showPlaceholder = () => {
-        // TODO: showPlaceholder if we're dragging a compatible resource
-        return false;
+        const payload = draggable as PlannerPayload | null;
+        return (
+            !!payload &&
+            payload.type === 'resource' &&
+            // Role stuff seems a little repetitive
+            payload.data.role === props.role &&
+            (blockMode === BlockMode.HOVER_DROP_CONSUMER ||
+                blockMode === BlockMode.HOVER_DROP_PROVIDER)
+        );
     };
 
     const plannerResourceListClass = toClass({
@@ -58,6 +65,15 @@ export const PlannerBlockResourceList: React.FC<
         show: showPlaceholder(),
         [props.role.toLowerCase()]: true,
     });
+
+    // Offset for the top of the hexagon, plus centering if there is only 1
+    const hexagonTopHeight = 35 + 2;
+    const resourceCount = list.length + (showPlaceholder() ? 1 : 0);
+    const yPosition =
+        resourceCount === 1
+            ? hexagonTopHeight + resourceHeight[size] / 2
+            : hexagonTopHeight;
+    const placeholderHeight = list.length * resourceHeight[size];
 
     return (
         <SVGLayoutNode
@@ -88,7 +104,7 @@ export const PlannerBlockResourceList: React.FC<
             <svg
                 className="resource-placeholder"
                 x={placeholderX}
-                y={totalHeight}
+                y={placeholderHeight}
             >
                 <rect
                     height={resourceHeight[size] - 4}

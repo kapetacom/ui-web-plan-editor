@@ -41,7 +41,7 @@ interface DropZoneProps<T> {
 export const DnDDropZone: <T>(
     props: DropZoneProps<T> & {
         children: (props: {
-            onRef: (elm: HTMLElement | null) => void;
+            onRef: (elm: Element | null) => void;
         }) => JSX.Element;
     }
 ) => JSX.Element = ({
