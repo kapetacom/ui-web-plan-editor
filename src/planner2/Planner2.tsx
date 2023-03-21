@@ -1,5 +1,5 @@
 import React from 'react';
-import { Asset, BlockKind, PlanKind } from '@blockware/ui-web-types';
+import { Asset, BlockKind, PlanKind } from '@kapeta/ui-web-types';
 import { PlannerContextProvider, PlannerMode } from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';

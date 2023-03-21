@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
-import { ResourceRole } from '@blockware/ui-web-types';
-import { toClass } from '@blockware/ui-web-utils';
+import { ResourceRole } from '@kapeta/ui-web-types';
+import { toClass } from '@kapeta/ui-web-utils';
 
 import { PlannerBlockResourceListItem } from './PlannerBlockResourceListItem';
 import { PlannerNodeSize } from '../../types';

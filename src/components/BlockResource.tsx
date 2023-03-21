@@ -3,9 +3,9 @@ import {
     toClass,
     createHexagonPath,
     Orientation,
-} from '@blockware/ui-web-utils';
+} from '@kapeta/ui-web-utils';
 
-import { ResourceRole } from '@blockware/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 
 import { PlannerNodeSize } from '../types';
 import './BlockResource.less';

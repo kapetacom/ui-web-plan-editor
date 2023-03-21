@@ -1,13 +1,13 @@
 {
-    "name": "@blockware/ui-web-plan-editor",
-    "version": "0.0.31",
+    "name": "@kapeta/ui-web-plan-editor",
+    "version": "0.0.32",
     "main": "src/index.ts",
     "files": [
         "package.json",
         "README.md",
         "src"
     ],
-    "description": "Provides ReactJS components for viewing and editing Blockware plans",
+    "description": "Provides ReactJS components for viewing and editing Kapeta plans",
     "private": false,
     "publishConfig": {
         "access": "public"
@@ -30,10 +30,10 @@
         "singleQuote": true
     },
     "peerDependencies": {
-        "@blockware/ui-web-components": "<2",
-        "@blockware/ui-web-context": "<2",
-        "@blockware/ui-web-types": "<2",
-        "@blockware/ui-web-utils": "<2",
+        "@kapeta/ui-web-components": "<2",
+        "@kapeta/ui-web-context": "<2",
+        "@kapeta/ui-web-types": "<2",
+        "@kapeta/ui-web-utils": "<2",
         "guid-typescript": "*",
         "less": ">=4",
         "lodash": ">=4",
@@ -45,7 +45,7 @@
         "react-use": ">=17"
     },
     "dependencies": {
-        "@blockware/nodejs-utils": ">=0.0.3 <2",
+        "@kapeta/nodejs-utils": ">=0.0.3 <2",
         "@types/lodash": "^4.14.185",
         "@types/node": "^18.7.18",
         "@types/react": ">=18",

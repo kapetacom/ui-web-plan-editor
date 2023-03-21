@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DefaultContext, Loader } from '@blockware/ui-web-components';
+import { DefaultContext, Loader } from '@kapeta/ui-web-components';
 
 import { Planner } from '../src/planner2/Planner2';
 

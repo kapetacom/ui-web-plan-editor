@@ -1,12 +1,12 @@
 import React, { useContext, useMemo } from 'react';
-import { InstanceStatus } from '@blockware/ui-web-context';
+import { InstanceStatus } from '@kapeta/ui-web-context';
 
 import { BlockNode } from '../../components/BlockNode';
 import { PlannerNodeSize } from '../../types';
 import { PlannerContext } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
 import { PlannerBlockResourceList } from './PlannerBlockResourceList';
-import { ResourceRole } from '@blockware/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { DragAndDrop } from '../DragAndDrop';
 import { LayoutNode } from '../LayoutContext';

@@ -1,10 +1,10 @@
-import { BlockStore } from '@blockware/ui-web-context';
+import { BlockStore } from '@kapeta/ui-web-context';
 import {
     BlockReference,
     BlockInstanceSpec,
     PlanKind,
     BlockKind,
-} from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
 
 import { PlannerModelWrapper } from '../wrappers/PlannerModelWrapper';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';

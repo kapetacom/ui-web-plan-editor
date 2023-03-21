@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 
-import { ItemType, ResourceRole } from '@blockware/ui-web-types';
-import { toClass } from '@blockware/ui-web-utils';
+import { ItemType, ResourceRole } from '@kapeta/ui-web-types';
+import { toClass } from '@kapeta/ui-web-utils';
 
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockResourceListItem } from './PlannerBlockResourceListItem';

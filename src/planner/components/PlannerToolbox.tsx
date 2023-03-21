@@ -6,14 +6,14 @@ import {
     PanelAlignment,
     PanelSize,
     DnDDrag,
-} from '@blockware/ui-web-components';
-import { ResourceTypeProvider } from '@blockware/ui-web-context';
-import { ResourceConfig, ResourceRole } from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-components';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { ResourceConfig, ResourceRole } from '@kapeta/ui-web-types';
 import {
     toClass,
     SVGCornersHelper,
     ResourceTagSide,
-} from '@blockware/ui-web-utils';
+} from '@kapeta/ui-web-utils';
 
 import { PlannerToolboxResource } from './PlannerToolboxResource';
 

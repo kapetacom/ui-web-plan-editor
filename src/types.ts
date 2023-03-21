@@ -1,5 +1,5 @@
 import { PlannerBlockModelWrapper } from './wrappers/PlannerBlockModelWrapper';
-import { Point } from '@blockware/ui-web-types';
+import { Point } from '@kapeta/ui-web-types';
 
 export enum PlannerNodeSize {
     SMALL = 0,

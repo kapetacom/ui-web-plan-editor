@@ -1,16 +1,16 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { toClass } from '@blockware/ui-web-utils';
+import { toClass } from '@kapeta/ui-web-utils';
 import {
     BlockKind,
     DataWrapper,
     Dimensions,
     ItemType,
     ResourceRole,
-} from '@blockware/ui-web-types';
-import { InstanceStatus } from '@blockware/ui-web-context';
-import { ButtonStyle, DnDDrag, showDelete } from '@blockware/ui-web-components';
+} from '@kapeta/ui-web-types';
+import { InstanceStatus } from '@kapeta/ui-web-context';
+import { ButtonStyle, DnDDrag, showDelete } from '@kapeta/ui-web-components';
 
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockResourceList } from './PlannerBlockResourceList';

@@ -12,14 +12,14 @@ import type {
     ResourceKind,
     SchemaEntity,
     Size,
-} from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
 import {
     isSchemaEntityCompatible,
     ResourceRole,
-} from '@blockware/ui-web-types';
-import { parseBlockwareUri, BlockwareURI } from '@blockware/nodejs-utils';
+} from '@kapeta/ui-web-types';
+import { parseBlockwareUri, BlockwareURI } from '@kapeta/nodejs-utils';
 
-import { BlockService, BlockTypeProvider } from '@blockware/ui-web-context';
+import { BlockService, BlockTypeProvider } from '@kapeta/ui-web-context';
 
 import { NeighboringBlocks, PlannerNodeSize } from '../types';
 import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
@@ -30,7 +30,7 @@ import {
     DSL_LANGUAGE_ID,
     DSLConverters,
     DSLWriter,
-} from '@blockware/ui-web-components';
+} from '@kapeta/ui-web-components';
 
 type HeightCache = { [size: number]: number };
 

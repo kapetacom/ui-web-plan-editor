@@ -8,10 +8,10 @@ import type {
     Dimensions,
     Point,
     ResourceKind,
-} from '@blockware/ui-web-types';
-import { ResourceRole } from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
-import { ResourceTypeProvider } from '@blockware/ui-web-context';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 
 const DEFAULT_EXTENSION_SIZE = 110;

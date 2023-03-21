@@ -1,5 +1,5 @@
-import { BlockConnectionSpec, Point } from '@blockware/ui-web-types';
-import { BasisCurve } from '@blockware/ui-web-utils';
+import { BlockConnectionSpec, Point } from '@kapeta/ui-web-types';
+import { BasisCurve } from '@kapeta/ui-web-utils';
 import { getResourceId } from './planUtils';
 
 export function calculatePathBetweenPoints(fromPoint: Point, toPoint: Point) {

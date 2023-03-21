@@ -7,8 +7,8 @@ import {
     SidePanel,
     TabContainer,
     TabPage,
-} from '@blockware/ui-web-components';
-import { InstanceEventType, InstanceService } from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-components';
+import { InstanceEventType, InstanceService } from '@kapeta/ui-web-context';
 
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
 import { LogEmitter, LogEntry, LogPanel } from '../../logs/LogPanel';

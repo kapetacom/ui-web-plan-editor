@@ -2,7 +2,7 @@ import { PlannerModelReader } from '../../src/planner/PlannerModelReader';
 import { BlockServiceMock } from './BlockServiceMock';
 import { PlannerData } from './PlannerData';
 import { PlannerModelWrapper } from '../../src';
-import { Asset, BlockKind, PlanKind } from '@blockware/ui-web-types';
+import { Asset, BlockKind, PlanKind } from '@kapeta/ui-web-types';
 
 export function readPlan(): Promise<PlannerModelWrapper> {
     const reader = new PlannerModelReader(BlockServiceMock);

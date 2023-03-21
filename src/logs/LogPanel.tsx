@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useList } from 'react-use';
-import { toClass } from '@blockware/ui-web-utils';
+import { toClass } from '@kapeta/ui-web-utils';
 
 import './LogPanel.less';
 

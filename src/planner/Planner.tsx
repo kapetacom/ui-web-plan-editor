@@ -11,22 +11,22 @@ import {
     reaction,
     runInAction,
 } from 'mobx';
-import { parseBlockwareUri } from '@blockware/nodejs-utils';
-import { toClass } from '@blockware/ui-web-utils';
+import { parseBlockwareUri } from '@kapeta/nodejs-utils';
+import { toClass } from '@kapeta/ui-web-utils';
 import {
     DnDContainer,
     DnDDrop,
     showToasty,
     ToastType,
-} from '@blockware/ui-web-components';
-import type { Point, Size } from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-components';
+import type { Point, Size } from '@kapeta/ui-web-types';
 import {
     AssetService,
     FailedBlockMessage,
     InstanceEventType,
     InstanceService,
     InstanceStatus,
-} from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-context';
 
 import type { BlockPositionCache, ZoomAreaMap } from '../types';
 import { PlannerNodeSize } from '../types';

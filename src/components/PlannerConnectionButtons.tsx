@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { toClass } from '@blockware/ui-web-utils';
-import { ButtonStyle } from '@blockware/ui-web-components';
-import { ResourceTypeProvider } from '@blockware/ui-web-context';
+import { toClass } from '@kapeta/ui-web-utils';
+import { ButtonStyle } from '@kapeta/ui-web-components';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import './PlannerConnectionButtons.less';
 import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';

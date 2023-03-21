@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Point, ResourceRole, Size } from '@blockware/ui-web-types';
+import { Point, ResourceRole, Size } from '@kapeta/ui-web-types';
 
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
 import {

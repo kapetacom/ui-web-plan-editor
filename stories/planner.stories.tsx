@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { DefaultContext, Loader } from '@blockware/ui-web-components';
-import { InstanceStatus } from '@blockware/ui-web-context';
-import { ResourceRole } from '@blockware/ui-web-types';
+import { DefaultContext, Loader } from '@kapeta/ui-web-components';
+import { InstanceStatus } from '@kapeta/ui-web-context';
+import { ResourceRole } from '@kapeta/ui-web-types';
 
 import {
     Planner,

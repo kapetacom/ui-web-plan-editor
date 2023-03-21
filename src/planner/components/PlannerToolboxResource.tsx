@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResourceConfig } from '@blockware/ui-web-types';
+import { ResourceConfig } from '@kapeta/ui-web-types';
 
 import { PlannerToolboxPainterProps } from './PlannerToolbox';
 import { BlockResource } from '../../components/BlockResource';

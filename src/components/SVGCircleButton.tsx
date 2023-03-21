@@ -1,6 +1,6 @@
 import React from 'react';
-import { ButtonStyle } from '@blockware/ui-web-components';
-import { toClass } from '@blockware/ui-web-utils';
+import { ButtonStyle } from '@kapeta/ui-web-components';
+import { toClass } from '@kapeta/ui-web-utils';
 import './SVGCircleButton.less';
 
 interface Props {

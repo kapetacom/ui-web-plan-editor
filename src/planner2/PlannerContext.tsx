@@ -6,8 +6,8 @@ import {
     BlockKind,
     PlanKind,
     Point,
-} from '@blockware/ui-web-types';
-import { parseBlockwareUri } from '@blockware/nodejs-utils';
+} from '@kapeta/ui-web-types';
+import { parseBlockwareUri } from '@kapeta/nodejs-utils';
 import { PlannerNodeSize } from '../types';
 import { cloneDeep } from 'lodash';
 

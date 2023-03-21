@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SVGCornersHelper } from '@blockware/ui-web-utils';
+import { SVGCornersHelper } from '@kapeta/ui-web-utils';
 import './PlannerBlockWarningTag.less';
 import { Guid } from 'guid-typescript';
 

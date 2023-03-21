@@ -3,9 +3,9 @@ import {
     BlockTargetProvider,
     BlockTypeProvider,
     ResourceTypeProvider,
-} from '@blockware/ui-web-context';
-import { ResourceRole, ResourceType } from '@blockware/ui-web-types';
-import { parseBlockwareUri } from '@blockware/nodejs-utils';
+} from '@kapeta/ui-web-context';
+import { ResourceRole, ResourceType } from '@kapeta/ui-web-types';
+import { parseBlockwareUri } from '@kapeta/nodejs-utils';
 
 export const BlockServiceMock = BlockService;
 

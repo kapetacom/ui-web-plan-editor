@@ -7,13 +7,13 @@ import type {
     BlockKind,
     Dimensions,
     ResourceConfig,
-} from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
 
-import { ItemType, ResourceKind } from '@blockware/ui-web-types';
+import { ItemType, ResourceKind } from '@kapeta/ui-web-types';
 import {
     BlockTypeProvider,
     ResourceTypeProvider,
-} from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-context';
 
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
 import { BlockMode } from '../../wrappers/wrapperHelpers';

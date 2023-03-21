@@ -5,7 +5,7 @@ import {
     PanelAlignment,
     PanelSize,
     SidePanelHeader,
-} from '@blockware/ui-web-components';
+} from '@kapeta/ui-web-components';
 
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 

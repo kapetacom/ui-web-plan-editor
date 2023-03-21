@@ -1,6 +1,6 @@
 import React from 'react';
-import { BlockConfig } from '@blockware/ui-web-types';
-import { InstanceStatus } from '@blockware/ui-web-context';
+import { BlockConfig } from '@kapeta/ui-web-types';
+import { InstanceStatus } from '@kapeta/ui-web-context';
 
 import { PlannerToolboxPainterProps } from './PlannerToolbox';
 import { BlockNode } from '../../components/BlockNode';

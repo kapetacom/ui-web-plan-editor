@@ -10,12 +10,12 @@ import {
     PanelSize,
     SidePanel,
     SimpleLoader,
-} from '@blockware/ui-web-components';
+} from '@kapeta/ui-web-components';
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
 
 import './ItemEditorPanel.less';
-import { BlockService } from '@blockware/ui-web-context';
-import { parseBlockwareUri } from '@blockware/nodejs-utils';
+import { BlockService } from '@kapeta/ui-web-context';
+import { parseBlockwareUri } from '@kapeta/nodejs-utils';
 import { BlockConfigurationData } from '../../wrappers/models';
 
 type Options = { [key: string]: string };

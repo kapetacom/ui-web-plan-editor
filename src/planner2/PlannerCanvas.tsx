@@ -3,9 +3,9 @@ import { PlannerContext, PlannerMode } from './PlannerContext';
 import { DragAndDrop } from './DragAndDrop';
 import { useBoundingBox } from './hooks/boundingBox';
 import { calculateCanvasSize } from './utils/planUtils';
-import { toClass } from '@blockware/ui-web-utils';
+import { toClass } from '@kapeta/ui-web-utils';
 import { PositionDiff } from './DragAndDrop/types';
-import { BlockInstanceSpec } from '@blockware/ui-web-types';
+import { BlockInstanceSpec } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
 
 const blockPositionUpdater =

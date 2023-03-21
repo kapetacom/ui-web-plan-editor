@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { InstanceStatus } from '@blockware/ui-web-context';
+import { InstanceStatus } from '@kapeta/ui-web-context';
 import {
     BlockInstanceSpec,
     BlockKind,
     BlockReference,
-} from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
 
 import {
     PlannerBlockModelWrapper,

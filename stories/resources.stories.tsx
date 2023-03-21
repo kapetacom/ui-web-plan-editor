@@ -4,7 +4,7 @@ import {
     BlockKind,
     ResourceKind,
     ResourceRole,
-} from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
 
 import {
     PlannerBlockModelWrapper,

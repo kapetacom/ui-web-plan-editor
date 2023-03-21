@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Point } from '@blockware/ui-web-types';
+import { Point } from '@kapeta/ui-web-types';
 
 import './PlannerBlockResourceListItem.less';
 

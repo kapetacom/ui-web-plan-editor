@@ -10,8 +10,8 @@ import {
     PLAN_KIND,
     PlanKind,
     ResourceRole,
-} from '@blockware/ui-web-types';
-import { ResourceTypeProvider } from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-types';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
 
 export interface PlannerModelRef {

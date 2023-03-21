@@ -3,8 +3,8 @@ import {
     BlockInstanceSpec,
     BlockKind,
     ResourceKind,
-} from '@blockware/ui-web-types';
-import { parseBlockwareUri, BlockwareURI } from '@blockware/nodejs-utils';
+} from '@kapeta/ui-web-types';
+import { parseBlockwareUri, BlockwareURI } from '@kapeta/nodejs-utils';
 import { PlannerContext } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';

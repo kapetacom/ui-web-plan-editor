@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import { PlannerContext } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
 import { calculatePathBetweenPoints } from '../utils/connectionUtils';
-import { BlockConnectionSpec } from '@blockware/ui-web-types';
-import { toClass } from '@blockware/ui-web-utils';
+import { BlockConnectionSpec } from '@kapeta/ui-web-types';
+import { toClass } from '@kapeta/ui-web-utils';
 import './PlannerConnection.less';
 import { getResourceId } from '../utils/planUtils';
 

@@ -2,7 +2,7 @@ import {
     ConnectionMethodMappingType,
     PLAN_KIND,
     PlanKind,
-} from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
 
 export const PlannerData: PlanKind = {
     kind: PLAN_KIND,

@@ -13,23 +13,23 @@ import {
     PanelSize,
     SidePanel,
     SimpleLoader,
-} from '@blockware/ui-web-components';
+} from '@kapeta/ui-web-components';
 
 import {
     BlockTypeProvider,
     IdentityService,
     ResourceTypeProvider,
-} from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-context';
 
-import { parseBlockwareUri } from '@blockware/nodejs-utils';
+import { parseBlockwareUri } from '@kapeta/nodejs-utils';
 
 import type {
     BlockConnectionSpec,
     DataWrapper,
     SchemaEntity,
     SchemaKind,
-} from '@blockware/ui-web-types';
-import { ResourceKind } from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
+import { ResourceKind } from '@kapeta/ui-web-types';
 
 import { EditableItemInterface } from '../../wrappers/models';
 import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';

@@ -3,14 +3,14 @@ import {
     createHexagonPath,
     Orientation,
     toClass,
-} from '@blockware/ui-web-utils';
-import { SVGText, SVGAutoSizeText } from '@blockware/ui-web-components';
-import { InstanceStatus } from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-utils';
+import { SVGText, SVGAutoSizeText } from '@kapeta/ui-web-components';
+import { InstanceStatus } from '@kapeta/ui-web-context';
 
 import './BlockNode.less';
 import { PlannerBlockWarningTag } from './PlannerBlockWarningTag';
 import { Guid } from 'guid-typescript';
-import { Point } from '@blockware/ui-web-types';
+import { Point } from '@kapeta/ui-web-types';
 
 interface BlockNodeProps {
     name: string;

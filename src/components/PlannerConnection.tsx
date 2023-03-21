@@ -7,14 +7,14 @@ import {
     DataWrapper,
     ItemType,
     Point,
-} from '@blockware/ui-web-types';
-import { toClass } from '@blockware/ui-web-utils';
+} from '@kapeta/ui-web-types';
+import { toClass } from '@kapeta/ui-web-utils';
 import {
     DialogControl,
     DialogTypes,
     showToasty,
     ToastType,
-} from '@blockware/ui-web-components';
+} from '@kapeta/ui-web-components';
 
 import { PlannerNodeSize } from '../types';
 

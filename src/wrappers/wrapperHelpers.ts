@@ -1,4 +1,4 @@
-import { ResourceRole } from '@blockware/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 
 export enum ResourceMode {
     HIDDEN = 0,

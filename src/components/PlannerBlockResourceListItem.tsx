@@ -7,10 +7,10 @@ import {
     ResourceConfig,
     ResourceRole,
     ResourceType,
-} from '@blockware/ui-web-types';
-import { toClass } from '@blockware/ui-web-utils';
-import { ResourceTypeProvider } from '@blockware/ui-web-context';
-import { ButtonStyle, showDelete } from '@blockware/ui-web-components';
+} from '@kapeta/ui-web-types';
+import { toClass } from '@kapeta/ui-web-utils';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { ButtonStyle, showDelete } from '@kapeta/ui-web-components';
 
 import { PlannerNodeSize } from '../types';
 import { PlannerResourceModelWrapper } from '../wrappers/PlannerResourceModelWrapper';

@@ -7,9 +7,9 @@ import {
     BlockConnectionSpec,
     Dimensions,
     Point,
-} from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-types';
 
-import { ResourceTypeProvider } from '@blockware/ui-web-context';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import './PlannerBlockResourceListItem.less';
 
@@ -25,7 +25,7 @@ import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
 
 import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';
 import { SelectedResourceItem } from '../wrappers/models';
-import { asHTMLElement, DOMElement } from '@blockware/ui-web-utils';
+import { asHTMLElement, DOMElement } from '@kapeta/ui-web-utils';
 import { observer } from 'mobx-react';
 import { action, computed, makeObservable, observable } from 'mobx';
 

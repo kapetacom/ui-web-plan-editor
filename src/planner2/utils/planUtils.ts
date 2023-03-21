@@ -1,5 +1,5 @@
 import { PlannerNodeSize } from '../../types';
-import { Asset, BlockInstanceSpec, BlockKind } from '@blockware/ui-web-types';
+import { Asset, BlockInstanceSpec, BlockKind } from '@kapeta/ui-web-types';
 
 export const resourceHeight = {
     [PlannerNodeSize.SMALL]: 30,

@@ -12,10 +12,10 @@ import type {
     Point,
     BlockConnectionSpec,
     DataWrapper,
-} from '@blockware/ui-web-types';
-import { ResourceRole } from '@blockware/ui-web-types';
-import { BasisCurve } from '@blockware/ui-web-utils';
-import { ResourceTypeProvider } from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
+import { BasisCurve } from '@kapeta/ui-web-utils';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
 import { PlannerModelWrapper } from './PlannerModelWrapper';

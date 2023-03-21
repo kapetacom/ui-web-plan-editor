@@ -5,9 +5,9 @@ import {
     ResourceKind,
     ResourceRole,
     ResourceType,
-} from '@blockware/ui-web-types';
-import { toClass } from '@blockware/ui-web-utils';
-import { ResourceTypeProvider } from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-types';
+import { toClass } from '@kapeta/ui-web-utils';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
@@ -16,7 +16,7 @@ import { useBlockContext } from '../BlockContext';
 import { ResourceMode } from '../../wrappers/wrapperHelpers';
 import { getResourceId, resourceHeight } from '../utils/planUtils';
 import { SVGCircleButton } from '../../components/SVGCircleButton';
-import { ButtonStyle } from '@blockware/ui-web-components';
+import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerConnectionPoint } from './PlannerConnectionPoint';
 import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
 

@@ -1,5 +1,5 @@
 import { toJS } from 'mobx';
-import { DataWrapper, ItemType } from '@blockware/ui-web-types';
+import { DataWrapper, ItemType } from '@kapeta/ui-web-types';
 
 import { Planner } from '../Planner';
 import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';

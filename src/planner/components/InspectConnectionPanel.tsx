@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import { observer } from 'mobx-react';
 
-import { Modal, ModalSize } from '@blockware/ui-web-components';
+import { Modal, ModalSize } from '@kapeta/ui-web-components';
 import {
     TrafficService,
     TrafficEventType,
     ResourceTypeProvider,
-} from '@blockware/ui-web-context';
-import { ConnectionMethodsMapping, Traffic } from '@blockware/ui-web-types';
+} from '@kapeta/ui-web-context';
+import { ConnectionMethodsMapping, Traffic } from '@kapeta/ui-web-types';
 
 import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
 
