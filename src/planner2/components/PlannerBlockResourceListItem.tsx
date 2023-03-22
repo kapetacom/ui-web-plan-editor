@@ -16,11 +16,10 @@ import { ButtonStyle } from '@kapeta/ui-web-components';
 import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
 import { PlannerConnectionPoint } from './PlannerConnectionPoint';
 import { BlockResource } from '../../components/BlockResource';
-import { DragAndDrop } from '../DragAndDrop';
+import { DragAndDrop } from '../utils/dndUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { useBlockContext } from '../BlockContext';
-import { PlannerPayload } from '../types';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 
@@ -270,7 +269,7 @@ export const PlannerBlockResourceListItem: React.FC<
 
     return (
         <SVGLayoutNode x={0} y={yOffset}>
-            <DragAndDrop.DropZone<PlannerPayload>
+            <DragAndDrop.DropZone
                 onDragEnter={() => setDragOver(true)}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={(payload) => {
@@ -293,7 +292,7 @@ export const PlannerBlockResourceListItem: React.FC<
                 accept={() => dragIsCompatible}
             >
                 {({ onRef }) => (
-                    <DragAndDrop.Draggable<PlannerPayload>
+                    <DragAndDrop.Draggable
                         data={{
                             type: 'resource',
                             data: {

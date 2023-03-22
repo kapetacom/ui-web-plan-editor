@@ -8,7 +8,7 @@ import { useBlockContext } from '../BlockContext';
 import { PlannerBlockResourceList } from './PlannerBlockResourceList';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode } from '../../wrappers/wrapperHelpers';
-import { DragAndDrop } from '../DragAndDrop';
+import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
 import { PlannerPayload, ResourcePayload } from '../types';
 
@@ -43,7 +43,7 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
 
     return (
         // TODO: Readonly/ viewonly
-        <DragAndDrop.Draggable<PlannerPayload>
+        <DragAndDrop.Draggable
             data={data}
             onDragStart={() => setBlockMode(BlockMode.SHOW)}
             onDrop={(position) => {

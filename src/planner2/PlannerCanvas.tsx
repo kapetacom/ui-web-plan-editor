@@ -1,13 +1,12 @@
 import React, { useContext, useMemo } from 'react';
 import { PlannerContext, PlannerMode } from './PlannerContext';
-import { DragAndDrop } from './DragAndDrop';
+import { DragAndDrop } from './utils/dndUtils';
 import { useBoundingBox } from './hooks/boundingBox';
 import { calculateCanvasSize } from './utils/planUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { PositionDiff } from './DragAndDrop/types';
 import { BlockInstanceSpec } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
-import { PlannerPayload } from './types';
 
 const blockPositionUpdater =
     (diff: PositionDiff, zoom: number) => (block: BlockInstanceSpec) => {
@@ -53,7 +52,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
     return (
         <div className={`planner-area-container ${classNames}`}>
             <div className="planner-area-position-parent" ref={onRef}>
-                <DragAndDrop.DropZone<PlannerPayload>
+                <DragAndDrop.DropZone
                     scale={zoom}
                     accept={(draggable) => {
                         // Filter types
