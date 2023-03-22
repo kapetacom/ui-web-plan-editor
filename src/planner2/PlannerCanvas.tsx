@@ -7,6 +7,7 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { PositionDiff } from './DragAndDrop/types';
 import { BlockInstanceSpec } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
+import { PlannerPayload } from './types';
 
 const blockPositionUpdater =
     (diff: PositionDiff, zoom: number) => (block: BlockInstanceSpec) => {
@@ -52,15 +53,21 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
     return (
         <div className={`planner-area-container ${classNames}`}>
             <div className="planner-area-position-parent" ref={onRef}>
-                <DragAndDrop.DropZone<{ id: string }>
+                <DragAndDrop.DropZone<PlannerPayload>
                     scale={zoom}
                     accept={(draggable) => {
                         // Filter types
-                        return true;
+                        return (
+                            draggable.type === 'block' && !!draggable.data.id
+                        );
                     }}
                     onDrop={(draggable, dragEvent) => {
+                        // Is it possible to narrow the type via the accept fn?
+                        if (draggable.type !== 'block') {
+                            return;
+                        }
                         updateBlockInstance(
-                            draggable.id,
+                            draggable.data.id,
                             blockPositionUpdater(dragEvent.diff, zoom)
                         );
                     }}

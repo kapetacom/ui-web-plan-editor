@@ -50,8 +50,9 @@ const DropZoneWrapper = (props) => {
 
 export const DragAndDropDemo = () => {
     const [savedPosition, setSavedPosition] = useState({ top: 0, left: 0 });
-    const data = {
-        test: 1,
+    const payload = {
+        type: 'demo',
+        data: { test: 1 },
     };
 
     return (
@@ -62,7 +63,7 @@ export const DragAndDropDemo = () => {
                 <DropZoneWrapper style={{ position: 'relative', top: '500' }} />
 
                 <DragAndDrop.Draggable
-                    data={data}
+                    data={payload}
                     onDrop={(position) =>
                         setSavedPosition({
                             left: savedPosition.left + position.x,

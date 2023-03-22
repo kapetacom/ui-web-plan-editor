@@ -11,7 +11,7 @@ const defaultState = {
 export const DnDContainer = <T extends unknown>(props) => {
     const [dragState, setDragState] = useState<{
         state: 'IDLE' | 'DRAGGING';
-        draggable?: DnDPayload<T>;
+        draggable?: DnDPayload;
         position: PositionDiff;
     }>(defaultState);
 

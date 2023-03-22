@@ -10,6 +10,7 @@ import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { DragAndDrop } from '../DragAndDrop';
 import { LayoutNode } from '../LayoutContext';
+import { PlannerPayload, ResourcePayload } from '../types';
 
 interface Props {
     viewOnly?: boolean;
@@ -24,6 +25,7 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
         blockDefinition,
         blockReference,
         setBlockMode,
+        isReadOnly,
     } = useBlockContext();
 
     if (!blockInstance) {
@@ -34,10 +36,14 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
         throw new Error('PlannerBlockNode requires a Plan context');
     }
 
-    const data = useMemo(() => ({ id: blockInstance.id }), [blockInstance.id]);
+    const data: PlannerPayload = useMemo(
+        () => ({ type: 'block', data: blockInstance }),
+        [blockInstance]
+    );
+
     return (
         // TODO: Readonly/ viewonly
-        <DragAndDrop.Draggable
+        <DragAndDrop.Draggable<PlannerPayload>
             data={data}
             onDragStart={() => setBlockMode(BlockMode.SHOW)}
             onDrop={(position) => {
@@ -51,52 +57,88 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
                     y={blockInstance.dimensions!.top + position.y / zoom}
                     key={blockInstance.id}
                 >
-                    <svg
-                        className="planner-block-node-container"
-                        style={{
-                            left: `${
-                                blockInstance.dimensions!.left +
-                                position.x / zoom
-                            }px`,
-                            top: `${
-                                blockInstance.dimensions!.top +
-                                position.y / zoom
-                            }px`,
+                    <DragAndDrop.DropZone
+                        accept={(draggable: PlannerPayload) => {
+                            return (
+                                draggable.type === 'resource' &&
+                                // don't connect to self
+                                draggable.data.block.id !== blockInstance.id &&
+                                // can create new clients if the block is editable
+                                !isReadOnly
+                            );
                         }}
-                        x={blockInstance.dimensions!.left}
-                        y={blockInstance.dimensions!.top}
-                    >
-                        <g
-                            data-node-id={blockInstance.id}
-                            data-node-type="block"
-                            className="planner-block-node"
-                        >
-                            <PlannerBlockResourceList
-                                role={ResourceRole.CONSUMES}
-                            />
-                            <PlannerBlockResourceList
-                                role={ResourceRole.PROVIDES}
-                            />
+                        onDrop={() => {
+                            setBlockMode(BlockMode.HIDDEN);
+                            // Edit block
+                            // Create new consumer on block and save definition?
 
-                            <BlockNode
-                                name={blockInstance.name}
-                                instanceName={blockInstance.name}
-                                onInstanceNameChange={(name) =>
-                                    // eslint-disable-next-line no-console
-                                    console.log(name)
-                                }
-                                readOnly={viewOnly}
-                                // TODO: Move this to block context
-                                status={InstanceStatus.STOPPED}
-                                height={instanceBlockHeight}
-                                width={blockInstance.dimensions!.width}
-                                typeName={blockDefinition?.metadata.name}
-                                version={blockReference.version}
-                                valid
-                                {...componentProps}
-                            />
-                        </g>
-                    </svg>
+                            // Add connection to new consumer
+                        }}
+                        onDragEnter={(draggable: ResourcePayload) => {
+                            if (draggable.data.role === ResourceRole.CONSUMES) {
+                                setBlockMode(BlockMode.HOVER_DROP_CONSUMER);
+                            } else if (
+                                draggable.data.role === ResourceRole.PROVIDES
+                            ) {
+                                setBlockMode(BlockMode.HOVER_DROP_PROVIDER);
+                            }
+                        }}
+                        onDragLeave={() => {
+                            setBlockMode(BlockMode.HIDDEN);
+                        }}
+                    >
+                        {({ onRef }) => (
+                            <svg
+                                className="planner-block-node-container"
+                                style={{
+                                    left: `${
+                                        blockInstance.dimensions!.left +
+                                        position.x / zoom
+                                    }px`,
+                                    top: `${
+                                        blockInstance.dimensions!.top +
+                                        position.y / zoom
+                                    }px`,
+                                }}
+                                x={blockInstance.dimensions!.left}
+                                y={blockInstance.dimensions!.top}
+                            >
+                                <g
+                                    data-node-id={blockInstance.id}
+                                    data-node-type="block"
+                                    className="planner-block-node"
+                                >
+                                    <PlannerBlockResourceList
+                                        role={ResourceRole.CONSUMES}
+                                    />
+                                    <PlannerBlockResourceList
+                                        role={ResourceRole.PROVIDES}
+                                    />
+
+                                    <BlockNode
+                                        name={blockInstance.name}
+                                        instanceName={blockInstance.name}
+                                        onInstanceNameChange={(name) =>
+                                            // eslint-disable-next-line no-console
+                                            console.log(name)
+                                        }
+                                        readOnly={viewOnly}
+                                        // TODO: Move this to block context
+                                        status={InstanceStatus.STOPPED}
+                                        height={instanceBlockHeight}
+                                        width={blockInstance.dimensions!.width}
+                                        typeName={
+                                            blockDefinition?.metadata.name
+                                        }
+                                        version={blockReference.version}
+                                        valid
+                                        blockRef={onRef}
+                                        {...componentProps}
+                                    />
+                                </g>
+                            </svg>
+                        )}
+                    </DragAndDrop.DropZone>
                 </LayoutNode>
             )}
         </DragAndDrop.Draggable>

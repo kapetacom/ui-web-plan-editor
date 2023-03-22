@@ -2,12 +2,12 @@ import React from 'react';
 import { DnDPayload, DragEventInfo } from './types';
 import { DropZoneEntity } from './DropZoneManager';
 
-export interface DnDContextType<T> {
+export interface DnDContextType<D extends DnDPayload = DnDPayload> {
     isDragging: boolean;
     /**
      * Reference to the current active draggable if any
      */
-    draggable: DnDPayload<T> | null;
+    draggable: D | null;
 
     callbacks: {
         /**
@@ -17,10 +17,10 @@ export interface DnDContextType<T> {
         registerDropZone(id: string, zone: DropZoneEntity): void;
         unregisterDropZone(id: string): void;
 
-        onDragStart(draggable: DnDPayload<T>, dragEvent: DragEventInfo): void;
-        onDrop(draggable: DnDPayload<T>, dragEvent: DragEventInfo): void;
+        onDragStart(draggable: DnDPayload, dragEvent: DragEventInfo): void;
+        onDrop(draggable: DnDPayload, dragEvent: DragEventInfo): void;
         // While dragging, this fires every n ms
-        onDrag(draggable: DnDPayload<T>, dragEvent: DragEventInfo): void;
+        onDrag(draggable: DnDPayload, dragEvent: DragEventInfo): void;
     };
 }
 
