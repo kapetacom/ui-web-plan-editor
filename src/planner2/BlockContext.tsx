@@ -53,11 +53,12 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
     } = useContext(PlannerContext);
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
 
+    const blockInstance =
+        plan?.spec.blocks?.find((block) => block.id === blockId) || null;
+    const blockDefinition =
+        getBlockByRef(blockInstance?.block.ref || '') || null;
+
     const value = useMemo(() => {
-        const blockInstance =
-            plan?.spec.blocks?.find((block) => block.id === blockId) || null;
-        const blockDefinition =
-            getBlockByRef(blockInstance?.block.ref || '') || null;
         // calculate Resource height
         const consumers = blockDefinition?.spec.consumers || [];
         const providers = blockDefinition?.spec.providers || [];
@@ -91,12 +92,11 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
                 plannerMode === PlannerMode.VIEW,
         };
     }, [
-        plan,
         size,
-        getBlockByRef,
+        blockInstance,
+        blockDefinition,
         blockMode,
         setBlockMode,
-        blockId,
         plannerMode,
     ]);
     return (

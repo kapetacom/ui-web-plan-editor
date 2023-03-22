@@ -1,4 +1,4 @@
-import React, { Context, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import {
     Asset,
@@ -29,6 +29,7 @@ export interface PlannerContextData {
     setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
     size: PlannerNodeSize;
     getBlockByRef(ref: string): BlockKind | undefined;
+    updateBlockDefinition(ref: string, update: BlockKind): void;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
     addConnection(connection: BlockConnectionSpec): void;
     hasConnections(connectionSpec: BlockResourceReferenceSpec): boolean;
@@ -38,8 +39,6 @@ export interface PlannerContextData {
         removePoint(pointId: string): void;
     };
 }
-
-export interface PlannerContextType extends Context<PlannerContextData> {}
 
 const defaultValue: PlannerContextData = {
     focusedBlock: undefined,
@@ -52,6 +51,7 @@ const defaultValue: PlannerContextData = {
     getBlockByRef(_ref: string) {
         return undefined;
     },
+    updateBlockDefinition() {},
     updateBlockInstance(blockId, callback) {
         // noop
     },
@@ -68,13 +68,12 @@ const defaultValue: PlannerContextData = {
     },
 };
 
-export const PlannerContext: PlannerContextType =
-    React.createContext(defaultValue);
+export const PlannerContext = React.createContext(defaultValue);
 
 // Helper to make sure we memoize anything we can for the context
 export const usePlannerContext = ({
     plan: extPlan,
-    blockAssets,
+    blockAssets: extBlockAssets,
     mode = PlannerMode.VIEW,
 }: {
     plan: PlanKind;
@@ -110,73 +109,99 @@ export const usePlannerContext = ({
     // size
     // endregion
 
+    // Allow internal changes, but load from props in case props change
     const [plan, setPlan] = useState(extPlan);
     useEffect(() => {
         setPlan(extPlan);
     }, [extPlan]);
 
-    // Plan:
-    // connections
+    // Allow internal changes, but load from props in case props change
+    const [blockAssets, setBlockAssets] = useState(extBlockAssets);
+    useEffect(() => {
+        setBlockAssets(extBlockAssets);
+    }, [extBlockAssets]);
 
-    return {
-        // view state
-        focusedBlock,
-        zoom,
-        setZoomLevel,
-        size: PlannerNodeSize.MEDIUM,
-        //
-        mode: viewMode,
-        //
-        plan: plan,
-        blockAssets,
-        getBlockByRef(ref: string) {
-            const blockAsset = blockAssets.find(
-                (asset) =>
-                    parseBlockwareUri(asset.ref).compare(
-                        parseBlockwareUri(ref)
-                    ) === 0
-            );
-            return blockAsset?.data;
-        },
-        updateBlockInstance(blockId: string, updater) {
-            // Use state callback to reference the previous state (avoid stale ref)
-            setPlan((prevState) => {
-                const newPlan = cloneDeep(prevState);
-                const blockIx =
-                    newPlan.spec.blocks?.findIndex(
-                        (pblock) => pblock.id === blockId
-                    ) ?? -1;
-                if (blockIx === -1) {
-                    throw new Error(`Block #${blockId} not found`);
-                }
+    return useMemo(
+        () => ({
+            // view state
+            focusedBlock,
+            zoom,
+            setZoomLevel,
+            size: PlannerNodeSize.MEDIUM,
+            //
+            mode: viewMode,
+            //
+            plan: plan,
+            blockAssets,
+            getBlockByRef(ref: string) {
+                const blockAsset = blockAssets.find(
+                    (asset) =>
+                        parseBlockwareUri(asset.ref).compare(
+                            parseBlockwareUri(ref)
+                        ) === 0
+                );
+                return blockAsset?.data;
+            },
+            updateBlockDefinition(ref: string, update: BlockKind) {
+                setBlockAssets((state) =>
+                    state.map((block) =>
+                        parseBlockwareUri(block.ref).compare(
+                            parseBlockwareUri(ref)
+                        ) === 0
+                            ? { ...block, data: update }
+                            : block
+                    )
+                );
+            },
+            updateBlockInstance(blockId: string, updater) {
+                // Use state callback to reference the previous state (avoid stale ref)
+                setPlan((prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    const blockIx =
+                        newPlan.spec.blocks?.findIndex(
+                            (pblock) => pblock.id === blockId
+                        ) ?? -1;
+                    if (blockIx === -1) {
+                        throw new Error(`Block #${blockId} not found`);
+                    }
 
-                const blocks = (newPlan.spec.blocks =
-                    newPlan.spec.blocks || []);
-                blocks[blockIx] = updater(blocks[blockIx]);
-                return newPlan;
-            });
+                    const blocks = (newPlan.spec.blocks =
+                        newPlan.spec.blocks || []);
+                    blocks[blockIx] = updater(blocks[blockIx]);
+                    return newPlan;
+                });
 
-            // TODO: Save to disk / callback
-        },
+                // TODO: Save to disk / callback
+            },
 
-        addConnection({ from, to, mapping }: BlockConnectionSpec) {
-            setPlan((prevState) => {
-                const newPlan = cloneDeep(prevState);
-                newPlan.spec.connections?.push({ from, to, mapping });
-                return newPlan;
-            });
-        },
-        hasConnections(connectionSpec: BlockResourceReferenceSpec) {
-            return !!plan.spec.connections?.find(
-                (connection) =>
-                    (connection.from.blockId === connectionSpec.blockId &&
-                        connection.from.resourceName ===
-                            connectionSpec.resourceName) ||
-                    (connection.to.blockId === connectionSpec.blockId &&
-                        connection.to.resourceName ===
-                            connectionSpec.resourceName)
-            );
-        },
-        connectionPoints,
-    };
+            addConnection({ from, to, mapping }: BlockConnectionSpec) {
+                setPlan((prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    newPlan.spec.connections?.push({ from, to, mapping });
+                    return newPlan;
+                });
+            },
+            hasConnections(connectionSpec: BlockResourceReferenceSpec) {
+                return !!plan.spec.connections?.find(
+                    (connection) =>
+                        (connection.from.blockId === connectionSpec.blockId &&
+                            connection.from.resourceName ===
+                                connectionSpec.resourceName) ||
+                        (connection.to.blockId === connectionSpec.blockId &&
+                            connection.to.resourceName ===
+                                connectionSpec.resourceName)
+                );
+            },
+            connectionPoints,
+        }),
+        [
+            blockAssets,
+            plan,
+            zoom,
+            setZoomLevel,
+            connectionPoints,
+            focusedBlock,
+            viewMode,
+        ]
+    );
 };

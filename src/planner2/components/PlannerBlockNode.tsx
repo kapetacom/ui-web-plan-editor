@@ -1,5 +1,6 @@
 import React, { useContext, useMemo } from 'react';
-import { InstanceStatus } from '@kapeta/ui-web-context';
+import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import _ from 'lodash';
 
 import { BlockNode } from '../../components/BlockNode';
 import { PlannerNodeSize } from '../../types';
@@ -18,7 +19,8 @@ interface Props {
 }
 
 export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
-    const { plan, zoom } = useContext(PlannerContext);
+    const { plan, zoom, updateBlockDefinition, addConnection } =
+        useContext(PlannerContext);
     const {
         blockInstance,
         instanceBlockHeight,
@@ -67,12 +69,50 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
                                 !isReadOnly
                             );
                         }}
-                        onDrop={() => {
+                        onDrop={(draggable: ResourcePayload) => {
                             setBlockMode(BlockMode.HIDDEN);
-                            // Edit block
+
+                            // Figure out what kind of consumer to create, and add a connection to it.
+                            const resourceConfigs = ResourceTypeProvider.list();
+                            const target = resourceConfigs.find(
+                                (rc) =>
+                                    rc.converters?.[0]?.fromKind ===
+                                    draggable.data.resource.kind
+                            );
+                            const targetKind =
+                                target?.kind || draggable.data.resource.kind;
+                            if (!resourceConfigs) {
+                                return;
+                            }
+
                             // Create new consumer on block and save definition?
+                            const newBlock = _.cloneDeep(blockDefinition);
+                            newBlock.spec.consumers =
+                                newBlock.spec.consumers || [];
+                            newBlock.spec.consumers.push({
+                                kind: targetKind,
+                                metadata: {
+                                    name: 'new-resource',
+                                },
+                                spec: {},
+                            });
+                            updateBlockDefinition(
+                                blockInstance.block.ref,
+                                newBlock
+                            );
 
                             // Add connection to new consumer
+                            addConnection({
+                                from: {
+                                    blockId: draggable.data.block.id,
+                                    resourceName:
+                                        draggable.data.resource.metadata.name,
+                                },
+                                to: {
+                                    blockId: blockInstance.id,
+                                    resourceName: 'new-resource',
+                                },
+                            });
                         }}
                         onDragEnter={(draggable: ResourcePayload) => {
                             if (draggable.data.role === ResourceRole.CONSUMES) {
