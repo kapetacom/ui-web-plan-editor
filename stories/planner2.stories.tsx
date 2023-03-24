@@ -10,6 +10,9 @@ import {
     PlannerMode,
 } from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
+import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
+import { SchemaKind } from '@kapeta/ui-web-types';
+import { parseBlockwareUri } from '@kapeta/nodejs-utils';
 
 export default {
     title: 'Planner2',
@@ -81,12 +84,20 @@ export const PlannerConfig2 = () => {
 
 export const PlannerActions = () => {
     const plan = useAsync(() => readPlanV2());
-    const [isOpen, setIsOpen] = React.useState(false);
+    //
+
+    const [editItem, setEditItem] = React.useState<SchemaKind<any, any> | null>(
+        null
+    );
+    const [configureItem, setConfigureItem] = React.useState<SchemaKind<
+        any,
+        any
+    > | null>(null);
 
     const actionConfig: PlannerActionConfig = {
         block: [
             {
-                enabled(planner): boolean {
+                enabled(): boolean {
                     return true; // planner.mode !== PlannerMode.VIEW;
                 },
                 onClick() {
@@ -97,8 +108,13 @@ export const PlannerActions = () => {
                 label: 'Inspect',
             },
             {
-                enabled(planner): boolean {
-                    return true; // planner.mode !== PlannerMode.VIEW;
+                enabled(planner, { blockInstance }): boolean {
+                    return (
+                        planner.mode !== PlannerMode.VIEW &&
+                        !!blockInstance &&
+                        parseBlockwareUri(blockInstance.block.ref).version ===
+                            'local'
+                    );
                 },
                 onClick() {
                     alert('delete');
@@ -108,8 +124,13 @@ export const PlannerActions = () => {
                 label: 'Delete',
             },
             {
-                enabled(planner): boolean {
-                    return true; // planner.mode !== PlannerMode.VIEW;
+                enabled(planner, { blockInstance }): boolean {
+                    return (
+                        planner.mode !== PlannerMode.VIEW &&
+                        !!blockInstance &&
+                        parseBlockwareUri(blockInstance.block.ref).version ===
+                            'local'
+                    );
                 },
                 onClick() {
                     alert('edit');
@@ -119,47 +140,45 @@ export const PlannerActions = () => {
                 label: 'Edit',
             },
             {
-                enabled(planner): boolean {
-                    return true; // planner.mode !== PlannerMode.VIEW;
+                enabled(planner, { blockInstance }): boolean {
+                    return planner.mode === PlannerMode.CONFIGURATION;
                 },
-                onClick() {
-                    alert('configure');
+                onClick(planner, { block }) {
+                    setConfigureItem(block);
                 },
                 buttonStyle: ButtonStyle.DEFAULT,
                 icon: 'fa fa-tools',
                 label: 'Configure',
             },
         ],
-        // TODO: Need resource id 🤔
         resource: [
             {
-                enabled(planner): boolean {
-                    return true; // planner.mode !== PlannerMode.VIEW;
+                enabled(planner, { blockInstance }): boolean {
+                    return (
+                        planner.mode !== PlannerMode.VIEW &&
+                        !!blockInstance &&
+                        parseBlockwareUri(blockInstance.block.ref).version ===
+                            'local'
+                    );
                 },
-                onClick() {
-                    alert('edit');
-                },
-                buttonStyle: ButtonStyle.SECONDARY,
-                icon: 'fa fa-pencil',
-                label: 'Edit',
-            },
-            {
-                enabled(planner): boolean {
-                    return true; // planner.mode !== PlannerMode.VIEW;
-                },
-                onClick() {
-                    alert('edit');
+                onClick(item, { resource }) {
+                    setEditItem({ type: 'resource' });
                 },
                 buttonStyle: ButtonStyle.SECONDARY,
                 icon: 'fa fa-pencil',
                 label: 'Edit',
             },
             {
-                enabled(planner): boolean {
-                    return true; // planner.mode !== PlannerMode.VIEW;
+                enabled(planner, { blockInstance }): boolean {
+                    return (
+                        planner.mode !== PlannerMode.VIEW &&
+                        !!blockInstance &&
+                        parseBlockwareUri(blockInstance.block.ref).version ===
+                            'local'
+                    );
                 },
-                onClick() {
-                    alert('delete');
+                onClick(planner, { block }) {
+                    setEditItem(block);
                 },
                 buttonStyle: ButtonStyle.DANGER,
                 icon: 'fa fa-trash',
@@ -171,10 +190,12 @@ export const PlannerActions = () => {
         connection: [
             {
                 enabled(planner): boolean {
-                    return true; // planner.mode !== PlannerMode.VIEW;
+                    return planner.mode !== PlannerMode.VIEW;
                 },
-                onClick() {
-                    alert('delete connection');
+                onClick(planner, { connection }) {
+                    alert(
+                        `delete connection from ${connection.from.blockId} to ${connection.to.blockId}`
+                    );
                 },
                 buttonStyle: ButtonStyle.DANGER,
                 icon: 'fa fa-trash',
@@ -185,16 +206,17 @@ export const PlannerActions = () => {
 
     return (
         <DefaultContext>
-            {isOpen ? <h1 onClick={() => setIsOpen(false)}>AWESOME</h1> : null}
-
             {plan.value ? (
                 <Planner
                     plan={plan.value.plan}
                     blockAssets={plan.value.blockAssets || []}
                     systemId="some-system"
                     actions={actionConfig}
+                    mode={PlannerMode.EDIT}
                 />
             ) : null}
+
+            <ItemEditorPanel open={!!editItem} editableItem={editItem} />
         </DefaultContext>
     );
 };

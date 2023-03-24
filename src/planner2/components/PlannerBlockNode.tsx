@@ -191,6 +191,11 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                         y={instanceBlockHeight + 10}
                                         show
                                         actions={actions.block}
+                                        //
+                                        actionContext={{
+                                            block: blockDefinition,
+                                            blockInstance: blockInstance,
+                                        }}
                                     />
                                 </g>
                             </svg>

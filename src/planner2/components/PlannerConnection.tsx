@@ -71,6 +71,9 @@ export const PlannerConnection: React.FC<{
                         // TODO: how can we avoid the magic number?
                         y={middlePoint.y - 5}
                         actions={props.actions}
+                        actionContext={{
+                            connection: props.connection,
+                        }}
                     />
                 )}
             </g>

@@ -30,9 +30,11 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
         plan,
         updateBlockInstance,
     } = useContext(PlannerContext);
+    const { isDragging } = useContext(DragAndDrop.Context);
 
     const classNames = toClass({
         'read-only': mode === PlannerMode.VIEW,
+        dragging: isDragging,
     });
 
     const { value: boundingBox, onRef } = useBoundingBox();

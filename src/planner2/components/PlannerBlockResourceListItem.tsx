@@ -121,7 +121,7 @@ export const PlannerBlockResourceListItem: React.FC<
     PlannerBlockResourceListItemProps
 > = (props) => {
     const planner = useContext(PlannerContext);
-    const { blockInstance } = useBlockContext();
+    const { blockInstance, blockDefinition } = useBlockContext();
     const { draggable } = useContext(DnDContext);
 
     let resourceConfig: ResourceConfig | null = null;
@@ -318,6 +318,10 @@ export const PlannerBlockResourceListItem: React.FC<
                                             y={buttonY}
                                             show={buttonsVisible}
                                             actions={props.actions || []}
+                                            actionContext={{
+                                                block: blockDefinition,
+                                                blockInstance,
+                                            }}
                                             ref={actionButtonsRef}
                                         />
 

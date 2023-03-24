@@ -1,5 +1,18 @@
-import React, { forwardRef, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+    forwardRef,
+    useContext,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
 import { PlannerAction } from '../types';
+import { PlannerContext } from '../PlannerContext';
+import {
+    BlockConnectionSpec,
+    BlockInstanceSpec,
+    BlockKind,
+    ResourceKind,
+} from '@kapeta/ui-web-types';
 
 const CircleButton = (props) => {
     return (
@@ -22,10 +35,20 @@ interface ActionButtonProps {
     y: number;
     show: boolean;
     actions: PlannerAction<any>[];
+
+    //
+    actionContext: {
+        block?: BlockKind;
+        blockInstance?: BlockInstanceSpec;
+        resource?: ResourceKind;
+        connection?: BlockConnectionSpec;
+    };
 }
 
 // Automatically compensate for the width of the connection buttons
 export const ActionButtons = forwardRef((props: ActionButtonProps, fwdRef) => {
+    const planner = useContext(PlannerContext);
+
     const ref = useRef<HTMLDivElement>(null);
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
@@ -79,14 +102,19 @@ export const ActionButtons = forwardRef((props: ActionButtonProps, fwdRef) => {
                     }}
                 >
                     {props.actions.map((action: PlannerAction<any>, ix) => {
-                        if (action.enabled()) {
+                        if (action.enabled(planner, props.actionContext)) {
                             return (
                                 <CircleButton
                                     key={ix}
                                     label={action.label}
                                     icon={action.icon}
                                     style={action.buttonStyle}
-                                    onClick={action.onClick}
+                                    onClick={() =>
+                                        action.onClick(
+                                            planner,
+                                            props.actionContext
+                                        )
+                                    }
                                 />
                             );
                         }
