@@ -1,11 +1,12 @@
 import {
+    BlockConnectionSpec,
     BlockInstanceSpec,
+    BlockKind,
     ResourceKind,
     ResourceRole,
 } from '@kapeta/ui-web-types';
-import { PlannerContextData } from './PlannerContext';
-import { PlannerBlockContextData } from './BlockContext';
 import { ButtonStyle } from '@kapeta/ui-web-components';
+import { PlannerContextData } from './PlannerContext';
 
 export type BlockPayload = {
     type: 'block';
@@ -22,13 +23,16 @@ export type ResourcePayload = {
 
 export type PlannerPayload = BlockPayload | ResourcePayload;
 
+export interface ActionContext {
+    block?: BlockKind;
+    blockInstance?: BlockInstanceSpec;
+    resource?: ResourceKind;
+    connection?: BlockConnectionSpec;
+}
 export interface PlannerAction<P extends unknown> {
-    enabled(
-        planner: PlannerContextData,
-        block: PlannerBlockContextData
-    ): boolean;
+    enabled(planner: PlannerContextData, info: ActionContext): boolean;
     buttonStyle: ButtonStyle;
     icon: string;
     label: string;
-    onClick(p: P): void;
+    onClick(planner: PlannerContextData, context: ActionContext): void;
 }
