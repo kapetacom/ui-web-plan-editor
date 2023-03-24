@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { BlockNode } from '../../components/BlockNode';
 import { PlannerNodeSize } from '../../types';
-import { PlannerContext } from '../PlannerContext';
+import { PlannerActionConfig, PlannerContext } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
 import { PlannerBlockResourceList } from './PlannerBlockResourceList';
 import { ResourceRole } from '@kapeta/ui-web-types';
@@ -12,13 +12,19 @@ import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
 import { PlannerPayload, ResourcePayload } from '../types';
+import { ActionButtons } from './ActionButtons';
 
 interface Props {
     viewOnly?: boolean;
     size: PlannerNodeSize;
+    actions: PlannerActionConfig;
 }
 
-export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
+export const PlannerBlockNode: React.FC<Props> = ({
+    viewOnly,
+    size,
+    actions,
+}) => {
     const { plan, zoom, updateBlockDefinition, addConnection } =
         useContext(PlannerContext);
     const {
@@ -150,9 +156,11 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
                                 >
                                     <PlannerBlockResourceList
                                         role={ResourceRole.CONSUMES}
+                                        actions={actions.resource}
                                     />
                                     <PlannerBlockResourceList
                                         role={ResourceRole.PROVIDES}
+                                        actions={actions.resource}
                                     />
 
                                     <BlockNode
@@ -174,6 +182,15 @@ export const PlannerBlockNode: React.FC<Props> = ({ viewOnly, size }) => {
                                         valid
                                         blockRef={onRef}
                                         {...componentProps}
+                                    />
+                                </g>
+                                <g>
+                                    {/* TODO: Render block actions w/ the wheel/staggered transitions */}
+                                    <ActionButtons
+                                        x={75}
+                                        y={instanceBlockHeight + 10}
+                                        show
+                                        actions={actions.block}
                                     />
                                 </g>
                             </svg>

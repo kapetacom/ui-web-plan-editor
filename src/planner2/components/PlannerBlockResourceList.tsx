@@ -11,10 +11,11 @@ import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
 import { resourceHeight } from '../utils/planUtils';
 import { SVGLayoutNode } from '../LayoutContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
-import { PlannerPayload } from '../types';
+import { PlannerAction, PlannerPayload } from '../types';
 
 export interface PlannerBlockResourceListProps {
     role: ResourceRole;
+    actions: PlannerAction<any>[];
 }
 
 export const PlannerBlockResourceList: React.FC<
@@ -96,6 +97,7 @@ export const PlannerBlockResourceList: React.FC<
                         // If hovering should trigger a different state, put it here
                         // show_options unless viewOnly or we're dragging
                         hoverMode={ResourceMode.SHOW_OPTIONS}
+                        actions={props.actions}
                     />
                 );
             })}

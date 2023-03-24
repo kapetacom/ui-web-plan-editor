@@ -3,6 +3,9 @@ import {
     ResourceKind,
     ResourceRole,
 } from '@kapeta/ui-web-types';
+import { PlannerContextData } from './PlannerContext';
+import { PlannerBlockContextData } from './BlockContext';
+import { ButtonStyle } from '@kapeta/ui-web-components';
 
 export type BlockPayload = {
     type: 'block';
@@ -18,3 +21,14 @@ export type ResourcePayload = {
 };
 
 export type PlannerPayload = BlockPayload | ResourcePayload;
+
+export interface PlannerAction<P extends unknown> {
+    enabled(
+        planner: PlannerContextData,
+        block: PlannerBlockContextData
+    ): boolean;
+    buttonStyle: ButtonStyle;
+    icon: string;
+    label: string;
+    onClick(p: P): void;
+}

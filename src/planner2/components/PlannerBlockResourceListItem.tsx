@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useLayoutEffect, useRef, useState } from 'react';
 
 import {
     ResourceConfig,
@@ -11,8 +11,6 @@ import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
 import { ResourceMode } from '../../wrappers/wrapperHelpers';
 import { getResourceId, resourceHeight } from '../utils/planUtils';
-import { SVGCircleButton } from '../../components/SVGCircleButton';
-import { ButtonStyle } from '@kapeta/ui-web-components';
 import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
 import { PlannerConnectionPoint } from './PlannerConnectionPoint';
 import { BlockResource } from '../../components/BlockResource';
@@ -22,6 +20,8 @@ import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { useBlockContext } from '../BlockContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
+import { ActionButtons } from './ActionButtons';
+import { PlannerAction } from '../types';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const BUTTON_HEIGHT = 24; // Height of edit and delete buttons
@@ -35,6 +35,7 @@ interface PlannerBlockResourceListItemProps {
     readOnly?: boolean;
     mode: ResourceMode;
     hoverMode?: ResourceMode;
+    actions?: PlannerAction<any>[];
 }
 
 const renderClipPath = (
@@ -63,68 +64,15 @@ const renderClipPath = (
     );
 };
 
-const renderActions = (consumer: boolean) => {
-    // Detect viewOnly/readOnly
-    const readOnly = false;
-    const viewOnly = false;
-    const setItemToInspect = () => {};
-
-    // Hmm, view only actions could be separate?
-    if ((readOnly && !setItemToInspect) || viewOnly) {
-        return <g className="resource-actions" />;
-    }
-
-    // @ts-ignore
-    if (readOnly && setItemToInspect) {
-        return (
-            <g className="resource-actions">
-                <SVGCircleButton
-                    x={0}
-                    y={0}
-                    className="inspect"
-                    style={ButtonStyle.PRIMARY}
-                    icon="fa fa-search"
-                    // onClick={this.inspectHandler}
-                    onClick={() => {}}
-                />
-            </g>
-        );
-    }
-
-    return (
-        <g className="resource-actions">
-            <SVGCircleButton
-                x={0}
-                y={0}
-                className="delete"
-                style={ButtonStyle.DANGER}
-                icon="fa fa-trash"
-                // onClick={this.deleteHandler}
-                onClick={() => {}}
-            />
-
-            <SVGCircleButton
-                x={consumer ? -30 : 30}
-                y={0}
-                className="edit"
-                style={ButtonStyle.SECONDARY}
-                icon="fa fa-pencil"
-                // onClick={this.editHandler}
-                onClick={() => {}}
-            />
-        </g>
-    );
-};
-
 const getResourceConnectionPoint = ({
     isConsumer,
     isExpanded,
-    showButtons,
+    buttonWidth = 0,
 }) => {
     const baseOffset = isConsumer ? -20 : 170;
     const expansionSign = isConsumer ? -1 : 1;
     const expansionWidth = isExpanded ? 100 : 0;
-    return baseOffset + expansionWidth * expansionSign;
+    return baseOffset + (expansionWidth + buttonWidth) * expansionSign;
 };
 
 const TempResource = ({ resource, nodeSize, x, y }) => {
@@ -226,9 +174,7 @@ export const PlannerBlockResourceListItem: React.FC<
 
     const extension = isExpanded ? 100 : 0;
     const getXPosition = () =>
-        props.role === ResourceRole.CONSUMES
-            ? -10.5 - extension
-            : 39 + extension;
+        props.role === ResourceRole.CONSUMES ? -10 - extension : 39 + extension;
 
     const nodeSize =
         props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
@@ -244,11 +190,20 @@ export const PlannerBlockResourceListItem: React.FC<
     const counterVisible = counterValue > 0 && buttonsVisible;
     const mouseCatcherWidth = blockInstance.dimensions!.width + 60;
 
-    const buttonY = (height - BUTTON_HEIGHT) / 2 - RESOURCE_SPACE / 2;
-    let buttonX = isConsumer ? -35 : 130;
+    const buttonY = height / 2 - RESOURCE_SPACE / 2;
+    let buttonX = isConsumer ? -10 : 130;
     if (!counterVisible) {
         buttonX += isConsumer ? 5 : -5;
     }
+    const actionButtonsRef = useRef<HTMLDivElement>(null);
+    const [actionButtonsWidth, setActionButtonsWidth] = useState(0);
+    useLayoutEffect(() => {
+        if (actionButtonsRef.current) {
+            setActionButtonsWidth(
+                actionButtonsRef.current.getBoundingClientRect().width
+            );
+        }
+    }, [actionButtonsRef]);
 
     const containerClass = toClass({
         'planner-block-resource-list-item': true,
@@ -355,17 +310,26 @@ export const PlannerBlockResourceListItem: React.FC<
                                             ref={onRef}
                                         />
 
-                                        <svg x={buttonX} y={buttonY}>
-                                            {renderActions(isConsumer)}
-                                        </svg>
+                                        <ActionButtons
+                                            pointType={
+                                                isConsumer ? 'right' : 'left'
+                                            }
+                                            x={buttonX}
+                                            y={buttonY}
+                                            show={buttonsVisible}
+                                            actions={props.actions || []}
+                                            ref={actionButtonsRef}
+                                        />
 
                                         <LayoutNode
                                             x={getResourceConnectionPoint({
                                                 isConsumer,
                                                 isExpanded,
-                                                showButtons: false,
+                                                buttonWidth: buttonsVisible
+                                                    ? actionButtonsWidth
+                                                    : 0,
                                             })}
-                                            y={buttonY + BUTTON_HEIGHT / 2}
+                                            y={buttonY}
                                         >
                                             <PlannerConnectionPoint
                                                 pointId={connectionResourceId}

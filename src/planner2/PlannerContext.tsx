@@ -12,6 +12,7 @@ import {
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerNodeSize } from '../types';
 import { cloneDeep } from 'lodash';
+import { PlannerAction } from './types';
 
 export enum PlannerMode {
     VIEW,
@@ -20,6 +21,12 @@ export enum PlannerMode {
 }
 
 type BlockUpdater = (block: BlockInstanceSpec) => BlockInstanceSpec;
+export interface PlannerActionConfig {
+    block?: PlannerAction<any>[];
+    connection?: PlannerAction<any>[];
+    resource?: PlannerAction<any>[];
+}
+
 export interface PlannerContextData {
     plan?: PlanKind;
     blockAssets: Asset<BlockKind>[];
@@ -38,6 +45,7 @@ export interface PlannerContextData {
         getPointById(id: string): Point | null;
         removePoint(pointId: string): void;
     };
+    actions: PlannerActionConfig;
 }
 
 const defaultValue: PlannerContextData = {
@@ -66,6 +74,7 @@ const defaultValue: PlannerContextData = {
         },
         removePoint() {},
     },
+    actions: {},
 };
 
 export const PlannerContext = React.createContext(defaultValue);
@@ -75,10 +84,12 @@ export const usePlannerContext = ({
     plan: extPlan,
     blockAssets: extBlockAssets,
     mode = PlannerMode.VIEW,
+    actions,
 }: {
     plan: PlanKind;
     blockAssets: Asset<BlockKind>[];
     mode: PlannerMode;
+    actions: PlannerActionConfig;
 }): PlannerContextData => {
     const [points, setPoints] = useState<{ [id: string]: Point }>({});
     const connectionPoints = useMemo(
@@ -123,6 +134,7 @@ export const usePlannerContext = ({
 
     return useMemo(
         () => ({
+            actions,
             // view state
             focusedBlock,
             zoom,
@@ -195,6 +207,7 @@ export const usePlannerContext = ({
             connectionPoints,
         }),
         [
+            actions,
             blockAssets,
             plan,
             zoom,

@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Asset, BlockKind, PlanKind } from '@kapeta/ui-web-types';
 import {
+    PlannerActionConfig,
     PlannerContext,
     PlannerMode,
     usePlannerContext,
@@ -22,6 +23,9 @@ interface Props {
     systemId: string;
     mode?: PlannerMode;
     size?: PlannerNodeSize;
+
+    // Should we instead augment the
+    actions?: PlannerActionConfig;
 }
 
 const renderTempResources: (
@@ -45,11 +49,19 @@ const renderTempResources: (
 };
 
 export const Planner: React.FC<Props> = (props) => {
-    const { size = PlannerNodeSize.MEDIUM, plan, blockAssets } = props;
+    const {
+        size = PlannerNodeSize.MEDIUM,
+        plan,
+        blockAssets,
+        mode = PlannerMode.VIEW,
+        // Move to common actions obj?
+        actions = {},
+    } = props;
     const context = usePlannerContext({
         plan,
         blockAssets,
-        mode: props.mode || PlannerMode.VIEW,
+        mode,
+        actions,
     });
 
     return (
@@ -60,7 +72,7 @@ export const Planner: React.FC<Props> = (props) => {
                 <PlannerCanvas>
                     {context.plan?.spec.blocks?.map((block, index) => (
                         <BlockContextProvider key={block.id} blockId={block.id}>
-                            <PlannerBlockNode size={size} />
+                            <PlannerBlockNode size={size} actions={actions} />
                         </BlockContextProvider>
                     ))}
 
@@ -69,6 +81,7 @@ export const Planner: React.FC<Props> = (props) => {
                             size={size}
                             key={getConnectionId(connection)}
                             connection={connection}
+                            actions={actions.connection}
                         />
                     ))}
 
