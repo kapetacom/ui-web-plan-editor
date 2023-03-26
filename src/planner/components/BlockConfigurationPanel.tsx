@@ -15,7 +15,7 @@ import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrappe
 
 import './ItemEditorPanel.less';
 import { BlockService } from '@kapeta/ui-web-context';
-import { parseBlockwareUri } from '@kapeta/nodejs-utils';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockConfigurationData } from '../../wrappers/models';
 
 type Options = { [key: string]: string };
@@ -58,12 +58,12 @@ export const BlockConfigurationPanel = (props: Props) => {
         }
         setLoading(true);
         try {
-            const blockUri = parseBlockwareUri(props.block.ref);
+            const blockUri = parseKapetaUri(props.block.ref);
             const blocks = await BlockService.list();
             const opts: Options = {};
             blocks
                 .filter((block) => {
-                    const uri = parseBlockwareUri(block.ref);
+                    const uri = parseKapetaUri(block.ref);
                     return uri.fullName === blockUri.fullName;
                 })
                 .forEach((block) => {

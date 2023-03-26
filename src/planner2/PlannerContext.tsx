@@ -9,7 +9,7 @@ import {
     PlanKind,
     Point,
 } from '@kapeta/ui-web-types';
-import { parseBlockwareUri } from '@kapeta/nodejs-utils';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerNodeSize } from '../types';
 import { cloneDeep } from 'lodash';
 
@@ -136,8 +136,8 @@ export const usePlannerContext = ({
             getBlockByRef(ref: string) {
                 const blockAsset = blockAssets.find(
                     (asset) =>
-                        parseBlockwareUri(asset.ref).compare(
-                            parseBlockwareUri(ref)
+                        parseKapetaUri(asset.ref).compare(
+                            parseKapetaUri(ref)
                         ) === 0
                 );
                 return blockAsset?.data;
@@ -145,8 +145,8 @@ export const usePlannerContext = ({
             updateBlockDefinition(ref: string, update: BlockKind) {
                 setBlockAssets((state) =>
                     state.map((block) =>
-                        parseBlockwareUri(block.ref).compare(
-                            parseBlockwareUri(ref)
+                        parseKapetaUri(block.ref).compare(
+                            parseKapetaUri(ref)
                         ) === 0
                             ? { ...block, data: update }
                             : block

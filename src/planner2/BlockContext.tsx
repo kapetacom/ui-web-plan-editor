@@ -4,7 +4,7 @@ import {
     BlockKind,
     ResourceKind,
 } from '@kapeta/ui-web-types';
-import { BlockwareURI, parseBlockwareUri } from '@kapeta/nodejs-utils';
+import { BlockwareURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerContext, PlannerMode } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';
@@ -76,7 +76,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
             size
         );
         const blockReference =
-            blockInstance && parseBlockwareUri(blockInstance?.block.ref);
+            blockInstance && parseKapetaUri(blockInstance?.block.ref);
 
         return {
             blockInstance,

@@ -21,7 +21,7 @@ import {
     ResourceTypeProvider,
 } from '@kapeta/ui-web-context';
 
-import { parseBlockwareUri } from '@kapeta/nodejs-utils';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 import type {
     BlockConnectionSpec,
@@ -181,8 +181,8 @@ export class ItemEditorPanel extends Component<Props, State> {
         let data: SchemaKind;
         if (
             this.state.entry &&
-            parseBlockwareUri(this.state.entry.kind).fullName ===
-                parseBlockwareUri(definition.kind).fullName
+            parseKapetaUri(this.state.entry.kind).fullName ===
+                parseKapetaUri(definition.kind).fullName
         ) {
             data = this.state.entry;
         } else {
@@ -260,7 +260,7 @@ export class ItemEditorPanel extends Component<Props, State> {
     }
 
     private renderBlockFields(data: SchemaKind) {
-        const kindUri = parseBlockwareUri(data.kind);
+        const kindUri = parseKapetaUri(data.kind);
         const versions = BlockTypeProvider.getVersionsFor(kindUri.fullName);
         const options: { [key: string]: string } = {};
 
@@ -372,7 +372,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                 return <></>;
             }
 
-            const dataKindUri = parseBlockwareUri(data.kind);
+            const dataKindUri = parseKapetaUri(data.kind);
 
             const versions: { [key: string]: string } = {};
             const versionAlternatives = ResourceTypeProvider.getVersionsFor(

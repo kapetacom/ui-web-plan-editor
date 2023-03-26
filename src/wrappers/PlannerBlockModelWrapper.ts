@@ -17,7 +17,7 @@ import {
     isSchemaEntityCompatible,
     ResourceRole,
 } from '@kapeta/ui-web-types';
-import { parseBlockwareUri, BlockwareURI } from '@kapeta/nodejs-utils';
+import { parseKapetaUri, BlockwareURI } from '@kapeta/nodejs-utils';
 
 import { BlockService, BlockTypeProvider } from '@kapeta/ui-web-context';
 
@@ -107,7 +107,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         this.blockReference = blockInstance.block;
         try {
-            this.blockReferenceUri = parseBlockwareUri(this.blockReference.ref);
+            this.blockReferenceUri = parseKapetaUri(this.blockReference.ref);
         } catch (e) {
             // TODO: can we ignore this?
         }
@@ -165,7 +165,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     setBlockReference(reference: string) {
         this.blockReference = { ref: reference };
         try {
-            this.blockReferenceUri = parseBlockwareUri(this.blockReference.ref);
+            this.blockReferenceUri = parseKapetaUri(this.blockReference.ref);
         } catch (e) {
             // TODO: can we ignore this?
         }
@@ -725,7 +725,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         try {
             if (this.blockReference.ref) {
-                parseBlockwareUri(this.blockReference.ref);
+                parseKapetaUri(this.blockReference.ref);
             }
         } catch (e) {
             this.errors.push(`Block reference was invalid: ${e.message}`);

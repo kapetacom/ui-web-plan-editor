@@ -5,7 +5,7 @@ import {
     ResourceTypeProvider,
 } from '@kapeta/ui-web-context';
 import { ResourceRole, ResourceType } from '@kapeta/ui-web-types';
-import { parseBlockwareUri } from '@kapeta/nodejs-utils';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 export const BlockServiceMock = BlockService;
 
@@ -100,7 +100,7 @@ blocks.push(
             role: ResourceRole.PROVIDES,
             validate: (data) => {
                 const errors: string[] = [];
-                parseBlockwareUri(data.kind);
+                parseKapetaUri(data.kind);
 
                 if (!data.spec.methods) {
                     errors.push('No methods defined!');
@@ -150,7 +150,7 @@ blocks.push(
             if (!block?.spec?.target?.kind) {
                 errors.push('Missing target kind');
             } else {
-                parseBlockwareUri(block?.spec?.target?.kind);
+                parseKapetaUri(block?.spec?.target?.kind);
                 BlockTargetProvider.get(block?.spec?.target?.kind, block.kind);
             }
 
@@ -166,9 +166,9 @@ BlockServiceMock.list = async () => {
 
 // @ts-ignore
 BlockServiceMock.get = async (ref) => {
-    const uri = parseBlockwareUri(ref);
+    const uri = parseKapetaUri(ref);
     const out = blocks.find((a) => {
-        const aUri = parseBlockwareUri(a.ref);
+        const aUri = parseKapetaUri(a.ref);
         return uri.fullName === aUri.fullName;
     });
     if (!out) {
