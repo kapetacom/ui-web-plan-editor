@@ -17,7 +17,7 @@ import {
     isSchemaEntityCompatible,
     ResourceRole,
 } from '@kapeta/ui-web-types';
-import { parseKapetaUri, BlockwareURI } from '@kapeta/nodejs-utils';
+import { parseKapetaUri, KapetaURI } from '@kapeta/nodejs-utils';
 
 import { BlockService, BlockTypeProvider } from '@kapeta/ui-web-context';
 
@@ -76,7 +76,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     blockReference: BlockReference;
 
     @observable
-    private blockReferenceUri?: BlockwareURI;
+    private blockReferenceUri?: KapetaURI;
 
     @observable
     private data!: BlockKind;

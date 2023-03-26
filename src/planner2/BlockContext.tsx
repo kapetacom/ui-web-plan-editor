@@ -4,7 +4,7 @@ import {
     BlockKind,
     ResourceKind,
 } from '@kapeta/ui-web-types';
-import { BlockwareURI, parseKapetaUri } from '@kapeta/nodejs-utils';
+import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerContext, PlannerMode } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';
@@ -12,7 +12,7 @@ import { BlockMode } from '../wrappers/wrapperHelpers';
 export interface PlannerBlockContextData {
     blockInstance: BlockInstanceSpec | null;
     blockDefinition: BlockKind | null;
-    blockReference: BlockwareURI | null;
+    blockReference: KapetaURI | null;
     consumers: ResourceKind[];
     providers: ResourceKind[];
     instanceBlockHeight: number;
