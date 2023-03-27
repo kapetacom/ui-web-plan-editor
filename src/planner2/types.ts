@@ -2,8 +2,10 @@ import {
     BlockConnectionSpec,
     BlockInstanceSpec,
     BlockKind,
+    ItemType,
     ResourceKind,
     ResourceRole,
+    SchemaKind,
 } from '@kapeta/ui-web-types';
 import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
@@ -27,6 +29,7 @@ export interface ActionContext {
     block?: BlockKind;
     blockInstance?: BlockInstanceSpec;
     resource?: ResourceKind;
+    resourceRole?: ResourceRole;
     connection?: BlockConnectionSpec;
 }
 export interface PlannerAction<P extends unknown> {
@@ -35,4 +38,10 @@ export interface PlannerAction<P extends unknown> {
     icon: string;
     label: string;
     onClick(planner: PlannerContextData, context: ActionContext): void;
+}
+
+export interface EditableItemInterface2 {
+    type: ItemType;
+    item: SchemaKind | BlockConnectionSpec;
+    creating: boolean;
 }

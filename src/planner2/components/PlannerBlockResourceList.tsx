@@ -22,13 +22,8 @@ export const PlannerBlockResourceList: React.FC<
     PlannerBlockResourceListProps
 > = (props) => {
     const { size } = useContext(PlannerContext);
-    const {
-        blockInstance,
-        providers,
-        consumers,
-        instanceBlockHeight,
-        blockMode,
-    } = useBlockContext();
+    const { blockInstance, providers, consumers, blockMode } =
+        useBlockContext();
     const { draggable } = useContext(DnDContext);
 
     const list = {

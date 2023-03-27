@@ -19,18 +19,20 @@ import {
     ResourceTypeProvider,
 } from '@kapeta/ui-web-context';
 
-import { parseBlockwareUri } from '@kapeta/nodejs-utils';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 import type {
     BlockConnectionSpec,
+    BlockKind,
     SchemaEntity,
     SchemaKind,
 } from '@kapeta/ui-web-types';
-import { ResourceKind } from '@kapeta/ui-web-types';
+import { ItemType, ResourceKind } from '@kapeta/ui-web-types';
 
 import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useAsync } from 'react-use';
+import { EditableItemInterface2 } from '../types';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {
@@ -63,7 +65,7 @@ interface BlockConnectionEditData {
 }
 
 function renderBlockFields(data: SchemaKind) {
-    const kindUri = parseBlockwareUri(data.kind);
+    const kindUri = parseKapetaUri(data.kind);
     const versions = BlockTypeProvider.getVersionsFor(kindUri.fullName);
     const options: { [key: string]: string } = {};
 
@@ -100,11 +102,11 @@ function renderBlockFields(data: SchemaKind) {
     );
 }
 
-function renderEditableItemForm(editableItem: EditableItemInterface): any {
-    if (editableItem.type === 'connection') {
-        // FUUUCK
-        const connection: BlockConnectionSpec = editableItem;
+function renderEditableItemForm(editableItem: EditableItemInterface2): any {
+    if (editableItem.type === ItemType.CONNECTION) {
+        const connection = editableItem.item as BlockConnectionSpec;
 
+        // TODO: look up block and resource types
         const sourceKind = connection.from;
         const targetKind = connection.to;
 
@@ -137,16 +139,15 @@ function renderEditableItemForm(editableItem: EditableItemInterface): any {
         );
     }
 
-    if (editableItem.type === 'block') {
-        const data = editableItem;
+    if (editableItem.type === ItemType.BLOCK) {
+        const data = editableItem.item as BlockKind;
 
         const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
+        console.log(data);
         if (!BlockTypeConfig.componentType) {
             return (
-                <div key={editableItem.spec.id}>
-                    {this.renderBlockFields(data)}
-                </div>
+                <div key={editableItem.item.id}>{renderBlockFields(data)}</div>
             );
         }
 
@@ -177,7 +178,7 @@ function renderEditableItemForm(editableItem: EditableItemInterface): any {
             return <></>;
         }
 
-        const dataKindUri = parseBlockwareUri(data.kind);
+        const dataKindUri = parseKapetaUri(data.kind);
 
         const versions: { [key: string]: string } = {};
         const versionAlternatives = ResourceTypeProvider.getVersionsFor(
@@ -213,8 +214,8 @@ function renderEditableItemForm(editableItem: EditableItemInterface): any {
                     )}
                 >
                     <resourceType.componentType
-                        key={editableItem.spec.id}
-                        block={editableItem.spec}
+                        key={editableItem.item.id}
+                        block={editableItem.item.spec}
                         // way to determine if its a new item?
                         creating={false} // editableItem.creating}
                     />
@@ -226,23 +227,22 @@ function renderEditableItemForm(editableItem: EditableItemInterface): any {
     return <></>;
 }
 
-interface EditableItemInterface extends SchemaKind {
-    type: string;
-}
-
 interface Props {
-    editableItem?: EditableItemInterface;
+    editableItem?: EditableItemInterface2;
     open: boolean;
     onClose: () => void;
 }
 
 export const ItemEditorPanel: React.FC<Props> = (props) => {
     // callbacks
-    const saveAndClose = (data) => {
+    const saveAndClose = (data: SchemaKind) => {
+        console.log(data);
         // save?
         props.onClose();
     };
-    const onPanelCancel = () => {};
+    const onPanelCancel = () => {
+        props.onClose();
+    };
 
     const [initialValue, setInitialValue] = useState<any>({});
 
@@ -268,10 +268,7 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
                 <div className="item-editor-panel">
                     <FormContainer
                         // Do we need editableItem state?
-                        initialValue={props.editableItem}
-                        // onChange={(data) =>
-                        //     setState({ entry: data as SchemaKind })
-                        // }
+                        initialValue={props.editableItem.item}
                         onSubmitData={(data) => saveAndClose(data)}
                     >
                         <div className="item-form">

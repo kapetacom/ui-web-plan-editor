@@ -156,11 +156,11 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                 >
                                     <PlannerBlockResourceList
                                         role={ResourceRole.CONSUMES}
-                                        actions={actions.resource}
+                                        actions={actions.resource || []}
                                     />
                                     <PlannerBlockResourceList
                                         role={ResourceRole.PROVIDES}
-                                        actions={actions.resource}
+                                        actions={actions.resource || []}
                                     />
 
                                     <BlockNode
@@ -190,8 +190,7 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                         x={75}
                                         y={instanceBlockHeight + 10}
                                         show
-                                        actions={actions.block}
-                                        //
+                                        actions={actions.block || []}
                                         actionContext={{
                                             block: blockDefinition,
                                             blockInstance: blockInstance,

@@ -8,6 +8,7 @@ import {
     BlockResourceReferenceSpec,
     PlanKind,
     Point,
+    ResourceRole,
 } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerNodeSize } from '../types';
@@ -38,14 +39,25 @@ export interface PlannerContextData {
     getBlockByRef(ref: string): BlockKind | undefined;
     updateBlockDefinition(ref: string, update: BlockKind): void;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
+    removeBlockInstance(blockId: string): void;
+
+    // resources
+    addResource(blockId: string);
+    removeResource(
+        blockId: string,
+        resourceName: string,
+        resourceRole: ResourceRole
+    ): void;
+
+    // connection stuff
     addConnection(connection: BlockConnectionSpec): void;
+    removeConnection(connection: BlockConnectionSpec): void;
     hasConnections(connectionSpec: BlockResourceReferenceSpec): boolean;
     connectionPoints: {
         addPoint(id: string, point: Point): void;
         getPointById(id: string): Point | null;
         removePoint(pointId: string): void;
     };
-    actions: PlannerActionConfig;
 }
 
 const defaultValue: PlannerContextData = {
@@ -63,7 +75,14 @@ const defaultValue: PlannerContextData = {
     updateBlockInstance(blockId, callback) {
         // noop
     },
+    removeBlockInstance(blockId) {},
+    // resources
+    addResource(blockId: string) {},
+    removeResource(blockId: string, resourceName: string) {},
+
+    // connection stuff
     addConnection(connection: BlockConnectionSpec) {},
+    removeConnection(connection: BlockConnectionSpec) {},
     hasConnections() {
         return false;
     },
@@ -74,23 +93,21 @@ const defaultValue: PlannerContextData = {
         },
         removePoint() {},
     },
-    actions: {},
 };
 
 export const PlannerContext = React.createContext(defaultValue);
+export type PlannerContextProps = {
+    plan: PlanKind;
+    blockAssets: Asset<BlockKind>[];
+    mode: PlannerMode;
+};
 
 // Helper to make sure we memoize anything we can for the context
 export const usePlannerContext = ({
     plan: extPlan,
     blockAssets: extBlockAssets,
     mode = PlannerMode.VIEW,
-    actions,
-}: {
-    plan: PlanKind;
-    blockAssets: Asset<BlockKind>[];
-    mode: PlannerMode;
-    actions: PlannerActionConfig;
-}): PlannerContextData => {
+}: PlannerContextProps): PlannerContextData => {
     const [points, setPoints] = useState<{ [id: string]: Point }>({});
     const connectionPoints = useMemo(
         () => ({
@@ -134,7 +151,6 @@ export const usePlannerContext = ({
 
     return useMemo(
         () => ({
-            actions,
             // view state
             focusedBlock,
             zoom,
@@ -185,11 +201,79 @@ export const usePlannerContext = ({
 
                 // TODO: Save to disk / callback
             },
-
+            removeBlockInstance(blockId: string) {
+                setPlan((prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    const blockIx =
+                        newPlan.spec.blocks?.findIndex(
+                            (pblock) => pblock.id === blockId
+                        ) ?? -1;
+                    if (blockIx === -1) {
+                        throw new Error(`Block #${blockId} not found`);
+                    }
+                    newPlan.spec.blocks?.splice(blockIx, 1);
+                    return newPlan;
+                });
+            },
+            // resources
+            addResource(blockId: string) {
+                // ...
+            },
+            removeResource(
+                blockId: string,
+                resourceName: string,
+                resourceRole: ResourceRole
+            ) {
+                setBlockAssets((prevState) => {
+                    const newAssets = cloneDeep(prevState);
+                    const blockIx =
+                        newAssets.findIndex(
+                            (pblock) => pblock.id === blockId
+                        ) ?? -1;
+                    if (blockIx === -1) {
+                        throw new Error(`Block #${blockId} not found`);
+                    }
+                    const block = newAssets[blockIx];
+                    const list =
+                        resourceRole === ResourceRole.PROVIDES
+                            ? block.data.spec.providers
+                            : block.data.spec.consumers;
+                    const resourceIx =
+                        list?.findIndex(
+                            (resource) =>
+                                resource.metadata.name === resourceName
+                        ) ?? -1;
+                    if (resourceIx === -1) {
+                        throw new Error(
+                            `Resource ${resourceName} not found in block #${blockId}`
+                        );
+                    }
+                    list!.splice(resourceIx, 1);
+                    return newAssets;
+                });
+            },
+            // connections
             addConnection({ from, to, mapping }: BlockConnectionSpec) {
                 setPlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     newPlan.spec.connections?.push({ from, to, mapping });
+                    return newPlan;
+                });
+            },
+            removeConnection(connection: BlockConnectionSpec) {
+                setPlan((prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    const connectionIx = newPlan.spec.connections?.findIndex(
+                        (conn) =>
+                            conn.from.blockId === connection.from.blockId &&
+                            conn.from.resourceName ===
+                                connection.from.resourceName &&
+                            conn.to.blockId === connection.to.blockId &&
+                            conn.to.resourceName === connection.to.resourceName
+                    );
+                    if (connectionIx !== undefined) {
+                        newPlan.spec.connections?.splice(connectionIx, 1);
+                    }
                     return newPlan;
                 });
             },
@@ -207,7 +291,6 @@ export const usePlannerContext = ({
             connectionPoints,
         }),
         [
-            actions,
             blockAssets,
             plan,
             zoom,
@@ -217,4 +300,15 @@ export const usePlannerContext = ({
             viewMode,
         ]
     );
+};
+
+export const withPlannerContext = function <T>(Inner: React.ComponentType<T>) {
+    return (props: T & JSX.IntrinsicAttributes & PlannerContextProps) => {
+        const context = usePlannerContext(props);
+        return (
+            <PlannerContext.Provider value={context}>
+                <Inner {...props} />
+            </PlannerContext.Provider>
+        );
+    };
 };
