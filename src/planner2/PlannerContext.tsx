@@ -165,6 +165,7 @@ export const usePlannerContext = ({
                     )
                 );
             },
+
             updateBlockInstance(blockId: string, updater) {
                 // Use state callback to reference the previous state (avoid stale ref)
                 setPlan((prevState) => {
