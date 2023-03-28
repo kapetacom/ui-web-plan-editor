@@ -12,6 +12,7 @@ import {
     BlockInstanceSpec,
     BlockKind,
     ResourceKind,
+    ResourceRole,
 } from '@kapeta/ui-web-types';
 
 const CircleButton = (props) => {
@@ -41,6 +42,7 @@ interface ActionButtonProps {
         block?: BlockKind;
         blockInstance?: BlockInstanceSpec;
         resource?: ResourceKind;
+        resourceRole?: ResourceRole;
         connection?: BlockConnectionSpec;
     };
 }

@@ -6,6 +6,7 @@ import {
 } from '@kapeta/ui-web-context';
 import { ResourceRole, ResourceType } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { cloneDeep } from 'lodash';
 
 export const BlockServiceMock = BlockService;
 
@@ -18,7 +19,7 @@ const blocks = [
         ref: `${data.metadata.name}:1.2.3`,
         path: '.',
         kind: data.kind,
-        data: data,
+        data: cloneDeep(data),
         exists: true,
         ymlPath: '.',
         version: '1.2.3',
@@ -36,7 +37,7 @@ blocks.push(
             ref: `${data.metadata.name}:1.0.2`,
             path: '.',
             kind: data.kind,
-            data: data,
+            data: cloneDeep(data),
             exists: true,
             ymlPath: '.',
             version: '1.0.2',
@@ -55,7 +56,7 @@ blocks.push(
             ref: `${data.metadata.name}:local`,
             path: '.',
             kind: data.kind,
-            data: data,
+            data: cloneDeep(data),
             exists: true,
             ymlPath: '.',
             version: 'local',

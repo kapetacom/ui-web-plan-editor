@@ -322,6 +322,7 @@ export const PlannerBlockResourceListItem: React.FC<
                                                 block: blockDefinition,
                                                 blockInstance,
                                                 resource: props.resource,
+                                                resourceRole: props.role,
                                             }}
                                             ref={actionButtonsRef}
                                         />

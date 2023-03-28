@@ -25,8 +25,13 @@ export const PlannerBlockNode: React.FC<Props> = ({
     size,
     actions,
 }) => {
-    const { plan, zoom, updateBlockDefinition, addConnection } =
-        useContext(PlannerContext);
+    const {
+        plan,
+        zoom,
+        updateBlockDefinition,
+        addConnection,
+        updateBlockInstance,
+    } = useContext(PlannerContext);
     const {
         blockInstance,
         instanceBlockHeight,
@@ -102,6 +107,7 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                 },
                                 spec: {},
                             });
+
                             updateBlockDefinition(
                                 blockInstance.block.ref,
                                 newBlock
@@ -167,8 +173,15 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                         name={blockInstance.name}
                                         instanceName={blockInstance.name}
                                         onInstanceNameChange={(name) =>
-                                            // eslint-disable-next-line no-console
-                                            console.log(name)
+                                            updateBlockInstance(
+                                                blockInstance.id,
+                                                (bx) => {
+                                                    return {
+                                                        ...bx,
+                                                        name,
+                                                    };
+                                                }
+                                            )
                                         }
                                         readOnly={viewOnly}
                                         // TODO: Move this to block context

@@ -42,6 +42,7 @@ export interface PlannerAction<P extends unknown> {
 
 export interface EditableItemInterface2 {
     type: ItemType;
+    ref: string;
     item: SchemaKind | BlockConnectionSpec;
     creating: boolean;
 }

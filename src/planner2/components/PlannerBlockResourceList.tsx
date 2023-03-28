@@ -82,7 +82,7 @@ export const PlannerBlockResourceList: React.FC<
                 return (
                     <PlannerBlockResourceListItem
                         size={nodeSize}
-                        key={`${resource.metadata.name}_${index}`}
+                        key={`${blockInstance.id}_${resource.metadata.name}_${index}`}
                         index={index}
                         resource={resource}
                         // Should we render a consumer or provider?

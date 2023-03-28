@@ -33,6 +33,7 @@ import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useAsync } from 'react-use';
 import { EditableItemInterface2 } from '../types';
+import { cloneDeep } from 'lodash';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {
@@ -144,7 +145,6 @@ function renderEditableItemForm(editableItem: EditableItemInterface2): any {
 
         const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
-        console.log(data);
         if (!BlockTypeConfig.componentType) {
             return (
                 <div key={editableItem.item.id}>{renderBlockFields(data)}</div>
@@ -230,14 +230,14 @@ function renderEditableItemForm(editableItem: EditableItemInterface2): any {
 interface Props {
     editableItem?: EditableItemInterface2;
     open: boolean;
+    onSubmit: (data: SchemaKind) => void;
     onClose: () => void;
 }
 
 export const ItemEditorPanel: React.FC<Props> = (props) => {
     // callbacks
     const saveAndClose = (data: SchemaKind) => {
-        console.log(data);
-        // save?
+        props.onSubmit(data);
         props.onClose();
     };
     const onPanelCancel = () => {
@@ -247,7 +247,8 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
     const [initialValue, setInitialValue] = useState<any>({});
 
     useEffect(() => {
-        setInitialValue(props.editableItem);
+        if (props.editableItem)
+            setInitialValue(cloneDeep(props.editableItem?.item));
     }, [props.editableItem]);
 
     const panelHeader = () => {
@@ -264,11 +265,11 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
             open={!!props.open}
             onClose={props.onClose}
         >
-            {props.editableItem && (
+            {initialValue && props.editableItem && (
                 <div className="item-editor-panel">
                     <FormContainer
                         // Do we need editableItem state?
-                        initialValue={props.editableItem.item}
+                        initialValue={initialValue}
                         onSubmitData={(data) => saveAndClose(data)}
                     >
                         <div className="item-form">

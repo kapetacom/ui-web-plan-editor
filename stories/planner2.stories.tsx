@@ -12,7 +12,7 @@ import {
     withPlannerContext,
 } from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
-import { ItemType, SchemaKind } from '@kapeta/ui-web-types';
+import { BlockKind, ItemType, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
 import { EditableItemInterface2 } from '../src/planner2/types';
@@ -85,7 +85,7 @@ export const PlannerConfig2 = () => {
     );
 };
 
-const PlanEditor = withPlannerContext(() => {
+const PlanEditor = withPlannerContext((props) => {
     const planner = useContext(PlannerContext);
     const [editItem, setEditItem] = React.useState<
         EditableItemInterface2 | undefined
@@ -137,10 +137,11 @@ const PlanEditor = withPlannerContext(() => {
                             'local'
                     );
                 },
-                onClick(context, { block }) {
+                onClick(context, { blockInstance, block }) {
                     setEditItem({
                         type: ItemType.BLOCK,
                         item: block!,
+                        ref: blockInstance!.block.ref,
                         creating: false,
                     });
                 },
@@ -186,10 +187,10 @@ const PlanEditor = withPlannerContext(() => {
                             'local'
                     );
                 },
-                onClick(context, { block, resource, resourceRole }) {
+                onClick(context, { blockInstance, resource, resourceRole }) {
                     // Block id?
                     context.removeResource(
-                        block!,
+                        blockInstance!.block.ref,
                         resource!.metadata.name,
                         resourceRole!
                     );
@@ -199,8 +200,6 @@ const PlanEditor = withPlannerContext(() => {
                 label: 'Delete',
             },
         ],
-
-        // TODO: Need to figure out props to both render and enabled
         connection: [
             {
                 enabled(context): boolean {
@@ -223,6 +222,28 @@ const PlanEditor = withPlannerContext(() => {
                 open={!!editItem}
                 editableItem={editItem}
                 onClose={() => setEditItem(undefined)}
+                onSubmit={(item) => {
+                    if (editItem?.type === ItemType.BLOCK) {
+                        if (editItem.creating) {
+                            // TODO: Save path/ref??
+                            // planner.addBlockDefinition(item);
+                        } else {
+                            planner.updateBlockDefinition(
+                                editItem.ref,
+                                item as BlockKind
+                            );
+                        }
+                    }
+
+                    if (editItem?.type === ItemType.RESOURCE) {
+                        if (editItem.creating) {
+                            //     ???
+                        } else {
+                            // update mapping?
+                            // planner.updateResourceDefinition(); //
+                        }
+                    }
+                }}
             />
         </>
     );
@@ -230,6 +251,7 @@ const PlanEditor = withPlannerContext(() => {
 
 export const PlannerActions = () => {
     const plan = useAsync(() => readPlanV2());
+
     return (
         <DefaultContext>
             {plan.value ? (
@@ -237,6 +259,7 @@ export const PlannerActions = () => {
                     plan={plan.value.plan}
                     blockAssets={plan.value.blockAssets || []}
                     mode={PlannerMode.EDIT}
+                    onChange={console.log}
                 />
             ) : (
                 plan.error && <div>{plan.error.message}</div>

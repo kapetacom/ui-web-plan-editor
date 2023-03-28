@@ -30,11 +30,11 @@
         "singleQuote": true
     },
     "peerDependencies": {
+        "@kapeta/nodejs-utils": "<2",
         "@kapeta/ui-web-components": "<2",
         "@kapeta/ui-web-context": "<2",
         "@kapeta/ui-web-types": "<2",
         "@kapeta/ui-web-utils": "<2",
-        "@kapeta/nodejs-utils": "<2",
         "guid-typescript": "*",
         "less": ">=4",
         "lodash": ">=4",

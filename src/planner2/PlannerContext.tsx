@@ -8,6 +8,7 @@ import {
     BlockResourceReferenceSpec,
     PlanKind,
     Point,
+    ResourceKind,
     ResourceRole,
 } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
@@ -42,9 +43,13 @@ export interface PlannerContextData {
     removeBlockInstance(blockId: string): void;
 
     // resources
-    addResource(blockId: string);
+    addResource(
+        blockRef: string,
+        resource: ResourceKind,
+        role: ResourceRole
+    ): void;
     removeResource(
-        blockId: string,
+        blockRef: string,
         resourceName: string,
         resourceRole: ResourceRole
     ): void;
@@ -162,11 +167,8 @@ export const usePlannerContext = ({
             plan: plan,
             blockAssets,
             getBlockByRef(ref: string) {
-                const blockAsset = blockAssets.find(
-                    (asset) =>
-                        parseKapetaUri(asset.ref).compare(
-                            parseKapetaUri(ref)
-                        ) === 0
+                const blockAsset = blockAssets.find((asset) =>
+                    parseKapetaUri(asset.ref).equals(parseKapetaUri(ref))
                 );
                 return blockAsset?.data;
             },
@@ -212,28 +214,65 @@ export const usePlannerContext = ({
                         throw new Error(`Block #${blockId} not found`);
                     }
                     newPlan.spec.blocks?.splice(blockIx, 1);
+
+                    // Remove any connections that reference this block
+                    newPlan.spec.connections = newPlan.spec.connections?.filter(
+                        (conn) =>
+                            conn.to.blockId !== blockId &&
+                            conn.from.blockId !== blockId
+                    );
                     return newPlan;
                 });
             },
             // resources
-            addResource(blockId: string) {
-                // ...
-            },
-            removeResource(
-                blockId: string,
-                resourceName: string,
-                resourceRole: ResourceRole
+            addResource(
+                blockRef: string,
+                resource: ResourceKind,
+                role: ResourceRole
             ) {
                 setBlockAssets((prevState) => {
                     const newAssets = cloneDeep(prevState);
                     const blockIx =
-                        newAssets.findIndex(
-                            (pblock) => pblock.id === blockId
+                        newAssets.findIndex((pblock) =>
+                            parseKapetaUri(pblock.ref).equals(
+                                parseKapetaUri(blockRef)
+                            )
                         ) ?? -1;
+
                     if (blockIx === -1) {
-                        throw new Error(`Block #${blockId} not found`);
+                        throw new Error(`Block #${blockRef} not found`);
                     }
+
                     const block = newAssets[blockIx];
+                    const list =
+                        role === ResourceRole.PROVIDES
+                            ? block.data.spec.providers
+                            : block.data.spec.consumers;
+                    list?.push(resource);
+                    return newAssets;
+                });
+            },
+            removeResource(
+                blockRef: string,
+                resourceName: string,
+                resourceRole: ResourceRole
+            ) {
+                // Remove connection point
+                setBlockAssets((prevState) => {
+                    const newAssets = cloneDeep(prevState);
+                    const blockIx =
+                        newAssets.findIndex((pblock) =>
+                            parseKapetaUri(pblock.ref).equals(
+                                parseKapetaUri(blockRef)
+                            )
+                        ) ?? -1;
+
+                    if (blockIx === -1) {
+                        throw new Error(`Block #${blockRef} not found`);
+                    }
+
+                    const block = newAssets[blockIx];
+
                     const list =
                         resourceRole === ResourceRole.PROVIDES
                             ? block.data.spec.providers
@@ -245,11 +284,38 @@ export const usePlannerContext = ({
                         ) ?? -1;
                     if (resourceIx === -1) {
                         throw new Error(
-                            `Resource ${resourceName} not found in block #${blockId}`
+                            `Resource ${resourceName} not found in block #${blockRef}`
                         );
                     }
                     list!.splice(resourceIx, 1);
                     return newAssets;
+                });
+
+                // Remove any connections to/from the deleted resource
+                setPlan((prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    const blockIds =
+                        newPlan.spec.blocks
+                            ?.filter((block) =>
+                                parseKapetaUri(block.block.ref).equals(
+                                    parseKapetaUri(blockRef)
+                                )
+                            )
+                            .map((block) => block.id) ?? [];
+                    const connections = newPlan.spec.connections ?? [];
+                    for (const blockId of blockIds) {
+                        const connectionIx = connections.findIndex((conn) =>
+                            resourceRole === ResourceRole.PROVIDES
+                                ? conn.from.blockId === blockId &&
+                                  conn.from.resourceName === resourceName
+                                : conn.to.blockId === blockId &&
+                                  conn.to.resourceName === resourceName
+                        );
+                        if (connectionIx !== -1) {
+                            connections.splice(connectionIx, 1);
+                        }
+                    }
+                    return newPlan;
                 });
             },
             // connections
