@@ -5,15 +5,8 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { PlannerAction } from '../types';
+import { ActionContext, PlannerAction } from '../types';
 import { PlannerContext } from '../PlannerContext';
-import {
-    BlockConnectionSpec,
-    BlockInstanceSpec,
-    BlockKind,
-    ResourceKind,
-    ResourceRole,
-} from '@kapeta/ui-web-types';
 
 const CircleButton = (props) => {
     return (
@@ -36,15 +29,7 @@ interface ActionButtonProps {
     y: number;
     show: boolean;
     actions: PlannerAction<any>[];
-
-    //
-    actionContext: {
-        block?: BlockKind;
-        blockInstance?: BlockInstanceSpec;
-        resource?: ResourceKind;
-        resourceRole?: ResourceRole;
-        connection?: BlockConnectionSpec;
-    };
+    actionContext: ActionContext;
 }
 
 // Automatically compensate for the width of the connection buttons
