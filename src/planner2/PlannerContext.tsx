@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import {
     Asset,
@@ -125,24 +125,33 @@ export const usePlannerContext = ({
     blockAssets: extBlockAssets,
     mode = PlannerMode.VIEW,
 }: PlannerContextProps): PlannerContextData => {
-    const [points, setPoints] = useState<{ [id: string]: Point }>({});
+    //
+    const [points, setPoints] = useState<{ [id: string]: Point }>(() => ({}));
+    const addPoint = useCallback(
+        function addPoint(id: string, point: Point) {
+            setPoints((ps) => ({ ...ps, [id]: point }));
+        },
+        [setPoints]
+    );
+    const removePoint = useCallback(
+        function removePoint(id: string) {
+            setPoints((prev) => {
+                const newPoints = { ...prev };
+                delete newPoints[id];
+                return newPoints;
+            });
+        },
+        [setPoints]
+    );
     const connectionPoints = useMemo(
         () => ({
-            addPoint(id: string, point: Point) {
-                setPoints((ps) => ({ ...ps, [id]: point }));
-            },
+            addPoint,
+            removePoint,
             getPointById(id: string) {
                 return points[id] || null;
             },
-            removePoint(id: string) {
-                setPoints((prev) => {
-                    const newPoints = { ...prev };
-                    delete newPoints[id];
-                    return newPoints;
-                });
-            },
         }),
-        [points, setPoints]
+        [addPoint, removePoint, points]
     );
 
     // region View state
@@ -150,6 +159,7 @@ export const usePlannerContext = ({
         useState<PlannerBlockModelWrapper>();
     const [viewMode, setViewMode] = useState(mode);
     const [zoom, setZoomLevel] = useState(1);
+
     // zoom
     // size
     // endregion

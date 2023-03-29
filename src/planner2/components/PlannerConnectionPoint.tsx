@@ -9,17 +9,16 @@ export const PlannerConnectionPoint: React.FC<{
     const { connectionPoints } = useContext(PlannerContext);
     const { offset } = useContext(LayoutContext);
 
+    const addPoint = connectionPoints.addPoint;
     useEffect(() => {
-        connectionPoints.addPoint(pointId, {
+        addPoint(pointId, {
             x: offset.x,
             y: offset.y,
         });
-    }, [connectionPoints, offset.x, offset.y, pointId]);
+    }, [addPoint, offset.x, offset.y, pointId]);
 
-    useEffect(
-        () => () => connectionPoints.removePoint(pointId),
-        [pointId, connectionPoints]
-    );
+    const removePoint = connectionPoints.removePoint;
+    useEffect(() => () => removePoint(pointId), [removePoint, pointId]);
 
     // This thing is not really a visual thing
     return null;
