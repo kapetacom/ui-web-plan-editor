@@ -63,7 +63,7 @@ export const PlannerBlockNode: React.FC<Props> = ({
             BlockTypeProvider.get(blockDefinition?.kind)?.validate?.(
                 blockDefinition
             ) || [];
-    } catch (e: Error) {
+    } catch (e: any) {
         errors = [e.message];
     }
     const isValid = errors.length === 0;
@@ -207,7 +207,6 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                         }
                                         version={blockReference.version}
                                         valid={isValid}
-                                        errors={errors}
                                         blockRef={onRef}
                                         {...componentProps}
                                     />
