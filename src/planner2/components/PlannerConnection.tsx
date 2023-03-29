@@ -17,6 +17,7 @@ export const PlannerConnection: React.FC<{
     // eslint-disable-next-line react/no-unused-prop-types
     size: PlannerNodeSize;
     className?: string;
+    // eslint-disable-next-line react/no-unused-prop-types
     viewOnly?: boolean;
     actions?: PlannerAction<any>[];
 }> = (props) => {

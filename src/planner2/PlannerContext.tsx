@@ -38,6 +38,8 @@ export interface PlannerContextData {
     setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
     size: PlannerNodeSize;
     getBlockByRef(ref: string): BlockKind | undefined;
+    getBlockById(blockId: string): BlockKind | undefined;
+
     updateBlockDefinition(ref: string, update: BlockKind): void;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
     removeBlockInstance(blockId: string): void;
@@ -53,6 +55,11 @@ export interface PlannerContextData {
         resourceName: string,
         resourceRole: ResourceRole
     ): void;
+    getResourceByBlockIdAndName(
+        blockId: string,
+        resourceName: string,
+        resourceRole: ResourceRole
+    ): ResourceKind | undefined;
 
     // connection stuff
     addConnection(connection: BlockConnectionSpec): void;
@@ -76,6 +83,9 @@ const defaultValue: PlannerContextData = {
     getBlockByRef(_ref: string) {
         return undefined;
     },
+    getBlockById(blockId: string): BlockKind | undefined {
+        return undefined;
+    },
     updateBlockDefinition() {},
     updateBlockInstance(blockId, callback) {
         // noop
@@ -84,7 +94,9 @@ const defaultValue: PlannerContextData = {
     // resources
     addResource(blockId: string) {},
     removeResource(blockId: string, resourceName: string) {},
-
+    getResourceByBlockIdAndName() {
+        return undefined;
+    },
     // connection stuff
     addConnection(connection: BlockConnectionSpec) {},
     removeConnection(connection: BlockConnectionSpec) {},
@@ -154,8 +166,8 @@ export const usePlannerContext = ({
         setBlockAssets(extBlockAssets);
     }, [extBlockAssets]);
 
-    return useMemo(
-        () => ({
+    return useMemo(() => {
+        const planner = {
             // view state
             focusedBlock,
             zoom,
@@ -171,6 +183,10 @@ export const usePlannerContext = ({
                     parseKapetaUri(asset.ref).equals(parseKapetaUri(ref))
                 );
                 return blockAsset?.data;
+            },
+            getBlockById(blockId: string) {
+                const block = plan.spec.blocks?.find((bx) => bx.id === blockId);
+                return block && planner.getBlockByRef(block.block.ref);
             },
             updateBlockDefinition(ref: string, update: BlockKind) {
                 setBlockAssets((state) =>
@@ -318,6 +334,24 @@ export const usePlannerContext = ({
                     return newPlan;
                 });
             },
+            getResourceByBlockIdAndName(
+                blockId: string,
+                resourceName: string,
+                resourceRole: ResourceRole
+            ) {
+                const block = plan.spec.blocks?.find(
+                    (bx) => bx.id === blockId
+                )?.block;
+                const blockAsset = block && planner.getBlockByRef(block.ref);
+                const list =
+                    resourceRole === ResourceRole.PROVIDES
+                        ? blockAsset?.spec.providers
+                        : blockAsset?.spec.consumers;
+                const resource = list?.find(
+                    (rx) => rx.metadata.name === resourceName
+                );
+                return resource;
+            },
             // connections
             addConnection({ from, to, mapping }: BlockConnectionSpec) {
                 setPlan((prevState) => {
@@ -355,20 +389,20 @@ export const usePlannerContext = ({
                 );
             },
             connectionPoints,
-        }),
-        [
-            blockAssets,
-            plan,
-            zoom,
-            setZoomLevel,
-            connectionPoints,
-            focusedBlock,
-            viewMode,
-        ]
-    );
+        };
+        return planner;
+    }, [
+        blockAssets,
+        plan,
+        zoom,
+        setZoomLevel,
+        connectionPoints,
+        focusedBlock,
+        viewMode,
+    ]);
 };
 
-export const withPlannerContext = function <T>(Inner: React.ComponentType<T>) {
+export function withPlannerContext<T>(Inner: React.ComponentType<T>) {
     return (props: T & JSX.IntrinsicAttributes & PlannerContextProps) => {
         const context = usePlannerContext(props);
         return (
@@ -377,4 +411,4 @@ export const withPlannerContext = function <T>(Inner: React.ComponentType<T>) {
             </PlannerContext.Provider>
         );
     };
-};
+}

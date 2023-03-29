@@ -1,10 +1,4 @@
-import React, {
-    forwardRef,
-    useContext,
-    useLayoutEffect,
-    useRef,
-    useState,
-} from 'react';
+import React, { useContext, useLayoutEffect, useRef, useState } from 'react';
 import { ActionContext, PlannerAction } from '../types';
 import { PlannerContext } from '../PlannerContext';
 
@@ -30,28 +24,29 @@ interface ActionButtonProps {
     show: boolean;
     actions: PlannerAction<any>[];
     actionContext: ActionContext;
+    onSizeChange?: (width: number, height: number) => void;
 }
 
 // Automatically compensate for the width of the connection buttons
-export const ActionButtons = forwardRef((props: ActionButtonProps, fwdRef) => {
+export const ActionButtons = (props: ActionButtonProps) => {
     const planner = useContext(PlannerContext);
 
-    const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLSpanElement>(null);
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
+
+    const { onSizeChange } = props;
     useLayoutEffect(() => {
-        const divElement = ref.current;
-        if (fwdRef instanceof Function) {
-            fwdRef(divElement);
-        } else if (fwdRef) {
-            fwdRef.current = divElement;
-        }
-        if (divElement) {
-            const { width: w, height: h } = divElement.getBoundingClientRect();
+        const span = ref.current;
+        if (span) {
+            const { width: w, height: h } = span.getBoundingClientRect();
             setWidth(w);
             setHeight(h);
+            if (onSizeChange) {
+                onSizeChange(w, h);
+            }
         }
-    }, [ref]);
+    }, [ref, onSizeChange]);
 
     // Allow changing the reference point of the buttons
     // Automatically offset the buttons based on the width
@@ -67,7 +62,6 @@ export const ActionButtons = forwardRef((props: ActionButtonProps, fwdRef) => {
             y={props.y - height / 2}
             width={width || 150}
             height={height || 150}
-            ref={fwdRef}
         >
             <foreignObject
                 x={0}
@@ -111,4 +105,4 @@ export const ActionButtons = forwardRef((props: ActionButtonProps, fwdRef) => {
             </foreignObject>
         </svg>
     );
-});
+};

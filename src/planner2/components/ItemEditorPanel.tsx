@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     AssetNameInput,
     Button,
@@ -27,13 +27,14 @@ import type {
     SchemaEntity,
     SchemaKind,
 } from '@kapeta/ui-web-types';
-import { ItemType, ResourceKind } from '@kapeta/ui-web-types';
+import { ItemType, ResourceKind, ResourceRole } from '@kapeta/ui-web-types';
 
 import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useAsync } from 'react-use';
 import { EditableItemInterface2 } from '../types';
 import { cloneDeep } from 'lodash';
+import { PlannerContext, PlannerContextData } from '../PlannerContext';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {
@@ -103,17 +104,35 @@ function renderBlockFields(data: SchemaKind) {
     );
 }
 
-function renderEditableItemForm(editableItem: EditableItemInterface2): any {
+function renderEditableItemForm(
+    planner: PlannerContextData,
+    editableItem: EditableItemInterface2
+): any {
     if (editableItem.type === ItemType.CONNECTION) {
         const connection = editableItem.item as BlockConnectionSpec;
 
-        // TODO: look up block and resource types
-        const sourceKind = connection.from;
-        const targetKind = connection.to;
+        const source = planner.getResourceByBlockIdAndName(
+            connection.from.blockId,
+            connection.from.resourceName,
+            ResourceRole.PROVIDES
+        );
+        const target = planner.getResourceByBlockIdAndName(
+            connection.to.blockId,
+            connection.to.resourceName,
+            ResourceRole.CONSUMES
+        );
+
+        if (!source || !target) {
+            throw new Error(
+                `Could not find resource for connection: ${JSON.stringify(
+                    connection
+                )}`
+            );
+        }
 
         const ConverterType = ResourceTypeProvider.getConverterFor(
-            sourceKind,
-            targetKind
+            source.kind,
+            target.kind
         );
 
         if (!ConverterType) {
@@ -128,12 +147,11 @@ function renderEditableItemForm(editableItem: EditableItemInterface2): any {
 
         return (
             <MappingComponent
-                key={connection.id}
                 title="mapping-editor"
-                source={connection.fromResource}
-                target={connection.toResource}
-                // sourceEntities={connection.fromResource.block.getEntities()}
-                // targetEntities={connection.toResource.block.getEntities()}
+                source={source}
+                target={target}
+                sourceEntities={[]} // connection.fromResource.block.getEntities()}
+                targetEntities={[]} // connection.toResource.block.getEntities()}
                 value={connection.mapping}
                 onDataChanged={(change) => this.onMappingChanged(change)}
             />
@@ -146,13 +164,11 @@ function renderEditableItemForm(editableItem: EditableItemInterface2): any {
         const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
         if (!BlockTypeConfig.componentType) {
-            return (
-                <div key={editableItem.item.id}>{renderBlockFields(data)}</div>
-            );
+            return <div key={editableItem.ref}>{renderBlockFields(data)}</div>;
         }
 
         return (
-            <div key={editableItem.item.id}>
+            <div key={editableItem.ref}>
                 {this.renderBlockFields(data)}
                 <ErrorBoundary
                     fallbackRender={(props) => (
@@ -170,8 +186,10 @@ function renderEditableItemForm(editableItem: EditableItemInterface2): any {
         );
     }
 
+    // TODO: Implement resource editing
+    // @ts-ignore
     if (editableItem.type === 'resource') {
-        const data = editableItem;
+        const data = editableItem.item as ResourceKind;
         const resourceType = ResourceTypeProvider.get(data.kind);
 
         if (!resourceType.componentType) {
@@ -214,10 +232,11 @@ function renderEditableItemForm(editableItem: EditableItemInterface2): any {
                     )}
                 >
                     <resourceType.componentType
-                        key={editableItem.item.id}
-                        block={editableItem.item.spec}
-                        // way to determine if its a new item?
-                        creating={false} // editableItem.creating}
+                        key={editableItem.ref}
+                        // TODO: make resource componentType accept ResourceKind/Schemakind
+                        // @ts-ignore
+                        block={data}
+                        creating={editableItem.creating}
                     />
                 </ErrorBoundary>
             </>
@@ -235,6 +254,7 @@ interface Props {
 }
 
 export const ItemEditorPanel: React.FC<Props> = (props) => {
+    const planner = useContext(PlannerContext);
     // callbacks
     const saveAndClose = (data: SchemaKind) => {
         props.onSubmit(data);
@@ -270,10 +290,15 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
                     <FormContainer
                         // Do we need editableItem state?
                         initialValue={initialValue}
-                        onSubmitData={(data) => saveAndClose(data)}
+                        onSubmitData={(data) =>
+                            saveAndClose(data as SchemaKind)
+                        }
                     >
                         <div className="item-form">
-                            {renderEditableItemForm(props.editableItem)}
+                            {renderEditableItemForm(
+                                planner,
+                                props.editableItem
+                            )}
                         </div>
                         <FormButtons>
                             <Button

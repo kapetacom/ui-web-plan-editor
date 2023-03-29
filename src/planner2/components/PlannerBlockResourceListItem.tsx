@@ -1,4 +1,4 @@
-import React, { useContext, useLayoutEffect, useRef, useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import {
     ResourceConfig,
@@ -195,15 +195,7 @@ export const PlannerBlockResourceListItem: React.FC<
     if (!counterVisible) {
         buttonX += isConsumer ? 5 : -5;
     }
-    const actionButtonsRef = useRef<HTMLDivElement>(null);
     const [actionButtonsWidth, setActionButtonsWidth] = useState(0);
-    useLayoutEffect(() => {
-        if (actionButtonsRef.current) {
-            setActionButtonsWidth(
-                actionButtonsRef.current.getBoundingClientRect().width
-            );
-        }
-    }, [actionButtonsRef]);
 
     const containerClass = toClass({
         'planner-block-resource-list-item': true,
@@ -324,7 +316,9 @@ export const PlannerBlockResourceListItem: React.FC<
                                                 resource: props.resource,
                                                 resourceRole: props.role,
                                             }}
-                                            ref={actionButtonsRef}
+                                            onSizeChange={(width) => {
+                                                setActionButtonsWidth(width);
+                                            }}
                                         />
 
                                         <LayoutNode
