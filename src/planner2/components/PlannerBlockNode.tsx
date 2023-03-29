@@ -1,5 +1,9 @@
 import React, { useContext, useMemo } from 'react';
-import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import {
+    BlockTypeProvider,
+    InstanceStatus,
+    ResourceTypeProvider,
+} from '@kapeta/ui-web-context';
 import _ from 'lodash';
 
 import { BlockNode } from '../../components/BlockNode';
@@ -53,6 +57,16 @@ export const PlannerBlockNode: React.FC<Props> = ({
         () => ({ type: 'block', data: blockInstance }),
         [blockInstance]
     );
+    let errors = [] as string[];
+    try {
+        errors =
+            BlockTypeProvider.get(blockDefinition?.kind)?.validate?.(
+                blockDefinition
+            ) || [];
+    } catch (e: Error) {
+        errors = [e.message];
+    }
+    const isValid = errors.length === 0;
 
     return (
         // TODO: Readonly/ viewonly
@@ -192,7 +206,8 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                             blockDefinition?.metadata.name
                                         }
                                         version={blockReference.version}
-                                        valid
+                                        valid={isValid}
+                                        errors={errors}
                                         blockRef={onRef}
                                         {...componentProps}
                                     />

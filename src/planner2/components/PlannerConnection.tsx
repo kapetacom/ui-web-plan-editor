@@ -6,11 +6,12 @@ import {
     getCurveMainPoints,
     getMiddlePoint,
 } from '../utils/connectionUtils';
-import { BlockConnectionSpec } from '@kapeta/ui-web-types';
+import { BlockConnectionSpec, ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { getResourceId } from '../utils/planUtils';
 import { PlannerAction } from '../types';
 import { ActionButtons } from './ActionButtons';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 export const PlannerConnection: React.FC<{
     connection: BlockConnectionSpec;
@@ -21,7 +22,7 @@ export const PlannerConnection: React.FC<{
     viewOnly?: boolean;
     actions?: PlannerAction<any>[];
 }> = (props) => {
-    const { connectionPoints } = useContext(PlannerContext);
+    const planner = useContext(PlannerContext);
     const [hasFocus, setHasFocus] = useState(false);
 
     const fromId = getResourceId(
@@ -32,11 +33,49 @@ export const PlannerConnection: React.FC<{
         props.connection.to.blockId,
         props.connection.to.resourceName
     );
-    const from = connectionPoints.getPointById(fromId);
-    const to = connectionPoints.getPointById(toId);
+    const from = planner.connectionPoints.getPointById(fromId);
+    const to = planner.connectionPoints.getPointById(toId);
 
     if (!from || !to) {
+        // Where can we render this error if there is no destination?
         return null;
+    }
+
+    const fromResource = planner.getResourceByBlockIdAndName(
+        props.connection.from.blockId,
+        props.connection.from.resourceName,
+        ResourceRole.PROVIDES
+    );
+    const toResource = planner.getResourceByBlockIdAndName(
+        props.connection.to.blockId,
+        props.connection.to.resourceName,
+        ResourceRole.CONSUMES
+    );
+    const fromEntities =
+        planner.getBlockById(props.connection.from.blockId)?.spec.entities
+            ?.types || [];
+    const toEntities =
+        planner.getBlockById(props.connection.to.blockId)?.spec.entities
+            ?.types || [];
+
+    let connectionValid = true;
+    if (fromResource && toResource) {
+        const converter = ResourceTypeProvider.getConverterFor(
+            fromResource.kind,
+            toResource.kind
+        );
+        if (converter) {
+            const errors = converter.validateMapping
+                ? converter.validateMapping(
+                      props.connection,
+                      fromResource,
+                      toResource,
+                      fromEntities,
+                      toEntities
+                  )
+                : [];
+            connectionValid = errors.length === 0;
+        }
     }
 
     let className = toClass({
@@ -44,7 +83,7 @@ export const PlannerConnection: React.FC<{
         // highlight: this.props.connection
         //     ? this.props.connection.editing
         //     : false,
-        // invalid: !this.connectionValid,
+        invalid: !connectionValid,
     });
 
     if (props.className) {
