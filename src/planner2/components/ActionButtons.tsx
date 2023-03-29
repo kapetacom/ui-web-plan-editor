@@ -35,18 +35,21 @@ export const ActionButtons = (props: ActionButtonProps) => {
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
 
-    const { onSizeChange } = props;
     useLayoutEffect(() => {
         const span = ref.current;
         if (span) {
             const { width: w, height: h } = span.getBoundingClientRect();
             setWidth(w);
             setHeight(h);
-            if (onSizeChange) {
-                onSizeChange(w, h);
-            }
         }
-    }, [ref, onSizeChange]);
+    }, [ref]);
+
+    const { onSizeChange } = props;
+    useLayoutEffect(() => {
+        if (onSizeChange) {
+            onSizeChange(width, height);
+        }
+    }, [width, height, onSizeChange]);
 
     // Allow changing the reference point of the buttons
     // Automatically offset the buttons based on the width
