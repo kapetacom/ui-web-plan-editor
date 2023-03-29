@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import _ from 'lodash';
 
@@ -12,7 +12,7 @@ import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
 import { PlannerPayload, ResourcePayload } from '../types';
-import { ActionButtons } from './ActionButtons';
+import { ActionButtons, ActionButtonTransition } from './ActionButtons';
 
 interface Props {
     viewOnly?: boolean;
@@ -53,6 +53,7 @@ export const PlannerBlockNode: React.FC<Props> = ({
         () => ({ type: 'block', data: blockInstance }),
         [blockInstance]
     );
+    const [hasHover, setHover] = useState(false);
 
     return (
         // TODO: Readonly/ viewonly
@@ -154,7 +155,29 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                 }}
                                 x={blockInstance.dimensions!.left}
                                 y={blockInstance.dimensions!.top}
+                                onMouseEnter={() => {
+                                    setHover(true);
+                                }}
+                                onMouseLeave={() => {
+                                    setHover(false);
+                                }}
                             >
+                                <g>
+                                    <ActionButtons
+                                        x={75}
+                                        y={instanceBlockHeight + 10}
+                                        transition={
+                                            ActionButtonTransition.BLOCK_SLIDE
+                                        }
+                                        show={hasHover}
+                                        actions={actions.block || []}
+                                        actionContext={{
+                                            block: blockDefinition,
+                                            blockInstance: blockInstance,
+                                        }}
+                                    />
+                                </g>
+
                                 <g
                                     data-node-id={blockInstance.id}
                                     data-node-type="block"
@@ -195,19 +218,6 @@ export const PlannerBlockNode: React.FC<Props> = ({
                                         valid
                                         blockRef={onRef}
                                         {...componentProps}
-                                    />
-                                </g>
-                                <g>
-                                    {/* TODO: Render block actions w/ the wheel/staggered transitions */}
-                                    <ActionButtons
-                                        x={75}
-                                        y={instanceBlockHeight + 10}
-                                        show
-                                        actions={actions.block || []}
-                                        actionContext={{
-                                            block: blockDefinition,
-                                            blockInstance: blockInstance,
-                                        }}
                                     />
                                 </g>
                             </svg>
