@@ -7,7 +7,7 @@ import {
 export const PlannerData: PlanKind = {
     kind: PLAN_KIND,
     metadata: {
-        name: 'blockware/my-todo-system',
+        name: 'kapeta/my-todo-system',
     },
     spec: {
         blocks: [
@@ -15,7 +15,7 @@ export const PlannerData: PlanKind = {
                 id: 'user',
                 name: 'Users',
                 block: {
-                    ref: 'blockware/user:local',
+                    ref: 'kapeta/user:local',
                 },
 
                 dimensions: {
@@ -29,7 +29,7 @@ export const PlannerData: PlanKind = {
                 id: 'user2',
                 name: 'Users 2',
                 block: {
-                    ref: 'blockware/user:local',
+                    ref: 'kapeta/user:local',
                 },
 
                 dimensions: {
@@ -43,7 +43,7 @@ export const PlannerData: PlanKind = {
                 id: 'todo',
                 name: 'Todo service',
                 block: {
-                    ref: 'blockware://blockware/todo:1.2.3',
+                    ref: 'kapeta://kapeta/todo:1.2.3',
                 },
 
                 dimensions: {
@@ -57,7 +57,7 @@ export const PlannerData: PlanKind = {
                 id: 'todo2',
                 name: 'Todo service 2',
                 block: {
-                    ref: 'blockware/todo:local',
+                    ref: 'kapeta/todo:local',
                 },
 
                 dimensions: {
@@ -71,7 +71,7 @@ export const PlannerData: PlanKind = {
                 id: 'images',
                 name: 'Image service',
                 block: {
-                    ref: 'blockware/image:local',
+                    ref: 'kapeta/image:local',
                 },
 
                 dimensions: {

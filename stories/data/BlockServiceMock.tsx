@@ -11,9 +11,9 @@ import { cloneDeep } from 'lodash';
 export const BlockServiceMock = BlockService;
 
 const blocks = [
-    require('./blocks/blockware-user.json'),
-    require('./blocks/blockware-todo.json'),
-    require('./blocks/blockware-images.json'),
+    require('./blocks/kapeta-user.json'),
+    require('./blocks/kapeta-todo.json'),
+    require('./blocks/kapeta-images.json'),
 ].map((data) => {
     return {
         ref: `${data.metadata.name}:1.2.3`,
@@ -29,9 +29,9 @@ const blocks = [
 
 blocks.push(
     ...[
-        require('./blocks/blockware-user.json'),
-        require('./blocks/blockware-todo.json'),
-        require('./blocks/blockware-images.json'),
+        require('./blocks/kapeta-user.json'),
+        require('./blocks/kapeta-todo.json'),
+        require('./blocks/kapeta-images.json'),
     ].map((data) => {
         return {
             ref: `${data.metadata.name}:1.0.2`,
@@ -48,9 +48,9 @@ blocks.push(
 
 blocks.push(
     ...[
-        require('./blocks/blockware-user.json'),
-        require('./blocks/blockware-todo.json'),
-        require('./blocks/blockware-images.json'),
+        require('./blocks/kapeta-user.json'),
+        require('./blocks/kapeta-todo.json'),
+        require('./blocks/kapeta-images.json'),
     ].map((data) => {
         return {
             ref: `${data.metadata.name}:local`,
@@ -66,8 +66,8 @@ blocks.push(
 );
 
 [
-    require('./blocks/blockware-resource-type-mongodb.json'),
-    require('./blocks/blockware-resource-type-postgresql.json'),
+    require('./blocks/kapeta-resource-type-mongodb.json'),
+    require('./blocks/kapeta-resource-type-postgresql.json'),
 ].forEach((resource) => {
     ResourceTypeProvider.register({
         kind: resource.metadata.name,
@@ -78,7 +78,7 @@ blocks.push(
     });
 });
 
-[require('./blocks/blockware-resource-type-rest-client.json')].forEach(
+[require('./blocks/kapeta-resource-type-rest-client.json')].forEach(
     (resource) => {
         ResourceTypeProvider.register({
             kind: resource.metadata.name,
@@ -86,12 +86,12 @@ blocks.push(
             title: resource.metadata.title,
             type: ResourceType.SERVICE,
             role: ResourceRole.CONSUMES,
-            converters: [{ fromKind: 'blockware/resource-type-rest-api' }],
+            converters: [{ fromKind: 'kapeta/resource-type-rest-api' }],
         });
     }
 );
 
-[require('./blocks/blockware-resource-type-rest-api.json')].forEach(
+[require('./blocks/kapeta-resource-type-rest-api.json')].forEach(
     (resource) => {
         ResourceTypeProvider.register({
             kind: resource.metadata.name,
@@ -118,30 +118,30 @@ blocks.push(
 );
 
 [
-    'blockware/language-target-java-spring-boot',
-    'blockware/language-target-test',
+    'kapeta/language-target-java-spring-boot',
+    'kapeta/language-target-test',
 ].forEach((targetKind) => {
     BlockTargetProvider.register({
         kind: targetKind,
         version: '1.2.3',
         title: 'Test',
-        blockKinds: ['blockware/block-type-service'],
+        blockKinds: ['kapeta/block-type-service'],
     });
 });
 
-['blockware/language-target-fails'].forEach((targetKind) => {
+['kapeta/language-target-fails'].forEach((targetKind) => {
     BlockTargetProvider.register({
         kind: targetKind,
         version: '1.2.3',
         title: 'Test',
-        blockKinds: ['blockware/block-type-service'],
+        blockKinds: ['kapeta/block-type-service'],
         validate: () => {
             return ['Fail target always fails'];
         },
     });
 });
 
-[require('./blocks/blockware-block-type-service.json')].forEach((resource) => {
+[require('./blocks/kapeta-block-type-service.json')].forEach((resource) => {
     BlockTypeProvider.register({
         kind: resource.metadata.name,
         version: '1.2.3',

@@ -7,7 +7,7 @@ import { Asset, BlockKind, PlanKind } from '@kapeta/ui-web-types';
 export function readPlan(): Promise<PlannerModelWrapper> {
     const reader = new PlannerModelReader(BlockServiceMock);
     try {
-        return reader.load(PlannerData, 'blockware/my-todo-system');
+        return reader.load(PlannerData, 'kapeta/my-todo-system');
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error('Failed to get mock plan', e);

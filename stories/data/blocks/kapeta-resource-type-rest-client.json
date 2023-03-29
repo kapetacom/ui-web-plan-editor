@@ -1,8 +1,8 @@
 {
     "kind": "core/resource-type-internal",
     "metadata": {
-        "name": "blockware/resource-type-rest-api",
-        "title": "Rest API"
+        "name": "kapeta/resource-type-rest-client",
+        "title": "REST Client"
     },
     "spec": {}
 }

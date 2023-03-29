@@ -1,7 +1,7 @@
 {
     "kind": "core/resource-type-operator",
     "metadata": {
-        "name": "blockware/resource-type-mongodb",
+        "name": "kapeta/resource-type-mongodb",
         "title": "MongoDB"
     },
     "spec": {}

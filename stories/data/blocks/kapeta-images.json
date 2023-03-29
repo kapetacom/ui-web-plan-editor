@@ -1,12 +1,12 @@
 {
-    "kind": "blockware/block-type-service:1.2.3",
+    "kind": "kapeta/block-type-service:1.2.3",
     "metadata": {
-        "name": "blockware/image",
+        "name": "kapeta/image",
         "title": "Image Service"
     },
     "spec": {
         "target": {
-            "kind": "blockware/language-target-java-spring-boot",
+            "kind": "kapeta/language-target-java-spring-boot",
             "options": {
                 "groupId": "org.mycompany",
                 "artifactId": "service-images",
@@ -33,7 +33,7 @@
         },
         "consumers": [
             {
-                "kind": "blockware/resource-type-postgresql",
+                "kind": "kapeta/resource-type-postgresql",
                 "metadata": {
                     "name": "imagesdb"
                 }
@@ -41,7 +41,7 @@
         ],
         "providers": [
             {
-                "kind": "blockware/resource-type-rest-api",
+                "kind": "kapeta/resource-type-rest-api",
                 "metadata": {
                     "name": "images"
                 },

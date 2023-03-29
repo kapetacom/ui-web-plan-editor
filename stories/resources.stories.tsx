@@ -19,7 +19,7 @@ const ValidInstance: BlockInstanceSpec = {
     id: '1',
     name: 'Some Instance',
     block: {
-        ref: 'blockware/some-ref:1.2.3',
+        ref: 'kapeta/some-ref:1.2.3',
     },
     dimensions: {
         top: 0,
@@ -30,13 +30,13 @@ const ValidInstance: BlockInstanceSpec = {
 };
 
 const ValidDefinition: BlockKind = {
-    kind: 'blockware/block-type-service',
+    kind: 'kapeta/block-type-service',
     metadata: {
         name: 'test/demo',
     },
     spec: {
         target: {
-            kind: 'blockware/language-target-test',
+            kind: 'kapeta/language-target-test',
         },
         consumers: [],
         providers: [],
@@ -44,7 +44,7 @@ const ValidDefinition: BlockKind = {
 };
 
 const MissingResourceKind: ResourceKind = {
-    kind: 'blockware/test',
+    kind: 'kapeta/test',
     metadata: {
         name: 'Name',
     },
@@ -60,7 +60,7 @@ const InvalidResourceKind: ResourceKind = {
 };
 
 const InvalidResourceSpec: ResourceKind = {
-    kind: 'blockware/resource-type-rest-api:1.2.3',
+    kind: 'kapeta/resource-type-rest-api:1.2.3',
     metadata: {
         name: 'Name',
     },
@@ -68,7 +68,7 @@ const InvalidResourceSpec: ResourceKind = {
 };
 
 const InvalidResourceSpecThrown: ResourceKind = {
-    kind: 'blockware/resource-type-rest-api:1.2.3',
+    kind: 'kapeta/resource-type-rest-api:1.2.3',
     metadata: {
         name: 'Name',
     },

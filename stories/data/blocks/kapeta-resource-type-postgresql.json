@@ -1,7 +1,7 @@
 {
     "kind": "core/resource-type-operator",
     "metadata": {
-        "name": "blockware/resource-type-postgresql",
+        "name": "kapeta/resource-type-postgresql",
         "title": "Postgres"
     },
     "spec": {}

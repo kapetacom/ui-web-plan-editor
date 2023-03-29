@@ -1,12 +1,12 @@
 {
-    "kind": "blockware/block-type-service:1.2.3",
+    "kind": "kapeta/block-type-service:1.2.3",
     "metadata": {
-        "name": "blockware/todo",
+        "name": "kapeta/todo",
         "title": "Todo"
     },
     "spec": {
         "target": {
-            "kind": "blockware/language-target-java-spring-boot",
+            "kind": "kapeta/language-target-java-spring-boot",
             "options": {
                 "groupId": "org.mycompany",
                 "artifactId": "service-todo",
@@ -16,13 +16,13 @@
         "entities": [],
         "consumers": [
             {
-                "kind": "blockware/resource-type-mongodb",
+                "kind": "kapeta/resource-type-mongodb",
                 "metadata": {
                     "name": "tasks"
                 }
             },
             {
-                "kind": "blockware/resource-type-rest-client",
+                "kind": "kapeta/resource-type-rest-client",
                 "metadata": {
                     "name": "users"
                 },

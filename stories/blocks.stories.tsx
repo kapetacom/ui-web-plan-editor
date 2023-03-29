@@ -15,7 +15,7 @@ import {
 } from '../src';
 
 const InvalidTargetRefDefinition: BlockKind = {
-    kind: 'blockware/block-type-service:1.2.3',
+    kind: 'kapeta/block-type-service:1.2.3',
     metadata: {
         name: 'test/demo',
     },
@@ -29,13 +29,13 @@ const InvalidTargetRefDefinition: BlockKind = {
 };
 
 const MissingTargetRefDefinition: BlockKind = {
-    kind: 'blockware/block-type-service:1.2.3',
+    kind: 'kapeta/block-type-service:1.2.3',
     metadata: {
         name: 'test/demo',
     },
     spec: {
         target: {
-            kind: 'blockware/my-target:1.2.3',
+            kind: 'kapeta/my-target:1.2.3',
         },
         consumers: [],
         providers: [],
@@ -43,7 +43,7 @@ const MissingTargetRefDefinition: BlockKind = {
 };
 
 const InvalidKindDefinition: BlockKind = {
-    kind: 'blockware/not-real:1.2.3',
+    kind: 'kapeta/not-real:1.2.3',
     metadata: {
         name: 'test/demo',
     },
@@ -86,7 +86,7 @@ const ValidInstance: BlockInstanceSpec = {
     id: '1',
     name: 'Some Instance',
     block: {
-        ref: 'blockware/some-ref:1.2.3',
+        ref: 'kapeta/some-ref:1.2.3',
     },
     dimensions: {
         top: 0,
