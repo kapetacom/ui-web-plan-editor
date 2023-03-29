@@ -1,7 +1,8 @@
 {
-    "kind": "blockware/block-type-service",
+    "kind": "blockware/block-type-service:1.2.3",
     "metadata": {
-        "name": "blockware/image"
+        "name": "blockware/image",
+        "title": "Image Service"
     },
     "spec": {
         "target": {

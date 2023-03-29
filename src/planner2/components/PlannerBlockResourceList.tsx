@@ -11,23 +11,19 @@ import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
 import { resourceHeight } from '../utils/planUtils';
 import { SVGLayoutNode } from '../LayoutContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
-import { PlannerPayload } from '../types';
+import { PlannerAction, PlannerPayload } from '../types';
 
 export interface PlannerBlockResourceListProps {
     role: ResourceRole;
+    actions: PlannerAction<any>[];
 }
 
 export const PlannerBlockResourceList: React.FC<
     PlannerBlockResourceListProps
 > = (props) => {
     const { size } = useContext(PlannerContext);
-    const {
-        blockInstance,
-        providers,
-        consumers,
-        instanceBlockHeight,
-        blockMode,
-    } = useBlockContext();
+    const { blockInstance, providers, consumers, blockMode } =
+        useBlockContext();
     const { draggable } = useContext(DnDContext);
 
     const list = {
@@ -86,7 +82,7 @@ export const PlannerBlockResourceList: React.FC<
                 return (
                     <PlannerBlockResourceListItem
                         size={nodeSize}
-                        key={`${resource.metadata.name}_${index}`}
+                        key={`${blockInstance.id}_${resource.metadata.name}_${index}`}
                         index={index}
                         resource={resource}
                         // Should we render a consumer or provider?
@@ -96,6 +92,7 @@ export const PlannerBlockResourceList: React.FC<
                         // If hovering should trigger a different state, put it here
                         // show_options unless viewOnly or we're dragging
                         hoverMode={ResourceMode.SHOW_OPTIONS}
+                        actions={props.actions}
                     />
                 );
             })}

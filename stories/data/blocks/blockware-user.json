@@ -1,5 +1,5 @@
 {
-    "kind": "blockware/block-type-service",
+    "kind": "blockware/block-type-service:1.2.3",
     "metadata": {
         "name": "blockware/user"
     },
