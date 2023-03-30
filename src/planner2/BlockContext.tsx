@@ -47,7 +47,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
 }) => {
     const {
         plan,
-        size,
+        nodeSize,
         getBlockByRef,
         mode: plannerMode,
     } = useContext(PlannerContext);
@@ -73,7 +73,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
         );
         const instanceBlockHeight = getBlockHeightByResourceCount(
             resourceCount,
-            size
+            nodeSize
         );
         const blockReference =
             blockInstance && parseKapetaUri(blockInstance?.block.ref);
@@ -92,7 +92,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
                 plannerMode === PlannerMode.VIEW,
         };
     }, [
-        size,
+        nodeSize,
         blockInstance,
         blockDefinition,
         blockMode,

@@ -124,6 +124,7 @@ export class FocusHelper {
                 connectedToFocusBlocks.consumingBlocks,
                 nodeSize
             ),
+            totalUsedHeight: -1,
             plannerHeight: availableSize.y,
             plannerWidth: availableSize.x,
         };

@@ -5,9 +5,9 @@ import {
     useEffect,
     useState,
 } from 'react';
-import { DnDPayload, DragEventInfo, PositionDiff } from './types';
-import { DnDContext } from './DnDContext';
-import { DnDZoneContext, DnDZoneInstance } from './DnDDropZone';
+import {DnDPayload, DragEventInfo, PositionDiff} from './types';
+import {DnDContext} from './DnDContext';
+import {DnDZoneContext, DnDZoneInstance} from './DnDDropZone';
 
 interface DnDCallbackProps {
     isDragging: boolean;
@@ -16,14 +16,17 @@ interface DnDCallbackProps {
         onMouseDown;
     };
 }
+
 interface DnDDraggableProps<T> {
     // payload for drag events
     data: T;
+    disabled?: boolean;
     onDrag?: (dragEvent: DragEventInfo) => void;
     onDragStart?: () => void;
     onDrop?: (dragEvent: DragEventInfo) => void;
     children: (props: DnDCallbackProps) => JSX.Element;
 }
+
 enum DragStatus {
     IDLE,
     DRAGGING,
@@ -56,15 +59,13 @@ const getDragEventInfo = (
     };
 };
 
-const zeroPosition = { x: 0, y: 0 };
+const zeroPosition = {x: 0, y: 0};
 const zeroDragEvent = {
     client: getDragEvent(zeroPosition, zeroPosition),
     zone: getDragEvent(zeroPosition, zeroPosition),
 };
 
-export const DnDDraggable: <T extends DnDPayload>(
-    props: DnDDraggableProps<T>
-) => JSX.Element = ({ onDragStart, onDrag, onDrop, data, children }) => {
+export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) => JSX.Element = (props: DnDDraggableProps<any>) => {
     // Track state here, use state callbacks to ensure consistency
     const ctx = useContext(DnDContext);
     const parentZone = useContext(DnDZoneContext);
@@ -77,8 +78,11 @@ export const DnDDraggable: <T extends DnDPayload>(
         status: DragStatus.IDLE,
     });
 
-    const mouseDownHandler = useCallback<MouseEventHandler>(
-        (downEvt) => {
+    const mouseDownHandler = useCallback<MouseEventHandler>((downEvt) => {
+            if (props.disabled) {
+                return;
+            }
+
             const initialClientPosition = {
                 y: downEvt.clientY,
                 x: downEvt.clientX,
@@ -94,7 +98,7 @@ export const DnDDraggable: <T extends DnDPayload>(
                 status: DragStatus.DRAGGING,
                 dragEvent: initialDragEvt,
             });
-            ctx.callbacks.onDragStart(data, initialDragEvt);
+            ctx.callbacks.onDragStart(props.data, initialDragEvt);
 
             let lastEvt = downEvt;
             // Transform scroll into drag events
@@ -149,24 +153,24 @@ export const DnDDraggable: <T extends DnDPayload>(
                 once: true,
             });
         },
-        [ctx.callbacks, parentZone, data]
+        [ctx.callbacks, parentZone, props.data, props.disabled]
     );
 
     const isDragging = state.status === DragStatus.DRAGGING;
     // Callback when isDragging changes
     useEffect(() => {
-        if (isDragging && onDragStart) {
-            onDragStart();
+        if (isDragging && props.onDragStart) {
+            props.onDragStart();
         }
-    }, [isDragging, onDragStart]);
+    }, [isDragging, props.onDragStart]);
 
     // Callback when position changes
     useEffect(() => {
         if (isDragging) {
-            if (onDrag) {
-                onDrag(state.dragEvent);
+            if (props.onDrag) {
+                props.onDrag(state.dragEvent);
             }
-            ctx.callbacks.onDrag(data, state.dragEvent);
+            ctx.callbacks.onDrag(props.data, state.dragEvent);
         }
     });
 
@@ -175,10 +179,10 @@ export const DnDDraggable: <T extends DnDPayload>(
     useEffect(() => {
         if (isDropped) {
             // Wait with resetting the position state, so the state is consistent when triggering onDrop
-            if (onDrop) {
-                onDrop(state.dragEvent);
+            if (props.onDrop) {
+                props.onDrop(state.dragEvent);
             }
-            ctx.callbacks.onDrop(data, state.dragEvent);
+            ctx.callbacks.onDrop(props.data, state.dragEvent);
 
             // Reset
             setState({
@@ -186,12 +190,12 @@ export const DnDDraggable: <T extends DnDPayload>(
                 status: DragStatus.IDLE,
             });
         }
-    }, [state.dragEvent, ctx.callbacks, isDropped, onDrop, data]);
+    }, [state.dragEvent, ctx.callbacks, isDropped, props.onDrop, props.data]);
 
     // get single child
-    return children({
+    return props.children({
         isDragging,
         position: state.dragEvent.zone.diff,
-        componentProps: { onMouseDown: mouseDownHandler },
+        componentProps: {onMouseDown: mouseDownHandler},
     });
 };

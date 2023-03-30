@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, {useContext, useEffect, useMemo} from 'react';
 import { PlannerContext, PlannerMode } from './PlannerContext';
 import { DragAndDrop } from './utils/dndUtils';
 import { useBoundingBox } from './hooks/boundingBox';
@@ -7,6 +7,7 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { PositionDiff } from './DragAndDrop/types';
 import { BlockInstanceSpec } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
+import { ZOOM_STEP_SIZE } from './types';
 
 const blockPositionUpdater =
     (diff: PositionDiff, zoom: number) => (block: BlockInstanceSpec) => {
@@ -21,41 +22,39 @@ const blockPositionUpdater =
     };
 
 export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
-    const {
-        size,
-        zoom,
-        setZoomLevel,
-        mode,
-        blockAssets,
-        plan,
-        updateBlockInstance,
-    } = useContext(PlannerContext);
+    const planner = useContext(PlannerContext);
     const { isDragging } = useContext(DragAndDrop.Context);
 
     const classNames = toClass({
-        'read-only': mode === PlannerMode.VIEW,
+        'read-only': planner.mode === PlannerMode.VIEW,
         dragging: isDragging,
     });
 
     const { value: boundingBox, onRef } = useBoundingBox();
     const canvasSize = useMemo(() => {
-        return calculateCanvasSize(plan?.spec.blocks || [], blockAssets, size, {
+        return calculateCanvasSize(planner.plan?.spec.blocks || [], planner.blockAssets, planner.nodeSize, {
             height: boundingBox.height,
             width: boundingBox.width,
         });
     }, [
-        plan?.spec.blocks,
-        blockAssets,
-        size,
+        planner.plan?.spec.blocks,
+        planner.blockAssets,
+        planner.nodeSize,
         boundingBox.width,
         boundingBox.height,
     ]);
+
+    useEffect(() => {
+        planner.setCanvasSize(canvasSize);
+    }, [planner, canvasSize])
+
+
 
     return (
         <div className={`planner-area-container ${classNames}`}>
             <div className="planner-area-position-parent" ref={onRef}>
                 <DragAndDrop.DropZone
-                    scale={zoom}
+                    scale={planner.zoom}
                     accept={(draggable) => {
                         // Filter types
                         return (
@@ -67,9 +66,9 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                         if (draggable.type !== 'block') {
                             return;
                         }
-                        updateBlockInstance(
+                        planner.updateBlockInstance(
                             draggable.data.id,
-                            blockPositionUpdater(dragEvent.zone.diff, zoom)
+                            blockPositionUpdater(dragEvent.zone.diff, planner.zoom)
                         );
                     }}
                 >
@@ -79,7 +78,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                                 className="planner-area-canvas"
                                 style={{
                                     ...canvasSize,
-                                    transform: `scale(${zoom})`,
+                                    transform: `scale(${(planner.zoom)})`,
                                 }}
                             >
                                 {props.children}
@@ -88,16 +87,16 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                     )}
                 </DragAndDrop.DropZone>
 
-                <ZoomButtons
-                    currentZoom={zoom}
+                {!planner.focusedBlock && <ZoomButtons
+                    currentZoom={planner.zoom}
                     onZoomIn={() =>
-                        setZoomLevel((currentZoom) => currentZoom + 0.25)
+                        planner.setZoomLevel((currentZoom) => currentZoom + ZOOM_STEP_SIZE)
                     }
                     onZoomOut={() =>
-                        setZoomLevel((currentZoom) => currentZoom - 0.25)
+                        planner.setZoomLevel((currentZoom) => currentZoom - ZOOM_STEP_SIZE)
                     }
-                    onZoomReset={() => setZoomLevel(1)}
-                />
+                    onZoomReset={() => planner.setZoomLevel(1)}
+                />}
             </div>
         </div>
     );

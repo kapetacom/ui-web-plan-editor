@@ -10,6 +10,7 @@ export enum PlannerNodeSize {
 export interface FocusPositioningData {
     maxVerticalBlocks: number;
     maxHorizontalBlocks: number;
+    totalUsedHeight: number;
     totalUsedHeightLeft: number;
     totalUsedHeightRight: number;
     plannerHeight: number;

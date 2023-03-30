@@ -14,7 +14,7 @@ import {
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerNodeSize } from '../types';
 import { cloneDeep } from 'lodash';
-import { PlannerAction } from './types';
+import {PlannerAction, Rectangle} from './types';
 
 export enum PlannerMode {
     VIEW,
@@ -32,11 +32,12 @@ export interface PlannerActionConfig {
 export interface PlannerContextData {
     plan?: PlanKind;
     blockAssets: Asset<BlockKind>[];
-    focusedBlock?: PlannerBlockModelWrapper;
+    focusedBlock?: BlockInstanceSpec;
+    setFocusedBlock(block:BlockInstanceSpec): void;
     mode?: PlannerMode;
     zoom: number;
     setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
-    size: PlannerNodeSize;
+    nodeSize: PlannerNodeSize;
     getBlockByRef(ref: string): BlockKind | undefined;
     getBlockById(blockId: string): BlockKind | undefined;
 
@@ -70,15 +71,23 @@ export interface PlannerContextData {
         getPointById(id: string): Point | null;
         removePoint(pointId: string): void;
     };
+
+    canvasSize: Rectangle
+    setCanvasSize(canvasSize: Rectangle): void;
 }
 
 const defaultValue: PlannerContextData = {
-    focusedBlock: undefined,
     mode: PlannerMode.VIEW,
     zoom: 1,
     setZoomLevel() {},
 
-    size: PlannerNodeSize.MEDIUM,
+    focusedBlock: undefined,
+    setFocusedBlock(block: BlockInstanceSpec) {},
+
+    canvasSize: {x: 0, y: 0, width: 0, height: 0},
+    setCanvasSize(canvasSize: Rectangle) {},
+
+    nodeSize: PlannerNodeSize.MEDIUM,
     blockAssets: [],
     getBlockByRef(_ref: string) {
         return undefined;
@@ -120,11 +129,8 @@ export type PlannerContextProps = {
 };
 
 // Helper to make sure we memoize anything we can for the context
-export const usePlannerContext = ({
-    plan: extPlan,
-    blockAssets: extBlockAssets,
-    mode = PlannerMode.VIEW,
-}: PlannerContextProps): PlannerContextData => {
+export const usePlannerContext = (props: PlannerContextProps): PlannerContextData => {
+    const mode = props.mode === undefined ? PlannerMode.VIEW : props.mode;
     //
     const [points, setPoints] = useState<{ [id: string]: Point }>(() => ({}));
     const addPoint = useCallback(
@@ -155,8 +161,8 @@ export const usePlannerContext = ({
     );
 
     // region View state
-    const [focusedBlock, setFocusedBlock] =
-        useState<PlannerBlockModelWrapper>();
+    const [focusedBlock, setFocusedBlock] = useState<BlockInstanceSpec>();
+    const [canvasSize, setCanvasSize] = useState<Rectangle>({x: 0, y: 0, width: 0, height: 0});
     const [viewMode, setViewMode] = useState(mode);
     const [zoom, setZoomLevel] = useState(1);
 
@@ -165,24 +171,34 @@ export const usePlannerContext = ({
     // endregion
 
     // Allow internal changes, but load from props in case props change
-    const [plan, setPlan] = useState(extPlan);
+    const [plan, setPlan] = useState(props.plan);
     useEffect(() => {
-        setPlan(extPlan);
-    }, [extPlan]);
+        setPlan(props.plan);
+    }, [props.plan]);
 
     // Allow internal changes, but load from props in case props change
-    const [blockAssets, setBlockAssets] = useState(extBlockAssets);
+    const [blockAssets, setBlockAssets] = useState(props.blockAssets);
     useEffect(() => {
-        setBlockAssets(extBlockAssets);
-    }, [extBlockAssets]);
+        setBlockAssets(props.blockAssets);
+    }, [props.blockAssets]);
+
+    const toggleFocusBlock = (block: BlockInstanceSpec) => {
+        setFocusedBlock(focusedBlock && block.id === focusedBlock.id ? undefined : block);
+    };
 
     return useMemo(() => {
         const planner = {
             // view state
             focusedBlock,
+            setFocusedBlock: toggleFocusBlock,
+
             zoom,
             setZoomLevel,
-            size: PlannerNodeSize.MEDIUM,
+
+            canvasSize,
+            setCanvasSize,
+
+            nodeSize: PlannerNodeSize.MEDIUM,
             //
             mode: viewMode,
             //
@@ -408,6 +424,7 @@ export const usePlannerContext = ({
         setZoomLevel,
         connectionPoints,
         focusedBlock,
+        setFocusedBlock,
         viewMode,
     ]);
 };

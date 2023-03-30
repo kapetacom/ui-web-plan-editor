@@ -2,10 +2,11 @@ import {
     BlockConnectionSpec,
     BlockInstanceSpec,
     BlockKind,
-    ItemType,
+    ItemType, PlanKind,
+    Point,
     ResourceKind,
     ResourceRole,
-    SchemaKind,
+    SchemaKind, Size,
 } from '@kapeta/ui-web-types';
 import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
@@ -46,3 +47,33 @@ export interface EditableItemInterface2 {
     item: SchemaKind | BlockConnectionSpec;
     creating: boolean;
 }
+
+
+export interface BlockInfo {
+    block: BlockKind
+    instance: BlockInstanceSpec
+}
+
+export interface FocusBlockInfo {
+    plan: PlanKind;
+    focus: BlockInfo;
+    consumingBlocks: BlockInfo[];
+    providingBlocks: BlockInfo[];
+    all: BlockInfo[];
+}
+
+export interface FocusBlockInfoShallow {
+    plan: PlanKind;
+    focus: BlockInfo;
+    consumingBlocks: BlockInstanceSpec[];
+    providingBlocks: BlockInstanceSpec[];
+    all: BlockInstanceSpec[];
+}
+
+export interface ZoomLevels {
+    [key: number]: Size;
+}
+
+export type Rectangle = Size & Point;
+
+export const ZOOM_STEP_SIZE = 0.25;

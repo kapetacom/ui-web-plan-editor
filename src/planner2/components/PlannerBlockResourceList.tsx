@@ -21,7 +21,7 @@ export interface PlannerBlockResourceListProps {
 export const PlannerBlockResourceList: React.FC<
     PlannerBlockResourceListProps
 > = (props) => {
-    const { size } = useContext(PlannerContext);
+    const { nodeSize } = useContext(PlannerContext);
     const { blockInstance, providers, consumers, blockMode } =
         useBlockContext();
     const { draggable } = useContext(DnDContext);
@@ -32,7 +32,6 @@ export const PlannerBlockResourceList: React.FC<
     }[props.role];
 
     // Can we move layout stuff to its own helpers?
-    const nodeSize = size !== undefined ? size : PlannerNodeSize.FULL;
     const offsetX = 1;
     const placeholderWidth = 4;
     const placeholderX =
@@ -67,9 +66,9 @@ export const PlannerBlockResourceList: React.FC<
     const resourceCount = list.length + (showPlaceholder() ? 1 : 0);
     const yPosition =
         resourceCount === 1
-            ? hexagonTopHeight + resourceHeight[size] / 2
+            ? hexagonTopHeight + resourceHeight[nodeSize] / 2
             : hexagonTopHeight;
-    const placeholderHeight = list.length * resourceHeight[size];
+    const placeholderHeight = list.length * resourceHeight[nodeSize];
 
     return (
         <SVGLayoutNode
@@ -104,7 +103,7 @@ export const PlannerBlockResourceList: React.FC<
                 y={placeholderHeight}
             >
                 <rect
-                    height={resourceHeight[size] - 4}
+                    height={resourceHeight[nodeSize] - 4}
                     width={placeholderWidth - offsetX}
                 />
             </svg>

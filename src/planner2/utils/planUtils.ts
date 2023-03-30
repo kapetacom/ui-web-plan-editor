@@ -1,5 +1,5 @@
 import { PlannerNodeSize } from '../../types';
-import { Asset, BlockInstanceSpec, BlockKind } from '@kapeta/ui-web-types';
+import {Asset, BlockInstanceSpec, BlockKind, Size} from '@kapeta/ui-web-types';
 
 export const resourceHeight = {
     [PlannerNodeSize.SMALL]: 30,
@@ -11,7 +11,7 @@ export const calculateCanvasSize = (
     blocks: BlockInstanceSpec[],
     blockAssets: Asset<BlockKind>[],
     size: PlannerNodeSize,
-    containerSize: { width: number; height: number }
+    containerSize: Size
 ) => {
     let maxWidth = 50;
     let maxHeight = 50;
@@ -58,8 +58,7 @@ export const calculateCanvasSize = (
         x: minX,
         y: minY,
         width: maxWidth > containerSize.width ? maxWidth : containerSize.width,
-        height:
-            maxHeight > containerSize.height ? maxHeight : containerSize.height,
+        height: maxHeight > containerSize.height ? maxHeight : containerSize.height,
     };
 };
 
@@ -82,4 +81,8 @@ export function getBlockHeightByResourceCount(
 
 export function getResourceId(blockId: string, resourceName: string) {
     return `${blockId}__${resourceName}`;
+}
+
+export function getBlockInstance(plan, blockId) {
+    return plan.spec.blocks.find((block) => block.id === blockId);
 }
