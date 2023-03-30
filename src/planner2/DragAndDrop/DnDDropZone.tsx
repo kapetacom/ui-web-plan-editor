@@ -3,7 +3,7 @@ import { DropZoneEntity } from './DropZoneManager';
 import { DnDContext } from './DnDContext';
 
 type ScrollOffset = { top: number; left: number };
-class DnDZoneInstance {
+export class DnDZoneInstance {
     private _listeners: ((offset: ScrollOffset) => void)[] = [];
     scale = 1;
     scrollOffset: ScrollOffset = { top: 0, left: 0 };

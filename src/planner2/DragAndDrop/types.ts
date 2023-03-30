@@ -9,7 +9,15 @@ export interface DnDPayload {
 }
 
 export interface DragEventInfo {
-    start: PositionDiff;
-    end: PositionDiff;
-    diff: PositionDiff;
+    // Client relative coordinates
+    client: {
+        start: PositionDiff;
+        end: PositionDiff;
+        diff: PositionDiff;
+    };
+    zone: {
+        start: PositionDiff;
+        end: PositionDiff;
+        diff: PositionDiff;
+    };
 }
