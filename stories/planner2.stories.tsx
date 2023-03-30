@@ -1,6 +1,10 @@
 import React, { useContext } from 'react';
 
-import { ButtonStyle, DefaultContext } from '@kapeta/ui-web-components';
+import {
+    ButtonStyle,
+    DefaultContext,
+    DialogControl,
+} from '@kapeta/ui-web-components';
 
 import { Planner } from '../src/planner2/Planner2';
 
@@ -62,7 +66,19 @@ const PlanEditor = withPlannerContext(
                         );
                     },
                     onClick(context, { blockInstance }) {
-                        planner.removeBlockInstance(blockInstance!.id);
+                        DialogControl.delete(
+                            `Delete Block Instance`,
+                            `Are you sure you want to delete ${
+                                blockInstance?.name || 'this block'
+                            }?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    planner.removeBlockInstance(
+                                        blockInstance!.id
+                                    );
+                                }
+                            }
+                        );
                     },
                     buttonStyle: ButtonStyle.DANGER,
                     icon: 'fa fa-trash',
