@@ -16,7 +16,12 @@ import {
     withPlannerContext,
 } from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
-import { BlockKind, ItemType, SchemaKind } from '@kapeta/ui-web-types';
+import {
+    BlockKind,
+    ItemType,
+    ResourceRole,
+    SchemaKind,
+} from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
 import { EditableItemInterface2 } from '../src/planner2/types';
@@ -178,7 +183,26 @@ const PlanEditor = withPlannerContext(
                         return planner.mode !== PlannerMode.VIEW;
                     },
                     onClick(context, { connection }) {
-                        planner.removeConnection(connection!);
+                        const from = planner.getResourceByBlockIdAndName(
+                            connection!.from.blockId,
+                            connection!.from.resourceName,
+                            ResourceRole.PROVIDES
+                        );
+                        const to = planner.getResourceByBlockIdAndName(
+                            connection!.to.blockId,
+                            connection!.to.resourceName,
+                            ResourceRole.CONSUMES
+                        );
+
+                        DialogControl.delete(
+                            `Delete Connection?`,
+                            `from ${from?.metadata.name} to ${to?.metadata.name}?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    planner.removeConnection(connection!);
+                                }
+                            }
+                        );
                     },
                     buttonStyle: ButtonStyle.DANGER,
                     icon: 'fa fa-trash',
