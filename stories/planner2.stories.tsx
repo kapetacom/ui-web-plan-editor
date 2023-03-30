@@ -1,6 +1,10 @@
 import React, { useContext } from 'react';
 
-import { ButtonStyle, DefaultContext } from '@kapeta/ui-web-components';
+import {
+    ButtonStyle,
+    DefaultContext,
+    DialogControl,
+} from '@kapeta/ui-web-components';
 
 import { Planner } from '../src/planner2/Planner2';
 
@@ -12,7 +16,12 @@ import {
     withPlannerContext,
 } from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
-import { BlockKind, ItemType, SchemaKind } from '@kapeta/ui-web-types';
+import {
+    BlockKind,
+    ItemType,
+    ResourceRole,
+    SchemaKind,
+} from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
 import { EditableItemInterface2 } from '../src/planner2/types';
@@ -62,7 +71,19 @@ const PlanEditor = withPlannerContext(
                         );
                     },
                     onClick(context, { blockInstance }) {
-                        planner.removeBlockInstance(blockInstance!.id);
+                        DialogControl.delete(
+                            `Delete Block Instance`,
+                            `Are you sure you want to delete ${
+                                blockInstance?.name || 'this block'
+                            }?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    planner.removeBlockInstance(
+                                        blockInstance!.id
+                                    );
+                                }
+                            }
+                        );
                     },
                     buttonStyle: ButtonStyle.DANGER,
                     icon: 'fa fa-trash',
@@ -135,11 +156,20 @@ const PlanEditor = withPlannerContext(
                         context,
                         { blockInstance, resource, resourceRole }
                     ) {
-                        // Block id?
-                        context.removeResource(
-                            blockInstance!.block.ref,
-                            resource!.metadata.name,
-                            resourceRole!
+                        DialogControl.delete(
+                            `Delete Resource`,
+                            `Are you sure you want to delete ${
+                                resource?.metadata.name || 'this resource'
+                            }?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    context.removeResource(
+                                        blockInstance!.block.ref,
+                                        resource!.metadata.name,
+                                        resourceRole!
+                                    );
+                                }
+                            }
                         );
                     },
                     buttonStyle: ButtonStyle.DANGER,
@@ -153,7 +183,26 @@ const PlanEditor = withPlannerContext(
                         return planner.mode !== PlannerMode.VIEW;
                     },
                     onClick(context, { connection }) {
-                        planner.removeConnection(connection!);
+                        const from = planner.getResourceByBlockIdAndName(
+                            connection!.from.blockId,
+                            connection!.from.resourceName,
+                            ResourceRole.PROVIDES
+                        );
+                        const to = planner.getResourceByBlockIdAndName(
+                            connection!.to.blockId,
+                            connection!.to.resourceName,
+                            ResourceRole.CONSUMES
+                        );
+
+                        DialogControl.delete(
+                            `Delete Connection?`,
+                            `from ${from?.metadata.name} to ${to?.metadata.name}?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    planner.removeConnection(connection!);
+                                }
+                            }
+                        );
                     },
                     buttonStyle: ButtonStyle.DANGER,
                     icon: 'fa fa-trash',
