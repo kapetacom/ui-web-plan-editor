@@ -64,10 +64,10 @@ export const DragAndDropDemo = () => {
 
                 <DragAndDrop.Draggable
                     data={payload}
-                    onDrop={(position) =>
+                    onDrop={(dragEvent) =>
                         setSavedPosition({
-                            left: savedPosition.left + position.x,
-                            top: savedPosition.top + position.y,
+                            left: savedPosition.left + dragEvent.zone.diff.x,
+                            top: savedPosition.top + dragEvent.zone.diff.y,
                         })
                     }
                 >

@@ -390,8 +390,8 @@ export const PlannerBlockResourceListItem: React.FC<
                                 {/* Temp draggable resource */}
                                 {isDragging ? (
                                     <TempResource
-                                        x={position.x}
-                                        y={position.y}
+                                        x={position.x / planner.zoom}
+                                        y={position.y / planner.zoom}
                                         nodeSize={nodeSize}
                                         resource={{
                                             typeName,

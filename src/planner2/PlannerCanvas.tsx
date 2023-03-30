@@ -69,7 +69,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                         }
                         updateBlockInstance(
                             draggable.data.id,
-                            blockPositionUpdater(dragEvent.diff, zoom)
+                            blockPositionUpdater(dragEvent.zone.diff, zoom)
                         );
                     }}
                 >

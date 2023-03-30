@@ -48,7 +48,10 @@ export class DropZoneManager {
         for (const dropZone of this.zones.filter((zone) =>
             zone.zone.accept ? zone.zone.accept(draggable) : true
         )) {
-            const isContained = this.checkContainment(dropZone.zone, evt.end);
+            const isContained = this.checkContainment(
+                dropZone.zone,
+                evt.client.end
+            );
 
             if (isContained) {
                 if (dropZone.state === 'IDLE') {
@@ -77,7 +80,10 @@ export class DropZoneManager {
         for (const dropZone of this.zones.filter((zone) =>
             zone.zone.accept ? zone.zone.accept(draggable) : true
         )) {
-            const isContained = this.checkContainment(dropZone.zone, evt.end);
+            const isContained = this.checkContainment(
+                dropZone.zone,
+                evt.client.end
+            );
 
             if (isContained) {
                 if (dropZone.zone.onDrop) {
