@@ -151,11 +151,20 @@ const PlanEditor = withPlannerContext(
                         context,
                         { blockInstance, resource, resourceRole }
                     ) {
-                        // Block id?
-                        context.removeResource(
-                            blockInstance!.block.ref,
-                            resource!.metadata.name,
-                            resourceRole!
+                        DialogControl.delete(
+                            `Delete Resource`,
+                            `Are you sure you want to delete ${
+                                resource?.metadata.name || 'this resource'
+                            }?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    context.removeResource(
+                                        blockInstance!.block.ref,
+                                        resource!.metadata.name,
+                                        resourceRole!
+                                    );
+                                }
+                            }
                         );
                     },
                     buttonStyle: ButtonStyle.DANGER,
