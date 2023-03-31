@@ -1,9 +1,10 @@
 import React, { useContext, useMemo, useState } from 'react';
 import { BlockInstanceSpec, BlockKind, ResourceKind } from '@kapeta/ui-web-types';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
-import { PlannerContext, PlannerMode } from './PlannerContext';
+import { PlannerContext } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';
+import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 
 export interface PlannerBlockContextData {
     blockInstance: BlockInstanceSpec | null;

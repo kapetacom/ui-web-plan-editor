@@ -6,7 +6,7 @@ import {
     DialogControl,
 } from '@kapeta/ui-web-components';
 
-import { Planner } from '../src/planner2/Planner2';
+import { Planner2 } from '../src/planner2/Planner2';
 
 import { readPlanV2 } from './data/planReader';
 import {
@@ -207,7 +207,7 @@ const PlanEditor = withPlannerContext(() => {
 
     return (
         <>
-            <Planner systemId="system?" actions={actionConfig} />
+            <Planner2 systemId="system?" actions={actionConfig} />
             <ItemEditorPanel
                 open={!!editItem}
                 editableItem={editItem}
