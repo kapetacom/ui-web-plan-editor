@@ -9,12 +9,7 @@ import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionMode
 import { observer } from 'mobx-react';
 import { SVGCircleButton } from './SVGCircleButton';
 
-function makeButtonBg(
-    x: number,
-    y: number,
-    height: number,
-    lineLength: number
-) {
+function makeButtonBg(x: number, y: number, height: number, lineLength: number) {
     const size = 18;
 
     if (height > 0) {
@@ -107,10 +102,8 @@ export class PlannerConnectionButtons extends React.Component<
             }
         }
 
-        const readOnly =
-            this.props.connection.fromResource.block.plan.isReadOnly();
-        const showEditBtn =
-            !readOnly && (!this.props.connection.isValid() || hasMapping);
+        const readOnly = this.props.connection.fromResource.block.plan.isReadOnly();
+        const showEditBtn = !readOnly && (!this.props.connection.isValid() || hasMapping);
         let showDelete = !readOnly;
         let showInspect = hasInspector;
 
@@ -133,18 +126,8 @@ export class PlannerConnectionButtons extends React.Component<
             deleteX = 5;
         }
 
-        const bgPath = makeButtonBg(
-            x,
-            0,
-            this.props.open ? clipHeight + 2 : 0,
-            length
-        );
-        const bgPathClip = makeButtonBg(
-            x,
-            0,
-            this.props.open ? clipHeight : 0,
-            length
-        );
+        const bgPath = makeButtonBg(x, 0, this.props.open ? clipHeight + 2 : 0, length);
+        const bgPathClip = makeButtonBg(x, 0, this.props.open ? clipHeight : 0, length);
 
         if (!showDelete && !showEditBtn && !showInspect) {
             return <></>;
@@ -165,8 +148,7 @@ export class PlannerConnectionButtons extends React.Component<
                     className={toClass({
                         'planner-connection-buttons': true,
                         over: this.state.over,
-                        open:
-                            this.props.open || !this.props.connection.isValid(),
+                        open: this.props.open || !this.props.connection.isValid(),
                         'no-inspect': !hasInspector,
                         'no-mapping': !hasMapping,
                     })}

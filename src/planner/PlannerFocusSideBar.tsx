@@ -1,11 +1,6 @@
 import React from 'react';
 
-import {
-    SidePanel,
-    PanelAlignment,
-    PanelSize,
-    SidePanelHeader,
-} from '@kapeta/ui-web-components';
+import { SidePanel, PanelAlignment, PanelSize, SidePanelHeader } from '@kapeta/ui-web-components';
 
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 
@@ -36,22 +31,9 @@ export const PlannerFocusSideBar = (props: Props) => {
                     title="Blocks in use"
                     onIconPress={props.blurFocus}
                     icon={
-                        <svg
-                            width="7"
-                            height="12"
-                            viewBox="0 0 7 12"
-                            fill="none"
-                        >
-                            <path
-                                d="M6.05054 11L0.999978 5.94974"
-                                stroke="#F5F1EE"
-                                strokeLinecap="round"
-                            />
-                            <path
-                                d="M1 5.94971L6.05025 0.999976"
-                                stroke="#F5F1EE"
-                                strokeLinecap="round"
-                            />
+                        <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                            <path d="M6.05054 11L0.999978 5.94974" stroke="#F5F1EE" strokeLinecap="round" />
+                            <path d="M1 5.94971L6.05025 0.999976" stroke="#F5F1EE" strokeLinecap="round" />
                         </svg>
                     }
                 />

@@ -67,10 +67,7 @@ export const BlockConfigurationPanel = (props: Props) => {
                     return uri.fullName === blockUri.fullName;
                 })
                 .forEach((block) => {
-                    opts[block.version] =
-                        block.version === 'local'
-                            ? 'Local Disk'
-                            : block.version;
+                    opts[block.version] = block.version === 'local' ? 'Local Disk' : block.version;
                 });
 
             setVersionOptions(opts);
@@ -80,12 +77,7 @@ export const BlockConfigurationPanel = (props: Props) => {
     };
 
     return (
-        <SidePanel
-            title={panelHeader()}
-            size={PanelSize.large}
-            open={props.open}
-            onClose={props.onClose}
-        >
+        <SidePanel title={panelHeader()} size={PanelSize.large} open={props.open} onClose={props.onClose}>
             <SimpleLoader
                 loading={loading}
                 key={props.block?.ref ?? 'unknown-block'}
@@ -95,9 +87,7 @@ export const BlockConfigurationPanel = (props: Props) => {
                 <div className="block-configuration-panel">
                     <FormContainer
                         initialValue={data}
-                        onSubmitData={(formData) =>
-                            props.onSave(formData as BlockConfigurationData)
-                        }
+                        onSubmitData={(formData) => props.onSave(formData as BlockConfigurationData)}
                     >
                         <FormField
                             name="name"
@@ -124,12 +114,7 @@ export const BlockConfigurationPanel = (props: Props) => {
                                 onClick={props.onClose}
                                 text="Cancel"
                             />
-                            <Button
-                                width={70}
-                                type={ButtonType.SUBMIT}
-                                style={ButtonStyle.PRIMARY}
-                                text="Save"
-                            />
+                            <Button width={70} type={ButtonType.SUBMIT} style={ButtonStyle.PRIMARY} text="Save" />
                         </FormButtons>
                     </FormContainer>
                 </div>

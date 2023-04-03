@@ -21,11 +21,7 @@ export class EditPanelHelper {
         this.planner.setEditingItem(undefined);
     }
 
-    public edit(
-        item: DataWrapper | any | undefined,
-        type: ItemType,
-        creating?: boolean
-    ) {
+    public edit(item: DataWrapper | any | undefined, type: ItemType, creating?: boolean) {
         this.reset();
 
         if (item instanceof PlannerResourceModelWrapper) {
@@ -42,9 +38,7 @@ export class EditPanelHelper {
             item.fromResource.setMode(ResourceMode.HIGHLIGHT);
         }
 
-        this.planner.setEditingItem(
-            toJS({ item: item, type: type, creating: !!creating })
-        );
+        this.planner.setEditingItem(toJS({ item: item, type: type, creating: !!creating }));
     }
 
     public onClosed = () => {

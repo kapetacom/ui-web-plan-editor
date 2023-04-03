@@ -2,23 +2,10 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import * as _ from 'lodash';
-import {
-    action,
-    computed,
-    Lambda,
-    makeObservable,
-    observable,
-    reaction,
-    runInAction,
-} from 'mobx';
+import { action, computed, Lambda, makeObservable, observable, reaction, runInAction } from 'mobx';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { toClass } from '@kapeta/ui-web-utils';
-import {
-    DnDContainer,
-    DnDDrop,
-    showToasty,
-    ToastType,
-} from '@kapeta/ui-web-components';
+import { DnDContainer, DnDDrop, showToasty, ToastType } from '@kapeta/ui-web-components';
 import type { Point, Size } from '@kapeta/ui-web-types';
 import {
     AssetService,
@@ -42,20 +29,13 @@ import { PlannerToolbox } from './components/PlannerToolbox';
 import { InspectConnectionPanel } from './components/InspectConnectionPanel';
 import { ItemEditorPanel } from './components/ItemEditorPanel';
 import { BlockInspectorPanel } from './components/BlockInspectorPanel';
-import {
-    FOCUSED_ID,
-    FocusHelper,
-    POSITIONING_DATA,
-} from './helpers/FocusHelper';
+import { FOCUSED_ID, FocusHelper, POSITIONING_DATA } from './helpers/FocusHelper';
 import { DnDHelper } from './helpers/DnDHelper';
 import { EditPanelHelper } from './helpers/EditPanelHelper';
 import { InspectBlockPanelHelper } from './helpers/InspectBlockPanelHelper';
 import { SVGDropShadow } from '../utils/SVGDropShadow';
 import { ZoomButtons } from '../components/ZoomButtons';
-import {
-    BlockConfigurationData,
-    EditableItemInterface,
-} from '../wrappers/models';
+import { BlockConfigurationData, EditableItemInterface } from '../wrappers/models';
 import './Planner.less';
 import { PlannerResourceModelWrapper } from '../wrappers/PlannerResourceModelWrapper';
 import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
@@ -167,14 +147,8 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             cachedPositions: {},
         };
 
-        this.connectionListObserver = reaction(
-            () => this.plan.connections.length,
-            this.onConnectionsChange
-        );
-        this.blockListObserver = reaction(
-            () => this.plan.blocks.length,
-            this.onBlocksChange
-        );
+        this.connectionListObserver = reaction(() => this.plan.connections.length, this.onConnectionsChange);
+        this.blockListObserver = reaction(() => this.plan.blocks.length, this.onBlocksChange);
         this.focusHelper = new FocusHelper(this.plan);
         this.init();
     }
@@ -236,9 +210,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     @observable
     private setupInstanceService() {
         InstanceService.getInstanceStatusForPlan(this.plan.getRef())
-            .then((instanceStatuses) =>
-                this.updateRunningBlockStatus(instanceStatuses)
-            )
+            .then((instanceStatuses) => this.updateRunningBlockStatus(instanceStatuses))
             .catch((err) => {
                 // eslint-disable-next-line no-console
                 console.warn('Failed to get current status', err);
@@ -288,16 +260,13 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     }
 
     @action
-    private setEditOrCreateItem = (item, type, creating = false) =>
-        this.editPanelHelper.edit(item, type, creating);
+    private setEditOrCreateItem = (item, type, creating = false) => this.editPanelHelper.edit(item, type, creating);
 
     @action
-    private setEditItem = (item, type) =>
-        this.setEditOrCreateItem(item, type, false);
+    private setEditItem = (item, type) => this.setEditOrCreateItem(item, type, false);
 
     @action
-    private setConfigurationBlock = (block: PlannerBlockModelWrapper) =>
-        (this.configurationBlock = block);
+    private setConfigurationBlock = (block: PlannerBlockModelWrapper) => (this.configurationBlock = block);
 
     @action
     private onEditorClosed = () => this.setEditingItem(undefined);
@@ -305,10 +274,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     @action
     private recalculateCanvas() {
         this.recalculateSize();
-        this.canvasSize = this.plan.calculateCanvasSize(
-            this.nodeSize,
-            this.plannerCanvasSize
-        );
+        this.canvasSize = this.plan.calculateCanvasSize(this.nodeSize, this.plannerCanvasSize);
     }
 
     private recalculateSize() {
@@ -316,8 +282,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             return;
         }
 
-        const bbox =
-            this.canvasContainerElement.current.getBoundingClientRect();
+        const bbox = this.canvasContainerElement.current.getBoundingClientRect();
 
         this.setPlannerCanvasSize({
             width: bbox.width,
@@ -330,9 +295,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         this.plannerCanvasSize = newCanvas;
     }
 
-    private addConnectionObservers(
-        connections: PlannerConnectionModelWrapper[]
-    ) {
+    private addConnectionObservers(connections: PlannerConnectionModelWrapper[]) {
         connections.forEach((connection) => {
             this.connectionObservers.push({
                 connection,
@@ -385,9 +348,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
     @action
     private onInstanceStatusExited = (message: FailedBlockMessage) => {
-        const failedBlocks = this.plan.blocks.filter(
-            (blockInst) => blockInst.id === message.instanceId
-        );
+        const failedBlocks = this.plan.blocks.filter((blockInst) => blockInst.id === message.instanceId);
         if (failedBlocks.length <= 0 || !message) {
             return;
         }
@@ -424,9 +385,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         }
 
         const added = this.plan.blocks.filter((block) => {
-            return !this.blockObservers.some(
-                (blockObserver) => blockObserver.block === block
-            );
+            return !this.blockObservers.some((blockObserver) => blockObserver.block === block);
         });
 
         if (added.length > 0) {
@@ -441,15 +400,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
      */
     @action
     private onConnectionsChange = async () => {
-        const removedConnections = this.connectionObservers.filter(
-            (connectionObserver) => {
-                return (
-                    this.plan.connections.indexOf(
-                        connectionObserver.connection
-                    ) === -1
-                );
-            }
-        );
+        const removedConnections = this.connectionObservers.filter((connectionObserver) => {
+            return this.plan.connections.indexOf(connectionObserver.connection) === -1;
+        });
 
         while (removedConnections.length > 0) {
             const connectionObserver = removedConnections.pop();
@@ -460,10 +413,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         }
 
         const newConnections = this.plan.connections.filter((connection) => {
-            return !this.connectionObservers.some(
-                (connectionObserver) =>
-                    connectionObserver.connection === connection
-            );
+            return !this.connectionObservers.some((connectionObserver) => connectionObserver.connection === connection);
         });
 
         this.addConnectionObservers(newConnections);
@@ -491,9 +441,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
         await AssetService.update(block.blockReference.ref, block.getData());
 
         // Check if we should update the reference in the plan as well (if the name changed)
-        const currentRef = parseKapetaUri(
-            `${block.getData().metadata.name}:${block.version}`
-        );
+        const currentRef = parseKapetaUri(`${block.getData().metadata.name}:${block.version}`);
         const oldRef = parseKapetaUri(block.ref);
         if (!oldRef.equals(currentRef)) {
             block.setBlockReference(currentRef.id);
@@ -501,23 +449,16 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     }
 
     private async savePlan() {
-        await AssetService.update(
-            this.props.systemId,
-            this.props.plan.getData()
-        );
+        await AssetService.update(this.props.systemId, this.props.plan.getData());
     }
 
     // Handle connection changes (mapping)
     @action
-    private onConnectionInstanceChange = async (
-        connection: PlannerConnectionModelWrapper
-    ) => {
+    private onConnectionInstanceChange = async (connection: PlannerConnectionModelWrapper) => {
         if (this.plan.connections.indexOf(connection) > -1) {
-            this.plan.connections = this.plan.connections.map(
-                (con: PlannerConnectionModelWrapper) => {
-                    return con.id === connection.id ? connection : con;
-                }
-            );
+            this.plan.connections = this.plan.connections.map((con: PlannerConnectionModelWrapper) => {
+                return con.id === connection.id ? connection : con;
+            });
         }
         await this.onConnectionSaved(connection);
         await this.onPlanChange();
@@ -545,9 +486,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     };
 
     @action
-    private onConnectionSaved = async (
-        connection: PlannerConnectionModelWrapper
-    ) => {
+    private onConnectionSaved = async (connection: PlannerConnectionModelWrapper) => {
         this.plan.updateConnection(connection);
     };
 
@@ -557,9 +496,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     };
 
     @action
-    private onConnectionRemoved = async (
-        connection: PlannerConnectionModelWrapper
-    ) => {
+    private onConnectionRemoved = async (connection: PlannerConnectionModelWrapper) => {
         this.plan.removeConnection(connection);
     };
 
@@ -587,11 +524,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             }
 
             if (this.instanceServiceExitedUnsubscribers) {
-                this.instanceServiceExitedUnsubscribers.forEach(
-                    (unsubscriber) => {
-                        unsubscriber();
-                    }
-                );
+                this.instanceServiceExitedUnsubscribers.forEach((unsubscriber) => {
+                    unsubscriber();
+                });
             }
 
             window.removeEventListener('resize', this.handleWindowResized);
@@ -609,10 +544,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
             do {
                 // populate the zoomLevelArea with all possible sizes after mounting
                 zoom += zoomStep;
-                this.zoomLevelAreas[zoom] = this.focusHelper.getFocusArea(
-                    zoom,
-                    this.plannerCanvasSize
-                );
+                this.zoomLevelAreas[zoom] = this.focusHelper.getFocusArea(zoom, this.plannerCanvasSize);
             } while (zoom < 3);
 
             // Fetch the focused block id from local storage anf focus if it exists
@@ -624,23 +556,17 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                     }
                 });
             }
-            const localCachedPositionData =
-                window.localStorage.getItem(POSITIONING_DATA);
+            const localCachedPositionData = window.localStorage.getItem(POSITIONING_DATA);
             if (localCachedPositionData) {
                 this.setState({
-                    cachedPositions: JSON.parse(
-                        localCachedPositionData
-                    ) as BlockPositionCache,
+                    cachedPositions: JSON.parse(localCachedPositionData) as BlockPositionCache,
                 });
             }
         });
     }
 
     @observable
-    private getNodeStatus = (
-        runningBlock: { status: InstanceStatus },
-        failedBlock: { status: FailedBlockMessage }
-    ) => {
+    private getNodeStatus = (runningBlock: { status: InstanceStatus }, failedBlock: { status: FailedBlockMessage }) => {
         if (failedBlock) {
             return InstanceStatus.EXITED;
         } else if (runningBlock) {
@@ -653,9 +579,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     private setZoomLevel = (increase: boolean) => {
         const resizeStep = 0.25;
         this.lastZoomLevel = this.zoom;
-        this.zoom = increase
-            ? +(this.zoom - resizeStep).toFixed(2)
-            : +(this.zoom + resizeStep).toFixed(2);
+        this.zoom = increase ? +(this.zoom - resizeStep).toFixed(2) : +(this.zoom + resizeStep).toFixed(2);
         if (this.zoom >= 3) {
             this.zoom = 3;
         } else if (this.zoom <= 0.4) {
@@ -699,23 +623,14 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     @action
     private reorderForFocus() {
         this.scrollPlannerTo();
-        this.zoom = this.focusHelper.getFocusZoomLevel(
-            this.zoomLevelAreas,
-            this.nodeSize
-        );
+        this.zoom = this.focusHelper.getFocusZoomLevel(this.zoomLevelAreas, this.nodeSize);
 
-        if (
-            !this.plan.focusedBlock &&
-            window.localStorage.getItem(FOCUSED_ID) !== null
-        ) {
+        if (!this.plan.focusedBlock && window.localStorage.getItem(FOCUSED_ID) !== null) {
             Object.keys(this.state.cachedPositions).forEach((key: string) => {
                 if (this.plan.findBlockById(key)) {
                     this.plan
                         .findBlockById(key)
-                        .setPosition(
-                            this.state.cachedPositions[key].x,
-                            this.state.cachedPositions[key].y
-                        );
+                        .setPosition(this.state.cachedPositions[key].x, this.state.cachedPositions[key].y);
                 }
             });
             this.setState({ cachedPositions: {} });
@@ -737,40 +652,31 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                     y: block.getDimensions(this.nodeSize).top,
                 };
             });
-            window.localStorage.setItem(
-                POSITIONING_DATA,
-                JSON.stringify(cachedPositions)
-            );
+            window.localStorage.setItem(POSITIONING_DATA, JSON.stringify(cachedPositions));
             this.setState({ cachedPositions });
 
             if (
                 this.plan.focusedBlock &&
-                (window.localStorage.getItem(FOCUSED_ID) === '' ||
-                    window.localStorage.getItem(FOCUSED_ID) === null)
+                (window.localStorage.getItem(FOCUSED_ID) === '' || window.localStorage.getItem(FOCUSED_ID) === null)
             ) {
-                window.localStorage.setItem(
-                    FOCUSED_ID,
-                    this.plan.focusedBlock.id
-                );
+                window.localStorage.setItem(FOCUSED_ID, this.plan.focusedBlock.id);
             }
         }
 
         if (this.plan.focusedBlock) {
-            this.plan.focusedBlock
-                .getConnectedBlocks()
-                .all.forEach((block: PlannerBlockModelWrapper) => {
-                    this.focusHelper.updateBlockPositionForFocus(
-                        block,
-                        this.nodeSize,
-                        this.getAdjustedSize(
-                            {
-                                x: this.plannerCanvasSize.width,
-                                y: this.plannerCanvasSize.height,
-                            },
-                            this.zoom
-                        )
-                    );
-                });
+            this.plan.focusedBlock.getConnectedBlocks().all.forEach((block: PlannerBlockModelWrapper) => {
+                this.focusHelper.updateBlockPositionForFocus(
+                    block,
+                    this.nodeSize,
+                    this.getAdjustedSize(
+                        {
+                            x: this.plannerCanvasSize.width,
+                            y: this.plannerCanvasSize.height,
+                        },
+                        this.zoom
+                    )
+                );
+            });
 
             this.focusHelper.updateBlockPositionForFocus(
                 this.plan.focusedBlock,
@@ -788,12 +694,8 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
 
     private getZoomDivDimensions = () => {
         return {
-            height:
-                (this.zoom < 1 ? 1 / this.zoom : this.zoom) *
-                this.canvasSize.height,
-            width:
-                (this.zoom < 1 ? 1 / this.zoom : this.zoom) *
-                this.canvasSize.width,
+            height: (this.zoom < 1 ? 1 / this.zoom : this.zoom) * this.canvasSize.height,
+            width: (this.zoom < 1 ? 1 / this.zoom : this.zoom) * this.canvasSize.width,
         };
     };
 
@@ -808,17 +710,12 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     };
 
     @action
-    private onBlockConfigurationSave = async (
-        config: BlockConfigurationData
-    ) => {
+    private onBlockConfigurationSave = async (config: BlockConfigurationData) => {
         if (!this.configurationBlock) {
             return;
         }
 
-        if (
-            config.version &&
-            config.version !== this.configurationBlock.version
-        ) {
+        if (config.version && config.version !== this.configurationBlock.version) {
             await this.configurationBlock.setVersion(config.version);
         }
 
@@ -902,9 +799,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                     ref={(ref) => (this.blockInspectorPanel = ref)}
                     planRef={this.plan.getRef()}
                     block={
-                        this.blockInspectorPanelHelper?.current?.id
-                            ? this.blockInspectorPanelHelper.current
-                            : undefined
+                        this.blockInspectorPanelHelper?.current?.id ? this.blockInspectorPanelHelper.current : undefined
                     }
                     onClosed={this.blockInspectorPanelHelper.onClosed}
                 />
@@ -917,42 +812,25 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                             })}
                         </div>
 
-                        {!this.props.plan.isReadOnly() && (
-                            <PlannerToolbox
-                                blockStore={this.props.blockStore}
-                                open
-                            />
-                        )}
+                        {!this.props.plan.isReadOnly() && <PlannerToolbox blockStore={this.props.blockStore} open />}
 
                         {this.focusHelper.renderSideBar({
-                            onNeighboringBlockHover:
-                                this.onNeighboringBlockHover,
+                            onNeighboringBlockHover: this.onNeighboringBlockHover,
                             setFocusZoom: this.setFocusBlock,
                         })}
 
-                        <div
-                            ref={this.canvasContainerElement}
-                            className="planner-area-position-parent"
-                        >
+                        <div ref={this.canvasContainerElement} className="planner-area-position-parent">
                             <div className={plannerScrollClassnames}>
                                 <DnDDrop
                                     type={['tool', 'block']}
                                     onDrop={(type, value, dimensions) => {
                                         if (!this.plan.focusedBlock) {
-                                            this.dnd.handleItemDropped(
-                                                type,
-                                                value,
-                                                dimensions
-                                            );
+                                            this.dnd.handleItemDropped(type, value, dimensions);
                                         }
                                     }}
                                     onDrag={(type, value, dimensions) => {
                                         if (!this.plan.focusedBlock) {
-                                            this.dnd.handleItemDragged(
-                                                type,
-                                                value,
-                                                dimensions
-                                            );
+                                            this.dnd.handleItemDragged(type, value, dimensions);
                                         }
                                     }}
                                 >
@@ -960,9 +838,7 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                         className="planner-area-canvas"
                                         style={{
                                             ...canvasSize,
-                                            transform: `scale(${
-                                                1 / this.zoom
-                                            })`,
+                                            transform: `scale(${1 / this.zoom})`,
                                         }}
                                     >
                                         <svg
@@ -974,182 +850,96 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
                                         >
                                             <SVGDropShadow />
 
-                                            {this.plan.connections.map(
-                                                (connection, index) => {
-                                                    const connectionClass =
-                                                        toClass({
-                                                            'connection-hidden':
-                                                                this.plan
-                                                                    .focusedBlock !==
-                                                                    undefined &&
-                                                                !this.focusHelper.isConnectionLinkedToFocus(
-                                                                    connection
-                                                                ),
-                                                        });
-                                                    return (
-                                                        <PlannerConnection
-                                                            className={
-                                                                connectionClass
-                                                            }
-                                                            viewOnly={this.plan.isViewing()}
-                                                            key={`${connection.id}_link_${index}`}
-                                                            size={this.nodeSize}
-                                                            handleInspectClick={
-                                                                this
-                                                                    .handleInspection
-                                                            }
-                                                            setItemToEdit={
-                                                                this.setEditItem
-                                                            }
-                                                            onFocus={() =>
-                                                                runInAction(
-                                                                    () =>
-                                                                        this.plan.moveConnectionToTop(
-                                                                            connection
-                                                                        )
-                                                                )
-                                                            }
-                                                            onDelete={
-                                                                this
-                                                                    .onConnectionRemoved
-                                                            }
-                                                            connection={
-                                                                connection
-                                                            }
-                                                        />
-                                                    );
-                                                }
-                                            )}
+                                            {this.plan.connections.map((connection, index) => {
+                                                const connectionClass = toClass({
+                                                    'connection-hidden':
+                                                        this.plan.focusedBlock !== undefined &&
+                                                        !this.focusHelper.isConnectionLinkedToFocus(connection),
+                                                });
+                                                return (
+                                                    <PlannerConnection
+                                                        className={connectionClass}
+                                                        viewOnly={this.plan.isViewing()}
+                                                        key={`${connection.id}_link_${index}`}
+                                                        size={this.nodeSize}
+                                                        handleInspectClick={this.handleInspection}
+                                                        setItemToEdit={this.setEditItem}
+                                                        onFocus={() =>
+                                                            runInAction(() => this.plan.moveConnectionToTop(connection))
+                                                        }
+                                                        onDelete={this.onConnectionRemoved}
+                                                        connection={connection}
+                                                    />
+                                                );
+                                            })}
 
-                                            {this.plan.selectedResource !==
-                                                undefined && (
+                                            {this.plan.selectedResource !== undefined && (
                                                 <PlannerTempResourceConnection
                                                     size={this.nodeSize}
-                                                    selectedResource={
-                                                        this.plan
-                                                            .selectedResource
-                                                    }
+                                                    selectedResource={this.plan.selectedResource}
                                                 />
                                             )}
                                         </svg>
 
-                                        {this.plan.blocks.map(
-                                            (block, index) => {
-                                                const runningBlock =
-                                                    this.runningBlocks[
-                                                        block.id
-                                                    ];
-                                                const failedToRunBlock =
-                                                    this.failedToRunBlocks[
-                                                        block.id
-                                                    ];
-                                                let blockIsVisible = false;
-                                                let focusClassNames = '';
-                                                if (this.plan.focusedBlock) {
-                                                    blockIsVisible =
-                                                        this.plan.focusedBlock.hasConnectionTo(
-                                                            block
-                                                        ) ||
-                                                        block.id ===
-                                                            this.plan
-                                                                .focusedBlock
-                                                                .id;
+                                        {this.plan.blocks.map((block, index) => {
+                                            const runningBlock = this.runningBlocks[block.id];
+                                            const failedToRunBlock = this.failedToRunBlocks[block.id];
+                                            let blockIsVisible = false;
+                                            let focusClassNames = '';
+                                            if (this.plan.focusedBlock) {
+                                                blockIsVisible =
+                                                    this.plan.focusedBlock.hasConnectionTo(block) ||
+                                                    block.id === this.plan.focusedBlock.id;
 
-                                                    focusClassNames = toClass({
-                                                        'planner-block':
-                                                            !blockIsVisible,
-                                                        'planner-focused-block':
-                                                            block.id ===
-                                                            this.plan
-                                                                .focusedBlock
-                                                                .id,
-                                                        'linked-block':
-                                                            block.id !==
-                                                                this.plan
-                                                                    .focusedBlock
-                                                                    .id &&
-                                                            blockIsVisible,
-                                                        'hovered-block': this
-                                                            .hoveredBlock
-                                                            ? block.id ===
-                                                              this.hoveredBlock
-                                                                  .id
-                                                            : false,
-                                                    });
-                                                }
-
-                                                return (
-                                                    // if block is focused render only it and it's connected blocks
-                                                    <PlannerBlockNode
-                                                        className={
-                                                            focusClassNames
-                                                        }
-                                                        key={
-                                                            block.id +
-                                                            block.name +
-                                                            index
-                                                        }
-                                                        block={block}
-                                                        zoom={this.zoom}
-                                                        onDoubleTap={() => {
-                                                            this.setFocusBlock(
-                                                                block
-                                                            );
-                                                        }}
-                                                        readOnly={
-                                                            this.plan.isReadOnly() ||
-                                                            this.plan
-                                                                .focusedBlock !==
-                                                                undefined
-                                                        }
-                                                        viewOnly={this.plan.isViewing()}
-                                                        onDrop={() => {
-                                                            this.recalculateCanvas();
-                                                        }}
-                                                        status={this.getNodeStatus(
-                                                            runningBlock,
-                                                            failedToRunBlock
-                                                        )}
-                                                        size={
-                                                            block ===
-                                                            this.plan
-                                                                .focusedBlock
-                                                                ? PlannerNodeSize.MEDIUM
-                                                                : this.nodeSize
-                                                        }
-                                                        setItemToEdit={
-                                                            this.setEditItem
-                                                        }
-                                                        setItemToConfigure={
-                                                            this
-                                                                .setConfigurationBlock
-                                                        }
-                                                        setItemToInspect={(
-                                                            item,
-                                                            type
-                                                        ) =>
-                                                            this.blockInspectorPanelHelper.show(
-                                                                item,
-                                                                type,
-                                                                false
-                                                            )
-                                                        }
-                                                        planner={this.plan}
-                                                    />
-                                                );
+                                                focusClassNames = toClass({
+                                                    'planner-block': !blockIsVisible,
+                                                    'planner-focused-block': block.id === this.plan.focusedBlock.id,
+                                                    'linked-block':
+                                                        block.id !== this.plan.focusedBlock.id && blockIsVisible,
+                                                    'hovered-block': this.hoveredBlock
+                                                        ? block.id === this.hoveredBlock.id
+                                                        : false,
+                                                });
                                             }
-                                        )}
-                                        {this.plan.selectedResource !==
-                                            undefined && (
+
+                                            return (
+                                                // if block is focused render only it and it's connected blocks
+                                                <PlannerBlockNode
+                                                    className={focusClassNames}
+                                                    key={block.id + block.name + index}
+                                                    block={block}
+                                                    zoom={this.zoom}
+                                                    onDoubleTap={() => {
+                                                        this.setFocusBlock(block);
+                                                    }}
+                                                    readOnly={
+                                                        this.plan.isReadOnly() || this.plan.focusedBlock !== undefined
+                                                    }
+                                                    viewOnly={this.plan.isViewing()}
+                                                    onDrop={() => {
+                                                        this.recalculateCanvas();
+                                                    }}
+                                                    status={this.getNodeStatus(runningBlock, failedToRunBlock)}
+                                                    size={
+                                                        block === this.plan.focusedBlock
+                                                            ? PlannerNodeSize.MEDIUM
+                                                            : this.nodeSize
+                                                    }
+                                                    setItemToEdit={this.setEditItem}
+                                                    setItemToConfigure={this.setConfigurationBlock}
+                                                    setItemToInspect={(item, type) =>
+                                                        this.blockInspectorPanelHelper.show(item, type, false)
+                                                    }
+                                                    planner={this.plan}
+                                                />
+                                            );
+                                        })}
+                                        {this.plan.selectedResource !== undefined && (
                                             <PlannerTempResourceItem
                                                 planner={this.plan}
                                                 size={this.nodeSize}
-                                                setItemToEdit={
-                                                    this.setEditOrCreateItem
-                                                }
-                                                selectedResource={
-                                                    this.plan.selectedResource
-                                                }
+                                                setItemToEdit={this.setEditOrCreateItem}
+                                                selectedResource={this.plan.selectedResource}
                                                 zoom={this.zoom}
                                             />
                                         )}

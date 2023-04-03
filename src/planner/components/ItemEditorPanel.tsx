@@ -15,20 +15,11 @@ import {
     SimpleLoader,
 } from '@kapeta/ui-web-components';
 
-import {
-    BlockTypeProvider,
-    IdentityService,
-    ResourceTypeProvider,
-} from '@kapeta/ui-web-context';
+import { BlockTypeProvider, IdentityService, ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
-import type {
-    BlockConnectionSpec,
-    DataWrapper,
-    SchemaEntity,
-    SchemaKind,
-} from '@kapeta/ui-web-types';
+import type { BlockConnectionSpec, DataWrapper, SchemaEntity, SchemaKind } from '@kapeta/ui-web-types';
 import { ResourceKind } from '@kapeta/ui-web-types';
 
 import { EditableItemInterface } from '../../wrappers/models';
@@ -45,13 +36,8 @@ const withNamespaces = (ChildComponent) => {
     return (props) => {
         const { value: namespaces, loading } = useAsync(async () => {
             const identity = await IdentityService.getCurrent();
-            const memberships = await IdentityService.getMemberships(
-                identity.id
-            );
-            return [
-                identity.handle,
-                ...memberships.map((membership) => membership.identity.handle),
-            ];
+            const memberships = await IdentityService.getMemberships(identity.id);
+            return [identity.handle, ...memberships.map((membership) => membership.identity.handle)];
         });
         return (
             <SimpleLoader loading={loading}>
@@ -127,23 +113,15 @@ export class ItemEditorPanel extends Component<Props, State> {
                 return;
             }
 
-            if (
-                this.props.editableItem.item instanceof
-                PlannerConnectionModelWrapper
-            ) {
+            if (this.props.editableItem.item instanceof PlannerConnectionModelWrapper) {
                 this.props.onConnectionRemoved(this.props.editableItem.item);
             }
 
-            if (
-                this.props.editableItem.item instanceof PlannerBlockModelWrapper
-            ) {
+            if (this.props.editableItem.item instanceof PlannerBlockModelWrapper) {
                 this.props.onBlockRemoved(this.props.editableItem.item);
             }
 
-            if (
-                this.props.editableItem.item instanceof
-                PlannerResourceModelWrapper
-            ) {
+            if (this.props.editableItem.item instanceof PlannerResourceModelWrapper) {
                 this.props.editableItem.item.remove();
             }
         } finally {
@@ -181,8 +159,7 @@ export class ItemEditorPanel extends Component<Props, State> {
         let data: SchemaKind;
         if (
             this.state.entry &&
-            parseKapetaUri(this.state.entry.kind).fullName ===
-                parseKapetaUri(definition.kind).fullName
+            parseKapetaUri(this.state.entry.kind).fullName === parseKapetaUri(definition.kind).fullName
         ) {
             data = this.state.entry;
         } else {
@@ -288,11 +265,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                     help={'The name of this block - e.g. "myhandle/my-block"'}
                 />
 
-                <FormField
-                    name="metadata.title"
-                    label="Title"
-                    help="This blocks human-friendly title"
-                />
+                <FormField name="metadata.title" label="Title" help="This blocks human-friendly title" />
             </>
         );
     }
@@ -303,10 +276,7 @@ export class ItemEditorPanel extends Component<Props, State> {
 
             const sourceKind = connection.fromResource.getKind();
             const targetKind = connection.toResource.getKind();
-            const ConverterType = ResourceTypeProvider.getConverterFor(
-                sourceKind,
-                targetKind
-            );
+            const ConverterType = ResourceTypeProvider.getConverterFor(sourceKind, targetKind);
 
             if (!ConverterType) {
                 return <></>;
@@ -338,11 +308,7 @@ export class ItemEditorPanel extends Component<Props, State> {
             const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
             if (!BlockTypeConfig.componentType) {
-                return (
-                    <div key={editableItem.item.id}>
-                        {this.renderBlockFields(data)}
-                    </div>
-                );
+                return <div key={editableItem.item.id}>{this.renderBlockFields(data)}</div>;
             }
 
             return (
@@ -356,9 +322,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                             </div>
                         )}
                     >
-                        <BlockTypeConfig.componentType
-                            creating={editableItem.creating}
-                        />
+                        <BlockTypeConfig.componentType creating={editableItem.creating} />
                     </ErrorBoundary>
                 </div>
             );
@@ -375,15 +339,10 @@ export class ItemEditorPanel extends Component<Props, State> {
             const dataKindUri = parseKapetaUri(data.kind);
 
             const versions: { [key: string]: string } = {};
-            const versionAlternatives = ResourceTypeProvider.getVersionsFor(
-                dataKindUri.fullName
-            );
+            const versionAlternatives = ResourceTypeProvider.getVersionsFor(dataKindUri.fullName);
             versionAlternatives.forEach((version) => {
-                const versionName =
-                    version === 'local' ? 'Local Disk' : version;
-                const altResourceType = ResourceTypeProvider.get(
-                    `${dataKindUri.fullName}:${version}`
-                );
+                const versionName = version === 'local' ? 'Local Disk' : version;
+                const altResourceType = ResourceTypeProvider.get(`${dataKindUri.fullName}:${version}`);
                 versions[`${dataKindUri.fullName}:${version}`] =
                     altResourceType && altResourceType.title
                         ? `${altResourceType.title} [${versionName}]`
@@ -403,8 +362,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                     <ErrorBoundary
                         fallbackRender={(props) => (
                             <div>
-                                Failed to render resource type: {data.kind}.{' '}
-                                <br />
+                                Failed to render resource type: {data.kind}. <br />
                                 Error: {props.error.message}
                             </div>
                         )}
@@ -442,16 +400,10 @@ export class ItemEditorPanel extends Component<Props, State> {
                     <div className="item-editor-panel">
                         <FormContainer
                             initialValue={this.state.initialValue}
-                            onChange={(data) =>
-                                this.setState({ entry: data as SchemaKind })
-                            }
+                            onChange={(data) => this.setState({ entry: data as SchemaKind })}
                             onSubmitData={(data) => this.saveAndClose(data)}
                         >
-                            <div className="item-form">
-                                {this.renderEditableItemForm(
-                                    this.props.editableItem
-                                )}
-                            </div>
+                            <div className="item-form">{this.renderEditableItemForm(this.props.editableItem)}</div>
                             <FormButtons>
                                 <Button
                                     width={70}
@@ -460,12 +412,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                                     onClick={this.onPanelCancel}
                                     text="Cancel"
                                 />
-                                <Button
-                                    width={70}
-                                    type={ButtonType.SUBMIT}
-                                    style={ButtonStyle.PRIMARY}
-                                    text="Save"
-                                />
+                                <Button width={70} type={ButtonType.SUBMIT} style={ButtonStyle.PRIMARY} text="Save" />
                             </FormButtons>
                         </FormContainer>
                     </div>

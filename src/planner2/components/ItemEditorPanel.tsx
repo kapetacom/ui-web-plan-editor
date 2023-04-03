@@ -13,20 +13,11 @@ import {
     SimpleLoader,
 } from '@kapeta/ui-web-components';
 
-import {
-    BlockTypeProvider,
-    IdentityService,
-    ResourceTypeProvider,
-} from '@kapeta/ui-web-context';
+import { BlockTypeProvider, IdentityService, ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
-import type {
-    BlockConnectionSpec,
-    BlockKind,
-    SchemaEntity,
-    SchemaKind,
-} from '@kapeta/ui-web-types';
+import type { BlockConnectionSpec, BlockKind, SchemaEntity, SchemaKind } from '@kapeta/ui-web-types';
 import { ItemType, ResourceKind, ResourceRole } from '@kapeta/ui-web-types';
 
 import './ItemEditorPanel.less';
@@ -41,13 +32,8 @@ const withNamespaces = (ChildComponent) => {
     return (props) => {
         const { value: namespaces, loading } = useAsync(async () => {
             const identity = await IdentityService.getCurrent();
-            const memberships = await IdentityService.getMemberships(
-                identity.id
-            );
-            return [
-                identity.handle,
-                ...memberships.map((membership) => membership.identity.handle),
-            ];
+            const memberships = await IdentityService.getMemberships(identity.id);
+            return [identity.handle, ...memberships.map((membership) => membership.identity.handle)];
         });
         return (
             <SimpleLoader loading={loading}>
@@ -95,19 +81,12 @@ function renderBlockFields(data: SchemaKind) {
                 help={'The name of this block - e.g. "myhandle/my-block"'}
             />
 
-            <FormField
-                name="metadata.title"
-                label="Title"
-                help="This blocks human-friendly title"
-            />
+            <FormField name="metadata.title" label="Title" help="This blocks human-friendly title" />
         </>
     );
 }
 
-function renderEditableItemForm(
-    planner: PlannerContextData,
-    editableItem: EditableItemInterface2
-): any {
+function renderEditableItemForm(planner: PlannerContextData, editableItem: EditableItemInterface2): any {
     if (editableItem.type === ItemType.CONNECTION) {
         const connection = editableItem.item as BlockConnectionSpec;
 
@@ -123,17 +102,10 @@ function renderEditableItemForm(
         );
 
         if (!source || !target) {
-            throw new Error(
-                `Could not find resource for connection: ${JSON.stringify(
-                    connection
-                )}`
-            );
+            throw new Error(`Could not find resource for connection: ${JSON.stringify(connection)}`);
         }
 
-        const ConverterType = ResourceTypeProvider.getConverterFor(
-            source.kind,
-            target.kind
-        );
+        const ConverterType = ResourceTypeProvider.getConverterFor(source.kind, target.kind);
 
         if (!ConverterType) {
             return <></>;
@@ -178,9 +150,7 @@ function renderEditableItemForm(
                         </div>
                     )}
                 >
-                    <BlockTypeConfig.componentType
-                        creating={editableItem.creating}
-                    />
+                    <BlockTypeConfig.componentType creating={editableItem.creating} />
                 </ErrorBoundary>
             </div>
         );
@@ -199,18 +169,12 @@ function renderEditableItemForm(
         const dataKindUri = parseKapetaUri(data.kind);
 
         const versions: { [key: string]: string } = {};
-        const versionAlternatives = ResourceTypeProvider.getVersionsFor(
-            dataKindUri.fullName
-        );
+        const versionAlternatives = ResourceTypeProvider.getVersionsFor(dataKindUri.fullName);
         versionAlternatives.forEach((version) => {
             const versionName = version === 'local' ? 'Local Disk' : version;
-            const altResourceType = ResourceTypeProvider.get(
-                `${dataKindUri.fullName}:${version}`
-            );
+            const altResourceType = ResourceTypeProvider.get(`${dataKindUri.fullName}:${version}`);
             versions[`${dataKindUri.fullName}:${version}`] =
-                altResourceType && altResourceType.title
-                    ? `${altResourceType.title} [${versionName}]`
-                    : versionName;
+                altResourceType && altResourceType.title ? `${altResourceType.title} [${versionName}]` : versionName;
         });
 
         return (
@@ -267,8 +231,7 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
     const [initialValue, setInitialValue] = useState<any>({});
 
     useEffect(() => {
-        if (props.editableItem)
-            setInitialValue(cloneDeep(props.editableItem?.item));
+        if (props.editableItem) setInitialValue(cloneDeep(props.editableItem?.item));
     }, [props.editableItem]);
 
     const panelHeader = () => {
@@ -279,27 +242,15 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
     };
 
     return (
-        <SidePanel
-            title={panelHeader()}
-            size={PanelSize.large}
-            open={!!props.open}
-            onClose={props.onClose}
-        >
+        <SidePanel title={panelHeader()} size={PanelSize.large} open={!!props.open} onClose={props.onClose}>
             {initialValue && props.editableItem && (
                 <div className="item-editor-panel">
                     <FormContainer
                         // Do we need editableItem state?
                         initialValue={initialValue}
-                        onSubmitData={(data) =>
-                            saveAndClose(data as SchemaKind)
-                        }
+                        onSubmitData={(data) => saveAndClose(data as SchemaKind)}
                     >
-                        <div className="item-form">
-                            {renderEditableItemForm(
-                                planner,
-                                props.editableItem
-                            )}
-                        </div>
+                        <div className="item-form">{renderEditableItemForm(planner, props.editableItem)}</div>
                         <FormButtons>
                             <Button
                                 width={70}
@@ -308,12 +259,7 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
                                 onClick={onPanelCancel}
                                 text="Cancel"
                             />
-                            <Button
-                                width={70}
-                                type={ButtonType.SUBMIT}
-                                style={ButtonStyle.PRIMARY}
-                                text="Save"
-                            />
+                            <Button width={70} type={ButtonType.SUBMIT} style={ButtonStyle.PRIMARY} text="Save" />
                         </FormButtons>
                     </FormContainer>
                 </div>

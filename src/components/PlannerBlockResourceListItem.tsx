@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 
-import {
-    ItemType,
-    Point,
-    ResourceConfig,
-    ResourceRole,
-    ResourceType,
-} from '@kapeta/ui-web-types';
+import { ItemType, Point, ResourceConfig, ResourceRole, ResourceType } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { ButtonStyle, showDelete } from '@kapeta/ui-web-components';
@@ -37,18 +31,11 @@ interface PlannerBlockResourceListItemProps {
     readOnly?: boolean;
     viewOnly?: boolean;
     setItemToEdit?: (
-        res:
-            | PlannerResourceModelWrapper
-            | PlannerBlockModelWrapper
-            | any
-            | undefined,
+        res: PlannerResourceModelWrapper | PlannerBlockModelWrapper | any | undefined,
         type: ItemType,
         block?: PlannerBlockModelWrapper
     ) => void;
-    setItemToInspect?: (
-        res: PlannerResourceModelWrapper,
-        type: ItemType
-    ) => void;
+    setItemToInspect?: (res: PlannerResourceModelWrapper, type: ItemType) => void;
 }
 
 interface PlannerBlockResourceListItemState {
@@ -105,9 +92,7 @@ export class PlannerBlockResourceListItem extends Component<
             let scroll: Point = { x: 0, y: 0 };
             let offset: Point = { x: 0, y: 0 };
             if (this.dragContainer) {
-                const container = this.dragContainer.closest(
-                    '.planner-area-scroll'
-                );
+                const container = this.dragContainer.closest('.planner-area-scroll');
                 if (container) {
                     scroll = {
                         x: container.scrollLeft,
@@ -138,10 +123,7 @@ export class PlannerBlockResourceListItem extends Component<
             this.setState({ dragging: true });
 
             if (this.props.planner) {
-                this.props.planner.setSelectedResources(
-                    tmpResource,
-                    this.props.resource
-                );
+                this.props.planner.setSelectedResources(tmpResource, this.props.resource);
             }
         }
     };
@@ -150,11 +132,7 @@ export class PlannerBlockResourceListItem extends Component<
     editHandler = () => {
         this.setState({ dragging: false, editMode: true });
         if (this.props.setItemToEdit) {
-            this.props.setItemToEdit(
-                this.props.resource,
-                ItemType.RESOURCE,
-                this.getBlock()
-            );
+            this.props.setItemToEdit(this.props.resource, ItemType.RESOURCE, this.getBlock());
         }
     };
 
@@ -177,14 +155,9 @@ export class PlannerBlockResourceListItem extends Component<
         }
 
         this.setState({ dragging: false });
-        this.getBlock().removeResource(
-            this.props.resource.id,
-            this.props.resource.role
-        );
+        this.getBlock().removeResource(this.props.resource.id, this.props.resource.role);
         if (this.props.planner) {
-            this.props.planner.removeConnectionByResourceId(
-                this.props.resource.id
-            );
+            this.props.planner.removeConnectionByResourceId(this.props.resource.id);
         }
     };
 
@@ -234,15 +207,7 @@ export class PlannerBlockResourceListItem extends Component<
             left = expanded ? 12 : 112;
         }
 
-        return (
-            <rect
-                className="resource-mask"
-                width={width}
-                height={height}
-                x={left}
-                y={top}
-            />
-        );
+        return <rect className="resource-mask" width={width} height={height} x={left} y={top} />;
     }
 
     private getZoom() {
@@ -283,8 +248,7 @@ export class PlannerBlockResourceListItem extends Component<
     @observable
     private ignoreMouseMovement() {
         return (
-            this.props.resource.mode === ResourceMode.HIGHLIGHT ||
-            this.props.resource.mode === ResourceMode.SHOW_FIXED
+            this.props.resource.mode === ResourceMode.HIGHLIGHT || this.props.resource.mode === ResourceMode.SHOW_FIXED
         );
     }
 
@@ -292,23 +256,13 @@ export class PlannerBlockResourceListItem extends Component<
     detachListeners = () => {
         if (this.dragContainer) {
             if (this.props.resource.role === ResourceRole.PROVIDES) {
-                this.dragContainer.removeEventListener(
-                    'mousedown',
-                    this.handleResourceDragging
-                );
+                this.dragContainer.removeEventListener('mousedown', this.handleResourceDragging);
             }
         }
 
         if (this.mouseOverContainer) {
-            this.mouseOverContainer.removeEventListener(
-                'mousemove',
-                this.openResourceDrawer
-            );
-            this.mouseOverContainer.removeEventListener(
-                'mouseleave',
-                this.closeResourcesDrawer,
-                false
-            );
+            this.mouseOverContainer.removeEventListener('mousemove', this.openResourceDrawer);
+            this.mouseOverContainer.removeEventListener('mouseleave', this.closeResourcesDrawer, false);
         }
     };
 
@@ -316,23 +270,13 @@ export class PlannerBlockResourceListItem extends Component<
     attachListeners = () => {
         if (this.dragContainer) {
             if (this.props.resource.role === ResourceRole.PROVIDES) {
-                this.dragContainer.addEventListener(
-                    'mousedown',
-                    this.handleResourceDragging
-                );
+                this.dragContainer.addEventListener('mousedown', this.handleResourceDragging);
             }
         }
 
         if (this.mouseOverContainer) {
-            this.mouseOverContainer.addEventListener(
-                'mousemove',
-                this.openResourceDrawerWithOptions
-            );
-            this.mouseOverContainer.addEventListener(
-                'mouseleave',
-                this.closeResourcesDrawer,
-                false
-            );
+            this.mouseOverContainer.addEventListener('mousemove', this.openResourceDrawerWithOptions);
+            this.mouseOverContainer.addEventListener('mouseleave', this.closeResourcesDrawer, false);
         }
     };
 
@@ -356,10 +300,7 @@ export class PlannerBlockResourceListItem extends Component<
     }
 
     private renderActions(consumer: boolean) {
-        if (
-            (this.props.readOnly && !this.props.setItemToInspect) ||
-            this.props.viewOnly
-        ) {
+        if ((this.props.readOnly && !this.props.setItemToInspect) || this.props.viewOnly) {
             return <g className="resource-actions" />;
         }
 
@@ -401,10 +342,7 @@ export class PlannerBlockResourceListItem extends Component<
     }
 
     render() {
-        const nodeSize =
-            this.props.size !== undefined
-                ? this.props.size
-                : PlannerNodeSize.MEDIUM;
+        const nodeSize = this.props.size !== undefined ? this.props.size : PlannerNodeSize.MEDIUM;
         const clipPathId = `${this.getId()}_clippath`;
         const fixedClipPathId = `${clipPathId}_fixed`;
 
@@ -412,21 +350,16 @@ export class PlannerBlockResourceListItem extends Component<
         const height = this.getBlock().getResourceHeight(nodeSize);
         const heightInner = height - RESOURCE_SPACE;
         const yOffset = height * this.props.index;
-        const buttonsVisible =
-            this.props.resource.mode === ResourceMode.SHOW_OPTIONS;
+        const buttonsVisible = this.props.resource.mode === ResourceMode.SHOW_OPTIONS;
         let resourceConfig: ResourceConfig | null = null;
         const errors: string[] = [];
         try {
-            resourceConfig = ResourceTypeProvider.get(
-                this.props.resource.getKind()
-            );
+            resourceConfig = ResourceTypeProvider.get(this.props.resource.getKind());
         } catch (e) {
             errors.push(`Failed to read resource kind: ${e.message}`);
         }
 
-        const type =
-            resourceConfig?.type.toString().toLowerCase() ??
-            ResourceType.SERVICE;
+        const type = resourceConfig?.type.toString().toLowerCase() ?? ResourceType.SERVICE;
         const title = resourceConfig?.title || resourceConfig?.kind;
         const typeName = title?.toString().toLowerCase() ?? 'unknown';
 
@@ -445,10 +378,7 @@ export class PlannerBlockResourceListItem extends Component<
         this.props.resource.setDimensions({
             height: heightInner,
             width: this.getBlock().width,
-            top:
-                this.getBlock().top +
-                this.getBlock().getResourceHeight(nodeSize) +
-                yOffset,
+            top: this.getBlock().top + this.getBlock().getResourceHeight(nodeSize) + yOffset,
             left: this.getBlock().left - this.getBlock().width,
         });
 
@@ -469,8 +399,7 @@ export class PlannerBlockResourceListItem extends Component<
             [typeName]: true,
             highlight: this.props.resource.mode === ResourceMode.HIGHLIGHT,
             compatible: this.props.resource.mode === ResourceMode.COMPATIBLE,
-            'compatible hover':
-                this.props.resource.mode === ResourceMode.HOVER_COMPATIBLE,
+            'compatible hover': this.props.resource.mode === ResourceMode.HOVER_COMPATIBLE,
             invalid: !valid,
         });
 
@@ -482,11 +411,7 @@ export class PlannerBlockResourceListItem extends Component<
                             className="container-mask"
                             width={mouseCatcherWidth}
                             height={height}
-                            x={
-                                consumer
-                                    ? -mouseCatcherWidth - 1
-                                    : this.getBlock().width + 1
-                            }
+                            x={consumer ? -mouseCatcherWidth - 1 : this.getBlock().width + 1}
                             y={0}
                         />
                     </clipPath>
@@ -500,15 +425,11 @@ export class PlannerBlockResourceListItem extends Component<
                             this.mouseOverContainer = elm;
                         }}
                     >
-                        <clipPath id={clipPathId}>
-                            {this.renderClipPath(height)}
-                        </clipPath>
+                        <clipPath id={clipPathId}>{this.renderClipPath(height)}</clipPath>
 
                         <g
                             className={bodyClass}
-                            transform={`translate(${this.getXPosition(
-                                this.props.resource
-                            )},0)`}
+                            transform={`translate(${this.getXPosition(this.props.resource)},0)`}
                             height={heightInner}
                         >
                             <rect
@@ -556,12 +477,7 @@ export class PlannerBlockResourceListItem extends Component<
                                         r={COUNTER_SIZE}
                                         className="background"
                                     />
-                                    <text
-                                        textAnchor="middle"
-                                        className="foreground"
-                                        y={12}
-                                        x={COUNTER_SIZE}
-                                    >
+                                    <text textAnchor="middle" className="foreground" y={12} x={COUNTER_SIZE}>
                                         {counterValue}
                                     </text>
                                 </g>

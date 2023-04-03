@@ -17,10 +17,7 @@ interface DropZoneState<T = any> {
 export class DropZoneManager {
     private zones: DropZoneState[] = [];
 
-    private checkContainment<T>(
-        dropZone: DropZoneEntity,
-        evt: { x: number; y: number }
-    ): boolean {
+    private checkContainment<T>(dropZone: DropZoneEntity, evt: { x: number; y: number }): boolean {
         const bounds = dropZone.element.getBoundingClientRect();
         const isContained =
             bounds.x <= evt.x &&
@@ -45,13 +42,8 @@ export class DropZoneManager {
     handleDragEvent(draggable, evt: DragEventInfo) {
         // callbacks based on state change?, or kept "instant"?
         // Loop all elements to check intersection
-        for (const dropZone of this.zones.filter((zone) =>
-            zone.zone.accept ? zone.zone.accept(draggable) : true
-        )) {
-            const isContained = this.checkContainment(
-                dropZone.zone,
-                evt.client.end
-            );
+        for (const dropZone of this.zones.filter((zone) => (zone.zone.accept ? zone.zone.accept(draggable) : true))) {
+            const isContained = this.checkContainment(dropZone.zone, evt.client.end);
 
             if (isContained) {
                 if (dropZone.state === 'IDLE') {
@@ -77,13 +69,8 @@ export class DropZoneManager {
 
     handleDropEvent(draggable, evt: DragEventInfo) {
         // Loop all elements to check intersection
-        for (const dropZone of this.zones.filter((zone) =>
-            zone.zone.accept ? zone.zone.accept(draggable) : true
-        )) {
-            const isContained = this.checkContainment(
-                dropZone.zone,
-                evt.client.end
-            );
+        for (const dropZone of this.zones.filter((zone) => (zone.zone.accept ? zone.zone.accept(draggable) : true))) {
+            const isContained = this.checkContainment(dropZone.zone, evt.client.end);
 
             if (isContained) {
                 if (dropZone.zone.onDrop) {

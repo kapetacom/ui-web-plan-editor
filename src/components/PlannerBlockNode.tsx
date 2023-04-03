@@ -2,13 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { toClass } from '@kapeta/ui-web-utils';
-import {
-    BlockKind,
-    DataWrapper,
-    Dimensions,
-    ItemType,
-    ResourceRole,
-} from '@kapeta/ui-web-types';
+import { BlockKind, DataWrapper, Dimensions, ItemType, ResourceRole } from '@kapeta/ui-web-types';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 import { ButtonStyle, DnDDrag, showDelete } from '@kapeta/ui-web-components';
 
@@ -33,29 +27,14 @@ interface PlannerBlockNodeProps {
     readOnly?: boolean;
     viewOnly?: boolean;
     onDrop?: () => void;
-    setItemToEdit?: (
-        res: DataWrapper<BlockKind>,
-        type: ItemType,
-        block?: PlannerBlockModelWrapper
-    ) => void;
-    setItemToConfigure?: (
-        res: DataWrapper<BlockKind>,
-        type: ItemType,
-        block?: PlannerBlockModelWrapper
-    ) => void;
-    setItemToInspect?: (
-        res: DataWrapper<BlockKind>,
-        type: ItemType,
-        block?: PlannerBlockModelWrapper
-    ) => void;
+    setItemToEdit?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
+    setItemToConfigure?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
+    setItemToInspect?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
     planner?: PlannerModelWrapper;
 }
 
 @observer
-export class PlannerBlockNode extends React.Component<
-    PlannerBlockNodeProps,
-    any
-> {
+export class PlannerBlockNode extends React.Component<PlannerBlockNodeProps, any> {
     private container: SVGPathElement | null = null;
 
     componentDidMount() {
@@ -313,18 +292,11 @@ export class PlannerBlockNode extends React.Component<
 
     render() {
         const block = this.props.block;
-        const nodeSize =
-            this.props.size !== undefined
-                ? this.props.size
-                : PlannerNodeSize.FULL;
+        const nodeSize = this.props.size !== undefined ? this.props.size : PlannerNodeSize.FULL;
         const height = block.calculateHeight(nodeSize);
         const highlight = BlockMode.HIGHLIGHT === this.props.block.mode;
-        const hasFocused: boolean = !!(
-            this.props.planner && this.props.planner.focusedBlock
-        );
-        const isFocused = this.props.planner
-            ? this.props.planner.focusedBlock === block
-            : false;
+        const hasFocused: boolean = !!(this.props.planner && this.props.planner.focusedBlock);
+        const isFocused = this.props.planner ? this.props.planner.focusedBlock === block : false;
         const isLinkedFocused = !!(
             !isFocused &&
             this.props.planner &&
@@ -335,10 +307,7 @@ export class PlannerBlockNode extends React.Component<
         const blockClassName = toClass({
             'planner-block-node': true,
             'hover-drop':
-                [
-                    BlockMode.HOVER_DROP_CONSUMER,
-                    BlockMode.HOVER_DROP_PROVIDER,
-                ].indexOf(this.props.block.mode) > -1,
+                [BlockMode.HOVER_DROP_CONSUMER, BlockMode.HOVER_DROP_PROVIDER].indexOf(this.props.block.mode) > -1,
             highlight: highlight,
             'focused-link': isLinkedFocused,
             'block-dragging': this.props.block.isDragging(),
@@ -384,13 +353,7 @@ export class PlannerBlockNode extends React.Component<
                             onDoubleClick={this.props.onDoubleTap}
                         >
                             <g className={groupContainerClasses}>
-                                <rect
-                                    fill="transparent"
-                                    x={0}
-                                    y={height - 40}
-                                    width={block.width}
-                                    height={70}
-                                />
+                                <rect fill="transparent" x={0} y={height - 40} width={block.width} height={70} />
 
                                 <svg y={height - 10} x={0}>
                                     {this.renderBlockActions(block)}
@@ -432,9 +395,7 @@ export class PlannerBlockNode extends React.Component<
                                     }}
                                     status={this.props.status}
                                     instanceName={block.name}
-                                    onInstanceNameChange={(newName) =>
-                                        (block.name = newName)
-                                    }
+                                    onInstanceNameChange={(newName) => (block.name = newName)}
                                     name={block.getBlockName()}
                                     version={block.version}
                                 />

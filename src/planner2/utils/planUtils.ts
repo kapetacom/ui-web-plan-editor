@@ -1,5 +1,5 @@
 import { PlannerNodeSize } from '../../types';
-import { Asset, BlockInstanceSpec, BlockKind } from '@kapeta/ui-web-types';
+import { Asset, BlockInstanceSpec, BlockKind, Size } from '@kapeta/ui-web-types';
 
 export const resourceHeight = {
     [PlannerNodeSize.SMALL]: 30,
@@ -11,7 +11,7 @@ export const calculateCanvasSize = (
     blocks: BlockInstanceSpec[],
     blockAssets: Asset<BlockKind>[],
     size: PlannerNodeSize,
-    containerSize: { width: number; height: number }
+    containerSize: Size
 ) => {
     let maxWidth = 50;
     let maxHeight = 50;
@@ -28,14 +28,11 @@ export const calculateCanvasSize = (
             };
 
             // TODO: Normalize refs
-            const blockKind = blockAssets.find(
-                (blockAsset) => blockAsset.ref === block.block.ref
-            );
+            const blockKind = blockAssets.find((blockAsset) => blockAsset.ref === block.block.ref);
             if (!blockKind) {
                 return;
             }
-            const bottom =
-                dimensions.top + calculateBlockHeight(blockKind.data, size);
+            const bottom = dimensions.top + calculateBlockHeight(blockKind.data, size);
             const right = dimensions.left + dimensions.width;
             const y = dimensions.top;
             const x = dimensions.left;
@@ -58,8 +55,7 @@ export const calculateCanvasSize = (
         x: minX,
         y: minY,
         width: maxWidth > containerSize.width ? maxWidth : containerSize.width,
-        height:
-            maxHeight > containerSize.height ? maxHeight : containerSize.height,
+        height: maxHeight > containerSize.height ? maxHeight : containerSize.height,
     };
 };
 
@@ -73,13 +69,14 @@ export function calculateBlockHeight(block: BlockKind, size: PlannerNodeSize) {
     return getBlockHeightByResourceCount(resourceCount, size);
 }
 
-export function getBlockHeightByResourceCount(
-    resourceCount: number,
-    size: PlannerNodeSize
-) {
+export function getBlockHeightByResourceCount(resourceCount: number, size: PlannerNodeSize) {
     return Math.max(150, 70 + resourceCount * resourceHeight[size]);
 }
 
 export function getResourceId(blockId: string, resourceName: string) {
     return `${blockId}__${resourceName}`;
+}
+
+export function getBlockInstance(plan, blockId) {
+    return plan.spec.blocks.find((block) => block.id === blockId);
 }

@@ -18,11 +18,7 @@ export interface PlannerBlockResourceListProps {
     blockData: PlannerBlockModelWrapper;
     size: PlannerNodeSize;
     setItemToEdit?: (
-        res:
-            | PlannerResourceModelWrapper
-            | PlannerBlockModelWrapper
-            | any
-            | undefined,
+        res: PlannerResourceModelWrapper | PlannerBlockModelWrapper | any | undefined,
         type: ItemType,
         block?: PlannerBlockModelWrapper
     ) => void;
@@ -33,10 +29,7 @@ export interface PlannerBlockResourceListProps {
 }
 
 @observer
-export class PlannerBlockResourceList extends Component<
-    PlannerBlockResourceListProps,
-    any
-> {
+export class PlannerBlockResourceList extends Component<PlannerBlockResourceListProps, any> {
     constructor(props: PlannerBlockResourceListProps) {
         super(props);
 
@@ -62,17 +55,11 @@ export class PlannerBlockResourceList extends Component<
 
     @observable
     showPlaceholder() {
-        if (
-            this.props.role === ResourceRole.PROVIDES &&
-            this.props.blockData.mode === BlockMode.HOVER_DROP_PROVIDER
-        ) {
+        if (this.props.role === ResourceRole.PROVIDES && this.props.blockData.mode === BlockMode.HOVER_DROP_PROVIDER) {
             return true;
         }
 
-        if (
-            this.props.role === ResourceRole.CONSUMES &&
-            this.props.blockData.mode === BlockMode.HOVER_DROP_CONSUMER
-        ) {
+        if (this.props.role === ResourceRole.CONSUMES && this.props.blockData.mode === BlockMode.HOVER_DROP_CONSUMER) {
             return true;
         }
 
@@ -80,17 +67,12 @@ export class PlannerBlockResourceList extends Component<
     }
 
     render() {
-        const nodeSize =
-            this.props.size !== undefined
-                ? this.props.size
-                : PlannerNodeSize.FULL;
+        const nodeSize = this.props.size !== undefined ? this.props.size : PlannerNodeSize.FULL;
         const resourceRight = this.props.blockData.getResourceHeight(nodeSize);
         const offsetX = 1;
         const placeholderWidth = 4;
         const placeholderX =
-            this.props.role === ResourceRole.PROVIDES
-                ? this.props.blockData.width + offsetX
-                : -placeholderWidth;
+            this.props.role === ResourceRole.PROVIDES ? this.props.blockData.width + offsetX : -placeholderWidth;
 
         const plannerResourceListClass = toClass({
             'planner-resource-list': true,
@@ -99,12 +81,7 @@ export class PlannerBlockResourceList extends Component<
         });
         const yPosition = this.getYOffset(nodeSize);
         return (
-            <svg
-                className={plannerResourceListClass}
-                overflow="visible"
-                x={0}
-                y={yPosition}
-            >
+            <svg className={plannerResourceListClass} overflow="visible" x={0} y={yPosition}>
                 {this.props.list.map((resource, index: number) => {
                     return (
                         <PlannerBlockResourceListItem
@@ -121,15 +98,8 @@ export class PlannerBlockResourceList extends Component<
                     );
                 })}
 
-                <svg
-                    className="resource-placeholder"
-                    x={placeholderX}
-                    y={resourceRight * this.props.list.length}
-                >
-                    <rect
-                        height={resourceRight - 4}
-                        width={placeholderWidth - offsetX}
-                    />
+                <svg className="resource-placeholder" x={placeholderX} y={resourceRight * this.props.list.length}>
+                    <rect height={resourceRight - 4} width={placeholderWidth - offsetX} />
                 </svg>
             </svg>
         );

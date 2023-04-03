@@ -3,12 +3,7 @@ import React from 'react';
 import { Point, ResourceRole, Size } from '@kapeta/ui-web-types';
 
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
-import {
-    FocusPositioningData,
-    NeighboringBlocks,
-    PlannerNodeSize,
-    ZoomAreaMap,
-} from '../../types';
+import { FocusPositioningData, NeighboringBlocks, PlannerNodeSize, ZoomAreaMap } from '../../types';
 import { PlannerModelWrapper } from '../../wrappers/PlannerModelWrapper';
 import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
 import { PlannerFocusSideBar } from '../PlannerFocusSideBar';
@@ -39,16 +34,12 @@ export class FocusHelper {
         nodeSize: PlannerNodeSize
     ) => {
         const x = positionData.plannerWidth / 2 - block.width / 2;
-        const y =
-            positionData.plannerHeight / 2 -
-            block.calculateHeight(nodeSize) / 2;
+        const y = positionData.plannerHeight / 2 - block.calculateHeight(nodeSize) / 2;
         return { x, y };
     };
 
     @observable
-    public isConnectionLinkedToFocus = (
-        connection: PlannerConnectionModelWrapper
-    ) => {
+    public isConnectionLinkedToFocus = (connection: PlannerConnectionModelWrapper) => {
         if (!this.plan.focusedBlock) {
             return false;
         }
@@ -62,10 +53,7 @@ export class FocusHelper {
     };
 
     @observable
-    private getBlockListTotalHeight = (
-        blocks: PlannerBlockModelWrapper[],
-        nodeSize: PlannerNodeSize
-    ) => {
+    private getBlockListTotalHeight = (blocks: PlannerBlockModelWrapper[], nodeSize: PlannerNodeSize) => {
         let totalHeight = OFFSET_FROM_TOP;
         blocks.forEach((block: PlannerBlockModelWrapper) => {
             totalHeight += block.calculateHeight(nodeSize) + 40;
@@ -112,18 +100,10 @@ export class FocusHelper {
 
         return {
             maxHorizontalBlocks: 3,
-            maxVerticalBlocks: Math.max(
-                verticalBlockNumberLeft,
-                verticalBlockNumberRight
-            ),
-            totalUsedHeightLeft: this.getBlockListTotalHeight(
-                connectedToFocusBlocks.providingBlocks,
-                nodeSize
-            ),
-            totalUsedHeightRight: this.getBlockListTotalHeight(
-                connectedToFocusBlocks.consumingBlocks,
-                nodeSize
-            ),
+            maxVerticalBlocks: Math.max(verticalBlockNumberLeft, verticalBlockNumberRight),
+            totalUsedHeightLeft: this.getBlockListTotalHeight(connectedToFocusBlocks.providingBlocks, nodeSize),
+            totalUsedHeightRight: this.getBlockListTotalHeight(connectedToFocusBlocks.consumingBlocks, nodeSize),
+            totalUsedHeight: -1,
             plannerHeight: availableSize.y,
             plannerWidth: availableSize.x,
         };
@@ -134,29 +114,18 @@ export class FocusHelper {
      * @param currentSize
      */
     @observable
-    public getFocusZoomLevel = (
-        zoomLevelAreas: ZoomAreaMap,
-        nodeSize: PlannerNodeSize
-    ): number => {
+    public getFocusZoomLevel = (zoomLevelAreas: ZoomAreaMap, nodeSize: PlannerNodeSize): number => {
         const positioningMap: { [key: string]: FocusPositioningData } = {};
         let fittingZoomLevels: number[] = [1];
 
         if (this.plan.focusedBlock) {
             const focusBlock = this.plan.focusedBlock;
             Object.keys(zoomLevelAreas).forEach((key: string) => {
-                positioningMap[key] = this.getBlocksFitToScreen(
-                    focusBlock,
-                    zoomLevelAreas[key],
-                    nodeSize
-                );
+                positioningMap[key] = this.getBlocksFitToScreen(focusBlock, zoomLevelAreas[key], nodeSize);
             });
             fittingZoomLevels = Object.keys(positioningMap)
                 .filter((key: string) => {
-                    return this.getFitBothSides(
-                        focusBlock,
-                        positioningMap[+key],
-                        nodeSize
-                    );
+                    return this.getFitBothSides(focusBlock, positioningMap[+key], nodeSize);
                 })
                 .map((key) => {
                     return +key;
@@ -167,9 +136,7 @@ export class FocusHelper {
         return Math.min(...fittingZoomLevels);
     };
 
-    public renderTopBar = (props: {
-        setFocusBlock: (block: PlannerBlockModelWrapper) => void;
-    }) => {
+    public renderTopBar = (props: { setFocusBlock: (block: PlannerBlockModelWrapper) => void }) => {
         return (
             <div>
                 {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
@@ -182,16 +149,8 @@ export class FocusHelper {
                     })}
                 >
                     <svg width="10" height="10" viewBox="0 0 8 13" fill="none">
-                        <path
-                            d="M6.5351 11.6896L1.31038 6.46523"
-                            stroke="#544B49"
-                            strokeLinecap="round"
-                        />
-                        <path
-                            d="M1.31042 6.46518L6.53482 1.34477"
-                            stroke="#544B49"
-                            strokeLinecap="round"
-                        />
+                        <path d="M6.5351 11.6896L1.31038 6.46523" stroke="#544B49" strokeLinecap="round" />
+                        <path d="M1.31042 6.46518L6.53482 1.34477" stroke="#544B49" strokeLinecap="round" />
                     </svg>
                 </div>
                 <div className="focused-block-info">
@@ -209,11 +168,7 @@ export class FocusHelper {
                             fill="#544B49"
                         />
                     </svg>
-                    <p>
-                        {this.plan.focusedBlock
-                            ? this.plan.focusedBlock.name
-                            : ''}
-                    </p>
+                    <p>{this.plan.focusedBlock ? this.plan.focusedBlock.name : ''}</p>
                 </div>
             </div>
         );
@@ -227,41 +182,21 @@ export class FocusHelper {
     }
 
     @action
-    public updateBlockPositionForFocus(
-        block: PlannerBlockModelWrapper,
-        nodeSize: PlannerNodeSize,
-        plannerSize: Point
-    ) {
+    public updateBlockPositionForFocus(block: PlannerBlockModelWrapper, nodeSize: PlannerNodeSize, plannerSize: Point) {
         let point;
         if (this.plan.focusedBlock) {
-            const positioningData = this.getBlocksFitToScreen(
-                this.plan.focusedBlock,
-                plannerSize,
-                nodeSize
-            );
+            const positioningData = this.getBlocksFitToScreen(this.plan.focusedBlock, plannerSize, nodeSize);
             const focusedColumn = 2;
-            const { providingBlocks, consumingBlocks, all } =
-                this.plan.focusedBlock.getConnectedBlocks();
+            const { providingBlocks, consumingBlocks, all } = this.plan.focusedBlock.getConnectedBlocks();
             if (this.plan.focusedBlock.id === block.id) {
-                point = this.getFocusedBlockPosition(
-                    this.plan.focusedBlock,
-                    positioningData,
-                    focusedColumn
-                );
-            } else if (
-                all.filter((singleBlock) => singleBlock.id === block.id)
-                    .length > 0
-            ) {
+                point = this.getFocusedBlockPosition(this.plan.focusedBlock, positioningData, focusedColumn);
+            } else if (all.filter((singleBlock) => singleBlock.id === block.id).length > 0) {
                 point = this.getFocusedLinkedBlockPosition(
                     block.id,
                     // eslint-disable-next-line no-nested-ternary
-                    providingBlocks.filter(
-                        (providingBlock) => providingBlock.id === block.id
-                    ).length > 0
+                    providingBlocks.filter((providingBlock) => providingBlock.id === block.id).length > 0
                         ? ResourceRole.CONSUMES
-                        : consumingBlocks.filter(
-                              (consumingBlock) => consumingBlock.id === block.id
-                          ).length > 0
+                        : consumingBlocks.filter((consumingBlock) => consumingBlock.id === block.id).length > 0
                         ? ResourceRole.PROVIDES
                         : ResourceRole.CONSUMES,
                     positioningData,
@@ -314,9 +249,7 @@ export class FocusHelper {
         nodeSize: PlannerNodeSize
     ): Point {
         let blockIndex = allBlocks.all.indexOf(
-            allBlocks.all.filter(
-                (block: PlannerBlockModelWrapper) => block.id === blockId
-            )[0]
+            allBlocks.all.filter((block: PlannerBlockModelWrapper) => block.id === blockId)[0]
         );
         let y = 0;
         let x = 0;
@@ -327,15 +260,9 @@ export class FocusHelper {
             blockIndex = allBlocks.providingBlocks.indexOf(currentBlock);
             x = currentBlock.width;
             usedHeight =
-                (positionData.plannerHeight -
-                    this.getBlockListTotalHeight(
-                        allBlocks.providingBlocks,
-                        nodeSize
-                    )) /
-                2;
+                (positionData.plannerHeight - this.getBlockListTotalHeight(allBlocks.providingBlocks, nodeSize)) / 2;
             for (let i = 0; i < blockIndex; i++) {
-                usedHeight +=
-                    allBlocks.providingBlocks[i].calculateHeight(nodeSize);
+                usedHeight += allBlocks.providingBlocks[i].calculateHeight(nodeSize);
             }
             y = usedHeight + OFFSET_FROM_TOP;
             return { x, y };
@@ -343,15 +270,9 @@ export class FocusHelper {
         // get columns for blocks on the right
         blockIndex = allBlocks.consumingBlocks.indexOf(currentBlock);
         usedHeight =
-            (positionData.plannerHeight -
-                this.getBlockListTotalHeight(
-                    allBlocks.consumingBlocks,
-                    nodeSize
-                )) /
-            2;
+            (positionData.plannerHeight - this.getBlockListTotalHeight(allBlocks.consumingBlocks, nodeSize)) / 2;
         for (let i = 0; i < blockIndex; i++) {
-            usedHeight +=
-                allBlocks.consumingBlocks[i].calculateHeight(nodeSize);
+            usedHeight += allBlocks.consumingBlocks[i].calculateHeight(nodeSize);
         }
         x = positionData.plannerWidth - currentBlock.width * 2;
         y = usedHeight + OFFSET_FROM_TOP;
@@ -374,14 +295,10 @@ export class FocusHelper {
             },
             nodeSize
         );
-        if (
-            positioningInfo.totalUsedHeightLeft < positioningInfo.plannerHeight
-        ) {
+        if (positioningInfo.totalUsedHeightLeft < positioningInfo.plannerHeight) {
             fitLeft = true;
         }
-        if (
-            positioningInfo.totalUsedHeightRight < positioningInfo.plannerHeight
-        ) {
+        if (positioningInfo.totalUsedHeightRight < positioningInfo.plannerHeight) {
             fitRight = true;
         }
         return fitLeft && fitRight;

@@ -1,6 +1,10 @@
-import { BlockConnectionSpec, Point } from '@kapeta/ui-web-types';
+import { BlockConnectionSpec, BlockInstanceSpec, PlanKind, Point } from '@kapeta/ui-web-types';
 import { BasisCurve } from '@kapeta/ui-web-utils';
 import { getResourceId } from './planUtils';
+import { NeighboringBlocks } from '../../types';
+import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
+import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
+import { FocusBlockInfo } from '../types';
 
 export function calculatePathBetweenPoints(fromPoint: Point, toPoint: Point) {
     return getCurveFromPoints(getCurveMainPoints(fromPoint, toPoint));
@@ -17,10 +21,10 @@ export function getCurveFromPoints(points: Point[]) {
 }
 
 export function getConnectionId(connection: BlockConnectionSpec) {
-    return `${getResourceId(
-        connection.from.blockId,
-        connection.from.resourceName
-    )}-${getResourceId(connection.to.blockId, connection.to.resourceName)}`;
+    return `${getResourceId(connection.from.blockId, connection.from.resourceName)}-${getResourceId(
+        connection.to.blockId,
+        connection.to.resourceName
+    )}`;
 }
 
 export function getMiddlePoint(list: Point[]) {
@@ -52,4 +56,23 @@ export function getCurveMainPoints(fromPoint: Point, toPoint: Point) {
     ];
 
     return points;
+}
+
+export function isConnectionTo(connection: BlockConnectionSpec, instanceId: string, resourceName?: string) {
+    if (!resourceName) {
+        return connection.from.blockId === instanceId || connection.to.blockId === instanceId;
+    }
+
+    return (
+        (connection.from.blockId === instanceId && connection.from.resourceName === resourceName) ||
+        (connection.to.blockId === instanceId && connection.to.resourceName === resourceName)
+    );
+}
+
+export function getConnectionsFor(plan: PlanKind, blockId: string, resourceName: string) {
+    return (
+        plan.spec.connections?.filter((connection) => {
+            return isConnectionTo(connection, blockId, resourceName);
+        }) ?? []
+    );
 }

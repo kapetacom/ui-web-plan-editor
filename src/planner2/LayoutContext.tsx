@@ -11,9 +11,7 @@ export const LayoutContext = React.createContext({
     },
 });
 
-export const LayoutNode: React.FC<
-    React.PropsWithChildren & { x?: number; y?: number }
-> = (props) => {
+export const LayoutNode: React.FC<React.PropsWithChildren & { x?: number; y?: number }> = (props) => {
     const layout = useContext(LayoutContext);
 
     return (
@@ -30,9 +28,7 @@ export const LayoutNode: React.FC<
     );
 };
 
-export const SVGLayoutNode: React.FC<
-    React.SVGProps<SVGSVGElement> & { x?: number; y?: number }
-> = (props) => {
+export const SVGLayoutNode: React.FC<React.SVGProps<SVGSVGElement> & { x?: number; y?: number }> = (props) => {
     return (
         <LayoutNode x={props.x} y={props.y}>
             <svg {...props}>{props.children}</svg>

@@ -2,12 +2,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, makeObservable, observable } from 'mobx';
-import {
-    PanelSize,
-    SidePanel,
-    TabContainer,
-    TabPage,
-} from '@kapeta/ui-web-components';
+import { PanelSize, SidePanel, TabContainer, TabPage } from '@kapeta/ui-web-components';
 import { InstanceEventType, InstanceService } from '@kapeta/ui-web-context';
 
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
@@ -47,11 +42,7 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
         };
     }
 
-    componentDidUpdate(
-        prevProps: Readonly<BlockInspectorPanelProps>,
-        prevState: Readonly<{}>,
-        snapshot?: any
-    ) {
+    componentDidUpdate(prevProps: Readonly<BlockInspectorPanelProps>, prevState: Readonly<{}>, snapshot?: any) {
         this.startListening();
 
         if (!this.props.block?.ref) {
@@ -103,10 +94,7 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
         }
         this.setLoading(true);
         try {
-            const result = await InstanceService.getInstanceLogs(
-                this.props.planRef,
-                this.props.block?.id
-            );
+            const result = await InstanceService.getInstanceLogs(this.props.planRef, this.props.block?.id);
             this.setLogs(result.ok === false ? [] : result.logs);
         } finally {
             this.setLoading(false);
@@ -146,11 +134,7 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
             return;
         }
         this.stopListening();
-        InstanceService.subscribe(
-            this.props.block.ref,
-            InstanceEventType.EVENT_INSTANCE_LOG,
-            this.onInstanceLog
-        );
+        InstanceService.subscribe(this.props.block.ref, InstanceEventType.EVENT_INSTANCE_LOG, this.onInstanceLog);
     }
 
     private stopListening() {
@@ -158,11 +142,7 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
             return;
         }
 
-        InstanceService.unsubscribe(
-            this.props.block.ref,
-            InstanceEventType.EVENT_INSTANCE_LOG,
-            this.onInstanceLog
-        );
+        InstanceService.unsubscribe(this.props.block.ref, InstanceEventType.EVENT_INSTANCE_LOG, this.onInstanceLog);
     }
 
     render() {
@@ -184,43 +164,22 @@ export class BlockInspectorPanel extends Component<BlockInspectorPanelProps> {
                                 />
                             </TabPage>
                             <TabPage id="issues" title="Issues">
-                                <div
-                                    className="issues-container"
-                                    key={`${this.props.block.ref}_issues`}
-                                >
+                                <div className="issues-container" key={`${this.props.block.ref}_issues`}>
                                     {(!this.props.block.isValid() && (
                                         <>
-                                            <span>
-                                                Found the following issues in
-                                                block
-                                            </span>
+                                            <span>Found the following issues in block</span>
                                             <ul className="issues-list">
-                                                {this.props.block
-                                                    .getIssues()
-                                                    .map((issue) => {
-                                                        return (
-                                                            <li>
-                                                                <div className="issue-context">
-                                                                    <span className="level">
-                                                                        {
-                                                                            issue.level
-                                                                        }
-                                                                    </span>
-                                                                    :
-                                                                    <span className="name">
-                                                                        {
-                                                                            issue.name
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                                <div className="issue-message">
-                                                                    {
-                                                                        issue.issue
-                                                                    }
-                                                                </div>
-                                                            </li>
-                                                        );
-                                                    })}
+                                                {this.props.block.getIssues().map((issue) => {
+                                                    return (
+                                                        <li>
+                                                            <div className="issue-context">
+                                                                <span className="level">{issue.level}</span>:
+                                                                <span className="name">{issue.name}</span>
+                                                            </div>
+                                                            <div className="issue-message">{issue.issue}</div>
+                                                        </li>
+                                                    );
+                                                })}
                                             </ul>
                                         </>
                                     )) || <span>No issues found</span>}

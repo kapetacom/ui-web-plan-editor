@@ -3,11 +3,7 @@ import { observable, action, makeObservable } from 'mobx';
 import { observer } from 'mobx-react';
 
 import { Modal, ModalSize } from '@kapeta/ui-web-components';
-import {
-    TrafficService,
-    TrafficEventType,
-    ResourceTypeProvider,
-} from '@kapeta/ui-web-context';
+import { TrafficService, TrafficEventType, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { ConnectionMethodsMapping, Traffic } from '@kapeta/ui-web-types';
 
 import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
@@ -23,10 +19,7 @@ interface InspectConnectionWrapperState {
 }
 
 @observer
-export class InspectConnectionPanel extends Component<
-    InspectConnectionWrapperProps,
-    InspectConnectionWrapperState
-> {
+export class InspectConnectionPanel extends Component<InspectConnectionWrapperProps, InspectConnectionWrapperState> {
     @observable
     private trafficLines: Traffic[] = [];
 
@@ -44,16 +37,8 @@ export class InspectConnectionPanel extends Component<
         this.unsubscribeAll();
         const { connection } = this.props;
         this.unsubscribers = [
-            TrafficService.subscribe(
-                connection.id,
-                TrafficEventType.TRAFFIC_START,
-                this.onTrafficStart
-            ),
-            TrafficService.subscribe(
-                connection.id,
-                TrafficEventType.TRAFFIC_END,
-                this.onTrafficEnd
-            ),
+            TrafficService.subscribe(connection.id, TrafficEventType.TRAFFIC_START, this.onTrafficStart),
+            TrafficService.subscribe(connection.id, TrafficEventType.TRAFFIC_END, this.onTrafficEnd),
         ];
     }
 
@@ -118,8 +103,7 @@ export class InspectConnectionPanel extends Component<
 
         const Inspector = converter.inspectComponentType;
 
-        const mapping: ConnectionMethodsMapping =
-            this.props.connection.mapping || {};
+        const mapping: ConnectionMethodsMapping = this.props.connection.mapping || {};
 
         return <Inspector trafficLines={this.trafficLines} mapping={mapping} />;
     }

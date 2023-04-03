@@ -150,7 +150,6 @@
 
     .planner-block {
         user-select: none;
-        display: none;
         transition: all 200ms;
         opacity: 0;
     }
@@ -158,6 +157,9 @@
     .linked-block {
         .transition();
         opacity: 0.65;
+        .block-body {
+            cursor: pointer !important;
+        }
     }
 
     .hovered-block {
@@ -168,6 +170,9 @@
     .planner-focused-block {
         transition: all 200ms;
         opacity: 1;
+        .block-body {
+            cursor: pointer !important;
+        }
     }
 
     .planner-draw {
@@ -189,5 +194,10 @@
 }
 
 .planner-block-node-container {
+    .transition();
+    opacity: 1;
     position: absolute;
+    &.dragging {
+        .transition(none);
+    }
 }

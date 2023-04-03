@@ -60,12 +60,7 @@ export const ActionButtons = (props: ActionButtonProps) => {
     }[props.pointType || 'center'];
 
     return (
-        <svg
-            x={xCoord}
-            y={props.y - height / 2}
-            width={width || 150}
-            height={height || 150}
-        >
+        <svg x={xCoord} y={props.y - height / 2} width={width || 150} height={height || 150}>
             <foreignObject
                 x={0}
                 y={0}
@@ -93,12 +88,7 @@ export const ActionButtons = (props: ActionButtonProps) => {
                                     label={action.label}
                                     icon={action.icon}
                                     style={action.buttonStyle}
-                                    onClick={() =>
-                                        action.onClick(
-                                            planner,
-                                            props.actionContext
-                                        )
-                                    }
+                                    onClick={() => action.onClick(planner, props.actionContext)}
                                 />
                             );
                         }

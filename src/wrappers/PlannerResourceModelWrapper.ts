@@ -3,12 +3,7 @@ import { PlannerNodeSize } from '../types';
 
 import { PlannerBlockModelWrapper } from './PlannerBlockModelWrapper';
 
-import type {
-    DataWrapper,
-    Dimensions,
-    Point,
-    ResourceKind,
-} from '@kapeta/ui-web-types';
+import type { DataWrapper, Dimensions, Point, ResourceKind } from '@kapeta/ui-web-types';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
@@ -16,9 +11,7 @@ import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 
 const DEFAULT_EXTENSION_SIZE = 110;
 
-export class PlannerResourceModelWrapper<T = any>
-    implements DataWrapper<ResourceKind>
-{
+export class PlannerResourceModelWrapper<T = any> implements DataWrapper<ResourceKind> {
     readonly block: PlannerBlockModelWrapper;
 
     readonly instanceId: string = '';
@@ -42,11 +35,7 @@ export class PlannerResourceModelWrapper<T = any>
         return resource.metadata.name;
     }
 
-    constructor(
-        role: ResourceRole,
-        resource: ResourceKind,
-        block: PlannerBlockModelWrapper
-    ) {
+    constructor(role: ResourceRole, resource: ResourceKind, block: PlannerBlockModelWrapper) {
         this.instanceId = crypto.randomUUID();
         this.role = role;
         this.mode = ResourceMode.HIDDEN;
@@ -83,11 +72,9 @@ export class PlannerResourceModelWrapper<T = any>
     @action
     setData(data: ResourceKind) {
         this.data = toJS(data);
-        this.block.plan
-            .getConnectionsFor(this)
-            .forEach((connection: PlannerConnectionModelWrapper) => {
-                connection.recalculateMapping(); // The connection will try to adjust to the changes made in the resource
-            });
+        this.block.plan.getConnectionsFor(this).forEach((connection: PlannerConnectionModelWrapper) => {
+            connection.recalculateMapping(); // The connection will try to adjust to the changes made in the resource
+        });
 
         this.validate();
     }
@@ -156,10 +143,7 @@ export class PlannerResourceModelWrapper<T = any>
 
         const offsetTop = this.block.calculateOffsetTop(size, this.role) - 2;
 
-        const resources =
-            this.role === ResourceRole.CONSUMES
-                ? block.consumes
-                : block.provides;
+        const resources = this.role === ResourceRole.CONSUMES ? block.consumes : block.provides;
 
         let index = resources.indexOf(this);
 
@@ -167,19 +151,11 @@ export class PlannerResourceModelWrapper<T = any>
             index = 0;
         }
 
-        return (
-            offsetTop +
-            this.calculateYOffsetFromBlock(index, resourceHeight, block) +
-            resourceHeight / 2
-        );
+        return offsetTop + this.calculateYOffsetFromBlock(index, resourceHeight, block) + resourceHeight / 2;
     }
 
     @observable
-    calculateYOffsetFromBlock(
-        index: number,
-        resourceHeight: number,
-        block: PlannerBlockModelWrapper
-    ) {
+    calculateYOffsetFromBlock(index: number, resourceHeight: number, block: PlannerBlockModelWrapper) {
         return index * resourceHeight + block.top;
     }
 
@@ -227,13 +203,7 @@ export class PlannerResourceModelWrapper<T = any>
     }
 
     @action
-    updateDimensionsFromEvent(
-        size: PlannerNodeSize,
-        evt: MouseEvent,
-        zoom: number,
-        scroll?: Point,
-        offset?: Point
-    ) {
+    updateDimensionsFromEvent(size: PlannerNodeSize, evt: MouseEvent, zoom: number, scroll?: Point, offset?: Point) {
         const height = this.block.getResourceHeight(size) - 4;
         const width = 150;
 
@@ -303,10 +273,7 @@ export class PlannerResourceModelWrapper<T = any>
 
             if (resourceType.validate) {
                 try {
-                    const typeErrors = resourceType.validate(
-                        this.data,
-                        this.block.getEntities()
-                    );
+                    const typeErrors = resourceType.validate(this.data, this.block.getEntities());
                     this.errors.push(...typeErrors);
                 } catch (e) {
                     this.errors.push(`Resource was invalid: ${e.message}`);
