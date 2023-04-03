@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-    BlockInstanceSpec,
-    BlockKind,
-    ResourceKind,
-    ResourceRole,
-} from '@kapeta/ui-web-types';
+import { BlockInstanceSpec, BlockKind, ResourceKind, ResourceRole } from '@kapeta/ui-web-types';
 
 import {
     PlannerBlockModelWrapper,
@@ -86,129 +81,57 @@ export default {
 };
 
 export const ResourceMissingKind = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        ValidInstance,
-        ValidDefinition,
-        somePlan
-    );
-    const resource = new PlannerResourceModelWrapper(
-        ResourceRole.PROVIDES,
-        MissingResourceKind,
-        block
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(ValidInstance, ValidDefinition, somePlan);
+    const resource = new PlannerResourceModelWrapper(ResourceRole.PROVIDES, MissingResourceKind, block);
     resource.setMode(ResourceMode.SHOW);
 
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockResourceListItem
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                resource={resource}
-                index={0}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...resource.errors].join('\n')}
-            </pre>
+            <PlannerBlockResourceListItem size={PlannerNodeSize.FULL} zoom={1} resource={resource} index={0} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...resource.errors].join('\n')}</pre>
         </div>
     );
 };
 
 export const ResourceInvalidKind = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        ValidInstance,
-        ValidDefinition,
-        somePlan
-    );
-    const resource = new PlannerResourceModelWrapper(
-        ResourceRole.PROVIDES,
-        InvalidResourceKind,
-        block
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(ValidInstance, ValidDefinition, somePlan);
+    const resource = new PlannerResourceModelWrapper(ResourceRole.PROVIDES, InvalidResourceKind, block);
     resource.setMode(ResourceMode.SHOW);
 
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockResourceListItem
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                resource={resource}
-                index={0}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...resource.errors].join('\n')}
-            </pre>
+            <PlannerBlockResourceListItem size={PlannerNodeSize.FULL} zoom={1} resource={resource} index={0} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...resource.errors].join('\n')}</pre>
         </div>
     );
 };
 
 export const ResourceInvalidResourceSpec = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        ValidInstance,
-        ValidDefinition,
-        somePlan
-    );
-    const resource = new PlannerResourceModelWrapper(
-        ResourceRole.PROVIDES,
-        InvalidResourceSpec,
-        block
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(ValidInstance, ValidDefinition, somePlan);
+    const resource = new PlannerResourceModelWrapper(ResourceRole.PROVIDES, InvalidResourceSpec, block);
     resource.setMode(ResourceMode.SHOW);
 
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockResourceListItem
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                resource={resource}
-                index={0}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...resource.errors].join('\n')}
-            </pre>
+            <PlannerBlockResourceListItem size={PlannerNodeSize.FULL} zoom={1} resource={resource} index={0} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...resource.errors].join('\n')}</pre>
         </div>
     );
 };
 
 export const ResourceInvalidResourceSpecThrown = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        ValidInstance,
-        ValidDefinition,
-        somePlan
-    );
-    const resource = new PlannerResourceModelWrapper(
-        ResourceRole.PROVIDES,
-        InvalidResourceSpecThrown,
-        block
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(ValidInstance, ValidDefinition, somePlan);
+    const resource = new PlannerResourceModelWrapper(ResourceRole.PROVIDES, InvalidResourceSpecThrown, block);
     resource.setMode(ResourceMode.SHOW);
 
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockResourceListItem
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                resource={resource}
-                index={0}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...resource.errors].join('\n')}
-            </pre>
+            <PlannerBlockResourceListItem size={PlannerNodeSize.FULL} zoom={1} resource={resource} index={0} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...resource.errors].join('\n')}</pre>
         </div>
     );
 };

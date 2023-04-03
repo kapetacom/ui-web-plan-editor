@@ -28,11 +28,7 @@ export class InspectBlockPanelHelper {
     }
 
     @action
-    public show(
-        item: DataWrapper | any | undefined,
-        type: ItemType,
-        creating?: boolean
-    ) {
+    public show(item: DataWrapper | any | undefined, type: ItemType, creating?: boolean) {
         this.reset();
 
         item.setMode(BlockMode.HIGHLIGHT);

@@ -1,9 +1,4 @@
-import {
-    BlockService,
-    BlockTargetProvider,
-    BlockTypeProvider,
-    ResourceTypeProvider,
-} from '@kapeta/ui-web-context';
+import { BlockService, BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { ResourceRole, ResourceType } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { cloneDeep } from 'lodash';
@@ -78,49 +73,42 @@ blocks.push(
     });
 });
 
-[require('./blocks/kapeta-resource-type-rest-client.json')].forEach(
-    (resource) => {
-        ResourceTypeProvider.register({
-            kind: resource.metadata.name,
-            version: '1.2.3',
-            title: resource.metadata.title,
-            type: ResourceType.SERVICE,
-            role: ResourceRole.CONSUMES,
-            converters: [{ fromKind: 'kapeta/resource-type-rest-api' }],
-        });
-    }
-);
+[require('./blocks/kapeta-resource-type-rest-client.json')].forEach((resource) => {
+    ResourceTypeProvider.register({
+        kind: resource.metadata.name,
+        version: '1.2.3',
+        title: resource.metadata.title,
+        type: ResourceType.SERVICE,
+        role: ResourceRole.CONSUMES,
+        converters: [{ fromKind: 'kapeta/resource-type-rest-api' }],
+    });
+});
 
-[require('./blocks/kapeta-resource-type-rest-api.json')].forEach(
-    (resource) => {
-        ResourceTypeProvider.register({
-            kind: resource.metadata.name,
-            version: '1.2.3',
-            title: resource.metadata.title,
-            type: ResourceType.SERVICE,
-            role: ResourceRole.PROVIDES,
-            validate: (data) => {
-                const errors: string[] = [];
-                parseKapetaUri(data.kind);
+[require('./blocks/kapeta-resource-type-rest-api.json')].forEach((resource) => {
+    ResourceTypeProvider.register({
+        kind: resource.metadata.name,
+        version: '1.2.3',
+        title: resource.metadata.title,
+        type: ResourceType.SERVICE,
+        role: ResourceRole.PROVIDES,
+        validate: (data) => {
+            const errors: string[] = [];
+            parseKapetaUri(data.kind);
 
-                if (!data.spec.methods) {
-                    errors.push('No methods defined!');
-                }
+            if (!data.spec.methods) {
+                errors.push('No methods defined!');
+            }
 
-                if (data.spec.throw) {
-                    throw Error('Thrown from type provider!');
-                }
+            if (data.spec.throw) {
+                throw Error('Thrown from type provider!');
+            }
 
-                return errors;
-            },
-        });
-    }
-);
+            return errors;
+        },
+    });
+});
 
-[
-    'kapeta/language-target-java-spring-boot',
-    'kapeta/language-target-test',
-].forEach((targetKind) => {
+['kapeta/language-target-java-spring-boot', 'kapeta/language-target-test'].forEach((targetKind) => {
     BlockTargetProvider.register({
         kind: targetKind,
         version: '1.2.3',

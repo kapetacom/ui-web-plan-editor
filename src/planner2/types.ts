@@ -2,11 +2,13 @@ import {
     BlockConnectionSpec,
     BlockInstanceSpec,
     BlockKind,
-    ItemType, PlanKind,
+    ItemType,
+    PlanKind,
     Point,
     ResourceKind,
     ResourceRole,
-    SchemaKind, Size,
+    SchemaKind,
+    Size,
 } from '@kapeta/ui-web-types';
 import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
@@ -48,10 +50,9 @@ export interface EditableItemInterface2 {
     creating: boolean;
 }
 
-
 export interface BlockInfo {
-    block: BlockKind
-    instance: BlockInstanceSpec
+    block: BlockKind;
+    instance: BlockInstanceSpec;
 }
 
 export interface FocusBlockInfo {

@@ -5,12 +5,7 @@ import { ButtonStyle, DefaultContext } from '@kapeta/ui-web-components';
 import { Planner } from '../src/planner2/Planner2';
 
 import { readPlanV2 } from './data/planReader';
-import {
-    PlannerActionConfig,
-    PlannerContext,
-    PlannerMode,
-    withPlannerContext,
-} from '../src/planner2/PlannerContext';
+import { PlannerActionConfig, PlannerContext, PlannerMode, withPlannerContext } from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
 import { BlockKind, ItemType, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
@@ -24,178 +19,154 @@ export default {
     },
 };
 
-const PlanEditor = withPlannerContext(
-    (props: { onChange: (SchemaKind) => void }) => {
-        const planner = useContext(PlannerContext);
-        const [editItem, setEditItem] = React.useState<
-            EditableItemInterface2 | undefined
-        >();
-        const [inspectItem, setInspectItem] = React.useState<SchemaKind<
-            any,
-            any
-        > | null>(null);
-        const [configureItem, setConfigureItem] = React.useState<SchemaKind<
-            any,
-            any
-        > | null>(null);
+const PlanEditor = withPlannerContext((props: { onChange: (SchemaKind) => void }) => {
+    const planner = useContext(PlannerContext);
+    const [editItem, setEditItem] = React.useState<EditableItemInterface2 | undefined>();
+    const [inspectItem, setInspectItem] = React.useState<SchemaKind<any, any> | null>(null);
+    const [configureItem, setConfigureItem] = React.useState<SchemaKind<any, any> | null>(null);
 
-        const actionConfig: PlannerActionConfig = {
-            block: [
-                {
-                    enabled(): boolean {
-                        return true; // planner.mode !== PlannerMode.VIEW;
-                    },
-                    onClick(context, { block }) {
-                        setInspectItem(block!);
-                    },
-                    buttonStyle: ButtonStyle.PRIMARY,
-                    icon: 'fa fa-search',
-                    label: 'Inspect',
+    const actionConfig: PlannerActionConfig = {
+        block: [
+            {
+                enabled(): boolean {
+                    return true; // planner.mode !== PlannerMode.VIEW;
                 },
-                {
-                    enabled(context, { blockInstance }): boolean {
-                        return (
-                            planner.mode !== PlannerMode.VIEW &&
-                            !!blockInstance &&
-                            parseKapetaUri(blockInstance.block.ref).version ===
-                                'local'
-                        );
-                    },
-                    onClick(context, { blockInstance }) {
-                        planner.removeBlockInstance(blockInstance!.id);
-                    },
-                    buttonStyle: ButtonStyle.DANGER,
-                    icon: 'fa fa-trash',
-                    label: 'Delete',
+                onClick(context, { block }) {
+                    setInspectItem(block!);
                 },
-                {
-                    enabled(context, { blockInstance }): boolean {
-                        return (
-                            planner.mode !== PlannerMode.VIEW &&
-                            !!blockInstance &&
-                            parseKapetaUri(blockInstance.block.ref).version ===
-                                'local'
-                        );
-                    },
-                    onClick(context, { blockInstance, block }) {
-                        setEditItem({
-                            type: ItemType.BLOCK,
-                            item: block!,
-                            ref: blockInstance!.block.ref,
-                            creating: false,
-                        });
-                    },
-                    buttonStyle: ButtonStyle.SECONDARY,
-                    icon: 'fa fa-pencil',
-                    label: 'Edit',
+                buttonStyle: ButtonStyle.PRIMARY,
+                icon: 'fa fa-search',
+                label: 'Inspect',
+            },
+            {
+                enabled(context, { blockInstance }): boolean {
+                    return (
+                        planner.mode !== PlannerMode.VIEW &&
+                        !!blockInstance &&
+                        parseKapetaUri(blockInstance.block.ref).version === 'local'
+                    );
                 },
-                {
-                    enabled(context, { blockInstance }): boolean {
-                        return context.mode === PlannerMode.CONFIGURATION;
-                    },
-                    onClick(context, { block }) {
-                        setConfigureItem(block!);
-                    },
-                    buttonStyle: ButtonStyle.DEFAULT,
-                    icon: 'fa fa-tools',
-                    label: 'Configure',
+                onClick(context, { blockInstance }) {
+                    planner.removeBlockInstance(blockInstance!.id);
                 },
-            ],
-            resource: [
-                {
-                    enabled(context, { blockInstance }): boolean {
-                        return (
-                            planner.mode !== PlannerMode.VIEW &&
-                            !!blockInstance &&
-                            parseKapetaUri(blockInstance.block.ref).version ===
-                                'local'
-                        );
-                    },
-                    onClick(p, { resource }) {
-                        setEditItem({
-                            type: ItemType.RESOURCE,
-                            item: resource!,
-                            creating: false,
-                        });
-                    },
-                    buttonStyle: ButtonStyle.SECONDARY,
-                    icon: 'fa fa-pencil',
-                    label: 'Edit',
+                buttonStyle: ButtonStyle.DANGER,
+                icon: 'fa fa-trash',
+                label: 'Delete',
+            },
+            {
+                enabled(context, { blockInstance }): boolean {
+                    return (
+                        planner.mode !== PlannerMode.VIEW &&
+                        !!blockInstance &&
+                        parseKapetaUri(blockInstance.block.ref).version === 'local'
+                    );
                 },
-                {
-                    enabled(context, { blockInstance }): boolean {
-                        return (
-                            planner.mode !== PlannerMode.VIEW &&
-                            !!blockInstance &&
-                            parseKapetaUri(blockInstance.block.ref).version ===
-                                'local'
-                        );
-                    },
-                    onClick(
-                        context,
-                        { blockInstance, resource, resourceRole }
-                    ) {
-                        // Block id?
-                        context.removeResource(
-                            blockInstance!.block.ref,
-                            resource!.metadata.name,
-                            resourceRole!
-                        );
-                    },
-                    buttonStyle: ButtonStyle.DANGER,
-                    icon: 'fa fa-trash',
-                    label: 'Delete',
+                onClick(context, { blockInstance, block }) {
+                    setEditItem({
+                        type: ItemType.BLOCK,
+                        item: block!,
+                        ref: blockInstance!.block.ref,
+                        creating: false,
+                    });
                 },
-            ],
-            connection: [
-                {
-                    enabled(context): boolean {
-                        return planner.mode !== PlannerMode.VIEW;
-                    },
-                    onClick(context, { connection }) {
-                        planner.removeConnection(connection!);
-                    },
-                    buttonStyle: ButtonStyle.DANGER,
-                    icon: 'fa fa-trash',
-                    label: 'Delete',
+                buttonStyle: ButtonStyle.SECONDARY,
+                icon: 'fa fa-pencil',
+                label: 'Edit',
+            },
+            {
+                enabled(context, { blockInstance }): boolean {
+                    return context.mode === PlannerMode.CONFIGURATION;
                 },
-            ],
-        };
+                onClick(context, { block }) {
+                    setConfigureItem(block!);
+                },
+                buttonStyle: ButtonStyle.DEFAULT,
+                icon: 'fa fa-tools',
+                label: 'Configure',
+            },
+        ],
+        resource: [
+            {
+                enabled(context, { blockInstance }): boolean {
+                    return (
+                        planner.mode !== PlannerMode.VIEW &&
+                        !!blockInstance &&
+                        parseKapetaUri(blockInstance.block.ref).version === 'local'
+                    );
+                },
+                onClick(p, { resource }) {
+                    setEditItem({
+                        type: ItemType.RESOURCE,
+                        item: resource!,
+                        creating: false,
+                    });
+                },
+                buttonStyle: ButtonStyle.SECONDARY,
+                icon: 'fa fa-pencil',
+                label: 'Edit',
+            },
+            {
+                enabled(context, { blockInstance }): boolean {
+                    return (
+                        planner.mode !== PlannerMode.VIEW &&
+                        !!blockInstance &&
+                        parseKapetaUri(blockInstance.block.ref).version === 'local'
+                    );
+                },
+                onClick(context, { blockInstance, resource, resourceRole }) {
+                    // Block id?
+                    context.removeResource(blockInstance!.block.ref, resource!.metadata.name, resourceRole!);
+                },
+                buttonStyle: ButtonStyle.DANGER,
+                icon: 'fa fa-trash',
+                label: 'Delete',
+            },
+        ],
+        connection: [
+            {
+                enabled(context): boolean {
+                    return planner.mode !== PlannerMode.VIEW;
+                },
+                onClick(context, { connection }) {
+                    planner.removeConnection(connection!);
+                },
+                buttonStyle: ButtonStyle.DANGER,
+                icon: 'fa fa-trash',
+                label: 'Delete',
+            },
+        ],
+    };
 
-        return (
-            <>
-                <Planner systemId="system?" actions={actionConfig} />
-                <ItemEditorPanel
-                    open={!!editItem}
-                    editableItem={editItem}
-                    onClose={() => setEditItem(undefined)}
-                    onSubmit={(item) => {
-                        if (editItem?.type === ItemType.BLOCK) {
-                            if (editItem.creating) {
-                                // TODO: Save path/ref??
-                                // planner.addBlockDefinition(item);
-                            } else {
-                                planner.updateBlockDefinition(
-                                    editItem.ref!,
-                                    item as BlockKind
-                                );
-                            }
+    return (
+        <>
+            <Planner systemId="system?" actions={actionConfig} />
+            <ItemEditorPanel
+                open={!!editItem}
+                editableItem={editItem}
+                onClose={() => setEditItem(undefined)}
+                onSubmit={(item) => {
+                    if (editItem?.type === ItemType.BLOCK) {
+                        if (editItem.creating) {
+                            // TODO: Save path/ref??
+                            // planner.addBlockDefinition(item);
+                        } else {
+                            planner.updateBlockDefinition(editItem.ref!, item as BlockKind);
                         }
+                    }
 
-                        if (editItem?.type === ItemType.RESOURCE) {
-                            if (editItem.creating) {
-                                //     ???
-                            } else {
-                                // update mapping?
-                                // planner.updateResourceDefinition(); //
-                            }
+                    if (editItem?.type === ItemType.RESOURCE) {
+                        if (editItem.creating) {
+                            //     ???
+                        } else {
+                            // update mapping?
+                            // planner.updateResourceDefinition(); //
                         }
-                    }}
-                />
-            </>
-        );
-    }
-);
+                    }
+                }}
+            />
+        </>
+    );
+});
 
 export const PlannerActions = () => {
     const plan = useAsync(() => readPlanV2());

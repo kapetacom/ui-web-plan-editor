@@ -2,19 +2,9 @@
 import React from 'react';
 import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';
 
-import {
-    BlockConnectionSpec,
-    DataWrapper,
-    ItemType,
-    Point,
-} from '@kapeta/ui-web-types';
+import { BlockConnectionSpec, DataWrapper, ItemType, Point } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
-import {
-    DialogControl,
-    DialogTypes,
-    showToasty,
-    ToastType,
-} from '@kapeta/ui-web-components';
+import { DialogControl, DialogTypes, showToasty, ToastType } from '@kapeta/ui-web-components';
 
 import { PlannerNodeSize } from '../types';
 
@@ -32,11 +22,7 @@ interface PlannerConnectionProps {
     viewOnly?: boolean;
     onFocus?: () => void;
     onDelete?: (connection: PlannerConnectionModelWrapper) => void;
-    setItemToEdit?: (
-        res: DataWrapper<BlockConnectionSpec>,
-        type: ItemType,
-        block?: PlannerBlockModelWrapper
-    ) => void;
+    setItemToEdit?: (res: DataWrapper<BlockConnectionSpec>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
     handleInspectClick?: (connection: PlannerConnectionModelWrapper) => void;
 }
 
@@ -77,10 +63,7 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
     @observable
     private handleEditClick = () => {
         if (this.props.setItemToEdit && this.props.connection) {
-            this.props.setItemToEdit(
-                this.props.connection,
-                ItemType.CONNECTION
-            );
+            this.props.setItemToEdit(this.props.connection, ItemType.CONNECTION);
         }
     };
 
@@ -138,20 +121,14 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
             path = this.props.path;
         } else if (this.props.connection) {
             path = this.props.connection.calculatePath(this.props.size);
-            middlePoint = this.getMiddlePoint(
-                this.props.connection.getPoints(this.props.size)
-            );
+            middlePoint = this.getMiddlePoint(this.props.connection.getPoints(this.props.size));
         } else {
-            throw new Error(
-                'Either "path" or "connection" property needs to be set with valid value'
-            );
+            throw new Error('Either "path" or "connection" property needs to be set with valid value');
         }
 
         let className = toClass({
             'planner-connection': true,
-            highlight: this.props.connection
-                ? this.props.connection.editing
-                : false,
+            highlight: this.props.connection ? this.props.connection.editing : false,
             invalid: !this.connectionValid,
         });
 
@@ -161,27 +138,21 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
 
         return (
             <>
-                <g
-                    className={className.trim()}
-                    onMouseOver={this.onMouseOver}
-                    onMouseOut={this.onMouseOut}
-                >
+                <g className={className.trim()} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
                     <path className="background" d={path} />
                     <path className="line" d={path} />
 
-                    {this.props.connection &&
-                        middlePoint &&
-                        !this.props.viewOnly && (
-                            <PlannerConnectionButtons
-                                connection={this.props.connection}
-                                open={this.buttonsVisible}
-                                x={middlePoint.x}
-                                y={middlePoint.y}
-                                onDelete={this.handleDeleteClick}
-                                onEdit={this.handleEditClick}
-                                onInspect={this.handleInspectClick}
-                            />
-                        )}
+                    {this.props.connection && middlePoint && !this.props.viewOnly && (
+                        <PlannerConnectionButtons
+                            connection={this.props.connection}
+                            open={this.buttonsVisible}
+                            x={middlePoint.x}
+                            y={middlePoint.y}
+                            onDelete={this.handleDeleteClick}
+                            onEdit={this.handleEditClick}
+                            onInspect={this.handleInspectClick}
+                        />
+                    )}
                 </g>
             </>
         );

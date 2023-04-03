@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-    toClass,
-    createHexagonPath,
-    Orientation,
-} from '@kapeta/ui-web-utils';
+import { toClass, createHexagonPath, Orientation } from '@kapeta/ui-web-utils';
 
 import { ResourceRole } from '@kapeta/ui-web-types';
 
@@ -23,18 +19,11 @@ interface PlannerResourceProps {
 }
 
 export const BlockResource = observer((props: PlannerResourceProps) => {
-    const nodeSize =
-        props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
+    const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const isSmall = nodeSize === PlannerNodeSize.SMALL;
     const consumer = props.role === ResourceRole.CONSUMES;
     const textX = consumer ? 12 : 20;
-    const hexagonPath = createHexagonPath(
-        props.width,
-        props.height,
-        2,
-        Orientation.HORIZONTAL,
-        7
-    );
+    const hexagonPath = createHexagonPath(props.width, props.height, 2, Orientation.HORIZONTAL, 7);
 
     const resourceClass = toClass({
         'block-resource': true,
@@ -51,12 +40,7 @@ export const BlockResource = observer((props: PlannerResourceProps) => {
     return (
         <g className={resourceClass}>
             <path className="block-resource-body" d={hexagonPath} />
-            <foreignObject
-                width={maxTextWidth}
-                className="block-resource-text"
-                y={padding}
-                x={textX}
-            >
+            <foreignObject width={maxTextWidth} className="block-resource-text" y={padding} x={textX}>
                 <span>{props.name}</span>
             </foreignObject>
 

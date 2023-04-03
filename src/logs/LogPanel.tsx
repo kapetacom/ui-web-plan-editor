@@ -80,9 +80,7 @@ export const LogPanel = (props: LogPanelProps) => {
 
                 return (
                     <div className={className} key={`log_entry_${ix}`}>
-                        <div className="date">
-                            {new Date(logEntry.time).toISOString()}
-                        </div>
+                        <div className="date">{new Date(logEntry.time).toISOString()}</div>
                         <div className="type">{logEntry.level}</div>
                         <div className="message">{logEntry.message.trim()}</div>
                     </div>

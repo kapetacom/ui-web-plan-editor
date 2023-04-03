@@ -28,10 +28,7 @@ export const StandAloneBlocks = () => {
         <Loader
             load={() =>
                 readPlan().then((plan) => (
-                    <div
-                        className="planner-canvas"
-                        style={{ width: '800px', height: '800px' }}
-                    >
+                    <div className="planner-canvas" style={{ width: '800px', height: '800px' }}>
                         <PlannerBlockNode
                             size={PlannerNodeSize.FULL}
                             zoom={1}
@@ -54,13 +51,7 @@ export const StandAloneBlocks = () => {
 export const PlannerEditor = () => {
     return (
         <DefaultContext>
-            <Loader
-                load={() =>
-                    readPlan().then((plan) => (
-                        <Planner systemId="my-system" plan={plan} />
-                    ))
-                }
-            />
+            <Loader load={() => readPlan().then((plan) => <Planner systemId="my-system" plan={plan} />)} />
         </DefaultContext>
     );
 };
@@ -105,15 +96,8 @@ export const BlockResourceProvider = () => {
                     resource.setMode(ResourceMode.SHOW_OPTIONS);
 
                     return (
-                        <svg
-                            width="800"
-                            height="1400"
-                            className="planner-canvas"
-                        >
-                            <PlannerBlockResourceListItem
-                                index={1}
-                                resource={resource}
-                            />
+                        <svg width="800" height="1400" className="planner-canvas">
+                            <PlannerBlockResourceListItem index={1} resource={resource} />
                         </svg>
                     );
                 })
@@ -132,16 +116,9 @@ export const BlockResourceConsumer = () => {
                     resource.setMode(ResourceMode.SHOW_OPTIONS);
 
                     return (
-                        <svg
-                            width="800"
-                            height="1400"
-                            className="planner-canvas"
-                        >
+                        <svg width="800" height="1400" className="planner-canvas">
                             <svg x={200} y={0} width={400} height={600}>
-                                <PlannerBlockResourceListItem
-                                    resource={resource}
-                                    index={1}
-                                />
+                                <PlannerBlockResourceListItem resource={resource} index={1} />
                             </svg>
                         </svg>
                     );

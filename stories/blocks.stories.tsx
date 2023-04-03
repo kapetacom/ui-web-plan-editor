@@ -1,18 +1,9 @@
 import React from 'react';
 
 import { InstanceStatus } from '@kapeta/ui-web-context';
-import {
-    BlockInstanceSpec,
-    BlockKind,
-    BlockReference,
-} from '@kapeta/ui-web-types';
+import { BlockInstanceSpec, BlockKind, BlockReference } from '@kapeta/ui-web-types';
 
-import {
-    PlannerBlockModelWrapper,
-    PlannerBlockNode,
-    PlannerModelWrapper,
-    PlannerNodeSize,
-} from '../src';
+import { PlannerBlockModelWrapper, PlannerBlockNode, PlannerModelWrapper, PlannerNodeSize } from '../src';
 
 const InvalidTargetRefDefinition: BlockKind = {
     kind: 'kapeta/block-type-service:1.2.3',
@@ -104,126 +95,56 @@ export default {
 };
 
 export const BlockInvalidInstanceReference = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        InvalidRefInstance,
-        InvalidTargetRefDefinition,
-        somePlan
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(InvalidRefInstance, InvalidTargetRefDefinition, somePlan);
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockNode
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                status={InstanceStatus.STOPPED}
-                block={block}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...block.errors].join('\n')}
-            </pre>
+            <PlannerBlockNode size={PlannerNodeSize.FULL} zoom={1} status={InstanceStatus.STOPPED} block={block} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...block.errors].join('\n')}</pre>
         </div>
     );
 };
 
 export const BlockMissingInstanceReference = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        MissingRefInstance,
-        InvalidTargetRefDefinition,
-        somePlan
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(MissingRefInstance, InvalidTargetRefDefinition, somePlan);
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockNode
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                status={InstanceStatus.STOPPED}
-                block={block}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...block.errors].join('\n')}
-            </pre>
+            <PlannerBlockNode size={PlannerNodeSize.FULL} zoom={1} status={InstanceStatus.STOPPED} block={block} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...block.errors].join('\n')}</pre>
         </div>
     );
 };
 
 export const BlockInvalidKindDefinition = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        ValidInstance,
-        InvalidKindDefinition,
-        somePlan
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(ValidInstance, InvalidKindDefinition, somePlan);
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockNode
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                status={InstanceStatus.STOPPED}
-                block={block}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...block.errors].join('\n')}
-            </pre>
+            <PlannerBlockNode size={PlannerNodeSize.FULL} zoom={1} status={InstanceStatus.STOPPED} block={block} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...block.errors].join('\n')}</pre>
         </div>
     );
 };
 
 export const BlockInvalidTargetRefDefinition = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        ValidInstance,
-        InvalidTargetRefDefinition,
-        somePlan
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(ValidInstance, InvalidTargetRefDefinition, somePlan);
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockNode
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                status={InstanceStatus.STOPPED}
-                block={block}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...block.errors].join('\n')}
-            </pre>
+            <PlannerBlockNode size={PlannerNodeSize.FULL} zoom={1} status={InstanceStatus.STOPPED} block={block} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...block.errors].join('\n')}</pre>
         </div>
     );
 };
 
 export const BlockMissingTargetRefDefinition = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper(
-        'test-plan',
-        'Some Plan'
-    );
-    const block = new PlannerBlockModelWrapper(
-        ValidInstance,
-        MissingTargetRefDefinition,
-        somePlan
-    );
+    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
+    const block = new PlannerBlockModelWrapper(ValidInstance, MissingTargetRefDefinition, somePlan);
     return (
         <div style={{ position: 'relative' }}>
-            <PlannerBlockNode
-                size={PlannerNodeSize.FULL}
-                zoom={1}
-                status={InstanceStatus.STOPPED}
-                block={block}
-            />
-            <pre style={{ left: 200, position: 'absolute' }}>
-                {['Errors:', ...block.errors].join('\n')}
-            </pre>
+            <PlannerBlockNode size={PlannerNodeSize.FULL} zoom={1} status={InstanceStatus.STOPPED} block={block} />
+            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...block.errors].join('\n')}</pre>
         </div>
     );
 };

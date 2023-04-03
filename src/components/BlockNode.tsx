@@ -1,9 +1,5 @@
 import React, { MouseEventHandler, useState } from 'react';
-import {
-    createHexagonPath,
-    Orientation,
-    toClass,
-} from '@kapeta/ui-web-utils';
+import { createHexagonPath, Orientation, toClass } from '@kapeta/ui-web-utils';
 import { SVGText, SVGAutoSizeText } from '@kapeta/ui-web-components';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 
@@ -53,13 +49,7 @@ export const BlockNode = (props: BlockNodeProps) => {
     const pointSize = props.pointSize ? props.pointSize : 30;
     const clipWidth = 4;
     const hexagonClipPath = `hex_clip${id}`;
-    const path = createHexagonPath(
-        props.width,
-        props.height,
-        5,
-        Orientation.VERTICAL,
-        pointSize
-    );
+    const path = createHexagonPath(props.width, props.height, 5, Orientation.VERTICAL, pointSize);
     const clipPath = createHexagonPath(
         props.width + clipWidth,
         props.height + clipWidth,
@@ -74,24 +64,12 @@ export const BlockNode = (props: BlockNodeProps) => {
                 <path x={20} d={clipPath} fill="transparent" />
             </clipPath>
 
-            <g
-                className={className}
-                clipPath={`url(#${hexagonClipPath})`}
-                x={props.position ? props.position.x : 50}
-            >
+            <g className={className} clipPath={`url(#${hexagonClipPath})`} x={props.position ? props.position.x : 50}>
                 <path className="block-body" ref={props.blockRef} d={path} />
-                <PlannerBlockWarningTag
-                    show={!props.valid}
-                    blockName={props.name}
-                />
+                <PlannerBlockWarningTag show={!props.valid} blockName={props.name} />
 
                 {props.status && (
-                    <circle
-                        className={`instance_${props.status}`}
-                        r={4}
-                        cx={props.width * 0.75}
-                        cy={pointSize + 10}
-                    />
+                    <circle className={`instance_${props.status}`} r={4} cx={props.width * 0.75} cy={pointSize + 10} />
                 )}
                 <SVGAutoSizeText
                     className="block-body-text instance-name"
@@ -102,9 +80,7 @@ export const BlockNode = (props: BlockNodeProps) => {
                     maxWidth={maxWidth}
                     maxChars={15}
                     maxLines={2}
-                    onChange={
-                        props.readOnly ? undefined : props.onInstanceNameChange
-                    }
+                    onChange={props.readOnly ? undefined : props.onInstanceNameChange}
                     value={props.instanceName}
                 />
 

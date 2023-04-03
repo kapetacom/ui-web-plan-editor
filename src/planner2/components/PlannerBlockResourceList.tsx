@@ -18,12 +18,9 @@ export interface PlannerBlockResourceListProps {
     actions: PlannerAction<any>[];
 }
 
-export const PlannerBlockResourceList: React.FC<
-    PlannerBlockResourceListProps
-> = (props) => {
+export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> = (props) => {
     const { nodeSize } = useContext(PlannerContext);
-    const { blockInstance, providers, consumers, blockMode } =
-        useBlockContext();
+    const { blockInstance, providers, consumers, blockMode } = useBlockContext();
     const { draggable } = useContext(DnDContext);
 
     const list = {
@@ -35,13 +32,10 @@ export const PlannerBlockResourceList: React.FC<
     const offsetX = 1;
     const placeholderWidth = 4;
     const placeholderX =
-        props.role === ResourceRole.PROVIDES
-            ? blockInstance.dimensions!.width + offsetX
-            : -placeholderWidth;
+        props.role === ResourceRole.PROVIDES ? blockInstance.dimensions!.width + offsetX : -placeholderWidth;
 
     // Enable SHOW mode if the whole block is in SHOW mode
-    const mode =
-        blockMode === BlockMode.SHOW ? ResourceMode.SHOW : ResourceMode.HIDDEN;
+    const mode = blockMode === BlockMode.SHOW ? ResourceMode.SHOW : ResourceMode.HIDDEN;
 
     const showPlaceholder = () => {
         const payload = draggable as PlannerPayload | null;
@@ -50,8 +44,7 @@ export const PlannerBlockResourceList: React.FC<
             payload.type === 'resource' &&
             // Role stuff seems a little repetitive
             payload.data.role === props.role &&
-            (blockMode === BlockMode.HOVER_DROP_CONSUMER ||
-                blockMode === BlockMode.HOVER_DROP_PROVIDER)
+            (blockMode === BlockMode.HOVER_DROP_CONSUMER || blockMode === BlockMode.HOVER_DROP_PROVIDER)
         );
     };
 
@@ -64,19 +57,11 @@ export const PlannerBlockResourceList: React.FC<
     // Offset for the top of the hexagon, plus centering if there is only 1
     const hexagonTopHeight = 35 + 2;
     const resourceCount = list.length + (showPlaceholder() ? 1 : 0);
-    const yPosition =
-        resourceCount === 1
-            ? hexagonTopHeight + resourceHeight[nodeSize] / 2
-            : hexagonTopHeight;
+    const yPosition = resourceCount === 1 ? hexagonTopHeight + resourceHeight[nodeSize] / 2 : hexagonTopHeight;
     const placeholderHeight = list.length * resourceHeight[nodeSize];
 
     return (
-        <SVGLayoutNode
-            className={plannerResourceListClass}
-            overflow="visible"
-            x={0}
-            y={yPosition}
-        >
+        <SVGLayoutNode className={plannerResourceListClass} overflow="visible" x={0} y={yPosition}>
             {list.map((resource, index: number) => {
                 return (
                     <PlannerBlockResourceListItem
@@ -97,15 +82,8 @@ export const PlannerBlockResourceList: React.FC<
             })}
 
             {/* Blinking "ghost" target when we're about to create a new connection */}
-            <svg
-                className="resource-placeholder"
-                x={placeholderX}
-                y={placeholderHeight}
-            >
-                <rect
-                    height={resourceHeight[nodeSize] - 4}
-                    width={placeholderWidth - offsetX}
-                />
+            <svg className="resource-placeholder" x={placeholderX} y={placeholderHeight}>
+                <rect height={resourceHeight[nodeSize] - 4} width={placeholderWidth - offsetX} />
             </svg>
         </SVGLayoutNode>
     );

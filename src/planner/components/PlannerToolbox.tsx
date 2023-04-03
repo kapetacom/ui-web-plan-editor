@@ -1,19 +1,10 @@
 import React, { ComponentType } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
-import {
-    SidePanel,
-    PanelAlignment,
-    PanelSize,
-    DnDDrag,
-} from '@kapeta/ui-web-components';
+import { SidePanel, PanelAlignment, PanelSize, DnDDrag } from '@kapeta/ui-web-components';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { ResourceConfig, ResourceRole } from '@kapeta/ui-web-types';
-import {
-    toClass,
-    SVGCornersHelper,
-    ResourceTagSide,
-} from '@kapeta/ui-web-utils';
+import { toClass, SVGCornersHelper, ResourceTagSide } from '@kapeta/ui-web-utils';
 
 import { PlannerToolboxResource } from './PlannerToolboxResource';
 
@@ -45,10 +36,7 @@ interface PlannerToolboxState {
     blockStoreVisible: boolean;
 }
 
-export class PlannerToolbox extends React.Component<
-    PlannerToolboxProps,
-    PlannerToolboxState
-> {
+export class PlannerToolbox extends React.Component<PlannerToolboxProps, PlannerToolboxState> {
     private toolSections: ToolSection<any>[] = [];
     private resourceTagHeight = 45;
     private resourceTagWidth = 128;
@@ -78,19 +66,14 @@ export class PlannerToolbox extends React.Component<
             painter: PlannerToolboxResource,
         };
 
-        ResourceTypeProvider.list().forEach(
-            (resourceConfig: ResourceConfig) => {
-                const section =
-                    resourceConfig.role === ResourceRole.PROVIDES
-                        ? providerSection
-                        : consumerSection;
-                section.items.push({
-                    title: resourceConfig.title || resourceConfig.kind,
-                    kind: resourceConfig.kind,
-                    data: resourceConfig,
-                });
-            }
-        );
+        ResourceTypeProvider.list().forEach((resourceConfig: ResourceConfig) => {
+            const section = resourceConfig.role === ResourceRole.PROVIDES ? providerSection : consumerSection;
+            section.items.push({
+                title: resourceConfig.title || resourceConfig.kind,
+                kind: resourceConfig.kind,
+                data: resourceConfig,
+            });
+        });
 
         this.toolSections.push(providerSection);
         this.toolSections.push(consumerSection);
@@ -118,11 +101,7 @@ export class PlannerToolbox extends React.Component<
                 open={this.props.open}
                 modal={false}
             >
-                <Tabs
-                    className="toolbox-tabs"
-                    defaultIndex={0}
-                    forceRenderTabPanel
-                >
+                <Tabs className="toolbox-tabs" defaultIndex={0} forceRenderTabPanel>
                     <TabList>
                         {this.props.blockStore && (
                             <>
@@ -177,82 +156,48 @@ export class PlannerToolbox extends React.Component<
                             </div>
                             <div className="resource-listing">
                                 {this.toolSections
-                                    .filter(
-                                        (section) =>
-                                            section.name.toLowerCase() ===
-                                            'consumers'
-                                    )[0]
-                                    .items.map(
-                                        (
-                                            item: ToolItem<any>,
-                                            index: number
-                                        ) => {
-                                            return (
-                                                <DnDDrag
-                                                    type="tool"
-                                                    value={item.data}
-                                                    key={index}
-                                                >
-                                                    <div
-                                                        className={this.getResourceTagClasses(
-                                                            item,
-                                                            true
-                                                        )}
+                                    .filter((section) => section.name.toLowerCase() === 'consumers')[0]
+                                    .items.map((item: ToolItem<any>, index: number) => {
+                                        return (
+                                            <DnDDrag type="tool" value={item.data} key={index}>
+                                                <div className={this.getResourceTagClasses(item, true)}>
+                                                    <svg
+                                                        className="item"
+                                                        width={this.resourceTagWidth}
+                                                        height={this.resourceTagHeight}
+                                                        viewBox={`0 0 ${this.resourceTagWidth} ${this.resourceTagHeight}`}
                                                     >
-                                                        <svg
-                                                            className="item"
-                                                            width={
-                                                                this
-                                                                    .resourceTagWidth
-                                                            }
-                                                            height={
-                                                                this
-                                                                    .resourceTagHeight
-                                                            }
-                                                            viewBox={`0 0 ${this.resourceTagWidth} ${this.resourceTagHeight}`}
+                                                        <path
+                                                            d={SVGCornersHelper.getResourceTagPath(
+                                                                this.resourceTagHeight,
+                                                                this.resourceTagWidth,
+                                                                this.resourceTagRadius,
+                                                                ResourceTagSide.LEFT,
+                                                                this.resourceTagAnglePercent
+                                                            )}
+                                                        />
+                                                        <text
+                                                            className="resource-title"
+                                                            textAnchor="start"
+                                                            x="20"
+                                                            y="20"
                                                         >
-                                                            <path
-                                                                d={SVGCornersHelper.getResourceTagPath(
-                                                                    this
-                                                                        .resourceTagHeight,
-                                                                    this
-                                                                        .resourceTagWidth,
-                                                                    this
-                                                                        .resourceTagRadius,
-                                                                    ResourceTagSide.LEFT,
-                                                                    this
-                                                                        .resourceTagAnglePercent
-                                                                )}
-                                                            />
-                                                            <text
-                                                                className="resource-title"
-                                                                textAnchor="start"
-                                                                x="20"
-                                                                y="20"
-                                                            >
-                                                                {item.title}
-                                                            </text>
-                                                            <text
-                                                                className="resource-type"
-                                                                textAnchor="start"
-                                                                x="20"
-                                                                y="35"
-                                                            >
-                                                                {item.data.type.charAt(
-                                                                    0
-                                                                ) +
-                                                                    item.data.type
-                                                                        .toLowerCase()
-                                                                        .substring(
-                                                                            1
-                                                                        )}
-                                                            </text>
-                                                        </svg>
-                                                    </div>
-                                                </DnDDrag>
-                                            );
-                                        }
-                                    )}
+                                                            {item.title}
+                                                        </text>
+                                                        <text
+                                                            className="resource-type"
+                                                            textAnchor="start"
+                                                            x="20"
+                                                            y="35"
+                                                        >
+                                                            {item.data.type.charAt(0) +
+                                                                item.data.type.toLowerCase().substring(1)}
+                                                        </text>
+                                                    </svg>
+                                                </div>
+                                            </DnDDrag>
+                                        );
+                                    })}
                             </div>
                         </div>
                         <div className="provider-resources-title resource-section">
@@ -272,11 +217,7 @@ export class PlannerToolbox extends React.Component<
                                             fill="#F9DFDD"
                                             fillOpacity="0.87"
                                         />
-                                        <rect
-                                            width="6.66667"
-                                            height="6.66667"
-                                            fill="#F9DFDD"
-                                        />
+                                        <rect width="6.66667" height="6.66667" fill="#F9DFDD" />
                                         <rect
                                             x="8.33325"
                                             y="8.33333"
@@ -301,80 +242,47 @@ export class PlannerToolbox extends React.Component<
                             </div>
                             <div className="resource-listing">
                                 {this.toolSections
-                                    .filter(
-                                        (section) =>
-                                            section.name.toLowerCase() ===
-                                            'providers'
-                                    )[0]
-                                    .items.map(
-                                        (
-                                            item: ToolItem<any>,
-                                            index: number
-                                        ) => {
-                                            return (
-                                                <DnDDrag
-                                                    type="tool"
-                                                    value={item.data}
-                                                    key={index}
-                                                >
-                                                    <div
-                                                        className={this.getResourceTagClasses(
-                                                            item,
-                                                            true
-                                                        )}
+                                    .filter((section) => section.name.toLowerCase() === 'providers')[0]
+                                    .items.map((item: ToolItem<any>, index: number) => {
+                                        return (
+                                            <DnDDrag type="tool" value={item.data} key={index}>
+                                                <div className={this.getResourceTagClasses(item, true)}>
+                                                    <svg
+                                                        className="item"
+                                                        width={this.resourceTagWidth}
+                                                        height={this.resourceTagHeight}
+                                                        viewBox={`0 0 ${this.resourceTagWidth} ${this.resourceTagHeight}`}
                                                     >
-                                                        <svg
-                                                            className="item"
-                                                            width={
-                                                                this
-                                                                    .resourceTagWidth
-                                                            }
-                                                            height={
-                                                                this
-                                                                    .resourceTagHeight
-                                                            }
-                                                            viewBox={`0 0 ${this.resourceTagWidth} ${this.resourceTagHeight}`}
+                                                        <path
+                                                            d={SVGCornersHelper.getResourceTag3_25(
+                                                                this.resourceTagWidth,
+                                                                this.resourceTagRadius,
+                                                                ResourceTagSide.RIGHT,
+                                                                this.resourceTagAnglePercent
+                                                            )}
+                                                        />
+                                                        <text
+                                                            className="resource-title"
+                                                            textAnchor="start"
+                                                            x="10"
+                                                            y="18"
                                                         >
-                                                            <path
-                                                                d={SVGCornersHelper.getResourceTag3_25(
-                                                                    this
-                                                                        .resourceTagWidth,
-                                                                    this
-                                                                        .resourceTagRadius,
-                                                                    ResourceTagSide.RIGHT,
-                                                                    this
-                                                                        .resourceTagAnglePercent
-                                                                )}
-                                                            />
-                                                            <text
-                                                                className="resource-title"
-                                                                textAnchor="start"
-                                                                x="10"
-                                                                y="18"
-                                                            >
-                                                                {item.title}
-                                                            </text>
-                                                            <text
-                                                                className="resource-type"
-                                                                textAnchor="start"
-                                                                x="10"
-                                                                y="35"
-                                                            >
-                                                                {item.data.type.charAt(
-                                                                    0
-                                                                ) +
-                                                                    item.data.type
-                                                                        .toLowerCase()
-                                                                        .substring(
-                                                                            1
-                                                                        )}
-                                                            </text>
-                                                        </svg>
-                                                    </div>
-                                                </DnDDrag>
-                                            );
-                                        }
-                                    )}
+                                                            {item.title}
+                                                        </text>
+                                                        <text
+                                                            className="resource-type"
+                                                            textAnchor="start"
+                                                            x="10"
+                                                            y="35"
+                                                        >
+                                                            {item.data.type.charAt(0) +
+                                                                item.data.type.toLowerCase().substring(1)}
+                                                        </text>
+                                                    </svg>
+                                                </div>
+                                            </DnDDrag>
+                                        );
+                                    })}
                             </div>
                         </div>
                     </TabPanel>

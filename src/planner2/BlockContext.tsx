@@ -1,9 +1,5 @@
 import React, { useContext, useMemo, useState } from 'react';
-import {
-    BlockInstanceSpec,
-    BlockKind,
-    ResourceKind,
-} from '@kapeta/ui-web-types';
+import { BlockInstanceSpec, BlockKind, ResourceKind } from '@kapeta/ui-web-types';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerContext, PlannerMode } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
@@ -41,42 +37,23 @@ export const BlockContext = React.createContext(defaultValue);
 interface BlockProviderProps extends React.PropsWithChildren {
     blockId: string;
 }
-export const BlockContextProvider: React.FC<BlockProviderProps> = ({
-    blockId,
-    children,
-}) => {
-    const {
-        plan,
-        nodeSize,
-        getBlockByRef,
-        mode: plannerMode,
-    } = useContext(PlannerContext);
+export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, children }) => {
+    const { plan, nodeSize, getBlockByRef, mode: plannerMode } = useContext(PlannerContext);
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
 
-    const blockInstance =
-        plan?.spec.blocks?.find((block) => block.id === blockId) || null;
-    const blockDefinition =
-        getBlockByRef(blockInstance?.block.ref || '') || null;
+    const blockInstance = plan?.spec.blocks?.find((block) => block.id === blockId) || null;
+    const blockDefinition = getBlockByRef(blockInstance?.block.ref || '') || null;
 
     const value = useMemo(() => {
         // calculate Resource height
         const consumers = blockDefinition?.spec.consumers || [];
         const providers = blockDefinition?.spec.providers || [];
 
-        const pendingConsumers =
-            blockMode === BlockMode.HOVER_DROP_CONSUMER ? 1 : 0;
-        const pendingProviders =
-            blockMode === BlockMode.HOVER_DROP_PROVIDER ? 1 : 0;
-        const resourceCount = Math.max(
-            consumers.length + pendingConsumers,
-            providers.length + pendingProviders
-        );
-        const instanceBlockHeight = getBlockHeightByResourceCount(
-            resourceCount,
-            nodeSize
-        );
-        const blockReference =
-            blockInstance && parseKapetaUri(blockInstance?.block.ref);
+        const pendingConsumers = blockMode === BlockMode.HOVER_DROP_CONSUMER ? 1 : 0;
+        const pendingProviders = blockMode === BlockMode.HOVER_DROP_PROVIDER ? 1 : 0;
+        const resourceCount = Math.max(consumers.length + pendingConsumers, providers.length + pendingProviders);
+        const instanceBlockHeight = getBlockHeightByResourceCount(resourceCount, nodeSize);
+        const blockReference = blockInstance && parseKapetaUri(blockInstance?.block.ref);
 
         return {
             blockInstance,
@@ -87,21 +64,10 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({
             instanceBlockHeight,
             blockMode,
             setBlockMode,
-            isReadOnly:
-                blockReference?.version !== 'local' ||
-                plannerMode === PlannerMode.VIEW,
+            isReadOnly: blockReference?.version !== 'local' || plannerMode === PlannerMode.VIEW,
         };
-    }, [
-        nodeSize,
-        blockInstance,
-        blockDefinition,
-        blockMode,
-        setBlockMode,
-        plannerMode,
-    ]);
-    return (
-        <BlockContext.Provider value={value}>{children}</BlockContext.Provider>
-    );
+    }, [nodeSize, blockInstance, blockDefinition, blockMode, setBlockMode, plannerMode]);
+    return <BlockContext.Provider value={value}>{children}</BlockContext.Provider>;
 };
 
 // TODO: theres got to be a better way to do this (non-null a field)

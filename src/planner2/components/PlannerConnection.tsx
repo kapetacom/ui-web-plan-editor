@@ -1,11 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { PlannerContext } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
-import {
-    calculatePathBetweenPoints,
-    getCurveMainPoints,
-    getMiddlePoint,
-} from '../utils/connectionUtils';
+import { calculatePathBetweenPoints, getCurveMainPoints, getMiddlePoint } from '../utils/connectionUtils';
 import { BlockConnectionSpec, ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { getResourceId } from '../utils/planUtils';
@@ -25,14 +21,8 @@ export const PlannerConnection: React.FC<{
     const planner = useContext(PlannerContext);
     const [hasFocus, setHasFocus] = useState(false);
 
-    const fromId = getResourceId(
-        props.connection.from.blockId,
-        props.connection.from.resourceName
-    );
-    const toId = getResourceId(
-        props.connection.to.blockId,
-        props.connection.to.resourceName
-    );
+    const fromId = getResourceId(props.connection.from.blockId, props.connection.from.resourceName);
+    const toId = getResourceId(props.connection.to.blockId, props.connection.to.resourceName);
     const from = planner.connectionPoints.getPointById(fromId);
     const to = planner.connectionPoints.getPointById(toId);
 
@@ -51,28 +41,15 @@ export const PlannerConnection: React.FC<{
         props.connection.to.resourceName,
         ResourceRole.CONSUMES
     );
-    const fromEntities =
-        planner.getBlockById(props.connection.from.blockId)?.spec.entities
-            ?.types || [];
-    const toEntities =
-        planner.getBlockById(props.connection.to.blockId)?.spec.entities
-            ?.types || [];
+    const fromEntities = planner.getBlockById(props.connection.from.blockId)?.spec.entities?.types || [];
+    const toEntities = planner.getBlockById(props.connection.to.blockId)?.spec.entities?.types || [];
 
     let connectionValid = true;
     if (fromResource && toResource) {
-        const converter = ResourceTypeProvider.getConverterFor(
-            fromResource.kind,
-            toResource.kind
-        );
+        const converter = ResourceTypeProvider.getConverterFor(fromResource.kind, toResource.kind);
         if (converter) {
             const errors = converter.validateMapping
-                ? converter.validateMapping(
-                      props.connection,
-                      fromResource,
-                      toResource,
-                      fromEntities,
-                      toEntities
-                  )
+                ? converter.validateMapping(props.connection, fromResource, toResource, fromEntities, toEntities)
                 : [];
             connectionValid = errors.length === 0;
         }
@@ -96,11 +73,7 @@ export const PlannerConnection: React.FC<{
 
     return (
         <svg style={{ position: 'absolute', zIndex: -1 }}>
-            <g
-                className={className.trim()}
-                onMouseOver={() => setHasFocus(true)}
-                onMouseOut={() => setHasFocus(false)}
-            >
+            <g className={className.trim()} onMouseOver={() => setHasFocus(true)} onMouseOut={() => setHasFocus(false)}>
                 <path className="background" d={path} />
                 <path className="line" d={path} />
 

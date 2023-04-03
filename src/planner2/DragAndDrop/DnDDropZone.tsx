@@ -40,19 +40,9 @@ interface DropZoneProps<T> {
 
 export const DnDDropZone: <T>(
     props: DropZoneProps<T> & {
-        children: (props: {
-            onRef: (elm: Element | null) => void;
-        }) => JSX.Element;
+        children: (props: { onRef: (elm: Element | null) => void }) => JSX.Element;
     }
-) => JSX.Element = ({
-    scale = 1,
-    accept,
-    onDrop,
-    onDragOver,
-    onDragLeave,
-    onDragEnter,
-    children,
-}) => {
+) => JSX.Element = ({ scale = 1, accept, onDrop, onDragOver, onDragLeave, onDragEnter, children }) => {
     const id = useMemo(() => crypto.randomUUID(), []);
     const { callbacks } = useContext(DnDContext);
     const [element, setElement] = useState<HTMLElement | null>(null);

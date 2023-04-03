@@ -13,10 +13,7 @@ import type {
     SchemaEntity,
     Size,
 } from '@kapeta/ui-web-types';
-import {
-    isSchemaEntityCompatible,
-    ResourceRole,
-} from '@kapeta/ui-web-types';
+import { isSchemaEntityCompatible, ResourceRole } from '@kapeta/ui-web-types';
 import { parseKapetaUri, KapetaURI } from '@kapeta/nodejs-utils';
 
 import { BlockService, BlockTypeProvider } from '@kapeta/ui-web-context';
@@ -26,11 +23,7 @@ import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
 import { PlannerModelWrapper } from './PlannerModelWrapper';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
-import {
-    DSL_LANGUAGE_ID,
-    DSLConverters,
-    DSLWriter,
-} from '@kapeta/ui-web-components';
+import { DSL_LANGUAGE_ID, DSLConverters, DSLWriter } from '@kapeta/ui-web-components';
 
 type HeightCache = { [size: number]: number };
 
@@ -86,11 +79,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     @observable
     errors: string[] = [];
 
-    constructor(
-        blockInstance: BlockInstanceSpec,
-        blockDefinition: BlockKind,
-        plan: PlannerModelWrapper
-    ) {
+    constructor(blockInstance: BlockInstanceSpec, blockDefinition: BlockKind, plan: PlannerModelWrapper) {
         this.instanceId = crypto.randomUUID();
 
         this.id = blockInstance.id;
@@ -102,8 +91,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         this.setData(blockDefinition);
 
-        this.name =
-            blockInstance.name || blockDefinition?.metadata?.title || '';
+        this.name = blockInstance.name || blockDefinition?.metadata?.title || '';
 
         this.blockReference = blockInstance.block;
         try {
@@ -139,9 +127,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     get version() {
-        return this.blockReferenceUri
-            ? this.blockReferenceUri.version
-            : 'unknown';
+        return this.blockReferenceUri ? this.blockReferenceUri.version : 'unknown';
     }
 
     get readonly() {
@@ -211,9 +197,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         }
 
         this.data.spec.entities.types = toJS(entities);
-        this.data.spec.entities.source.value = DSLWriter.write(
-            entities.map(DSLConverters.fromSchemaEntity)
-        );
+        this.data.spec.entities.source.value = DSLWriter.write(entities.map(DSLConverters.fromSchemaEntity));
     }
 
     @observable
@@ -251,19 +235,14 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @action
-    private updateResources(
-        role: ResourceRole,
-        resources: ResourceKind[]
-    ): void {
-        const wrappers =
-            role === ResourceRole.CONSUMES ? this.consumes : this.provides;
+    private updateResources(role: ResourceRole, resources: ResourceKind[]): void {
+        const wrappers = role === ResourceRole.CONSUMES ? this.consumes : this.provides;
 
         // Get rid of wrappers for resources that no longer exist
         wrappers
             .filter((wrapper) => {
                 return !resources.some((resource) => {
-                    const id =
-                        PlannerResourceModelWrapper.getResourceID(resource);
+                    const id = PlannerResourceModelWrapper.getResourceID(resource);
                     return id === wrapper.id;
                 });
             })
@@ -301,25 +280,21 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         const consumerBlocks: PlannerBlockModelWrapper[] = []; // blocks to the right
         const providerBlocks: PlannerBlockModelWrapper[] = []; // blocks to the left
         this.provides.forEach((resource: PlannerResourceModelWrapper) => {
-            this.plan
-                .getConnectionsFor(resource)
-                .forEach((connection: PlannerConnectionModelWrapper) => {
-                    if (!consumerBlocks[resource.id]) {
-                        consumerBlocks[resource.id] = [];
-                    }
-                    consumerBlocks.push(connection.toResource.block);
-                });
+            this.plan.getConnectionsFor(resource).forEach((connection: PlannerConnectionModelWrapper) => {
+                if (!consumerBlocks[resource.id]) {
+                    consumerBlocks[resource.id] = [];
+                }
+                consumerBlocks.push(connection.toResource.block);
+            });
         });
 
         this.consumes.forEach((resource: PlannerResourceModelWrapper) => {
-            this.plan
-                .getConnectionsFor(resource)
-                .forEach((connection: PlannerConnectionModelWrapper) => {
-                    if (!providerBlocks[resource.id]) {
-                        providerBlocks[resource.id] = [];
-                    }
-                    providerBlocks.push(connection.fromResource.block);
-                });
+            this.plan.getConnectionsFor(resource).forEach((connection: PlannerConnectionModelWrapper) => {
+                if (!providerBlocks[resource.id]) {
+                    providerBlocks[resource.id] = [];
+                }
+                providerBlocks.push(connection.fromResource.block);
+            });
         });
 
         return {
@@ -336,17 +311,13 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         const connectedBlocks = this.getConnectedBlocks();
 
         if (type === ResourceRole.CONSUMES) {
-            connectedBlocks.consumingBlocks.forEach(
-                (block: PlannerBlockModelWrapper) => {
-                    blocksToMeasure.push(block);
-                }
-            );
+            connectedBlocks.consumingBlocks.forEach((block: PlannerBlockModelWrapper) => {
+                blocksToMeasure.push(block);
+            });
         } else {
-            connectedBlocks.providingBlocks.forEach(
-                (block: PlannerBlockModelWrapper) => {
-                    blocksToMeasure.push(block);
-                }
-            );
+            connectedBlocks.providingBlocks.forEach((block: PlannerBlockModelWrapper) => {
+                blocksToMeasure.push(block);
+            });
         }
         blocksToMeasure.forEach((block: PlannerBlockModelWrapper) => {
             totalHeight += block.calculateHeight(size);
@@ -357,30 +328,19 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     getMaxConnectedBlocksTotalHeight(size: PlannerNodeSize) {
         let totalProviderHeight = 0;
         let totalConsumerHeight = 0;
-        totalConsumerHeight = this.getConnectedBlocksTotalHeight(
-            ResourceRole.CONSUMES,
-            size
-        );
-        totalProviderHeight = this.getConnectedBlocksTotalHeight(
-            ResourceRole.PROVIDES,
-            size
-        );
+        totalConsumerHeight = this.getConnectedBlocksTotalHeight(ResourceRole.CONSUMES, size);
+        totalProviderHeight = this.getConnectedBlocksTotalHeight(ResourceRole.PROVIDES, size);
         return Math.max(totalConsumerHeight, totalProviderHeight);
     }
 
-    private createResourceWrapper(
-        offset: number,
-        role: ResourceRole,
-        resource: ResourceKind
-    ) {
+    private createResourceWrapper(offset: number, role: ResourceRole, resource: ResourceKind) {
         return new PlannerResourceModelWrapper(role, resource, this);
     }
 
     @observable
     calculateOffsetTop(size: PlannerNodeSize, role: ResourceRole) {
         const height = this.calculateHeight(size);
-        const resourceHeight =
-            this.getResourceLength(role) * this.getResourceHeight(size);
+        const resourceHeight = this.getResourceLength(role) * this.getResourceHeight(size);
         return (height - resourceHeight) / 2 + 2;
     }
 
@@ -395,10 +355,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
         const resourceCount = Math.max(consumesCount, providesCount);
 
-        this.heightCache[size] = Math.max(
-            150,
-            70 + resourceCount * this.getResourceHeight(size)
-        );
+        this.heightCache[size] = Math.max(150, 70 + resourceCount * this.getResourceHeight(size));
 
         return this.heightCache[size];
     }
@@ -554,17 +511,11 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     @observable
     getResourceLength(role: ResourceRole) {
         let length = this.getResources(role).length;
-        if (
-            role === ResourceRole.CONSUMES &&
-            this.mode === BlockMode.HOVER_DROP_CONSUMER
-        ) {
+        if (role === ResourceRole.CONSUMES && this.mode === BlockMode.HOVER_DROP_CONSUMER) {
             length++;
         }
 
-        if (
-            role === ResourceRole.PROVIDES &&
-            this.mode === BlockMode.HOVER_DROP_PROVIDER
-        ) {
+        if (role === ResourceRole.PROVIDES && this.mode === BlockMode.HOVER_DROP_PROVIDER) {
             length++;
         }
 
@@ -598,22 +549,11 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @observable
-    getMatchingEntity(
-        entity: SchemaEntity,
-        sourceEntities: SchemaEntity[]
-    ): SchemaEntity | undefined {
+    getMatchingEntity(entity: SchemaEntity, sourceEntities: SchemaEntity[]): SchemaEntity | undefined {
         const namedEntity = this.getEntityByName(entity.name);
         let matchedEntity;
 
-        if (
-            namedEntity &&
-            isSchemaEntityCompatible(
-                entity,
-                namedEntity,
-                sourceEntities,
-                this.getEntities()
-            )
-        ) {
+        if (namedEntity && isSchemaEntityCompatible(entity, namedEntity, sourceEntities, this.getEntities())) {
             matchedEntity = namedEntity;
         }
 
@@ -621,22 +561,11 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @observable
-    public getConflictingEntity(
-        entity: SchemaEntity,
-        sourceEntities: SchemaEntity[]
-    ): SchemaEntity | undefined {
+    public getConflictingEntity(entity: SchemaEntity, sourceEntities: SchemaEntity[]): SchemaEntity | undefined {
         const namedEntity = this.getEntityByName(entity.name);
         let conflictingEntity;
 
-        if (
-            namedEntity &&
-            isSchemaEntityCompatible(
-                entity,
-                namedEntity,
-                sourceEntities,
-                this.getEntities()
-            )
-        ) {
+        if (namedEntity && isSchemaEntityCompatible(entity, namedEntity, sourceEntities, this.getEntities())) {
             conflictingEntity = namedEntity;
         }
 
@@ -660,11 +589,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
                 types: this.data.spec.entities,
                 source: {
                     type: DSL_LANGUAGE_ID,
-                    value: DSLWriter.write(
-                        this.data.spec.entities.map(
-                            DSLConverters.fromSchemaEntity
-                        )
-                    ),
+                    value: DSLWriter.write(this.data.spec.entities.map(DSLConverters.fromSchemaEntity)),
                 },
             };
         }
@@ -739,9 +664,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
 
                     this.errors.push(...typeErrors);
                 } catch (e) {
-                    this.errors.push(
-                        `Kind-specific validation failed: ${e.message}`
-                    );
+                    this.errors.push(`Kind-specific validation failed: ${e.message}`);
                 }
             }
         } catch (e) {

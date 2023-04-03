@@ -5,12 +5,7 @@ import type { SelectedResourceItem } from './models';
 import { PlannerBlockModelWrapper } from './PlannerBlockModelWrapper';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
-import {
-    Dimensions,
-    PLAN_KIND,
-    PlanKind,
-    ResourceRole,
-} from '@kapeta/ui-web-types';
+import { Dimensions, PLAN_KIND, PlanKind, ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
 
@@ -105,10 +100,7 @@ export class PlannerModelWrapper {
     }
 
     isReadOnly() {
-        return (
-            this.mode === PlannerMode.VIEW ||
-            this.mode === PlannerMode.CONFIGURATION
-        );
+        return this.mode === PlannerMode.VIEW || this.mode === PlannerMode.CONFIGURATION;
     }
 
     isConfiguring() {
@@ -162,10 +154,7 @@ export class PlannerModelWrapper {
     }
 
     @action
-    setSelectedResources(
-        resource?: PlannerResourceModelWrapper,
-        original?: PlannerResourceModelWrapper
-    ) {
+    setSelectedResources(resource?: PlannerResourceModelWrapper, original?: PlannerResourceModelWrapper) {
         if (original && resource) {
             this.dragging = true;
             this.selectedResource = { original, resource };
@@ -194,10 +183,7 @@ export class PlannerModelWrapper {
     @action
     removeConnectionByResourceId(resourceId: string) {
         _.remove(this.connections, (connection) => {
-            return (
-                connection.from.resourceName === resourceId ||
-                connection.to.resourceName === resourceId
-            );
+            return connection.from.resourceName === resourceId || connection.to.resourceName === resourceId;
         });
 
         this.validate();
@@ -206,10 +192,7 @@ export class PlannerModelWrapper {
     @action
     removeConnectionByBlockId(blockId: string) {
         _.remove(this.connections, (connection) => {
-            return (
-                connection.from.blockId === blockId ||
-                connection.to.blockId === blockId
-            );
+            return connection.from.blockId === blockId || connection.to.blockId === blockId;
         });
 
         this.validate();
@@ -220,9 +203,7 @@ export class PlannerModelWrapper {
         if (this.connections.indexOf(newConnection) > -1) {
             // force connections to update to trigger the plan observer
             this.connections = this.connections.map((existingConnection) => {
-                return existingConnection.id === newConnection.id
-                    ? newConnection
-                    : existingConnection;
+                return existingConnection.id === newConnection.id ? newConnection : existingConnection;
             });
         } else {
             this.connections = [...this.connections, newConnection];
@@ -254,10 +235,7 @@ export class PlannerModelWrapper {
     }
 
     @action
-    copyResourceToBlock(
-        targetBlockId: string,
-        fromResource: PlannerResourceModelWrapper
-    ) {
+    copyResourceToBlock(targetBlockId: string, fromResource: PlannerResourceModelWrapper) {
         const toBlock = this.findBlockById(targetBlockId);
 
         if (!toBlock) {
@@ -278,14 +256,10 @@ export class PlannerModelWrapper {
         const fromEntities = fromBlock.getEntities();
 
         // Get entities in use by resource being copied
-        const entityNames = ResourceTypeProvider.resolveEntities(
-            fromResource.getData()
-        );
+        const entityNames = ResourceTypeProvider.resolveEntities(fromResource.getData());
 
         // Convert resource to consumable resource
-        const data = ResourceTypeProvider.convertToConsumable(
-            fromResource.getData()
-        );
+        const data = ResourceTypeProvider.convertToConsumable(fromResource.getData());
 
         entityNames.forEach((entityName) => {
             const entity = fromBlock.getEntityByName(entityName);
@@ -294,10 +268,7 @@ export class PlannerModelWrapper {
             }
 
             // See if target block already has an entity that is identical to this one
-            const existingEntity = toBlock.getMatchingEntity(
-                entity,
-                fromEntities
-            );
+            const existingEntity = toBlock.getMatchingEntity(entity, fromEntities);
             if (existingEntity) {
                 // If already there no need to do anything
                 return;
@@ -308,10 +279,7 @@ export class PlannerModelWrapper {
             const originalName = entity.name;
             do {
                 // Check if an entity exists of the same name - but different properties
-                conflictingEntity = toBlock.getConflictingEntity(
-                    entity,
-                    fromEntities
-                );
+                conflictingEntity = toBlock.getConflictingEntity(entity, fromEntities);
 
                 if (conflictingEntity) {
                     // We need to rename the new entity and all references to it to be able to add it to the target block.
@@ -322,11 +290,7 @@ export class PlannerModelWrapper {
 
             if (entity.name !== originalName) {
                 // We need to change our references
-                ResourceTypeProvider.renameEntityReferences(
-                    data,
-                    originalName,
-                    entity.name
-                );
+                ResourceTypeProvider.renameEntityReferences(data, originalName, entity.name);
             }
 
             toBlock.addEntity(entity);
@@ -334,21 +298,11 @@ export class PlannerModelWrapper {
 
         data.metadata.name = resourceName;
 
-        const toResource = new PlannerResourceModelWrapper(
-            ResourceRole.CONSUMES,
-            data,
-            toBlock
-        );
+        const toResource = new PlannerResourceModelWrapper(ResourceRole.CONSUMES, data, toBlock);
         toBlock.addResource(toResource);
-        const connection = PlannerConnectionModelWrapper.createFromResources(
-            fromResource,
-            toResource
-        );
+        const connection = PlannerConnectionModelWrapper.createFromResources(fromResource, toResource);
 
-        const converter = ResourceTypeProvider.getConverterFor(
-            fromResource.getKind(),
-            toResource.getKind()
-        );
+        const converter = ResourceTypeProvider.getConverterFor(fromResource.getKind(), toResource.getKind());
         if (converter && converter.createMapping) {
             const mapping = converter.createMapping(
                 fromResource.getData(),
@@ -392,10 +346,7 @@ export class PlannerModelWrapper {
         const oldSize = this.blocks.length;
 
         _.remove(this.connections, (connection) => {
-            return (
-                connection.from.blockId === block.id ||
-                connection.to.blockId === block.id
-            );
+            return connection.from.blockId === block.id || connection.to.blockId === block.id;
         });
 
         _.pull(this.blocks, block);
@@ -447,10 +398,7 @@ export class PlannerModelWrapper {
         return true;
     }
 
-    calculateCanvasSize = (
-        size: PlannerNodeSize,
-        containerSize: { width: number; height: number }
-    ) => {
+    calculateCanvasSize = (size: PlannerNodeSize, containerSize: { width: number; height: number }) => {
         let maxWidth = 50;
         let maxHeight = 50;
         let minX = 0;
@@ -480,24 +428,16 @@ export class PlannerModelWrapper {
         return {
             x: minX,
             y: minY,
-            width:
-                maxWidth > containerSize.width ? maxWidth : containerSize.width,
-            height:
-                maxHeight > containerSize.height
-                    ? maxHeight
-                    : containerSize.height,
+            width: maxWidth > containerSize.width ? maxWidth : containerSize.width,
+            height: maxHeight > containerSize.height ? maxHeight : containerSize.height,
         };
     };
 
     findResourceBlock(res: PlannerResourceModelWrapper) {
         return this.blocks.filter(
             (b) =>
-                b.provides.filter(
-                    (r: PlannerResourceModelWrapper) => r.id === res.id
-                ).length > 0 ||
-                b.consumes.filter(
-                    (r: PlannerResourceModelWrapper) => r.id === res.id
-                ).length > 0
+                b.provides.filter((r: PlannerResourceModelWrapper) => r.id === res.id).length > 0 ||
+                b.consumes.filter((r: PlannerResourceModelWrapper) => r.id === res.id).length > 0
         )[0];
     }
 
@@ -529,32 +469,17 @@ export class PlannerModelWrapper {
         );
     }
 
-    filterResourcesFromDimensions(
-        resources: PlannerResourceModelWrapper[],
-        hoverDimensions: Dimensions
-    ) {
-        return resources.find(
-            (compatibleResource: PlannerResourceModelWrapper) => {
-                return !!(
-                    compatibleResource.dimensions &&
-                    this.dimensionsOverlap(
-                        hoverDimensions,
-                        compatibleResource.dimensions
-                    )
-                );
-            }
-        );
+    filterResourcesFromDimensions(resources: PlannerResourceModelWrapper[], hoverDimensions: Dimensions) {
+        return resources.find((compatibleResource: PlannerResourceModelWrapper) => {
+            return !!(
+                compatibleResource.dimensions && this.dimensionsOverlap(hoverDimensions, compatibleResource.dimensions)
+            );
+        });
     }
 
-    findValidBlockTargetFromDimensions(
-        size: PlannerNodeSize,
-        hoverDimensions: Dimensions
-    ) {
+    findValidBlockTargetFromDimensions(size: PlannerNodeSize, hoverDimensions: Dimensions) {
         return this.blocks.find((block) => {
-            return this.dimensionsOverlap(
-                hoverDimensions,
-                block.getDimensions(size)
-            );
+            return this.dimensionsOverlap(hoverDimensions, block.getDimensions(size));
         });
     }
 
@@ -565,10 +490,8 @@ export class PlannerModelWrapper {
     ) {
         return this.blocks.find((block) => {
             return (
-                this.dimensionsOverlap(
-                    hoverDimensions,
-                    block.getDimensions(size)
-                ) && this.canAddResourceToBlock(block, resource)
+                this.dimensionsOverlap(hoverDimensions, block.getDimensions(size)) &&
+                this.canAddResourceToBlock(block, resource)
             );
         });
     }
@@ -581,28 +504,19 @@ export class PlannerModelWrapper {
 
     getConnectionsFor(resource: PlannerResourceModelWrapper) {
         return this.connections.filter((connection) => {
-            return (
-                connection.toResource === resource ||
-                connection.fromResource === resource
-            );
+            return connection.toResource === resource || connection.fromResource === resource;
         });
     }
 
     getConnectionsForBlock(block: PlannerBlockModelWrapper) {
         return this.connections.filter((connection) => {
-            return (
-                connection.toResource.block === block ||
-                connection.fromResource.block === block
-            );
+            return connection.toResource.block === block || connection.fromResource.block === block;
         });
     }
 
     /* private */
 
-    private dimensionsOverlap(
-        dimensionsA: Dimensions,
-        dimensionsB: Dimensions
-    ) {
+    private dimensionsOverlap(dimensionsA: Dimensions, dimensionsB: Dimensions) {
         const r1Right = dimensionsA.left + dimensionsA.width;
         const r2Right = dimensionsB.left + dimensionsB.width;
         const r1Bottom = dimensionsA.top + dimensionsA.height;
@@ -616,10 +530,7 @@ export class PlannerModelWrapper {
         );
     }
 
-    private canAddResourceToBlock(
-        toBlock: PlannerBlockModelWrapper,
-        fromResource: PlannerResourceModelWrapper
-    ) {
+    private canAddResourceToBlock(toBlock: PlannerBlockModelWrapper, fromResource: PlannerResourceModelWrapper) {
         const fromBlock = fromResource.block;
         if (!fromBlock) {
             return false;

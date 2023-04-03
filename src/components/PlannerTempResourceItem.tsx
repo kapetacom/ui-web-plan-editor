@@ -1,13 +1,6 @@
 /* eslint-disable react/sort-comp */
 import React, { Component } from 'react';
-import {
-    ItemType,
-    ResourceRole,
-    DataWrapper,
-    BlockConnectionSpec,
-    Dimensions,
-    Point,
-} from '@kapeta/ui-web-types';
+import { ItemType, ResourceRole, DataWrapper, BlockConnectionSpec, Dimensions, Point } from '@kapeta/ui-web-types';
 
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
@@ -32,11 +25,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 export interface PlannerTempResourceItemProps {
     selectedResource: SelectedResourceItem;
     size: PlannerNodeSize;
-    setItemToEdit?: (
-        res: DataWrapper<BlockConnectionSpec>,
-        type: ItemType,
-        creating?: boolean
-    ) => void;
+    setItemToEdit?: (res: DataWrapper<BlockConnectionSpec>, type: ItemType, creating?: boolean) => void;
     planner: PlannerModelWrapper;
     zoom?: number;
 }
@@ -98,10 +87,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
 
     @observable
     private findValidResourceFromDimensions(hoverDimensions: Dimensions) {
-        return this.props.planner.filterResourcesFromDimensions(
-            this.compatibleResources,
-            hoverDimensions
-        );
+        return this.props.planner.filterResourcesFromDimensions(this.compatibleResources, hoverDimensions);
     }
 
     @observable
@@ -149,8 +135,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
 
         let activeBlock: PlannerBlockModelWrapper | undefined;
 
-        const activeResource =
-            this.findValidResourceFromDimensions(hoverDimensions);
+        const activeResource = this.findValidResourceFromDimensions(hoverDimensions);
         if (!activeResource) {
             activeBlock = this.findValidBlockFromDimensions(hoverDimensions);
             if (activeBlock && activeBlock.readonly) {
@@ -161,24 +146,20 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
         this.props.planner.blocks.forEach((block) => {
             if (activeBlock === block) {
                 const role =
-                    this.resource.role === ResourceRole.CONSUMES
-                        ? ResourceRole.PROVIDES
-                        : ResourceRole.CONSUMES;
+                    this.resource.role === ResourceRole.CONSUMES ? ResourceRole.PROVIDES : ResourceRole.CONSUMES;
                 block.setHoverDropModeFromRole(role);
             } else {
                 block.setMode(BlockMode.HIDDEN);
             }
         });
 
-        this.compatibleResources.forEach(
-            (compatibleResource: PlannerResourceModelWrapper) => {
-                if (activeResource === compatibleResource) {
-                    compatibleResource.setMode(ResourceMode.HOVER_COMPATIBLE);
-                } else {
-                    compatibleResource.setMode(ResourceMode.COMPATIBLE);
-                }
+        this.compatibleResources.forEach((compatibleResource: PlannerResourceModelWrapper) => {
+            if (activeResource === compatibleResource) {
+                compatibleResource.setMode(ResourceMode.HOVER_COMPATIBLE);
+            } else {
+                compatibleResource.setMode(ResourceMode.COMPATIBLE);
             }
-        );
+        });
     };
 
     @action
@@ -194,37 +175,25 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
 
         let activeBlock: PlannerBlockModelWrapper | undefined;
 
-        const activeResource =
-            this.findValidResourceFromDimensions(hoverDimensions);
+        const activeResource = this.findValidResourceFromDimensions(hoverDimensions);
         if (!activeResource) {
             activeBlock = this.findValidBlockFromDimensions(hoverDimensions);
         }
 
         if (activeResource) {
-            const connection =
-                PlannerConnectionModelWrapper.createFromResources(
-                    this.original,
-                    activeResource
-                );
+            const connection = PlannerConnectionModelWrapper.createFromResources(this.original, activeResource);
             this.props.planner.addConnection(connection);
 
             const converter = ResourceTypeProvider.getConverterFor(
                 connection.fromResource.getKind(),
                 connection.toResource.getKind()
             );
-            if (
-                converter &&
-                converter.mappingComponentType &&
-                this.props.setItemToEdit
-            ) {
+            if (converter && converter.mappingComponentType && this.props.setItemToEdit) {
                 this.props.setItemToEdit(connection, ItemType.CONNECTION, true);
             }
         } else if (activeBlock && !activeBlock.readonly) {
             activeBlock.setMode(BlockMode.HIDDEN);
-            this.props.planner.copyResourceToBlock(
-                activeBlock.id,
-                this.original
-            );
+            this.props.planner.copyResourceToBlock(activeBlock.id, this.original);
         }
 
         this.dragEnd();
@@ -240,15 +209,8 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
             })
             .forEach((block) => {
                 block.consumes.forEach((resource) => {
-                    if (
-                        ResourceTypeProvider.canApplyResourceToKind(
-                            this.resource.getKind(),
-                            resource.getKind()
-                        )
-                    ) {
-                        if (
-                            !this.props.planner.hasIncomingConnection(resource)
-                        ) {
+                    if (ResourceTypeProvider.canApplyResourceToKind(this.resource.getKind(), resource.getKind())) {
+                        if (!this.props.planner.hasIncomingConnection(resource)) {
                             this.compatibleResources.push(resource);
                             resource.setMode(ResourceMode.COMPATIBLE);
                         }
@@ -281,9 +243,7 @@ export class PlannerTempResourceItem extends Component<PlannerTempResourceItemPr
 
     render() {
         const heightInner = this.getResourceHeight() - RESOURCE_SPACE;
-        const resourceConfig = ResourceTypeProvider.get(
-            this.resource.getKind()
-        );
+        const resourceConfig = ResourceTypeProvider.get(this.resource.getKind());
 
         const position = {
             x: this.xPosition,

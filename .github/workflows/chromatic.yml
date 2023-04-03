@@ -34,4 +34,3 @@ jobs:
                   exitOnceUploaded: true
                   # Tests seem to break w/ some crypto stuff, maybe because they run in electron?
                   skip: true
-

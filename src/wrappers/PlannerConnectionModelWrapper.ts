@@ -1,18 +1,7 @@
-import {
-    action,
-    computed,
-    makeObservable,
-    observable,
-    runInAction,
-    toJS,
-} from 'mobx';
+import { action, computed, makeObservable, observable, runInAction, toJS } from 'mobx';
 import _ from 'lodash';
 
-import type {
-    Point,
-    BlockConnectionSpec,
-    DataWrapper,
-} from '@kapeta/ui-web-types';
+import type { Point, BlockConnectionSpec, DataWrapper } from '@kapeta/ui-web-types';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { BasisCurve } from '@kapeta/ui-web-utils';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
@@ -21,9 +10,7 @@ import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
 import { PlannerModelWrapper } from './PlannerModelWrapper';
 import { PlannerNodeSize } from '../types';
 
-export class PlannerConnectionModelWrapper
-    implements DataWrapper<BlockConnectionSpec>
-{
+export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectionSpec> {
     @observable
     readonly fromResource: PlannerResourceModelWrapper;
 
@@ -39,10 +26,7 @@ export class PlannerConnectionModelWrapper
     @observable
     editing: boolean = false;
 
-    static createFromData(
-        data: BlockConnectionSpec,
-        planner: PlannerModelWrapper
-    ) {
+    static createFromData(data: BlockConnectionSpec, planner: PlannerModelWrapper) {
         return runInAction(() => {
             const fromBlock = planner.findBlockById(data.from.blockId);
             if (!fromBlock) {
@@ -55,42 +39,23 @@ export class PlannerConnectionModelWrapper
                 throw new Error(`Target Block not found: ${data.from.blockId}`);
             }
 
-            const fromResource = fromBlock.findResourceById(
-                ResourceRole.PROVIDES,
-                data.from.resourceName
-            );
+            const fromResource = fromBlock.findResourceById(ResourceRole.PROVIDES, data.from.resourceName);
 
             if (!fromResource) {
-                throw new Error(
-                    `Provider resource not found: ${data.from.resourceName}`
-                );
+                throw new Error(`Provider resource not found: ${data.from.resourceName}`);
             }
 
-            const toResource = toBlock.findResourceById(
-                ResourceRole.CONSUMES,
-                data.to.resourceName
-            );
+            const toResource = toBlock.findResourceById(ResourceRole.CONSUMES, data.to.resourceName);
 
             if (!toResource) {
-                throw new Error(
-                    `Consumer resource not found: ${data.to.resourceName}`
-                );
+                throw new Error(`Consumer resource not found: ${data.to.resourceName}`);
             }
 
-            return makeObservable(
-                new PlannerConnectionModelWrapper(
-                    data,
-                    fromResource,
-                    toResource
-                )
-            );
+            return makeObservable(new PlannerConnectionModelWrapper(data, fromResource, toResource));
         });
     }
 
-    static createFromResources(
-        fromResource: PlannerResourceModelWrapper,
-        toResource: PlannerResourceModelWrapper
-    ) {
+    static createFromResources(fromResource: PlannerResourceModelWrapper, toResource: PlannerResourceModelWrapper) {
         return makeObservable(
             new PlannerConnectionModelWrapper(
                 {
@@ -299,9 +264,6 @@ export class PlannerConnectionModelWrapper
 
     @observable
     private getConverter() {
-        return ResourceTypeProvider.getConverterFor(
-            this.fromResource.getKind(),
-            this.toResource.getKind()
-        );
+        return ResourceTypeProvider.getConverterFor(this.fromResource.getKind(), this.toResource.getKind());
     }
 }

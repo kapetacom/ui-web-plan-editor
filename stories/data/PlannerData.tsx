@@ -1,8 +1,4 @@
-import {
-    ConnectionMethodMappingType,
-    PLAN_KIND,
-    PlanKind,
-} from '@kapeta/ui-web-types';
+import { ConnectionMethodMappingType, PLAN_KIND, PlanKind } from '@kapeta/ui-web-types';
 
 export const PlannerData: PlanKind = {
     kind: PLAN_KIND,

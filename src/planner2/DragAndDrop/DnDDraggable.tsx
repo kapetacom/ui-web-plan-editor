@@ -1,13 +1,7 @@
-import {
-    MouseEventHandler,
-    useCallback,
-    useContext,
-    useEffect,
-    useState,
-} from 'react';
-import {DnDPayload, DragEventInfo, PositionDiff} from './types';
-import {DnDContext} from './DnDContext';
-import {DnDZoneContext, DnDZoneInstance} from './DnDDropZone';
+import { MouseEventHandler, useCallback, useContext, useEffect, useState } from 'react';
+import { DnDPayload, DragEventInfo, PositionDiff } from './types';
+import { DnDContext } from './DnDContext';
+import { DnDZoneContext, DnDZoneInstance } from './DnDDropZone';
 
 interface DnDCallbackProps {
     isDragging: boolean;
@@ -34,10 +28,7 @@ enum DragStatus {
 }
 
 // TODO: change to include different coordinates: pageX/Y, zoneX/Y
-const getDragEvent = (
-    windowPosition: PositionDiff,
-    initialPosition: PositionDiff
-): DragEventInfo['client'] => ({
+const getDragEvent = (windowPosition: PositionDiff, initialPosition: PositionDiff): DragEventInfo['client'] => ({
     diff: {
         x: windowPosition.x - initialPosition.x,
         y: windowPosition.y - initialPosition.y,
@@ -59,13 +50,15 @@ const getDragEventInfo = (
     };
 };
 
-const zeroPosition = {x: 0, y: 0};
+const zeroPosition = { x: 0, y: 0 };
 const zeroDragEvent = {
     client: getDragEvent(zeroPosition, zeroPosition),
     zone: getDragEvent(zeroPosition, zeroPosition),
 };
 
-export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) => JSX.Element = (props: DnDDraggableProps<any>) => {
+export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) => JSX.Element = (
+    props: DnDDraggableProps<any>
+) => {
     // Track state here, use state callbacks to ensure consistency
     const ctx = useContext(DnDContext);
     const parentZone = useContext(DnDZoneContext);
@@ -78,7 +71,8 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
         status: DragStatus.IDLE,
     });
 
-    const mouseDownHandler = useCallback<MouseEventHandler>((downEvt) => {
+    const mouseDownHandler = useCallback<MouseEventHandler>(
+        (downEvt) => {
             if (props.disabled) {
                 return;
             }
@@ -88,11 +82,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 x: downEvt.clientX,
             };
 
-            const initialDragEvt = getDragEventInfo(
-                parentZone,
-                initialClientPosition,
-                initialClientPosition
-            );
+            const initialDragEvt = getDragEventInfo(parentZone, initialClientPosition, initialClientPosition);
 
             setState({
                 status: DragStatus.DRAGGING,
@@ -196,6 +186,6 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
     return props.children({
         isDragging,
         position: state.dragEvent.zone.diff,
-        componentProps: {onMouseDown: mouseDownHandler},
+        componentProps: { onMouseDown: mouseDownHandler },
     });
 };

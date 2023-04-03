@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useMemo} from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { PlannerContext, PlannerMode } from './PlannerContext';
 import { DragAndDrop } from './utils/dndUtils';
 import { useBoundingBox } from './hooks/boundingBox';
@@ -9,17 +9,16 @@ import { BlockInstanceSpec } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
 import { ZOOM_STEP_SIZE } from './types';
 
-const blockPositionUpdater =
-    (diff: PositionDiff, zoom: number) => (block: BlockInstanceSpec) => {
-        return {
-            ...block,
-            dimensions: {
-                ...block.dimensions!,
-                top: block.dimensions!.top + diff.y / zoom,
-                left: block.dimensions!.left + diff.x / zoom,
-            },
-        };
+const blockPositionUpdater = (diff: PositionDiff, zoom: number) => (block: BlockInstanceSpec) => {
+    return {
+        ...block,
+        dimensions: {
+            ...block.dimensions!,
+            top: block.dimensions!.top + diff.y / zoom,
+            left: block.dimensions!.left + diff.x / zoom,
+        },
     };
+};
 
 export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
     const planner = useContext(PlannerContext);
@@ -36,19 +35,11 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
             height: boundingBox.height,
             width: boundingBox.width,
         });
-    }, [
-        planner.plan?.spec.blocks,
-        planner.blockAssets,
-        planner.nodeSize,
-        boundingBox.width,
-        boundingBox.height,
-    ]);
+    }, [planner.plan?.spec.blocks, planner.blockAssets, planner.nodeSize, boundingBox.width, boundingBox.height]);
 
     useEffect(() => {
         planner.setCanvasSize(canvasSize);
-    }, [planner, canvasSize])
-
-
+    }, [planner, canvasSize]);
 
     return (
         <div className={`planner-area-container ${classNames}`}>
@@ -57,9 +48,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                     scale={planner.zoom}
                     accept={(draggable) => {
                         // Filter types
-                        return (
-                            draggable.type === 'block' && !!draggable.data.id
-                        );
+                        return draggable.type === 'block' && !!draggable.data.id;
                     }}
                     onDrop={(draggable, dragEvent) => {
                         // Is it possible to narrow the type via the accept fn?
@@ -78,7 +67,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                                 className="planner-area-canvas"
                                 style={{
                                     ...canvasSize,
-                                    transform: `scale(${(planner.zoom)})`,
+                                    transform: `scale(${planner.zoom})`,
                                 }}
                             >
                                 {props.children}
@@ -87,16 +76,14 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                     )}
                 </DragAndDrop.DropZone>
 
-                {!planner.focusedBlock && <ZoomButtons
-                    currentZoom={planner.zoom}
-                    onZoomIn={() =>
-                        planner.setZoomLevel((currentZoom) => currentZoom + ZOOM_STEP_SIZE)
-                    }
-                    onZoomOut={() =>
-                        planner.setZoomLevel((currentZoom) => currentZoom - ZOOM_STEP_SIZE)
-                    }
-                    onZoomReset={() => planner.setZoomLevel(1)}
-                />}
+                {!planner.focusedBlock && (
+                    <ZoomButtons
+                        currentZoom={planner.zoom}
+                        onZoomIn={() => planner.setZoomLevel((currentZoom) => currentZoom + ZOOM_STEP_SIZE)}
+                        onZoomOut={() => planner.setZoomLevel((currentZoom) => currentZoom - ZOOM_STEP_SIZE)}
+                        onZoomReset={() => planner.setZoomLevel(1)}
+                    />
+                )}
             </div>
         </div>
     );

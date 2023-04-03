@@ -27,14 +27,9 @@ export class PlannerTempResourceConnection extends Component<PlannerTempResource
 
     // path for dragging resource
     calculateTempPath(toPoint: Point) {
-        const fromPoint: Point = this.original.getConnectionPoint(
-            this.props.size
-        );
+        const fromPoint: Point = this.original.getConnectionPoint(this.props.size);
 
-        return PlannerConnectionModelWrapper.calculatePathBetweenPoints(
-            fromPoint,
-            toPoint
-        );
+        return PlannerConnectionModelWrapper.calculatePathBetweenPoints(fromPoint, toPoint);
     }
 
     render() {
@@ -42,19 +37,11 @@ export class PlannerTempResourceConnection extends Component<PlannerTempResource
         if (this.resource.dimensions) {
             const tempPoint = {
                 x: this.resource.dimensions.left,
-                y:
-                    this.resource.dimensions.top +
-                    this.resource.dimensions.height / 2,
+                y: this.resource.dimensions.top + this.resource.dimensions.height / 2,
             };
             path = this.calculateTempPath(tempPoint);
         }
 
-        return (
-            <>
-                {path && (
-                    <PlannerConnection path={path} size={this.props.size} />
-                )}
-            </>
-        );
+        return <>{path && <PlannerConnection path={path} size={this.props.size} />}</>;
     }
 }

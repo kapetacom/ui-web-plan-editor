@@ -20,10 +20,6 @@ export enum BlockMode {
     FOCUSED = 7,
 }
 
-export function createResourceId(
-    blockId: string,
-    role: ResourceRole,
-    ix: number
-) {
+export function createResourceId(blockId: string, role: ResourceRole, ix: number) {
     return `${blockId}_${role}_${ix}`;
 }

@@ -1,11 +1,6 @@
 import React, { useContext, useState } from 'react';
 
-import {
-    ResourceConfig,
-    ResourceKind,
-    ResourceRole,
-    ResourceType,
-} from '@kapeta/ui-web-types';
+import { ResourceConfig, ResourceKind, ResourceRole, ResourceType } from '@kapeta/ui-web-types';
 
 import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
@@ -38,11 +33,7 @@ interface PlannerBlockResourceListItemProps {
     actions?: PlannerAction<any>[];
 }
 
-const renderClipPath = (
-    height: number,
-    role: ResourceRole,
-    expanded: boolean
-) => {
+const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) => {
     const top = 0;
     let width = 250;
     let left = 0;
@@ -53,22 +44,10 @@ const renderClipPath = (
         left = expanded ? 12 : 112;
     }
 
-    return (
-        <rect
-            className="resource-mask"
-            width={width}
-            height={height}
-            x={left}
-            y={top}
-        />
-    );
+    return <rect className="resource-mask" width={width} height={height} x={left} y={top} />;
 };
 
-const getResourceConnectionPoint = ({
-    isConsumer,
-    isExpanded,
-    buttonWidth = 0,
-}) => {
+const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 }) => {
     const baseOffset = isConsumer ? -20 : 170;
     const expansionSign = isConsumer ? -1 : 1;
     const expansionWidth = isExpanded ? 100 : 0;
@@ -85,15 +64,11 @@ const TempResource = ({ resource, nodeSize, x, y }) => {
     return (
         <SVGLayoutNode x={x + 150} y={y}>
             {/* Clip the hexagon to create a straight edge */}
-            <clipPath id={clipPathId}>
-                {renderClipPath(height, ResourceRole.CONSUMES, true)}
-            </clipPath>
+            <clipPath id={clipPathId}>{renderClipPath(height, ResourceRole.CONSUMES, true)}</clipPath>
 
             <g height={heightInner}>
                 <LayoutNode x={-10} y={height / 2}>
-                    <PlannerConnectionPoint
-                        pointId={getResourceId('temp-block', 'temp-resource')}
-                    />
+                    <PlannerConnectionPoint pointId={getResourceId('temp-block', 'temp-resource')} />
                 </LayoutNode>
 
                 <svg
@@ -117,9 +92,7 @@ const TempResource = ({ resource, nodeSize, x, y }) => {
     );
 };
 
-export const PlannerBlockResourceListItem: React.FC<
-    PlannerBlockResourceListItemProps
-> = (props) => {
+export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItemProps> = (props) => {
     const planner = useContext(PlannerContext);
     const { blockInstance, blockDefinition } = useBlockContext();
     const { draggable } = useContext(DnDContext);
@@ -132,14 +105,11 @@ export const PlannerBlockResourceListItem: React.FC<
         errors.push(`Failed to read resource kind: ${e.message}`);
     }
 
-    const type =
-        resourceConfig?.type.toString().toLowerCase() ?? ResourceType.SERVICE;
+    const type = resourceConfig?.type.toString().toLowerCase() ?? ResourceType.SERVICE;
     const title = resourceConfig?.title || resourceConfig?.kind;
     const typeName = title?.toString().toLowerCase() ?? 'unknown';
 
-    const counterValue = resourceConfig?.getCounterValue
-        ? resourceConfig.getCounterValue(props.resource)
-        : 0;
+    const counterValue = resourceConfig?.getCounterValue ? resourceConfig.getCounterValue(props.resource) : 0;
     const valid = errors.length === 0 && true; // TODO props.resource.isValid();
 
     const [isHovered, setHoverState] = useState(false);
@@ -150,10 +120,7 @@ export const PlannerBlockResourceListItem: React.FC<
         isConsumer &&
         draggable?.type === 'resource' &&
         draggable.data.block.id !== blockInstance.id &&
-        ResourceTypeProvider.canApplyResourceToKind(
-            draggable.data.resource.kind,
-            props.resource.kind
-        ) &&
+        ResourceTypeProvider.canApplyResourceToKind(draggable.data.resource.kind, props.resource.kind) &&
         !planner.hasConnections({
             blockId: blockInstance.id,
             resourceName: props.resource.metadata.name,
@@ -166,18 +133,13 @@ export const PlannerBlockResourceListItem: React.FC<
     const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
     const clipPathId = `${resourceId}_clippath`;
 
-    const connectionResourceId = getResourceId(
-        blockInstance.id,
-        props.resource.metadata.name
-    );
+    const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name);
     const fixedClipPathId = `${clipPathId}_fixed`;
 
     const extension = isExpanded ? 100 : 0;
-    const getXPosition = () =>
-        props.role === ResourceRole.CONSUMES ? -10 - extension : 39 + extension;
+    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -10 - extension : 39 + extension);
 
-    const nodeSize =
-        props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
+    const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const height = resourceHeight[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     const yOffset = height * props.index;
@@ -256,12 +218,7 @@ export const PlannerBlockResourceListItem: React.FC<
                                         className="container-mask"
                                         width={mouseCatcherWidth}
                                         height={height}
-                                        x={
-                                            isConsumer
-                                                ? -mouseCatcherWidth - 1
-                                                : blockInstance.dimensions!
-                                                      .width + 1
-                                        }
+                                        x={isConsumer ? -mouseCatcherWidth - 1 : blockInstance.dimensions!.width + 1}
                                         y={0}
                                     />
                                 </clipPath>
@@ -274,17 +231,11 @@ export const PlannerBlockResourceListItem: React.FC<
                                     onMouseLeave={() => setHoverState(false)}
                                     onMouseMove={() => setHoverState(true)}
                                     // Only register the drag handler if the resource should be draggable (Providers only atm)
-                                    {...(props.role === ResourceRole.PROVIDES
-                                        ? componentProps
-                                        : {})}
+                                    {...(props.role === ResourceRole.PROVIDES ? componentProps : {})}
                                 >
                                     {/* Clip the hexagon to create a straight edge */}
                                     <clipPath id={clipPathId}>
-                                        {renderClipPath(
-                                            height,
-                                            props.role,
-                                            isExpanded
-                                        )}
+                                        {renderClipPath(height, props.role, isExpanded)}
                                     </clipPath>
 
                                     <g
@@ -303,9 +254,7 @@ export const PlannerBlockResourceListItem: React.FC<
                                         />
 
                                         <ActionButtons
-                                            pointType={
-                                                isConsumer ? 'right' : 'left'
-                                            }
+                                            pointType={isConsumer ? 'right' : 'left'}
                                             x={buttonX}
                                             y={buttonY}
                                             show={buttonsVisible}
@@ -325,38 +274,27 @@ export const PlannerBlockResourceListItem: React.FC<
                                             x={getResourceConnectionPoint({
                                                 isConsumer,
                                                 isExpanded,
-                                                buttonWidth: buttonsVisible
-                                                    ? actionButtonsWidth
-                                                    : 0,
+                                                buttonWidth: buttonsVisible ? actionButtonsWidth : 0,
                                             })}
                                             y={buttonY}
                                         >
-                                            <PlannerConnectionPoint
-                                                pointId={connectionResourceId}
-                                            />
+                                            <PlannerConnectionPoint pointId={connectionResourceId} />
                                         </LayoutNode>
 
                                         <svg
                                             clipPath={`url(#${clipPathId})`}
                                             style={{
-                                                cursor: isConsumer
-                                                    ? ''
-                                                    : 'grab',
+                                                cursor: isConsumer ? '' : 'grab',
                                             }}
                                         >
                                             <BlockResource
                                                 role={props.role}
                                                 size={nodeSize}
-                                                name={
-                                                    props.resource.metadata.name
-                                                }
+                                                name={props.resource.metadata.name}
                                                 readOnly={props.readOnly}
                                                 type={type}
                                                 typeName={typeName}
-                                                width={
-                                                    blockInstance.dimensions!
-                                                        .width
-                                                }
+                                                width={blockInstance.dimensions!.width}
                                                 height={heightInner}
                                             />
                                         </svg>

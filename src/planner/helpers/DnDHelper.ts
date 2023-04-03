@@ -1,19 +1,10 @@
 import { action, observable } from 'mobx';
 import { Guid } from 'guid-typescript';
 
-import type {
-    Asset,
-    BlockInstanceSpec,
-    BlockKind,
-    Dimensions,
-    ResourceConfig,
-} from '@kapeta/ui-web-types';
+import type { Asset, BlockInstanceSpec, BlockKind, Dimensions, ResourceConfig } from '@kapeta/ui-web-types';
 
 import { ItemType, ResourceKind } from '@kapeta/ui-web-types';
-import {
-    BlockTypeProvider,
-    ResourceTypeProvider,
-} from '@kapeta/ui-web-context';
+import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
 import { BlockMode } from '../../wrappers/wrapperHelpers';
@@ -88,8 +79,7 @@ export class DnDHelper {
         if (BlockTypeProvider.exists(data.kind)) {
             const blockDefinition: BlockKind = data.data;
             const blockInstanceId = Guid.create().toString();
-            const initialName =
-                blockDefinition.metadata.title || blockDefinition.metadata.name;
+            const initialName = blockDefinition.metadata.title || blockDefinition.metadata.name;
             const blockInstance: BlockInstanceSpec = {
                 id: blockInstanceId,
                 name: initialName,
@@ -97,11 +87,7 @@ export class DnDHelper {
                     ref: data.ref,
                 },
             };
-            const wrapper = new PlannerBlockModelWrapper(
-                blockInstance,
-                blockDefinition,
-                this.planner.plan
-            );
+            const wrapper = new PlannerBlockModelWrapper(blockInstance, blockDefinition, this.planner.plan);
             wrapper.top = dimensions.top - 60; // Adjustment for SVG
             wrapper.left = dimensions.left;
 
@@ -111,30 +97,21 @@ export class DnDHelper {
 
     @action
     private handleToolItemDragged(data: any, dimensions: Dimensions) {
-        if (
-            ResourceTypeProvider.exists(data.kind) &&
-            !this.planner.plan.focusedBlock
-        ) {
-            let activeBlock =
-                this.planner.plan.findValidBlockTargetFromDimensions(
-                    this.planner.nodeSize,
-                    dimensions
-                );
+        if (ResourceTypeProvider.exists(data.kind) && !this.planner.plan.focusedBlock) {
+            let activeBlock = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
             const resourceConfig: ResourceConfig = data;
 
             if (activeBlock && activeBlock.readonly) {
                 activeBlock = undefined;
             }
 
-            this.planner.plan.blocks.forEach(
-                (block: PlannerBlockModelWrapper) => {
-                    if (activeBlock === block) {
-                        block.setHoverDropModeFromRole(resourceConfig.role);
-                    } else {
-                        block.setMode(BlockMode.HIDDEN);
-                    }
+            this.planner.plan.blocks.forEach((block: PlannerBlockModelWrapper) => {
+                if (activeBlock === block) {
+                    block.setHoverDropModeFromRole(resourceConfig.role);
+                } else {
+                    block.setMode(BlockMode.HIDDEN);
                 }
-            );
+            });
         }
     }
 
@@ -164,11 +141,7 @@ export class DnDHelper {
                 },
             };
 
-            const wrapper = new PlannerBlockModelWrapper(
-                blockInstance,
-                blockDefinition,
-                this.planner.plan
-            );
+            const wrapper = new PlannerBlockModelWrapper(blockInstance, blockDefinition, this.planner.plan);
             wrapper.top = dimensions.top;
             wrapper.left = dimensions.left;
 
@@ -179,16 +152,11 @@ export class DnDHelper {
         }
 
         if (ResourceTypeProvider.exists(asset.kind)) {
-            this.planner.plan.blocks.forEach(
-                (block: PlannerBlockModelWrapper) => {
-                    block.setMode(BlockMode.HIDDEN);
-                }
-            );
+            this.planner.plan.blocks.forEach((block: PlannerBlockModelWrapper) => {
+                block.setMode(BlockMode.HIDDEN);
+            });
 
-            const block = this.planner.plan.findValidBlockTargetFromDimensions(
-                this.planner.nodeSize,
-                dimensions
-            );
+            const block = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
             if (!block || block.readonly) {
                 return;
             }
@@ -203,11 +171,7 @@ export class DnDHelper {
                 spec: {},
             };
 
-            const wrapper = new PlannerResourceModelWrapper(
-                resourceConfig.role,
-                resourceKind,
-                block
-            );
+            const wrapper = new PlannerResourceModelWrapper(resourceConfig.role, resourceKind, block);
             block.addResource(wrapper);
 
             this.editPanel.edit(wrapper, ItemType.RESOURCE, true);

@@ -86,13 +86,7 @@ export class BlockTree extends React.Component<Props, State> {
         }
         return (
             <div className={`resource-icon ${type}`}>
-                <svg
-                    width="10 "
-                    height="11"
-                    viewBox="0 0 10 11"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
+                <svg width="10 " height="11" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         opacity="0.6"
                         d="M6.98571 10.5285C6.80262 10.8195 6.45524 11 6.07824 11L1.03811 11C0.464779 11 -9.17796e-07 10.5896 -8.73537e-07 10.0833L-7.21614e-08 0.916667C-2.79027e-08 0.410406 0.46478 1.20079e-07 1.03811 1.70201e-07L6.07824 6.10823e-07C6.45525 6.43782e-07 6.80262 0.180485 6.98571 0.471495L9.86936 5.05483C10.0435 5.33168 10.0435 5.66832 9.86936 5.94517L6.98571 10.5285Z"
@@ -114,74 +108,50 @@ export class BlockTree extends React.Component<Props, State> {
                     {this.getBlockIcon(this.props.block)}
                     <div className="block-name">{this.props.block.name} </div>
                 </div>
-                {this.props.block
-                    .getConnectedBlocks()
-                    .all.map((block, index) => {
-                        return (
-                            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-                            <div
-                                key={block.id + index}
-                                className="connected-block-line"
-                                onMouseEnter={() => {
-                                    this.showResourcesFor(block);
-                                    this.props.onBlockItemHover(block);
-                                }}
-                                onMouseLeave={() => {
-                                    this.showResourcesFor(undefined);
-                                    this.props.onBlockItemHover(undefined);
-                                }}
-                                onClick={() => {
-                                    this.props.onBlockClicked(block);
-                                }}
-                            >
-                                {this.getBlockIcon(block)}
-                                <div className="block-name">{block.name} </div>
-                                {this.state.hoveredBlock &&
-                                    this.state.hoveredBlock.id === block.id &&
-                                    [
-                                        ...block.getResources(
-                                            ResourceRole.CONSUMES
-                                        ),
-                                        ...block.getResources(
-                                            ResourceRole.PROVIDES
-                                        ),
-                                    ].map(
-                                        (
-                                            resource: PlannerResourceModelWrapper,
-                                            ix
-                                        ) => {
-                                            return (
-                                                <div
-                                                    key={`resource_${ix}`}
-                                                    onMouseMove={() => {
-                                                        resource.setMode(
-                                                            ResourceMode.SHOW
-                                                        );
-                                                    }}
-                                                    onMouseLeave={() => {
-                                                        resource.setMode(
-                                                            ResourceMode.HIDDEN
-                                                        );
-                                                    }}
-                                                >
-                                                    <div className="resource-icon">
-                                                        {this.getResourceIcon(
-                                                            resource
-                                                        )}
-                                                    </div>
-                                                    <div className="resource-name">
-                                                        {
-                                                            resource.getData()
-                                                                .metadata.name
-                                                        }
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                    )}
-                            </div>
-                        );
-                    })}
+                {this.props.block.getConnectedBlocks().all.map((block, index) => {
+                    return (
+                        // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+                        <div
+                            key={block.id + index}
+                            className="connected-block-line"
+                            onMouseEnter={() => {
+                                this.showResourcesFor(block);
+                                this.props.onBlockItemHover(block);
+                            }}
+                            onMouseLeave={() => {
+                                this.showResourcesFor(undefined);
+                                this.props.onBlockItemHover(undefined);
+                            }}
+                            onClick={() => {
+                                this.props.onBlockClicked(block);
+                            }}
+                        >
+                            {this.getBlockIcon(block)}
+                            <div className="block-name">{block.name} </div>
+                            {this.state.hoveredBlock &&
+                                this.state.hoveredBlock.id === block.id &&
+                                [
+                                    ...block.getResources(ResourceRole.CONSUMES),
+                                    ...block.getResources(ResourceRole.PROVIDES),
+                                ].map((resource: PlannerResourceModelWrapper, ix) => {
+                                    return (
+                                        <div
+                                            key={`resource_${ix}`}
+                                            onMouseMove={() => {
+                                                resource.setMode(ResourceMode.SHOW);
+                                            }}
+                                            onMouseLeave={() => {
+                                                resource.setMode(ResourceMode.HIDDEN);
+                                            }}
+                                        >
+                                            <div className="resource-icon">{this.getResourceIcon(resource)}</div>
+                                            <div className="resource-name">{resource.getData().metadata.name}</div>
+                                        </div>
+                                    );
+                                })}
+                        </div>
+                    );
+                })}
             </div>
         );
     }
