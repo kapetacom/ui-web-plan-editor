@@ -1,13 +1,22 @@
 import React, { useContext } from 'react';
 
-import { ButtonStyle, DefaultContext } from '@kapeta/ui-web-components';
+import {
+    ButtonStyle,
+    DefaultContext,
+    DialogControl,
+} from '@kapeta/ui-web-components';
 
 import { Planner } from '../src/planner2/Planner2';
 
 import { readPlanV2 } from './data/planReader';
 import { PlannerActionConfig, PlannerContext, PlannerMode, withPlannerContext } from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
-import { BlockKind, ItemType, SchemaKind } from '@kapeta/ui-web-types';
+import {
+    BlockKind,
+    ItemType,
+    ResourceRole,
+    SchemaKind,
+} from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
 import { EditableItemInterface2 } from '../src/planner2/types';
@@ -31,8 +40,33 @@ const PlanEditor = withPlannerContext((props: { onChange: (SchemaKind) => void }
                 enabled(): boolean {
                     return true; // planner.mode !== PlannerMode.VIEW;
                 },
-                onClick(context, { block }) {
-                    setInspectItem(block!);
+                {
+                    enabled(context, { blockInstance }): boolean {
+                        return (
+                            planner.mode !== PlannerMode.VIEW &&
+                            !!blockInstance &&
+                            parseKapetaUri(blockInstance.block.ref).version ===
+                                'local'
+                        );
+                    },
+                    onClick(context, { blockInstance }) {
+                        DialogControl.delete(
+                            `Delete Block Instance`,
+                            `Are you sure you want to delete ${
+                                blockInstance?.name || 'this block'
+                            }?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    planner.removeBlockInstance(
+                                        blockInstance!.id
+                                    );
+                                }
+                            }
+                        );
+                    },
+                    buttonStyle: ButtonStyle.DANGER,
+                    icon: 'fa fa-trash',
+                    label: 'Delete',
                 },
                 buttonStyle: ButtonStyle.PRIMARY,
                 icon: 'fa fa-search',
@@ -61,21 +95,71 @@ const PlanEditor = withPlannerContext((props: { onChange: (SchemaKind) => void }
                         parseKapetaUri(blockInstance.block.ref).version === 'local'
                     );
                 },
-                onClick(context, { blockInstance, block }) {
-                    setEditItem({
-                        type: ItemType.BLOCK,
-                        item: block!,
-                        ref: blockInstance!.block.ref,
-                        creating: false,
-                    });
+
+                {
+                    enabled(context, { blockInstance }): boolean {
+                        return (
+                            planner.mode !== PlannerMode.VIEW &&
+                            !!blockInstance &&
+                            parseKapetaUri(blockInstance.block.ref).version ===
+                                'local'
+                        );
+                    },
+                    onClick(
+                        context,
+                        { blockInstance, resource, resourceRole }
+                    ) {
+                        DialogControl.delete(
+                            `Delete Resource`,
+                            `Are you sure you want to delete ${
+                                resource?.metadata.name || 'this resource'
+                            }?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    context.removeResource(
+                                        blockInstance!.block.ref,
+                                        resource!.metadata.name,
+                                        resourceRole!
+                                    );
+                                }
+                            }
+                        );
+                    },
+                    buttonStyle: ButtonStyle.DANGER,
+                    icon: 'fa fa-trash',
+                    label: 'Delete',
                 },
-                buttonStyle: ButtonStyle.SECONDARY,
-                icon: 'fa fa-pencil',
-                label: 'Edit',
-            },
-            {
-                enabled(context, { blockInstance }): boolean {
-                    return context.mode === PlannerMode.CONFIGURATION;
+            ],
+            connection: [
+                {
+                    enabled(context): boolean {
+                        return planner.mode !== PlannerMode.VIEW;
+                    },
+                    onClick(context, { connection }) {
+                        const from = planner.getResourceByBlockIdAndName(
+                            connection!.from.blockId,
+                            connection!.from.resourceName,
+                            ResourceRole.PROVIDES
+                        );
+                        const to = planner.getResourceByBlockIdAndName(
+                            connection!.to.blockId,
+                            connection!.to.resourceName,
+                            ResourceRole.CONSUMES
+                        );
+
+                        DialogControl.delete(
+                            `Delete Connection?`,
+                            `from ${from?.metadata.name} to ${to?.metadata.name}?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    planner.removeConnection(connection!);
+                                }
+                            }
+                        );
+                    },
+                    buttonStyle: ButtonStyle.DANGER,
+                    icon: 'fa fa-trash',
+                    label: 'Delete',
                 },
                 onClick(context, { block }) {
                     setConfigureItem(block!);
