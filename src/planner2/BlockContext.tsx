@@ -78,16 +78,13 @@ type WithEnsuredFields<T, KS extends keyof T> = {
 
 type BlockContextWData = WithEnsuredFields<
     PlannerBlockContextData,
-    'blockReference' | 'blockDefinition' | 'blockInstance'
+    'blockReference' | 'blockInstance'
 >;
 
 export const useBlockContext = (): BlockContextWData => {
     const ctx = useContext(BlockContext);
     if (!ctx.blockInstance || !ctx.blockReference) {
         throw new Error('Unable to find block in plan context.');
-    }
-    if (!ctx.blockDefinition) {
-        throw new Error('Unable to find block definition');
     }
     return ctx as BlockContextWData;
 };

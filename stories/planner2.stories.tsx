@@ -12,7 +12,6 @@ import { readPlanV2 } from './data/planReader';
 import {
     PlannerActionConfig,
     PlannerContext,
-    PlannerMode,
     withPlannerContext,
 } from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
@@ -25,6 +24,7 @@ import {
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
 import { EditableItemInterface2 } from '../src/planner2/types';
+import { PlannerMode } from '../src';
 
 export default {
     title: 'Planner2',

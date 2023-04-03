@@ -46,12 +46,18 @@ export const PlannerConnection: React.FC<{
 
     let connectionValid = true;
     if (fromResource && toResource) {
-        const converter = ResourceTypeProvider.getConverterFor(fromResource.kind, toResource.kind);
-        if (converter) {
-            const errors = converter.validateMapping
-                ? converter.validateMapping(props.connection, fromResource, toResource, fromEntities, toEntities)
-                : [];
-            connectionValid = errors.length === 0;
+        try {
+            const converter = ResourceTypeProvider.getConverterFor(fromResource.kind, toResource.kind);
+            if (converter) {
+                const errors = converter.validateMapping
+                    ? converter.validateMapping(props.connection, fromResource, toResource, fromEntities, toEntities)
+                    : [];
+                connectionValid = errors.length === 0;
+            }
+        } catch (e) {
+            // Ignore in case the resource types are not loaded or the converter is not found
+            // eslint-disable-next-line no-console
+            console.error('Connection cannot render.', e);
         }
     }
 
