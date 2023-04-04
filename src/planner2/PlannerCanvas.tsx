@@ -10,6 +10,7 @@ import { ZoomButtons } from '../components/ZoomButtons';
 
 import { ZOOM_STEP_SIZE } from './types';
 import { PlannerMode } from '../wrappers/PlannerModelWrapper';
+import { FocusTopbar } from './components/FocusTopbar';
 
 const blockPositionUpdater = (diff: PositionDiff, zoom: number) => (block: BlockInstanceSpec) => {
     return {
@@ -43,8 +44,17 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
         planner.setCanvasSize(canvasSize);
     }, [planner, canvasSize]);
 
+    const focusToolbar = toClass({
+        'client-block-focus': !!planner.focusedBlock,
+        'focus-toolbar': true,
+        'focus-toolbar-hidden': !planner.focusedBlock,
+    });
+
     return (
         <div className={`planner-area-container ${classNames}`}>
+            <div className={focusToolbar}>
+                <FocusTopbar setFocusBlock={planner.setFocusedBlock} focusedBlock={planner.focusedBlock} />
+            </div>
             <div className="planner-area-position-parent" ref={onRef}>
                 <DragAndDrop.DropZone
                     scale={planner.zoom}
