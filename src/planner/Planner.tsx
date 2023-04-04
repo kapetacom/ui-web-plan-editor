@@ -438,6 +438,9 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     };
 
     private async saveBlock(block: PlannerBlockModelWrapper) {
+        if (this.plan.isReadOnly()) {
+            return;
+        }
         await AssetService.update(block.blockReference.ref, block.getData());
 
         // Check if we should update the reference in the plan as well (if the name changed)
@@ -449,6 +452,10 @@ export class Planner extends React.Component<PlannerProps, PlannerState> {
     }
 
     private async savePlan() {
+        if (this.plan.isReadOnly()) {
+            return;
+        }
+
         await AssetService.update(this.props.systemId, this.props.plan.getData());
     }
 
