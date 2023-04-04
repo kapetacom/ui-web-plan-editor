@@ -8,7 +8,7 @@ import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 
 export interface PlannerBlockContextData {
     blockInstance: BlockInstanceSpec | null;
-    blockDefinition: BlockKind | null;
+    blockDefinition?: BlockKind;
     blockReference: KapetaURI | null;
     consumers: ResourceKind[];
     providers: ResourceKind[];
@@ -20,7 +20,7 @@ export interface PlannerBlockContextData {
 }
 
 const defaultValue: PlannerBlockContextData = {
-    blockDefinition: null,
+    blockDefinition: undefined,
     blockInstance: null,
     blockReference: null,
     consumers: [],
@@ -43,7 +43,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
 
     const blockInstance = plan?.spec.blocks?.find((block) => block.id === blockId) || null;
-    const blockDefinition = getBlockByRef(blockInstance?.block.ref || '') || null;
+    const blockDefinition = getBlockByRef(blockInstance?.block.ref || '');
 
     const value = useMemo(() => {
         // calculate Resource height
@@ -76,10 +76,7 @@ type WithEnsuredFields<T, KS extends keyof T> = {
     [K in keyof T]: K extends KS ? NonNullable<T[K]> : T[K];
 };
 
-type BlockContextWData = WithEnsuredFields<
-    PlannerBlockContextData,
-    'blockReference' | 'blockInstance'
->;
+type BlockContextWData = WithEnsuredFields<PlannerBlockContextData, 'blockReference' | 'blockInstance'>;
 
 export const useBlockContext = (): BlockContextWData => {
     const ctx = useContext(BlockContext);

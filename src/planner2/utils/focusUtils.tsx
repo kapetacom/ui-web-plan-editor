@@ -1,6 +1,6 @@
 import { BlockInstanceSpec, BlockKind, PlanKind, Point, ResourceRole, Size } from '@kapeta/ui-web-types';
 
-import { FocusPositioningData, PlannerNodeSize, ZoomAreaMap } from '../../types';
+import { FocusPositioningData, PlannerNodeSize } from '../../types';
 import { BlockInfo, FocusBlockInfo, FocusBlockInfoShallow, ZOOM_STEP_SIZE, ZoomLevels } from '../types';
 
 import { calculateBlockHeight, getBlockInstance } from './planUtils';
@@ -124,7 +124,7 @@ function getFocusedLinkedBlockPosition(
         x = currentBlock.instance.dimensions?.width ?? 0;
 
         const totalHeight = positionData.totalUsedHeightLeft;
-        //We start
+        // We start
         y = (positionData.totalUsedHeight - totalHeight) / 2;
         for (let i = 0; i < blockIndex; i++) {
             y += calculateBlockHeight(focusBlockInfo.providingBlocks[i].block, nodeSize) + FOCUS_BLOCK_SPACING;
@@ -265,7 +265,7 @@ export function getBlockPositionForFocus(
             (consumingBlock) => consumingBlock.instance.id === blockInfo.instance.id
         );
 
-        let side = isConsuming ? ResourceRole.PROVIDES : ResourceRole.CONSUMES;
+        const side = isConsuming ? ResourceRole.PROVIDES : ResourceRole.CONSUMES;
 
         point = getFocusedLinkedBlockPosition(blockInfo.instance.id, side, positioningData, focusInfo, nodeSize);
     }
@@ -300,24 +300,25 @@ export function useFocusInfo() {
 
     const zoomLevelAreas: ZoomLevels = useMemo(() => {
         let zoom = 0.5;
-        const zoomLevelAreas: ZoomLevels = {};
+        const newZoomLevelAreas: ZoomLevels = {};
         do {
             // populate the zoomLevelArea with all possible sizes after mounting
             zoom += ZOOM_STEP_SIZE;
-            zoomLevelAreas[zoom] = getFocusArea(zoom, planner.canvasSize);
+            newZoomLevelAreas[zoom] = getFocusArea(zoom, planner.canvasSize);
         } while (zoom < 3);
 
-        return zoomLevelAreas;
+        return newZoomLevelAreas;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [planner.canvasSize.width, planner.canvasSize.height]);
 
     const focusInfo = useMemo(() => {
         if (!planner.plan || !planner.focusedBlock) {
-            return;
+            return undefined;
         }
 
         const focusBlockDefinition = planner.getBlockById(planner.focusedBlock.id);
         if (!focusBlockDefinition) {
-            return;
+            return undefined;
         }
 
         const focusInfoShallow = getFocusBlockInfo(planner.plan, {
@@ -331,7 +332,9 @@ export function useFocusInfo() {
             consumingBlocks: toBlockInfoList(focusInfoShallow.consumingBlocks),
             providingBlocks: toBlockInfoList(focusInfoShallow.providingBlocks),
         };
-    }, [planner.plan, planner.focusedBlock]);
+        // TODO:
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [planner.plan, planner.focusedBlock, toBlockInfoList]);
 
     useEffect(() => {
         if (!focusInfo) {
@@ -340,9 +343,10 @@ export function useFocusInfo() {
 
         const zoomLevel = getFocusZoomLevel(focusInfo, zoomLevelAreas, planner.nodeSize);
         if (planner.zoom !== zoomLevel) {
-            planner.setZoomLevel(zoomLevel);
+            planner.setZoomLevel.call(null, zoomLevel);
         }
-    }, [focusInfo?.focus.instance.id]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [focusInfo?.focus.instance.id, planner.setZoomLevel]);
 
     return focusInfo;
 }

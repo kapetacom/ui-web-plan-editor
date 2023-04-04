@@ -1,10 +1,6 @@
-import { BlockConnectionSpec, BlockInstanceSpec, PlanKind, Point } from '@kapeta/ui-web-types';
+import { BlockConnectionSpec, PlanKind, Point } from '@kapeta/ui-web-types';
 import { BasisCurve } from '@kapeta/ui-web-utils';
 import { getResourceId } from './planUtils';
-import { NeighboringBlocks } from '../../types';
-import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
-import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
-import { FocusBlockInfo } from '../types';
 
 export function calculatePathBetweenPoints(fromPoint: Point, toPoint: Point) {
     return getCurveFromPoints(getCurveMainPoints(fromPoint, toPoint));

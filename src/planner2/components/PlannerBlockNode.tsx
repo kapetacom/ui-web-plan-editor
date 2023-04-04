@@ -13,7 +13,6 @@ import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
 import { BlockInfo, PlannerPayload, ResourcePayload } from '../types';
 import { ActionButtons } from './ActionButtons';
-import { toClass } from '@kapeta/ui-web-utils';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 
 interface Props {
@@ -44,7 +43,9 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
     let errors = [] as string[];
     try {
         errors =
-            BlockTypeProvider.get(blockContext.blockDefinition?.kind)?.validate?.(blockContext.blockDefinition) || [];
+            (blockContext.blockDefinition &&
+                BlockTypeProvider.get(blockContext.blockDefinition.kind)?.validate?.(blockContext.blockDefinition)) ||
+            [];
     } catch (e: any) {
         errors = [e.message];
     }
@@ -52,7 +53,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
 
     let className = 'planner-block-node-container';
     if (props.className) {
-        className += ' ' + props.className;
+        className += ` ${props.className}`;
     }
 
     const canMove = !props.viewOnly && !focusInfo;
@@ -85,7 +86,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                 if (focusInfo) {
                     const blockInfo: BlockInfo = {
                         instance: blockContext.blockInstance,
-                        block: blockContext.blockDefinition,
+                        block: blockContext.blockDefinition!,
                     };
                     const focusPoint = getBlockPositionForFocus(blockInfo, focusInfo, planner.zoom, planner.canvasSize);
                     if (focusPoint) {
@@ -119,7 +120,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 }
 
                                 // Create new consumer on block and save definition?
-                                const newBlock = _.cloneDeep(blockContext.blockDefinition);
+                                const newBlock = _.cloneDeep(blockContext.blockDefinition!);
                                 newBlock.spec.consumers = newBlock.spec.consumers || [];
                                 newBlock.spec.consumers.push({
                                     kind: targetKind,

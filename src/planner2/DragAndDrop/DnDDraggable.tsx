@@ -150,7 +150,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
     // Callback when isDragging changes
     useEffect(() => {
         if (isDragging && props.onDragStart) {
-            props.onDragStart();
+            props.onDragStart.call(null);
         }
     }, [isDragging, props.onDragStart]);
 
@@ -170,9 +170,9 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
         if (isDropped) {
             // Wait with resetting the position state, so the state is consistent when triggering onDrop
             if (props.onDrop) {
-                props.onDrop(state.dragEvent);
+                props.onDrop.call(null, state.dragEvent);
             }
-            ctx.callbacks.onDrop(props.data, state.dragEvent);
+            ctx.callbacks.onDrop.call(null, props.data, state.dragEvent);
 
             // Reset
             setState({
@@ -180,7 +180,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 status: DragStatus.IDLE,
             });
         }
-    }, [state.dragEvent, ctx.callbacks, isDropped, props.onDrop, props.data]);
+    }, [state.dragEvent, ctx.callbacks.onDrop, isDropped, props.onDrop, props.data]);
 
     // get single child
     return props.children({
