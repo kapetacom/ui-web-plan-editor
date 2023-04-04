@@ -1,0 +1,84 @@
+@import '~@kapeta/ui-web-components/styles/values';
+@import '~@kapeta/ui-web-components/styles/functions';
+
+.focus-side-panel-2 {
+    .side-panel-container.small {
+        background-color: @gray-xdark;
+        width: 300px;
+        top: 0px;
+        color: @bw-planner-background;
+    }
+
+    .side-panel-header-icon {
+        align-content: center;
+    }
+
+    p {
+        color: @bw-planner-background;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .focused-block-line {
+        .transition();
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        .block-icon {
+            display: inline-flex;
+            margin-right: 12px;
+        }
+
+        .block-name {
+            display: inline;
+        }
+    }
+
+    .connected-blocks {
+        color: @bw-planner-background;
+        padding: 5px;
+
+        .connected-block-line {
+            cursor: pointer;
+            .transition();
+            padding-top: 10px;
+
+            .block-icon {
+                display: inline-flex;
+                margin-right: 12px;
+            }
+
+            .block-name {
+                display: inline;
+            }
+
+            .resource-icon {
+                left: 0;
+                display: inline-flex;
+                padding: 5px;
+
+                &.database {
+                    svg {
+                        path {
+                            fill: @bw-green;
+                        }
+                    }
+                }
+
+                &.service {
+                    svg {
+                        path {
+                            fill: @bw-orange;
+                        }
+                    }
+                }
+            }
+
+            .resource-name {
+                display: inline;
+            }
+        }
+    }
+}

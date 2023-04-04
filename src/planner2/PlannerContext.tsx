@@ -29,7 +29,7 @@ export interface PlannerContextData {
     plan?: PlanKind;
     blockAssets: Asset<BlockKind>[];
     focusedBlock?: BlockInstanceSpec;
-    setFocusedBlock(block: BlockInstanceSpec): void;
+    setFocusedBlock(block: BlockInstanceSpec | undefined): void;
     mode?: PlannerMode;
     zoom: number;
     setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
@@ -80,6 +80,7 @@ const defaultValue: PlannerContextData = {
     getBlockById(blockId: string): BlockKind | undefined {
         return undefined;
     },
+
     updateBlockDefinition() {},
     updateBlockInstance(blockId, callback) {
         // noop
@@ -190,8 +191,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     }, [props.onAssetChange, blockAssets, props.blockAssets]);
 
     const toggleFocusBlock = useCallback(
-        (block: BlockInstanceSpec) => {
-            setFocusedBlock((prevFocus) => (prevFocus && block.id === prevFocus.id ? undefined : block));
+        (block: BlockInstanceSpec | undefined) => {
+            setFocusedBlock((prevFocus) => (prevFocus && block && block.id === prevFocus.id ? undefined : block));
         },
         [setFocusedBlock]
     );
@@ -335,6 +336,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 const resource = list?.find((rx) => rx.metadata.name === resourceName);
                 return resource;
             },
+
             // connections
             addConnection({ from, to, mapping }: BlockConnectionSpec) {
                 setPlan((prevState) => {
