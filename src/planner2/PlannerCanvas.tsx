@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo } from 'react';
-import { PlannerContext, PlannerMode } from './PlannerContext';
+import { PlannerContext } from './PlannerContext';
 import { DragAndDrop } from './utils/dndUtils';
 import { useBoundingBox } from './hooks/boundingBox';
 import { calculateCanvasSize } from './utils/planUtils';
@@ -7,7 +7,9 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { PositionDiff } from './DragAndDrop/types';
 import { BlockInstanceSpec } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
+
 import { ZOOM_STEP_SIZE } from './types';
+import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 
 const blockPositionUpdater = (diff: PositionDiff, zoom: number) => (block: BlockInstanceSpec) => {
     return {

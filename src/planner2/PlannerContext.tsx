@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import {
     Asset,
     BlockConnectionSpec,
@@ -10,17 +9,14 @@ import {
     Point,
     ResourceKind,
     ResourceRole,
+    SchemaKind,
 } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerNodeSize } from '../types';
 import { cloneDeep } from 'lodash';
 import { PlannerAction, Rectangle } from './types';
 
-export enum PlannerMode {
-    VIEW,
-    CONFIGURATION,
-    EDIT,
-}
+import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 
 type BlockUpdater = (block: BlockInstanceSpec) => BlockInstanceSpec;
 export interface PlannerActionConfig {
@@ -69,15 +65,12 @@ export interface PlannerContextData {
 }
 
 const defaultValue: PlannerContextData = {
+    focusedBlock: undefined,
     mode: PlannerMode.VIEW,
     zoom: 1,
     setZoomLevel() {},
 
-    focusedBlock: undefined,
     setFocusedBlock(block: BlockInstanceSpec) {},
-
-    canvasSize: { x: 0, y: 0, width: 0, height: 0 },
-    setCanvasSize(canvasSize: Rectangle) {},
 
     nodeSize: PlannerNodeSize.MEDIUM,
     blockAssets: [],
@@ -111,6 +104,9 @@ const defaultValue: PlannerContextData = {
         },
         removePoint() {},
     },
+
+    canvasSize: { x: 0, y: 0, width: 0, height: 0 },
+    setCanvasSize() {},
 };
 
 export const PlannerContext = React.createContext(defaultValue);
@@ -118,11 +114,12 @@ export type PlannerContextProps = {
     plan: PlanKind;
     blockAssets: Asset<BlockKind>[];
     mode: PlannerMode;
+    onChange?: (plan: PlanKind) => void;
+    onAssetChange?: (asset: Asset<SchemaKind>) => void;
 };
 
 // Helper to make sure we memoize anything we can for the context
 export const usePlannerContext = (props: PlannerContextProps): PlannerContextData => {
-    const mode = props.mode === undefined ? PlannerMode.VIEW : props.mode;
     //
     const [points, setPoints] = useState<{ [id: string]: Point }>(() => ({}));
     const addPoint = useCallback(
@@ -155,7 +152,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     // region View state
     const [focusedBlock, setFocusedBlock] = useState<BlockInstanceSpec>();
     const [canvasSize, setCanvasSize] = useState<Rectangle>({ x: 0, y: 0, width: 0, height: 0 });
-    const [viewMode, setViewMode] = useState(mode);
+    const [viewMode, setViewMode] = useState(props.mode);
     const [zoom, setZoomLevel] = useState(1);
 
     // zoom
@@ -174,9 +171,30 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         setBlockAssets(props.blockAssets);
     }, [props.blockAssets]);
 
-    const toggleFocusBlock = (block: BlockInstanceSpec) => {
-        setFocusedBlock(focusedBlock && block.id === focusedBlock.id ? undefined : block);
-    };
+    // onChange listeners
+    useEffect(() => {
+        if (plan !== props.plan && props.onChange) {
+            props.onChange.call(null, plan);
+        }
+    }, [props.onChange, plan, props.plan]);
+
+    useEffect(() => {
+        if (blockAssets !== props.blockAssets && props.onAssetChange) {
+            blockAssets.forEach((asset) => {
+                const existing = props.blockAssets.find((a) => parseKapetaUri(a.ref).equals(parseKapetaUri(asset.ref)));
+                if (existing && existing.data !== asset.data) {
+                    props.onAssetChange!.call(null, asset);
+                }
+            });
+        }
+    }, [props.onAssetChange, blockAssets, props.blockAssets]);
+
+    const toggleFocusBlock = useCallback(
+        (block: BlockInstanceSpec) => {
+            setFocusedBlock((prevFocus) => (prevFocus && block.id === prevFocus.id ? undefined : block));
+        },
+        [setFocusedBlock]
+    );
 
     return useMemo(() => {
         const planner = {
@@ -226,8 +244,6 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     blocks[blockIx] = updater(blocks[blockIx]);
                     return newPlan;
                 });
-
-                // TODO: Save to disk / callback
             },
             removeBlockInstance(blockId: string) {
                 setPlan((prevState) => {
@@ -266,7 +282,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             removeResource(blockRef: string, resourceName: string, resourceRole: ResourceRole) {
                 // Remove connection point
                 setBlockAssets((prevState) => {
-                    const newAssets = cloneDeep(prevState);
+                    const newAssets = [...prevState];
                     const blockIx =
                         newAssets.findIndex((pblock) => parseKapetaUri(pblock.ref).equals(parseKapetaUri(blockRef))) ??
                         -1;
@@ -275,8 +291,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                         throw new Error(`Block #${blockRef} not found`);
                     }
 
-                    const block = newAssets[blockIx];
-
+                    const block = cloneDeep(newAssets[blockIx]);
                     const list =
                         resourceRole === ResourceRole.PROVIDES ? block.data.spec.providers : block.data.spec.consumers;
                     const resourceIx = list?.findIndex((resource) => resource.metadata.name === resourceName) ?? -1;
@@ -284,6 +299,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                         throw new Error(`Resource ${resourceName} not found in block #${blockRef}`);
                     }
                     list!.splice(resourceIx, 1);
+
+                    newAssets[blockIx] = block;
                     return newAssets;
                 });
 
@@ -295,6 +312,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                             ?.filter((block) => parseKapetaUri(block.block.ref).equals(parseKapetaUri(blockRef)))
                             .map((block) => block.id) ?? [];
                     const connections = newPlan.spec.connections ?? [];
+                    let deletions = 0;
                     for (const blockId of blockIds) {
                         const connectionIx = connections.findIndex((conn) =>
                             resourceRole === ResourceRole.PROVIDES
@@ -303,9 +321,10 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                         );
                         if (connectionIx !== -1) {
                             connections.splice(connectionIx, 1);
+                            deletions++;
                         }
                     }
-                    return newPlan;
+                    return deletions ? newPlan : prevState;
                 });
             },
             getResourceByBlockIdAndName(blockId: string, resourceName: string, resourceRole: ResourceRole) {
@@ -352,7 +371,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             connectionPoints,
         };
         return planner;
-    }, [blockAssets, plan, zoom, setZoomLevel, connectionPoints, focusedBlock, setFocusedBlock, viewMode]);
+    }, [blockAssets, canvasSize, connectionPoints, focusedBlock, plan, setZoomLevel, toggleFocusBlock, viewMode, zoom]);
 };
 
 export function withPlannerContext<T>(Inner: React.ComponentType<T>) {

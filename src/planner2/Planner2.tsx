@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext, useMemo } from 'react';
+import React, { ReactNode, useContext } from 'react';
 import { PlannerActionConfig, PlannerContext } from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';
@@ -8,10 +8,9 @@ import { PlannerCanvas } from './PlannerCanvas';
 import { PlannerConnection } from './components/PlannerConnection';
 import { getConnectionId, isConnectionTo } from './utils/connectionUtils';
 import { DnDContext, DnDContextType } from './DragAndDrop/DnDContext';
-import { BlockInfo, FocusBlockInfo, PlannerPayload } from './types';
+import { PlannerPayload } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
-import { getFocusBlockInfo, isBlockInFocus, useFocusInfo } from './utils/focusUtils';
-import { BlockInstanceSpec } from '@kapeta/ui-web-types';
+import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
@@ -39,11 +38,11 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
     ) : null;
 };
 
-export const Planner: React.FC<Props> = (props) => {
+export const Planner2: React.FC<Props> = (props) => {
     const { nodeSize = PlannerNodeSize.MEDIUM, plan } = useContext(PlannerContext);
 
-    let instances = plan?.spec.blocks ?? [];
-    let connections = plan?.spec.connections ?? [];
+    const instances = plan?.spec.blocks ?? [];
+    const connections = plan?.spec.connections ?? [];
 
     const focusInfo = useFocusInfo();
     const focusModeEnabled = !!focusInfo;
@@ -55,8 +54,8 @@ export const Planner: React.FC<Props> = (props) => {
                 {instances.map((instance, index) => {
                     const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
                     const isInFocus = !!(focusInfo && isBlockInFocus(focusInfo, instance.id));
-                    //Hide blocks that are not in focus or connected to the focused block
-                    let className = toClass({
+                    // Hide blocks that are not in focus or connected to the focused block
+                    const className = toClass({
                         'planner-block': focusModeEnabled && !isInFocus,
                         'linked-block': focusModeEnabled && isInFocus && !focusedBlock,
                         'planner-focused-block': focusedBlock,
@@ -70,8 +69,8 @@ export const Planner: React.FC<Props> = (props) => {
                 })}
 
                 {connections.map((connection) => {
-                    //Hide connections that are not connected to the focused block
-                    let className = toClass({
+                    // Hide connections that are not connected to the focused block
+                    const className = toClass({
                         'connection-hidden': !!(
                             focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
                         ),

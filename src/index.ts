@@ -31,3 +31,6 @@ export * from './wrappers/PlannerModelWrapper';
 export * from './wrappers/PlannerResourceModelWrapper';
 export * from './wrappers/wrapperHelpers';
 export * from './types';
+
+export * from './planner2/Planner2';
+export * from './planner2/PlannerContext';

@@ -4,7 +4,6 @@ import { ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 
 import { PlannerBlockResourceListItem } from './PlannerBlockResourceListItem';
-import { PlannerNodeSize } from '../../types';
 import { PlannerContext } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
 import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
