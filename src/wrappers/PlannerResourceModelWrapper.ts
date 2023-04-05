@@ -8,6 +8,7 @@ import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
+import { randomUUID } from '../utils/cryptoUtils';
 
 const DEFAULT_EXTENSION_SIZE = 110;
 
@@ -36,7 +37,8 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     }
 
     constructor(role: ResourceRole, resource: ResourceKind, block: PlannerBlockModelWrapper) {
-        this.instanceId = crypto.randomUUID();
+        this.instanceId = randomUUID();
+
         this.role = role;
         this.mode = ResourceMode.HIDDEN;
         this.data = resource;
