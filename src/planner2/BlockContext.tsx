@@ -3,6 +3,7 @@ import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerContext } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';
+import { InstanceStatus } from '@kapeta/ui-web-context';
 import {BlockDefinition, BlockInstance, Resource} from "@kapeta/schemas";
 
 export interface PlannerBlockContextData {
@@ -11,6 +12,7 @@ export interface PlannerBlockContextData {
     blockReference: KapetaURI | null;
     consumers: Resource[];
     providers: Resource[];
+    instanceStatus: InstanceStatus;
     instanceBlockHeight: number;
 
     blockMode: BlockMode;
@@ -25,6 +27,7 @@ const defaultValue: PlannerBlockContextData = {
     blockReference: null,
     consumers: [],
     providers: [],
+    instanceStatus: InstanceStatus.STOPPED,
     instanceBlockHeight: 0,
     blockMode: BlockMode.HIDDEN,
     setBlockMode(mode: BlockMode) {
@@ -48,6 +51,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
     // Overrides from external sources, such as the sidebar
     const overrideMode = blockInstance && planner.assetState.getViewModeForBlock(blockInstance);
     const focusedMode = planner.focusedBlock?.id === blockId ? BlockMode.FOCUSED : undefined;
+    const instanceStatus = planner.instanceStates[blockId] || InstanceStatus.STOPPED;
 
     const value = useMemo(() => {
         // calculate Resource height
@@ -66,6 +70,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
             blockReference,
             consumers,
             providers,
+            instanceStatus,
             instanceBlockHeight,
             blockMode: focusedMode ?? overrideMode ?? blockMode,
             setBlockMode,
@@ -77,6 +82,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
         planner.canEditBlocks,
         blockInstance,
         blockDefinition,
+        instanceStatus,
         blockMode,
         setBlockMode,
         overrideMode,

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react';
-import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { InstanceStatus, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import _ from 'lodash';
 
 import { BlockNode } from '../../components/BlockNode';
@@ -241,8 +241,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                                 })
                                             }
                                             readOnly={!canEditInstance}
-                                            // TODO: Move this to block context
-                                            status={InstanceStatus.STOPPED}
+                                            status={blockContext.instanceStatus}
                                             height={blockContext.instanceBlockHeight}
                                             width={blockContext.blockInstance.dimensions!.width}
                                             typeName={blockContext.blockDefinition?.metadata.name}

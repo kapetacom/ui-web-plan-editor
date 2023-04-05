@@ -6,15 +6,16 @@ import {
     SchemaKind,
 } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
-import { PlannerNodeSize } from '../types';
+import { InstanceStatus } from '@kapeta/ui-web-context';
+import {BlockDefinition, BlockInstance, Connection, Endpoint, Plan, Resource } from '@kapeta/schemas';
 import { cloneDeep } from 'lodash';
+import { PlannerNodeSize } from '../types';
 import { PlannerAction, Rectangle } from './types';
 
 import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 import { getResourceId } from './utils/planUtils';
 import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
-import {BlockDefinition, BlockInstance, Connection, Endpoint, Plan, Resource } from '@kapeta/schemas';
 
 type BlockUpdater = (block: BlockInstance) => BlockInstance;
 type Callback = () => void;
@@ -55,6 +56,7 @@ export interface PlannerContextData {
         getViewModeForBlock(blockInstance: BlockInstance): BlockMode | undefined;
         setViewModeForBlock(blockInstance: BlockInstance, mode?: BlockMode): void;
     };
+    instanceStates: { [id: string]: InstanceStatus };
 
     mode?: PlannerMode;
     zoom: number;
@@ -108,6 +110,7 @@ const defaultValue: PlannerContextData = {
         },
         setViewModeForBlock() {},
     },
+    instanceStates: {},
     zoom: 1,
     setZoomLevel() {},
 
@@ -170,6 +173,7 @@ export type PlannerContextProps = {
     mode: PlannerMode;
     onChange?: (plan: Plan) => void;
     onAssetChange?: (asset: Asset<SchemaKind>) => void;
+    instanceStates?: { [id: string]: InstanceStatus };
 };
 
 // Helper to make sure we memoize anything we can for the context
@@ -215,15 +219,6 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     // Allow internal changes, but load from props in case props change
     const [plan, setPlan] = useState(props.plan);
-    function updatePlan(changer: (prev: Plan) => Plan) {
-        setPlan((prev) => {
-            const newPlan = changer(prev);
-            if (props.onChange && newPlan !== prev) {
-                props.onChange(newPlan);
-            }
-            return newPlan;
-        });
-    }
 
     useEffect(() => {
         setPlan(props.plan);
@@ -231,21 +226,6 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     // Allow internal changes, but load from props in case props change
     const [blockAssets, setBlockAssets] = useState(props.blockAssets);
-
-    function updateBlockAssets(changer: (prev: Asset<BlockDefinition>[]) => Asset<BlockDefinition>[]) {
-        setBlockAssets((prev) => {
-            const newAssets = changer(prev);
-            if (props.onAssetChange) {
-                const onChange = props.onAssetChange;
-                newAssets.forEach((newAsset, ix) => {
-                    if (prev.indexOf(newAsset) === -1) {
-                        onChange(newAsset);
-                    }
-                });
-            }
-            return newAssets;
-        });
-    }
 
     useEffect(() => {
         setBlockAssets(props.blockAssets);
@@ -287,6 +267,38 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         };
     }, []);
 
+    const instanceStates = useMemo(() => props.instanceStates || {}, [props.instanceStates]);
+    const onPlanChange = props.onChange;
+    const updatePlan = useCallback(
+        function updatePlan(changer: (prev: Plan) => Plan) {
+            setPlan((prev) => {
+                const newPlan = changer(prev);
+                if (onPlanChange && newPlan !== prev) {
+                    onPlanChange(newPlan);
+                }
+                return newPlan;
+            });
+        },
+        [onPlanChange]
+    );
+    const onAssetChange = props.onAssetChange;
+    const updateBlockAssets = useCallback(
+        function updateBlockAssets(changer: (prev: Asset<BlockDefinition>[]) => Asset<BlockDefinition>[]) {
+            setBlockAssets((prev) => {
+                const newAssets = changer(prev);
+                if (onAssetChange) {
+                    newAssets.forEach((newAsset, ix) => {
+                        if (prev.indexOf(newAsset) === -1) {
+                            onAssetChange(newAsset);
+                        }
+                    });
+                }
+                return newAssets;
+            });
+        },
+        [onAssetChange]
+    );
+
     return useMemo(() => {
         const canEditBlocks = viewMode === PlannerMode.EDIT;
         const canEditConnections = viewMode === PlannerMode.EDIT;
@@ -296,6 +308,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             focusedBlock,
             setFocusedBlock: toggleFocusBlock,
             assetState,
+            //
+            instanceStates,
 
             zoom,
             setZoomLevel,
@@ -312,8 +326,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             //
             plan: plan,
             blockAssets,
-            setBlockAssets(blockAssets: Asset<BlockDefinition>[]) {
-                setBlockAssets(blockAssets);
+            setBlockAssets(newBlockAssets: Asset<BlockDefinition>[]) {
+                setBlockAssets(newBlockAssets);
             },
             getBlockByRef(ref: string) {
                 const blockAsset = blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(parseKapetaUri(ref)));
@@ -566,6 +580,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         };
         return planner;
     }, [
+        updatePlan,
+        updateBlockAssets,
+        instanceStates,
         blockAssets,
         canvasSize,
         connectionPoints,
