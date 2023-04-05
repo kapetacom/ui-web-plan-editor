@@ -139,7 +139,7 @@ const PlanEditor = withPlannerContext(() => {
         connection: [
             {
                 enabled(context): boolean {
-                    return planner.mode !== PlannerMode.VIEW;
+                    return planner.mode === PlannerMode.EDIT;
                 },
                 onClick(context, { connection }) {
                     const from = planner.getResourceByBlockIdAndName(

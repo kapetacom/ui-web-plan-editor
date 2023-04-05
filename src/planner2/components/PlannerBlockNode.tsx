@@ -17,7 +17,6 @@ import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils
 import { toClass } from '@kapeta/ui-web-utils';
 
 interface Props {
-    viewOnly?: boolean;
     size: PlannerNodeSize;
     actions: PlannerActionConfig;
     className?: string;
@@ -60,8 +59,8 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
         className += ` ${props.className}`;
     }
 
-    const canMove = !props.viewOnly && !focusInfo;
-    let canEditName = !props.viewOnly;
+    const canMove = blockContext.isMovable && !focusInfo;
+    let canEditName = !blockContext.isReadOnly;
 
     if (
         focusInfo &&
