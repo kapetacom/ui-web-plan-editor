@@ -24,6 +24,7 @@ import { PlannerModelWrapper } from './PlannerModelWrapper';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 import { DSL_LANGUAGE_ID, DSLConverters, DSLWriter } from '@kapeta/ui-web-components';
+import { randomUUID } from '../utils/cryptoUtils';
 
 type HeightCache = { [size: number]: number };
 
@@ -80,7 +81,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     errors: string[] = [];
 
     constructor(blockInstance: BlockInstanceSpec, blockDefinition: BlockKind, plan: PlannerModelWrapper) {
-        this.instanceId = crypto.randomUUID();
+        this.instanceId = randomUUID();
 
         this.id = blockInstance.id;
         if (!this.id) {

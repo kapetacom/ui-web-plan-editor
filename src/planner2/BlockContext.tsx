@@ -4,7 +4,6 @@ import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerContext } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';
-import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 
 export interface PlannerBlockContextData {
     blockInstance: BlockInstanceSpec | null;
@@ -17,6 +16,7 @@ export interface PlannerBlockContextData {
     blockMode: BlockMode;
     setBlockMode: (mode: BlockMode) => void;
     isReadOnly: boolean;
+    isMovable: boolean;
 }
 
 const defaultValue: PlannerBlockContextData = {
@@ -31,6 +31,7 @@ const defaultValue: PlannerBlockContextData = {
         this.blockMode = mode;
     },
     isReadOnly: false,
+    isMovable: false,
 };
 
 export const BlockContext = React.createContext(defaultValue);
@@ -68,15 +69,16 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
             instanceBlockHeight,
             blockMode: focusedMode ?? overrideMode ?? blockMode,
             setBlockMode,
-            isReadOnly: blockReference?.version !== 'local' || planner.mode === PlannerMode.VIEW,
+            isMovable: planner.canEditBlocks === true,
+            isReadOnly: blockReference?.version !== 'local' || planner.canEditBlocks === false,
         };
     }, [
         planner.nodeSize,
+        planner.canEditBlocks,
         blockInstance,
         blockDefinition,
         blockMode,
         setBlockMode,
-        planner.mode,
         overrideMode,
         focusedMode,
     ]);

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DropZoneEntity } from './DropZoneManager';
 import { DnDContext } from './DnDContext';
+import { randomUUID } from '../../utils/cryptoUtils';
 
 type ScrollOffset = { top: number; left: number };
 export class DnDZoneInstance {
@@ -43,7 +44,7 @@ export const DnDDropZone: <T>(
         children: (props: { onRef: (elm: Element | null) => void }) => JSX.Element;
     }
 ) => JSX.Element = ({ scale = 1, accept, onDrop, onDragOver, onDragLeave, onDragEnter, children }) => {
-    const id = useMemo(() => crypto.randomUUID(), []);
+    const id = useMemo(() => randomUUID(), []);
     const { callbacks } = useContext(DnDContext);
     const [element, setElement] = useState<HTMLElement | null>(null);
 

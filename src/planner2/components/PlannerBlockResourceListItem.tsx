@@ -233,6 +233,8 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                 role: ResourceRole.CONSUMES,
                             },
                         }}
+                        // Only allow creating new connections in edit mode
+                        disabled={!planner.canEditConnections}
                     >
                         {({ isDragging, position, componentProps }) => (
                             <>

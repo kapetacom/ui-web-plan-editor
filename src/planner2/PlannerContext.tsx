@@ -34,6 +34,10 @@ export interface PlannerContextData {
     blockAssets: Asset<BlockKind>[];
     focusedBlock?: BlockInstanceSpec;
     setFocusedBlock(block: BlockInstanceSpec | undefined): void;
+
+    canEditBlocks?: boolean;
+    canEditConnections?: boolean;
+
     // view modes
     assetState: {
         getViewModeForResource(
@@ -265,6 +269,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             nodeSize: PlannerNodeSize.MEDIUM,
             //
             mode: viewMode,
+            // is this the right place for this? Are there more conditions?
+            canEditBlocks: viewMode === PlannerMode.EDIT,
+            canEditConnections: viewMode === PlannerMode.EDIT,
             //
             plan: plan,
             blockAssets,
