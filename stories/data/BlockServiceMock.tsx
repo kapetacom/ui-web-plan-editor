@@ -81,6 +81,9 @@ blocks.push(
         type: ResourceType.SERVICE,
         role: ResourceRole.CONSUMES,
         converters: [{ fromKind: 'kapeta/resource-type-rest-api' }],
+        getCounterValue() {
+            return 2;
+        },
     });
 });
 
@@ -104,6 +107,9 @@ blocks.push(
             }
 
             return errors;
+        },
+        getCounterValue: (data) => {
+            return 3;
         },
     });
 });
