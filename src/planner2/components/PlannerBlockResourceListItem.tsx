@@ -167,20 +167,22 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const heightInner = height - RESOURCE_SPACE;
     const yOffset = height * props.index;
 
-    // TODO: Counter?
-    const counterPoint = {
-        x: 0,
-        y: 0,
-    }; // this.calculateCounterPosition(heightInner);
     const counterVisible = counterValue > 0 && buttonsVisible;
     const mouseCatcherWidth = blockInstance.dimensions!.width + 60;
 
+    const counterX = isConsumer ? -10 : 110;
+    // Different offsets because the counter takes up positive space only
+    const counterOffset = isConsumer ? -5 : COUNTER_SIZE * 2 + 5;
+    const buttonX = counterX + (counterVisible ? counterOffset : 0);
     const buttonY = height / 2 - RESOURCE_SPACE / 2;
-    let buttonX = isConsumer ? -10 : 130;
-    if (!counterVisible) {
-        buttonX += isConsumer ? 5 : -5;
-    }
+    const counterY = buttonY - COUNTER_SIZE;
+
     const [actionButtonsWidth, setActionButtonsWidth] = useState(0);
+
+    const counterPoint = {
+        x: counterX,
+        y: counterY,
+    };
 
     const containerClass = toClass({
         'planner-block-resource-list-item': true,
