@@ -11,7 +11,7 @@ import { PlannerContext } from '../PlannerContext';
 
 export const POSITIONING_DATA = 'preFocusPosition';
 export const FOCUSED_ID = 'focusedID';
-const OFFSET_FROM_TOP = 20;
+const OFFSET_FROM_TOP = 100;
 const FOCUS_BLOCK_SPACING = 40;
 
 /**

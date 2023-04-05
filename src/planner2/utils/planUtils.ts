@@ -1,5 +1,5 @@
 import { PlannerNodeSize } from '../../types';
-import { Asset, BlockInstanceSpec, BlockKind, Size } from '@kapeta/ui-web-types';
+import { Asset, BlockInstanceSpec, BlockKind, ResourceRole, Size } from '@kapeta/ui-web-types';
 
 export const resourceHeight = {
     [PlannerNodeSize.SMALL]: 30,
@@ -73,8 +73,8 @@ export function getBlockHeightByResourceCount(resourceCount: number, size: Plann
     return Math.max(150, 70 + resourceCount * resourceHeight[size]);
 }
 
-export function getResourceId(blockId: string, resourceName: string) {
-    return `${blockId}__${resourceName}`;
+export function getResourceId(blockId: string, resourceName: string, resourceRole: ResourceRole) {
+    return `${blockId}__${resourceName}__${resourceRole}`;
 }
 
 export function getBlockInstance(plan, blockId) {

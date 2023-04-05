@@ -10,7 +10,6 @@ import { BlockInstanceSpec } from '@kapeta/ui-web-types';
 interface Props {
     block?: BlockInstanceSpec;
     blurFocus: () => void;
-    onBlockItemHover: (block?: BlockInstanceSpec) => void;
     onClose: () => void;
     onFocusChange: (block: BlockInstanceSpec) => void;
 }
@@ -40,7 +39,6 @@ export const PlannerFocusSideBar = (props: Props) => {
         >
             {props.block && (
                 <BlockTree
-                    onBlockItemHover={props.onBlockItemHover}
                     onBlockClicked={(block) => {
                         props.onFocusChange(block);
                     }}

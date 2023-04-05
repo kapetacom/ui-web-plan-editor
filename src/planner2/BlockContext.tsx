@@ -39,11 +39,14 @@ interface BlockProviderProps extends React.PropsWithChildren {
     blockId: string;
 }
 export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, children }) => {
-    const { plan, nodeSize, getBlockByRef, mode: plannerMode } = useContext(PlannerContext);
+    const planner = useContext(PlannerContext);
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
 
-    const blockInstance = plan?.spec.blocks?.find((block) => block.id === blockId) || null;
-    const blockDefinition = getBlockByRef(blockInstance?.block.ref || '');
+    const blockInstance = planner.plan?.spec.blocks?.find((block) => block.id === blockId) || null;
+    const blockDefinition = planner.getBlockByRef(blockInstance?.block.ref || '');
+    // Overrides from external sources, such as the sidebar
+    const overrideMode = blockInstance && planner.assetState.getViewModeForBlock(blockInstance);
+    const focusedMode = planner.focusedBlock?.id === blockId ? BlockMode.FOCUSED : undefined;
 
     const value = useMemo(() => {
         // calculate Resource height
@@ -53,7 +56,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
         const pendingConsumers = blockMode === BlockMode.HOVER_DROP_CONSUMER ? 1 : 0;
         const pendingProviders = blockMode === BlockMode.HOVER_DROP_PROVIDER ? 1 : 0;
         const resourceCount = Math.max(consumers.length + pendingConsumers, providers.length + pendingProviders);
-        const instanceBlockHeight = getBlockHeightByResourceCount(resourceCount, nodeSize);
+        const instanceBlockHeight = getBlockHeightByResourceCount(resourceCount, planner.nodeSize);
         const blockReference = blockInstance && parseKapetaUri(blockInstance?.block.ref);
 
         return {
@@ -63,11 +66,20 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
             consumers,
             providers,
             instanceBlockHeight,
-            blockMode,
+            blockMode: focusedMode ?? overrideMode ?? blockMode,
             setBlockMode,
-            isReadOnly: blockReference?.version !== 'local' || plannerMode === PlannerMode.VIEW,
+            isReadOnly: blockReference?.version !== 'local' || planner.mode === PlannerMode.VIEW,
         };
-    }, [nodeSize, blockInstance, blockDefinition, blockMode, setBlockMode, plannerMode]);
+    }, [
+        planner.nodeSize,
+        blockInstance,
+        blockDefinition,
+        blockMode,
+        setBlockMode,
+        planner.mode,
+        overrideMode,
+        focusedMode,
+    ]);
     return <BlockContext.Provider value={value}>{children}</BlockContext.Provider>;
 };
 

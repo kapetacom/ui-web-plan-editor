@@ -62,10 +62,6 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                 blurFocus={() => {
                     planner.setFocusedBlock(undefined);
                 }}
-                onBlockItemHover={() => {
-                    // console.log('on block item hover');
-                    // TODO:
-                }}
                 onClose={() => {
                     planner.setFocusedBlock(undefined);
                 }}

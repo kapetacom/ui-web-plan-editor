@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { BlockInstanceSpec, ResourceKind, ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import { useFocusInfo } from '../utils/focusUtils';
 import { BlockInfo } from '../types';
+import { PlannerContext } from '../PlannerContext';
+import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
 
 export interface Props {
     block: BlockInstanceSpec;
     onBlockClicked: (block: BlockInstanceSpec) => void;
-    onBlockItemHover: (block?: BlockInstanceSpec) => void;
 }
 
 export interface State {
@@ -16,6 +17,7 @@ export interface State {
 }
 
 export function BlockTree(props: Props) {
+    const planner = useContext(PlannerContext);
     const focusInfo = useFocusInfo();
     const [hoveredBlock, setHoveredBlock] = useState<BlockInfo>();
 
@@ -109,11 +111,11 @@ export function BlockTree(props: Props) {
                         className="connected-block-line"
                         onMouseEnter={() => {
                             setHoveredBlock(block);
-                            props.onBlockItemHover(block.instance);
+                            planner.assetState.setViewModeForBlock(block.instance, BlockMode.HIGHLIGHT);
                         }}
                         onMouseLeave={() => {
                             setHoveredBlock(undefined);
-                            props.onBlockItemHover(undefined);
+                            planner.assetState.setViewModeForBlock(block.instance, undefined);
                         }}
                         onClick={() => {
                             props.onBlockClicked(block.instance);
@@ -137,10 +139,21 @@ export function BlockTree(props: Props) {
                                     <div
                                         key={`resource_${ix}`}
                                         onMouseMove={() => {
-                                            // resource.setMode(ResourceMode.SHOW);
+                                            planner.assetState.setViewModeForResource(
+                                                hoveredBlock!.instance,
+                                                resource,
+                                                role,
+                                                ResourceMode.SHOW
+                                            );
                                         }}
                                         onMouseLeave={() => {
-                                            // resource.setMode(ResourceMode.HIDDEN);
+                                            // null to reset the state
+                                            planner.assetState.setViewModeForResource(
+                                                hoveredBlock!.instance,
+                                                resource,
+                                                role,
+                                                undefined
+                                            );
                                         }}
                                     >
                                         <div className="resource-icon">{getResourceIcon(resource, role)}</div>

@@ -14,6 +14,7 @@ import { LayoutNode } from '../LayoutContext';
 import { BlockInfo, PlannerPayload, ResourcePayload } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
+import { toClass } from '@kapeta/ui-web-utils';
 
 interface Props {
     viewOnly?: boolean;
@@ -51,7 +52,10 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
     }
     const isValid = errors.length === 0;
 
-    let className = 'planner-block-node-container';
+    let className = toClass({
+        'planner-block-node-container': true,
+        'hovered-block': blockContext.blockMode === BlockMode.HIGHLIGHT,
+    });
     if (props.className) {
         className += ` ${props.className}`;
     }
@@ -66,6 +70,11 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
     ) {
         canEditName = false;
     }
+
+    const blockClassNames = toClass({
+        'planner-block-node': true,
+        highlight: blockContext.blockMode === BlockMode.HIGHLIGHT,
+    });
 
     return (
         // TODO: Readonly/ viewonly
@@ -169,7 +178,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                     <g
                                         data-node-id={blockContext.blockInstance.id}
                                         data-node-type="block"
-                                        className="planner-block-node"
+                                        className={blockClassNames}
                                     >
                                         <PlannerBlockResourceList
                                             role={ResourceRole.CONSUMES}
