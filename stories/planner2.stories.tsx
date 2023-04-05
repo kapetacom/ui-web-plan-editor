@@ -411,6 +411,11 @@ const PlanEditor = withPlannerContext(
 const PlannerLoader = (props) => {
     const plan = useAsync(() => readPlanV2());
 
+    const instanceStatuses = plan.value?.plan?.spec.blocks?.reduce((agg, blockInstance) => {
+        agg[blockInstance.id] = props.instanceStatus;
+        return agg;
+    }, {} as Record<string, InstanceStatus>);
+
     return (
         <DefaultContext>
             {plan.value ? (
@@ -422,6 +427,7 @@ const PlannerLoader = (props) => {
                     onChange={console.log}
                     // eslint-disable-next-line no-console
                     onAssetChange={console.log}
+                    instanceStates={instanceStatuses}
                 />
             ) : (
                 plan.error && <div>{plan.error.message}</div>
@@ -438,8 +444,31 @@ const meta: Meta<typeof PlannerLoader> = {
     component: PlannerLoader,
     argTypes: {
         plannerMode: {
-            options: [PlannerMode.EDIT, PlannerMode.VIEW, PlannerMode.CONFIGURATION],
-            control: { type: 'radio' },
+            options: ['edit', 'view', 'configure'],
+            mapping: {
+                edit: PlannerMode.EDIT,
+                view: PlannerMode.VIEW,
+                configure: PlannerMode.CONFIGURATION,
+            },
+            control: {
+                type: 'select', // Type 'select' is automatically inferred when 'options' is defined
+                labels: {
+                    // 'labels' maps option values to string labels
+                    edit: 'Edit',
+                    view: 'View',
+                    configure: 'Configure',
+                },
+            },
+        },
+        instanceStatus: {
+            options: [
+                InstanceStatus.STOPPED,
+                InstanceStatus.STARTING,
+                InstanceStatus.READY,
+                InstanceStatus.EXITED,
+                InstanceStatus.UNHEALTHY,
+            ],
+            control: 'select',
         },
     },
 };
@@ -450,15 +479,18 @@ type Story = StoryObj<typeof PlannerLoader>;
 export const ViewOnly: Story = {
     args: {
         plannerMode: PlannerMode.VIEW,
+        instanceStatus: InstanceStatus.READY,
     },
 };
 export const EditMode: Story = {
     args: {
         plannerMode: PlannerMode.EDIT,
+        instanceStatus: InstanceStatus.READY,
     },
 };
 export const ConfigureMode: Story = {
     args: {
         plannerMode: PlannerMode.CONFIGURATION,
+        instanceStatus: InstanceStatus.READY,
     },
 };

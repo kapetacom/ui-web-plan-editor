@@ -1,13 +1,8 @@
 import React, { RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-    Asset,
-    Point,
-    ResourceRole,
-    SchemaKind,
-} from '@kapeta/ui-web-types';
+import { Asset, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { InstanceStatus } from '@kapeta/ui-web-context';
-import {BlockDefinition, BlockInstance, Connection, Endpoint, Plan, Resource } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, Connection, Endpoint, Plan, Resource } from '@kapeta/schemas';
 import { cloneDeep } from 'lodash';
 import { PlannerNodeSize } from '../types';
 import { PlannerAction, Rectangle } from './types';
@@ -211,6 +206,10 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     const [focusedBlock, setFocusedBlock] = useState<BlockInstance>();
     const [canvasSize, setCanvasSize] = useState<Rectangle>({ x: 0, y: 0, width: 0, height: 0 });
     const [viewMode, setViewMode] = useState(props.mode);
+    useEffect(() => {
+        setViewMode(props.mode);
+    }, [props.mode]);
+
     const [zoom, setZoomLevel] = useState(1);
 
     // zoom
