@@ -68,7 +68,9 @@ const TempResource = ({ resource, nodeSize, x, y }) => {
 
             <g height={heightInner}>
                 <LayoutNode x={-10} y={height / 2}>
-                    <PlannerConnectionPoint pointId={getResourceId('temp-block', 'temp-resource')} />
+                    <PlannerConnectionPoint
+                        pointId={getResourceId('temp-block', 'temp-resource', ResourceRole.CONSUMES)}
+                    />
                 </LayoutNode>
 
                 <svg
@@ -113,7 +115,28 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const valid = errors.length === 0 && true; // TODO props.resource.isValid();
 
     const [isHovered, setHoverState] = useState(false);
-    const mode = isHovered ? props.hoverMode || props.mode : props.mode;
+    // Mode is complicated;
+    const overrideMode = planner.assetState.getViewModeForResource(blockInstance, props.resource, props.role);
+
+    // expand if the resource is connected to a focused block
+    const isConnectedToFocusedBlock = planner.plan?.spec.connections?.some((connection) => {
+        const isConnectionToResource =
+            connection.from.blockId === planner.focusedBlock?.id &&
+            connection.to.blockId === blockInstance.id &&
+            connection.to.resourceName === props.resource.metadata.name &&
+            props.role === ResourceRole.CONSUMES;
+        const isConnectionFromResource =
+            connection.to.blockId === planner.focusedBlock?.id &&
+            connection.from.blockId === blockInstance.id &&
+            connection.from.resourceName === props.resource.metadata.name &&
+            props.role === ResourceRole.PROVIDES;
+        return isConnectionToResource || isConnectionFromResource;
+    });
+
+    const focusMode = isConnectedToFocusedBlock ? ResourceMode.SHOW_FIXED : undefined; //
+    // props mode is the default, unless overridden by the planner
+    const propsMode = isHovered ? props.hoverMode || props.mode : props.mode;
+    const mode = overrideMode ?? focusMode ?? propsMode;
 
     const isConsumer = props.role === ResourceRole.CONSUMES;
     const dragIsCompatible =
@@ -133,7 +156,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
     const clipPathId = `${resourceId}_clippath`;
 
-    const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name);
+    const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name, props.role);
     const fixedClipPathId = `${clipPathId}_fixed`;
 
     const extension = isExpanded ? 100 : 0;

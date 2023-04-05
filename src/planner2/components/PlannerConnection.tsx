@@ -21,8 +21,12 @@ export const PlannerConnection: React.FC<{
     const planner = useContext(PlannerContext);
     const [hasFocus, setHasFocus] = useState(false);
 
-    const fromId = getResourceId(props.connection.from.blockId, props.connection.from.resourceName);
-    const toId = getResourceId(props.connection.to.blockId, props.connection.to.resourceName);
+    const fromId = getResourceId(
+        props.connection.from.blockId,
+        props.connection.from.resourceName,
+        ResourceRole.PROVIDES
+    );
+    const toId = getResourceId(props.connection.to.blockId, props.connection.to.resourceName, ResourceRole.CONSUMES);
     const from = planner.connectionPoints.getPointById(fromId);
     const to = planner.connectionPoints.getPointById(toId);
 

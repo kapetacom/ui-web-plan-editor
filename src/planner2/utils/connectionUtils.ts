@@ -1,4 +1,4 @@
-import { BlockConnectionSpec, PlanKind, Point } from '@kapeta/ui-web-types';
+import { BlockConnectionSpec, PlanKind, Point, ResourceRole } from '@kapeta/ui-web-types';
 import { BasisCurve } from '@kapeta/ui-web-utils';
 import { getResourceId } from './planUtils';
 
@@ -17,10 +17,11 @@ export function getCurveFromPoints(points: Point[]) {
 }
 
 export function getConnectionId(connection: BlockConnectionSpec) {
-    return `${getResourceId(connection.from.blockId, connection.from.resourceName)}-${getResourceId(
-        connection.to.blockId,
-        connection.to.resourceName
-    )}`;
+    return `${getResourceId(
+        connection.from.blockId,
+        connection.from.resourceName,
+        ResourceRole.PROVIDES
+    )}-${getResourceId(connection.to.blockId, connection.to.resourceName, ResourceRole.CONSUMES)}`;
 }
 
 export function getMiddlePoint(list: Point[]) {

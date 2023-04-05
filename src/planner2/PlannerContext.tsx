@@ -17,6 +17,8 @@ import { cloneDeep } from 'lodash';
 import { PlannerAction, Rectangle } from './types';
 
 import { PlannerMode } from '../wrappers/PlannerModelWrapper';
+import { getResourceId } from './utils/planUtils';
+import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
 
 type BlockUpdater = (block: BlockInstanceSpec) => BlockInstanceSpec;
 export interface PlannerActionConfig {
@@ -25,11 +27,30 @@ export interface PlannerActionConfig {
     resource?: PlannerAction<any>[];
 }
 
+enum ViewState {}
+
 export interface PlannerContextData {
     plan?: PlanKind;
     blockAssets: Asset<BlockKind>[];
     focusedBlock?: BlockInstanceSpec;
     setFocusedBlock(block: BlockInstanceSpec | undefined): void;
+    // view modes
+    assetState: {
+        getViewModeForResource(
+            blockInstance: BlockInstanceSpec,
+            resource: ResourceKind,
+            role: ResourceRole
+        ): ResourceMode | undefined;
+        setViewModeForResource(
+            blockInstance: BlockInstanceSpec,
+            resource: ResourceKind,
+            role: ResourceRole,
+            mode?: ResourceMode
+        ): void;
+        getViewModeForBlock(blockInstance: BlockInstanceSpec): BlockMode | undefined;
+        setViewModeForBlock(blockInstance: BlockInstanceSpec, mode?: BlockMode): void;
+    };
+
     mode?: PlannerMode;
     zoom: number;
     setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
@@ -67,6 +88,16 @@ export interface PlannerContextData {
 const defaultValue: PlannerContextData = {
     focusedBlock: undefined,
     mode: PlannerMode.VIEW,
+    assetState: {
+        getViewModeForResource() {
+            return undefined;
+        },
+        setViewModeForResource() {},
+        getViewModeForBlock() {
+            return undefined;
+        },
+        setViewModeForBlock() {},
+    },
     zoom: 1,
     setZoomLevel() {},
 
@@ -197,11 +228,33 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         [setFocusedBlock]
     );
 
+    const [viewStates, setViewStates] = useState({});
+    const assetState: PlannerContextData['assetState'] = useMemo(
+        () => ({
+            getViewModeForResource(blockInstance, resource, role) {
+                const id = getResourceId(blockInstance.id, resource.metadata.name, role);
+                return viewStates[id] as ResourceMode | undefined;
+            },
+            setViewModeForResource(blockInstance, resource: ResourceKind, role, resourceMode) {
+                const id = getResourceId(blockInstance.id, resource.metadata.name, role);
+                setViewStates((prev) => ({ ...prev, [id]: resourceMode }));
+            },
+            getViewModeForBlock(blockInstance) {
+                return viewStates[blockInstance.id] as BlockMode | undefined;
+            },
+            setViewModeForBlock(blockInstance, blockMode) {
+                setViewStates((prev) => ({ ...prev, [blockInstance.id]: blockMode }));
+            },
+        }),
+        [viewStates, setViewStates]
+    );
+
     return useMemo(() => {
         const planner = {
             // view state
             focusedBlock,
             setFocusedBlock: toggleFocusBlock,
+            assetState,
 
             zoom,
             setZoomLevel,
@@ -373,7 +426,18 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             connectionPoints,
         };
         return planner;
-    }, [blockAssets, canvasSize, connectionPoints, focusedBlock, plan, setZoomLevel, toggleFocusBlock, viewMode, zoom]);
+    }, [
+        blockAssets,
+        canvasSize,
+        connectionPoints,
+        focusedBlock,
+        plan,
+        setZoomLevel,
+        toggleFocusBlock,
+        viewMode,
+        zoom,
+        assetState,
+    ]);
 };
 
 export function withPlannerContext<T>(Inner: React.ComponentType<T>) {
