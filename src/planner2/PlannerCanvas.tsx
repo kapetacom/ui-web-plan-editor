@@ -95,8 +95,8 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
 
                         if (draggable.type === 'block-type') {
                             const blockInstance = createBlockInstanceForBlock(draggable.data);
-                            const center = (BLOCK_SIZE / 2) * planner.zoom; //To account for mouse offset
-                            let point = dragEvent.zone.end;
+                            const center = (BLOCK_SIZE / 2) * planner.zoom; // To account for mouse offset
+                            const point = dragEvent.zone.end;
                             point.x -= center;
                             point.y -= center;
                             const blockPoint = toBlockPoint(point, planner.zoom);

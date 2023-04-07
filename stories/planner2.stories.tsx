@@ -1,4 +1,4 @@
-import React, { ForwardedRef, forwardRef, MutableRefObject, useContext } from 'react';
+import React, { forwardRef, MutableRefObject, useContext } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
 import { ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
@@ -22,7 +22,7 @@ import { DragAndDrop } from '../src/planner2/utils/dndUtils';
 import './styles.less';
 import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockServiceMock } from './data/BlockServiceMock';
-import { BLOCK_SIZE, getBlockHeightByResourceCount } from '../src/planner2/utils/planUtils';
+import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -48,7 +48,7 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
 
     return (
         <svg
-            className={'plan-item-dragged block'}
+            className="plan-item-dragged block"
             style={{
                 left: props.point.x - center,
                 top: props.point.y - center,
@@ -60,11 +60,11 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
         >
             <BlockNode
                 name={props.name}
-                valid={true}
+                valid
                 instanceName={props.title ?? props.name}
                 version={props.block.version}
                 typeName={props.name}
-                readOnly={true}
+                readOnly
                 status={InstanceStatus.STOPPED}
                 height={BLOCK_SIZE}
                 width={BLOCK_SIZE}
@@ -84,7 +84,7 @@ const DraggableResource = (props: DraggableResourceProps & { point: Point }) => 
     const height = 40;
     return (
         <svg
-            className={'plan-item-dragged resource'}
+            className="plan-item-dragged resource"
             style={{
                 left: props.point.x - width / 2,
                 top: props.point.y - height / 2,
@@ -268,7 +268,7 @@ const PlanEditor = withPlannerContext(
         const blocks = useAsync(() => BlockServiceMock.list());
 
         return (
-            <div ref={forwardedRef} className={'plan-container'}>
+            <div ref={forwardedRef} className="plan-container">
                 {draggableItem && draggableItemPosition && draggableItem.type === ItemType.RESOURCE && (
                     <DraggableResource {...draggableItem.data} point={draggableItemPosition} />
                 )}
@@ -303,9 +303,9 @@ const PlanEditor = withPlannerContext(
                     }}
                 />
 
-                <div className={'test-tool-panel'}>
+                <div className="test-tool-panel">
                     <h2>Resources</h2>
-                    <ul className={'resources'}>
+                    <ul className="resources">
                         {ResourceTypeProvider.list().map((resourceConfig, ix) => {
                             const name = resourceConfig.title ?? 'Unknown';
 
@@ -340,14 +340,13 @@ const PlanEditor = withPlannerContext(
                                     onDrop={(evt) => {
                                         setDraggableItem(null);
                                         setDraggableItemPosition(null);
-                                        console.log('Dropped', evt);
                                     }}
                                 >
                                     {(evt) => {
                                         return (
                                             <li {...evt.componentProps}>
-                                                <span className={'title'}>{name}</span>
-                                                <span className={'role'}>{resourceConfig.role.toLowerCase()}</span>
+                                                <span className="title">{name}</span>
+                                                <span className="role">{resourceConfig.role.toLowerCase()}</span>
                                             </li>
                                         );
                                     }}
@@ -357,7 +356,7 @@ const PlanEditor = withPlannerContext(
                     </ul>
 
                     <h2>Blocks</h2>
-                    <ul className={'blocks'}>
+                    <ul className="blocks">
                         {blocks?.value?.map((block, ix) => {
                             const name = block.data.metadata.name;
                             return (
@@ -388,14 +387,13 @@ const PlanEditor = withPlannerContext(
                                     onDrop={(evt) => {
                                         setDraggableItem(null);
                                         setDraggableItemPosition(null);
-                                        console.log('Dropped block', evt);
                                     }}
                                 >
                                     {(evt) => {
                                         return (
                                             <li {...evt.componentProps}>
-                                                <span className={'title'}>{name}</span>
-                                                <span className={'version'}>{block.version}</span>
+                                                <span className="title">{name}</span>
+                                                <span className="version">{block.version}</span>
                                             </li>
                                         );
                                     }}

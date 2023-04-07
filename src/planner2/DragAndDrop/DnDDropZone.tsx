@@ -97,18 +97,12 @@ export const DnDDropZone: <T>(props: DropZoneProps<T> & DropZoneChildrenProps) =
 
     useEffect(() => {
         if (!element) {
-            return;
+            return () => {};
         }
 
         const cb = () => {
-            let top = element.scrollTop;
-            let left = element.scrollLeft;
-            if (element instanceof HTMLElement) {
-                const bbox = element.getBoundingClientRect();
-                const style = window.getComputedStyle(element);
-
-                console.log('element', element);
-            }
+            const top = element.scrollTop;
+            const left = element.scrollLeft;
 
             instance.setOffset({
                 top,
@@ -119,7 +113,9 @@ export const DnDDropZone: <T>(props: DropZoneProps<T> & DropZoneChildrenProps) =
         cb();
 
         element.addEventListener('scroll', cb);
-        return () => element.removeEventListener('scroll', cb);
+        return (): void => {
+            element.removeEventListener('scroll', cb);
+        };
     }, [element, instance]);
 
     return (

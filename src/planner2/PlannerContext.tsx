@@ -19,7 +19,6 @@ import { PlannerAction, Rectangle } from './types';
 import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 import { getResourceId } from './utils/planUtils';
 import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
-import { DragAndDrop } from './DragAndDrop';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
 
 type BlockUpdater = (block: BlockInstanceSpec) => BlockInstanceSpec;
@@ -28,8 +27,6 @@ export interface PlannerActionConfig {
     connection?: PlannerAction<any>[];
     resource?: PlannerAction<any>[];
 }
-
-enum ViewState {}
 
 export interface PlannerContextData {
     plan?: PlanKind;

@@ -1,6 +1,5 @@
 import { DragEventInfo } from './types';
 import { DnDZoneInstance } from './DnDDropZone';
-import { DnDDrag } from '@kapeta/ui-web-components';
 import { Point } from '@kapeta/ui-web-types';
 
 export interface DropZoneEntity<T = any> {
@@ -121,24 +120,25 @@ export class DropZoneManager {
         }
     }
 
-    handleDropEvent(draggable, evt: DragEventInfo, fromZone: DnDZoneInstance, root: HTMLElement | null) {
+    handleDropEvent(draggable, event: DragEventInfo, fromZone: DnDZoneInstance, root: HTMLElement | null) {
+        let eventCopy = { ...event };
         // Loop all elements to check intersection
         for (const dropZone of this.getValidZones(draggable)) {
-            const isContained = this.checkContainment(dropZone.zone, evt.client.end);
+            const isContained = this.checkContainment(dropZone.zone, eventCopy.client.end);
 
             if (isContained) {
                 if (fromZone !== dropZone.zone.instance) {
                     if (!fromZone.isValid() && root) {
-                        //First adjust the event to root to element
+                        // First adjust the event to root to element
                         const rootBox = root.getBoundingClientRect();
                         const zoneBox = dropZone.zone.element.getBoundingClientRect();
-                        evt = this.translateFromElementToRoot(evt, rootBox, zoneBox);
+                        eventCopy = this.translateFromElementToRoot(eventCopy, rootBox, zoneBox);
                     }
 
-                    evt = this.translateFromZoneToZone(evt, fromZone, dropZone.zone.instance);
+                    eventCopy = this.translateFromZoneToZone(eventCopy, fromZone, dropZone.zone.instance);
                 }
                 if (dropZone.zone.onDrop) {
-                    dropZone.zone.onDrop(draggable, evt);
+                    dropZone.zone.onDrop(draggable, eventCopy);
                 }
                 dropZone.state = 'IDLE';
             }
