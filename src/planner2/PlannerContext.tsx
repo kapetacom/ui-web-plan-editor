@@ -258,6 +258,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     );
 
     return useMemo(() => {
+        const canEditBlocks = viewMode === PlannerMode.EDIT;
+        const canEditConnections = viewMode === PlannerMode.EDIT;
+
         const planner = {
             // view state
             focusedBlock,
@@ -274,8 +277,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             //
             mode: viewMode,
             // is this the right place for this? Are there more conditions?
-            canEditBlocks: viewMode === PlannerMode.EDIT,
-            canEditConnections: viewMode === PlannerMode.EDIT,
+            canEditBlocks,
+            canEditConnections,
             //
             plan: plan,
             blockAssets,
@@ -288,6 +291,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 return block && planner.getBlockByRef(block.block.ref);
             },
             updateBlockDefinition(ref: string, update: BlockKind) {
+                if (!canEditBlocks) {
+                    return;
+                }
                 setBlockAssets((state) =>
                     state.map((block) =>
                         parseKapetaUri(block.ref).compare(parseKapetaUri(ref)) === 0
@@ -297,6 +303,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 );
             },
             updateBlockInstance(blockId: string, updater) {
+                if (!canEditBlocks) {
+                    return;
+                }
                 // Use state callback to reference the previous state (avoid stale ref)
                 setPlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
@@ -311,6 +320,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 });
             },
             addBlockInstance(blockInstance: BlockInstanceSpec) {
+                if (!canEditBlocks) {
+                    return;
+                }
                 setPlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     newPlan.spec.blocks?.push(blockInstance);
@@ -318,6 +330,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 });
             },
             removeBlockInstance(blockId: string) {
+                if (!canEditBlocks) {
+                    return;
+                }
                 setPlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
@@ -335,6 +350,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             },
             // resources
             addResource(blockRef: string, resource: ResourceKind, role: ResourceRole) {
+                if (!canEditBlocks) {
+                    return;
+                }
                 setBlockAssets((prevState) => {
                     const newAssets = cloneDeep(prevState);
                     const blockIx =
@@ -352,6 +370,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 });
             },
             removeResource(blockRef: string, resourceName: string, resourceRole: ResourceRole) {
+                if (!canEditBlocks) {
+                    return;
+                }
                 // Remove connection point
                 setBlockAssets((prevState) => {
                     const newAssets = [...prevState];
@@ -410,6 +431,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
             // connections
             addConnection({ from, to, mapping }: BlockConnectionSpec) {
+                if (!canEditConnections) {
+                    return;
+                }
                 setPlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     newPlan.spec.connections?.push({ from, to, mapping });
@@ -417,6 +441,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 });
             },
             removeConnection(connection: BlockConnectionSpec) {
+                if (!canEditConnections) {
+                    return;
+                }
                 setPlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const connectionIx = newPlan.spec.connections?.findIndex(

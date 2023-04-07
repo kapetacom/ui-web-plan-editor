@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, {useContext, useMemo, useState} from 'react';
 
 import { ResourceConfig, ResourceKind, ResourceRole, ResourceType } from '@kapeta/ui-web-types';
 
@@ -139,15 +139,16 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const mode = overrideMode ?? focusMode ?? propsMode;
 
     const isConsumer = props.role === ResourceRole.CONSUMES;
-    const dragIsCompatible =
-        isConsumer &&
-        draggable?.type === 'resource' &&
-        draggable.data.block.id !== blockInstance.id &&
-        ResourceTypeProvider.canApplyResourceToKind(draggable.data.resource.kind, props.resource.kind) &&
-        !planner.hasConnections({
-            blockId: blockInstance.id,
-            resourceName: props.resource.metadata.name,
-        });
+    const dragIsCompatible = useMemo(() => {
+        return isConsumer &&
+                draggable?.type === 'resource' &&
+                draggable.data.block.id !== blockInstance.id &&
+                ResourceTypeProvider.canApplyResourceToKind(draggable.data.resource.kind, props.resource.kind) &&
+                !planner.hasConnections({
+                    blockId: blockInstance.id,
+                    resourceName: props.resource.metadata.name,
+                });
+    }, [draggable, blockInstance, props.resource, planner, isConsumer]);
 
     // Change to inclusion list if necessary
     const isExpanded = mode !== ResourceMode.HIDDEN || dragIsCompatible;

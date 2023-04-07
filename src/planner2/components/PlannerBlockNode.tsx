@@ -106,6 +106,10 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
                         <DragAndDrop.DropZone
                             accept={(draggable: PlannerPayload) => {
+                                if (blockContext.isReadOnly) {
+                                    return false;
+                                }
+
                                 if (draggable.type === 'resource-type') {
                                     //New resource being added
                                     return true;
@@ -114,12 +118,14 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 return (
                                     draggable.type === 'resource' &&
                                     // don't connect to self
-                                    draggable.data.block.id !== blockContext.blockInstance.id &&
-                                    // can create new clients if the block is editable
-                                    !blockContext.isReadOnly
+                                    draggable.data.block.id !== blockContext.blockInstance.id
                                 );
                             }}
                             onDrop={(draggable: ResourcePayload | ResourceTypePayload) => {
+                                if (blockContext.isReadOnly) {
+                                    return;
+                                }
+
                                 blockContext.setBlockMode(BlockMode.HIDDEN);
 
                                 if (draggable.type === 'resource-type') {
@@ -183,6 +189,9 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 });
                             }}
                             onDragEnter={(draggable: ResourcePayload | ResourceTypePayload) => {
+                                if (blockContext.isReadOnly) {
+                                    return;
+                                }
                                 const role =
                                     draggable.type === 'resource-type'
                                         ? draggable.data.config.role
@@ -194,6 +203,9 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 }
                             }}
                             onDragLeave={() => {
+                                if (blockContext.isReadOnly) {
+                                    return;
+                                }
                                 blockContext.setBlockMode(BlockMode.HIDDEN);
                             }}
                         >
