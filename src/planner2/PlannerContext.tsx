@@ -223,12 +223,11 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     function updatePlan(changer: (prev: PlanKind) => PlanKind) {
         setPlan((prev) => {
             const newPlan = changer(prev);
-            if (props.onChange &&
-                newPlan !== prev) {
+            if (props.onChange && newPlan !== prev) {
                 props.onChange(newPlan);
             }
             return newPlan;
-        })
+        });
     }
 
     useEffect(() => {
@@ -250,13 +249,12 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 });
             }
             return newAssets;
-        })
+        });
     }
 
     useEffect(() => {
         setBlockAssets(props.blockAssets);
     }, [props.blockAssets]);
-
 
     const toggleFocusBlock = useCallback(
         (block: BlockInstanceSpec | undefined) => {
@@ -288,16 +286,15 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     const callbackHandlers = useMemo(() => {
         return {
-            onBlockInstanceAdded:[] as InstanceAddedCallback[],
-            onResourceAdded:[] as ResourceAddedCallback[],
-            onConnectionAdded:[] as ConnectionAddedCallback[],
+            onBlockInstanceAdded: [] as InstanceAddedCallback[],
+            onResourceAdded: [] as ResourceAddedCallback[],
+            onConnectionAdded: [] as ConnectionAddedCallback[],
         };
-    }, [])
+    }, []);
 
     return useMemo(() => {
         const canEditBlocks = viewMode === PlannerMode.EDIT;
         const canEditConnections = viewMode === PlannerMode.EDIT;
-
 
         const planner = {
             // view state
@@ -372,12 +369,14 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     newPlan.spec.blocks.push(blockInstance);
                     return newPlan;
                 });
-                callbackHandlers.onBlockInstanceAdded.forEach(cb => cb(blockInstance));
+                callbackHandlers.onBlockInstanceAdded.forEach((cb) => cb(blockInstance));
             },
-            onBlockInstanceAdded(callback:InstanceAddedCallback) {
+            onBlockInstanceAdded(callback: InstanceAddedCallback) {
                 callbackHandlers.onBlockInstanceAdded.push(callback);
                 return () => {
-                    callbackHandlers.onBlockInstanceAdded = callbackHandlers.onBlockInstanceAdded.filter(cb => cb !== callback);
+                    callbackHandlers.onBlockInstanceAdded = callbackHandlers.onBlockInstanceAdded.filter(
+                        (cb) => cb !== callback
+                    );
                 };
             },
             removeBlockInstance(blockId: string) {
@@ -407,9 +406,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 const blockUri = parseKapetaUri(blockRef);
                 updateBlockAssets((prevState) => {
                     const newAssets = cloneDeep(prevState);
-                    const blockIx =
-                        newAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ??
-                        -1;
+                    const blockIx = newAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ?? -1;
 
                     if (blockIx === -1) {
                         throw new Error(`Block #${blockRef} not found`);
@@ -424,22 +421,18 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                         block.data.spec.consumers = [];
                     }
 
-                    const list = role === ResourceRole.PROVIDES ?
-                        block.data.spec.providers :
-                        block.data.spec.consumers;
+                    const list = role === ResourceRole.PROVIDES ? block.data.spec.providers : block.data.spec.consumers;
                     list.push(resource);
 
-                    callbackHandlers.onResourceAdded.forEach(cb => cb(blockRef, block.data, resource));
+                    callbackHandlers.onResourceAdded.forEach((cb) => cb(blockRef, block.data, resource));
 
                     return newAssets;
                 });
-
-
             },
-            onResourceAdded(callback:ResourceAddedCallback) {
+            onResourceAdded(callback: ResourceAddedCallback) {
                 callbackHandlers.onResourceAdded.push(callback);
                 return () => {
-                    callbackHandlers.onResourceAdded = callbackHandlers.onResourceAdded.filter(cb => cb !== callback);
+                    callbackHandlers.onResourceAdded = callbackHandlers.onResourceAdded.filter((cb) => cb !== callback);
                 };
             },
             removeResource(blockRef: string, resourceName: string, resourceRole: ResourceRole) {
@@ -515,13 +508,15 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return newPlan;
                 });
 
-                callbackHandlers.onConnectionAdded.forEach(cb => cb(connection));
+                callbackHandlers.onConnectionAdded.forEach((cb) => cb(connection));
             },
-            onConnectionAdded(callback:ConnectionAddedCallback) {
+            onConnectionAdded(callback: ConnectionAddedCallback) {
                 callbackHandlers.onConnectionAdded.push(callback);
                 return () => {
-                    callbackHandlers.onConnectionAdded = callbackHandlers.onConnectionAdded.filter(cb => cb !== callback);
-                }
+                    callbackHandlers.onConnectionAdded = callbackHandlers.onConnectionAdded.filter(
+                        (cb) => cb !== callback
+                    );
+                };
             },
             updateConnectionMapping({ from, to, mapping }: BlockConnectionSpec) {
                 if (!canEditConnections) {
@@ -529,12 +524,15 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 }
                 updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
-                    const ix = newPlan.spec.connections?.findIndex(c => {
-                        return c.from.blockId === from.blockId &&
-                            c.from.resourceName === from.resourceName &&
-                            c.to.blockId === to.blockId &&
-                            c.to.resourceName === to.resourceName;
-                    }) ?? -1
+                    const ix =
+                        newPlan.spec.connections?.findIndex((c) => {
+                            return (
+                                c.from.blockId === from.blockId &&
+                                c.from.resourceName === from.resourceName &&
+                                c.to.blockId === to.blockId &&
+                                c.to.resourceName === to.resourceName
+                            );
+                        }) ?? -1;
                     if (ix > -1) {
                         newPlan.spec.connections![ix] = { from, to, mapping: cloneDeep(mapping) };
                     }
@@ -583,7 +581,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         viewMode,
         zoom,
         assetState,
-        callbackHandlers
+        callbackHandlers,
     ]);
 };
 

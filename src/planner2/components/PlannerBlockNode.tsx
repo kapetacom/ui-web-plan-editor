@@ -131,14 +131,18 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
 
                                 if (draggable.type === 'resource-type') {
                                     const config = draggable.data.config;
-                                    const ref = `${config.kind}:${config.version}`
-                                    planner.addResource(blockContext.blockReference?.id, {
-                                        kind: ref,
-                                        metadata: {
-                                            name: 'new-resource',
+                                    const ref = `${config.kind}:${config.version}`;
+                                    planner.addResource(
+                                        blockContext.blockReference?.id,
+                                        {
+                                            kind: ref,
+                                            metadata: {
+                                                name: 'new-resource',
+                                            },
+                                            spec: {},
                                         },
-                                        spec: {},
-                                    }, config.role);
+                                        config.role
+                                    );
                                     return;
                                 }
 
