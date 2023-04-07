@@ -111,7 +111,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 }
 
                                 if (draggable.type === 'resource-type') {
-                                    //New resource being added
+                                    // New resource being added
                                     return true;
                                 }
 

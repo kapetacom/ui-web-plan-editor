@@ -95,7 +95,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 x: downEvt.clientX,
             };
 
-            //Initial client position includes scroll
+            // Initial client position includes scroll
             const initialClientPosition = parentZone.getZoneCoordinates(initialPoint);
 
             const initialDragEvt = getDragEventInfo(ctx.root, parentZone, initialPoint, initialClientPosition);
@@ -163,7 +163,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 once: true,
             });
         },
-        [ctx.callbacks, parentZone, props.data, props.disabled]
+        [ctx.callbacks, parentZone, props.data, props.disabled, ctx.root]
     );
 
     const isDragging = state.status === DragStatus.DRAGGING;
@@ -186,14 +186,15 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
 
     // Callback when a drag ends, then reset the state
     const isDropped = state.status === DragStatus.DROPPED;
+    const { onDrop, data } = props;
     useEffect(() => {
         if (isDropped) {
             // Wait with resetting the position state, so the state is consistent when triggering onDrop
-            if (props.onDrop) {
-                props.onDrop(state.dragEvent);
+            if (onDrop) {
+                onDrop(state.dragEvent);
             }
 
-            ctx.callbacks.onDrop(props.data, state.dragEvent, parentZone);
+            ctx.callbacks.onDrop(data, state.dragEvent, parentZone);
 
             // Reset
             setState({
@@ -201,7 +202,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 status: DragStatus.IDLE,
             });
         }
-    }, [state.dragEvent, ctx.callbacks.onDrop, isDropped, props.onDrop, props.data]);
+    }, [state.dragEvent, ctx.callbacks.onDrop, isDropped, onDrop, data, ctx.callbacks, parentZone]);
 
     // get single child
     return props.children({

@@ -26,7 +26,7 @@ export const DnDContainer = <T extends unknown>(props: Props) => {
     const dzManager = useMemo(() => new DropZoneManager(), []);
 
     const callbacks = useMemo<DnDCallbacks>(() => {
-        const callbacks: DnDCallbacks = {
+        return {
             registerDropZone(id: string, zone: DropZoneEntity) {
                 dzManager.addZone(id, zone);
             },
@@ -43,7 +43,6 @@ export const DnDContainer = <T extends unknown>(props: Props) => {
                 dzManager.handleDragEvent(draggable, dragEvent, fromZone, props.root.current);
             },
             onDrop(draggable, dragEvent, fromZone) {
-                console.log('props.root.current', props.root.current);
                 // Loop all elements to check intersection
                 dzManager.handleDropEvent(draggable, dragEvent, fromZone, props.root.current);
                 setDragState(defaultState);
@@ -56,8 +55,7 @@ export const DnDContainer = <T extends unknown>(props: Props) => {
                 });
             },
         };
-        return callbacks;
-    }, [props.root.current]);
+    }, [props.root, dzManager]);
 
     return (
         <DnDContext.Provider
