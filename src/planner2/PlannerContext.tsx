@@ -36,6 +36,8 @@ export interface PlannerActionConfig {
 export interface PlannerContextData {
     plan?: PlanKind;
     blockAssets: Asset<BlockKind>[];
+    setBlockAssets(blockAssets: Asset<BlockKind>[]): void;
+
     focusedBlock?: BlockInstanceSpec;
     setFocusedBlock(block: BlockInstanceSpec | undefined): void;
 
@@ -118,6 +120,7 @@ const defaultValue: PlannerContextData = {
 
     nodeSize: PlannerNodeSize.MEDIUM,
     blockAssets: [],
+    setBlockAssets(blockAssets: Asset<BlockKind>[]) {},
     getBlockByRef(_ref: string) {
         return undefined;
     },
@@ -317,6 +320,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             //
             plan: plan,
             blockAssets,
+            setBlockAssets(blockAssets: Asset<BlockKind>[]) {
+                setBlockAssets(blockAssets);
+            },
             getBlockByRef(ref: string) {
                 const blockAsset = blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(parseKapetaUri(ref)));
                 return blockAsset?.data;
