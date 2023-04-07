@@ -217,33 +217,43 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     // Allow internal changes, but load from props in case props change
     const [plan, setPlan] = useState(props.plan);
+    function updatePlan(changer: (prev: PlanKind) => PlanKind) {
+        setPlan((prev) => {
+            const newPlan = changer(prev);
+            if (props.onChange &&
+                newPlan !== prev) {
+                props.onChange(newPlan);
+            }
+            return newPlan;
+        })
+    }
+
     useEffect(() => {
         setPlan(props.plan);
     }, [props.plan]);
 
     // Allow internal changes, but load from props in case props change
     const [blockAssets, setBlockAssets] = useState(props.blockAssets);
+
+    function updateBlockAssets(changer: (prev: Asset<BlockKind>[]) => Asset<BlockKind>[]) {
+        setBlockAssets((prev) => {
+            const newAssets = changer(prev);
+            if (props.onAssetChange) {
+                const onChange = props.onAssetChange;
+                newAssets.forEach((newAsset, ix) => {
+                    if (prev.indexOf(newAsset) === -1) {
+                        onChange(newAsset);
+                    }
+                });
+            }
+            return newAssets;
+        })
+    }
+
     useEffect(() => {
         setBlockAssets(props.blockAssets);
     }, [props.blockAssets]);
 
-    // onChange listeners
-    useEffect(() => {
-        if (plan !== props.plan && props.onChange) {
-            props.onChange.call(null, plan);
-        }
-    }, [props.onChange, plan, props.plan]);
-
-    useEffect(() => {
-        if (blockAssets !== props.blockAssets && props.onAssetChange) {
-            blockAssets.forEach((asset) => {
-                const existing = props.blockAssets.find((a) => parseKapetaUri(a.ref).equals(parseKapetaUri(asset.ref)));
-                if (existing && existing.data !== asset.data) {
-                    props.onAssetChange!.call(null, asset);
-                }
-            });
-        }
-    }, [props.onAssetChange, blockAssets, props.blockAssets]);
 
     const toggleFocusBlock = useCallback(
         (block: BlockInstanceSpec | undefined) => {
@@ -319,7 +329,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditBlocks) {
                     return;
                 }
-                setBlockAssets((state) =>
+                updateBlockAssets((state) =>
                     state.map((block) =>
                         parseKapetaUri(block.ref).compare(parseKapetaUri(ref)) === 0
                             ? { ...block, data: update }
@@ -332,7 +342,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return;
                 }
                 // Use state callback to reference the previous state (avoid stale ref)
-                setPlan((prevState) => {
+                updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
                     if (blockIx === -1) {
@@ -348,7 +358,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditBlocks) {
                     return;
                 }
-                setPlan((prevState) => {
+                updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     if (!newPlan.spec.blocks) {
                         newPlan.spec.blocks = [];
@@ -368,7 +378,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditBlocks) {
                     return;
                 }
-                setPlan((prevState) => {
+                updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
                     if (blockIx === -1) {
@@ -389,7 +399,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return;
                 }
                 const blockUri = parseKapetaUri(blockRef);
-                setBlockAssets((prevState) => {
+                updateBlockAssets((prevState) => {
                     const newAssets = cloneDeep(prevState);
                     const blockIx =
                         newAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ??
@@ -431,7 +441,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return;
                 }
                 // Remove connection point
-                setBlockAssets((prevState) => {
+                updateBlockAssets((prevState) => {
                     const newAssets = [...prevState];
                     const blockIx =
                         newAssets.findIndex((pblock) => parseKapetaUri(pblock.ref).equals(parseKapetaUri(blockRef))) ??
@@ -455,7 +465,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 });
 
                 // Remove any connections to/from the deleted resource
-                setPlan((prevState) => {
+                updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const blockIds =
                         newPlan.spec.blocks
@@ -490,7 +500,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditConnections) {
                     return;
                 }
-                setPlan((prevState) => {
+                updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     if (!newPlan.spec.connections) {
                         newPlan.spec.connections = [];
@@ -511,7 +521,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditConnections) {
                     return;
                 }
-                setPlan((prevState) => {
+                updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const ix = newPlan.spec.connections?.findIndex(c => {
                         return c.from.blockId === from.blockId &&
@@ -529,7 +539,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditConnections) {
                     return;
                 }
-                setPlan((prevState) => {
+                updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const connectionIx = newPlan.spec.connections?.findIndex(
                         (conn) =>
