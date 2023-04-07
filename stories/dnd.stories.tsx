@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Simulate } from 'react-dom/test-utils';
 import drag = Simulate.drag;
 import { DragAndDrop } from '../src/planner2/DragAndDrop';
@@ -54,10 +54,10 @@ export const DragAndDropDemo = () => {
         type: 'demo',
         data: { test: 1 },
     };
-
+    const rootRef = useRef(null);
     return (
-        <div className="storywrapper" style={{ position: 'relative' }}>
-            <DragAndDrop.ContextProvider>
+        <DragAndDrop.ContextProvider root={rootRef}>
+            <div className="storywrapper" style={{ position: 'relative' }} ref={rootRef}>
                 <DropZoneWrapper style={{ position: 'relative', top: '300' }} />
                 <DropZoneWrapper style={{ position: 'relative', top: '400' }} />
                 <DropZoneWrapper style={{ position: 'relative', top: '500' }} />
@@ -71,23 +71,23 @@ export const DragAndDropDemo = () => {
                         })
                     }
                 >
-                    {({ position, isDragging, componentProps }) => (
+                    {(evt) => (
                         <div
-                            {...componentProps}
+                            {...evt.componentProps}
                             style={{
                                 position: 'absolute',
-                                top: savedPosition.top + position.y,
-                                left: savedPosition.left + position.x,
+                                top: savedPosition.top + evt.zone.diff.y,
+                                left: savedPosition.left + evt.zone.diff.x,
                                 userSelect: 'none',
-                                cursor: isDragging ? 'grabbing' : 'grab',
+                                cursor: evt.isDragging ? 'grabbing' : 'grab',
                             }}
                         >
                             DRAG ME!
-                            <pre>{JSON.stringify(position)}</pre>
+                            <pre>{JSON.stringify(evt.zone.end)}</pre>
                         </div>
                     )}
                 </DragAndDrop.Draggable>
-            </DragAndDrop.ContextProvider>
-        </div>
+            </div>
+        </DragAndDrop.ContextProvider>
     );
 };
