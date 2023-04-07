@@ -2,33 +2,56 @@ import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { DropZoneEntity } from './DropZoneManager';
 import { DnDContext } from './DnDContext';
 import { randomUUID } from '../../utils/cryptoUtils';
+import { Point } from '@kapeta/ui-web-types';
 
-type ScrollOffset = { top: number; left: number };
+type Offset = { top: number; left: number };
+type ScrollListener = (offset: Offset) => void;
+
+function parsePixelValue(value) {
+    if (value.endsWith('px')) {
+        return parseFloat(value.slice(0, -2));
+    }
+    return 0;
+}
+
 export class DnDZoneInstance {
-    private _listeners: ((offset: ScrollOffset) => void)[] = [];
-    scale = 1;
-    scrollOffset: ScrollOffset = { top: 0, left: 0 };
-
-    setOffset(offset: ScrollOffset) {
-        this.scrollOffset = offset;
-        this._listeners.forEach((listener) => listener(offset));
+    private _listeners: ScrollListener[] = [];
+    private offset: Offset = { top: 0, left: 0 };
+    private readonly valid: boolean;
+    constructor(valid: boolean = false) {
+        this.valid = valid;
     }
 
-    onScrollChange(callback: (offset: ScrollOffset) => void) {
+    public isValid() {
+        return this.valid;
+    }
+
+    setOffset(offset: Offset) {
+        this.offset = offset;
+        this._listeners.forEach((listener) => {
+            listener(offset);
+        });
+    }
+
+    getOffset() {
+        return this.offset;
+    }
+
+    onScrollChange(callback: ScrollListener) {
         this._listeners.push(callback);
         return () => {
             this._listeners.splice(this._listeners.indexOf(callback), 1);
         };
     }
 
-    getZoneCoordinates(coords: { y: number; x: number }) {
+    getZoneCoordinates(coords: Point) {
         return {
-            x: coords.x + this.scrollOffset.left,
-            y: coords.y + this.scrollOffset.top,
+            x: coords.x + this.offset.left,
+            y: coords.y + this.offset.top,
         };
     }
 }
-export const DnDZoneContext = React.createContext(new DnDZoneInstance());
+export const DnDZoneContext = React.createContext(new DnDZoneInstance(false));
 
 interface DropZoneProps<T> {
     scale?: number;
@@ -39,14 +62,16 @@ interface DropZoneProps<T> {
     onDrop?: DropZoneEntity<T>['onDrop'];
 }
 
-export const DnDDropZone: <T>(
-    props: DropZoneProps<T> & {
-        children: (props: { onRef: (elm: Element | null) => void }) => JSX.Element;
-    }
-) => JSX.Element = ({ scale = 1, accept, onDrop, onDragOver, onDragLeave, onDragEnter, children }) => {
+type DropZoneChildrenProps = {
+    children: (props: { onRef: (elm: Element | null) => void }) => JSX.Element;
+};
+
+export const DnDDropZone: <T>(props: DropZoneProps<T> & DropZoneChildrenProps) => JSX.Element = (props) => {
     const id = useMemo(() => randomUUID(), []);
     const { callbacks } = useContext(DnDContext);
     const [element, setElement] = useState<HTMLElement | null>(null);
+
+    const instance = useMemo(() => new DnDZoneInstance(true), []);
 
     const onRef = (ref) => {
         setElement(ref);
@@ -56,12 +81,9 @@ export const DnDDropZone: <T>(
         if (!element) return;
 
         callbacks.registerDropZone(id, {
+            ...props,
             element,
-            accept,
-            onDragEnter,
-            onDragOver,
-            onDragLeave,
-            onDrop,
+            instance,
         });
     });
 
@@ -73,21 +95,36 @@ export const DnDDropZone: <T>(
         [callbacks, id]
     );
 
-    const instance = useMemo(() => new DnDZoneInstance(), []);
     useEffect(() => {
+        if (!element) {
+            return;
+        }
+
         const cb = () => {
+            let top = element.scrollTop;
+            let left = element.scrollLeft;
+            if (element instanceof HTMLElement) {
+                const bbox = element.getBoundingClientRect();
+                const style = window.getComputedStyle(element);
+
+                console.log('element', element);
+            }
+
             instance.setOffset({
-                top: element?.scrollTop || 0,
-                left: element?.scrollLeft || 0,
+                top,
+                left,
             });
         };
-        element?.addEventListener('scroll', cb);
-        return () => element?.removeEventListener('scroll', cb);
+
+        cb();
+
+        element.addEventListener('scroll', cb);
+        return () => element.removeEventListener('scroll', cb);
     }, [element, instance]);
 
     return (
         <DnDZoneContext.Provider value={instance}>
-            {children({
+            {props.children({
                 onRef,
             })}
         </DnDZoneContext.Provider>

@@ -39,11 +39,14 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
 
     const showPlaceholder = () => {
         const payload = draggable as PlannerPayload | null;
+        if (!payload) {
+            return false;
+        }
+        const rightTypeAndRole =
+            (payload.type === 'resource' && payload.data.role === props.role) ||
+            (payload.type === 'resource-type' && payload.data.config.role === props.role);
         return (
-            !!payload &&
-            payload.type === 'resource' &&
-            // Role stuff seems a little repetitive
-            payload.data.role === props.role &&
+            rightTypeAndRole &&
             (blockMode === BlockMode.HOVER_DROP_CONSUMER || blockMode === BlockMode.HOVER_DROP_PROVIDER)
         );
     };

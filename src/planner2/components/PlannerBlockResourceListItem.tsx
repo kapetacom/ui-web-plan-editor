@@ -238,7 +238,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                         // Only allow creating new connections in edit mode
                         disabled={!planner.canEditConnections}
                     >
-                        {({ isDragging, position, componentProps }) => (
+                        {(evt) => (
                             <>
                                 <clipPath id={fixedClipPathId}>
                                     <rect
@@ -258,7 +258,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                     onMouseLeave={() => setHoverState(false)}
                                     onMouseMove={() => setHoverState(true)}
                                     // Only register the drag handler if the resource should be draggable (Providers only atm)
-                                    {...(props.role === ResourceRole.PROVIDES ? componentProps : {})}
+                                    {...(props.role === ResourceRole.PROVIDES ? evt.componentProps : {})}
                                 >
                                     {/* Clip the hexagon to create a straight edge */}
                                     <clipPath id={clipPathId}>
@@ -353,10 +353,10 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                 </svg>
 
                                 {/* Temp draggable resource */}
-                                {isDragging ? (
+                                {evt.isDragging ? (
                                     <TempResource
-                                        x={position.x / planner.zoom}
-                                        y={position.y / planner.zoom}
+                                        x={evt.zone.diff.x / planner.zoom}
+                                        y={evt.zone.diff.y / planner.zoom}
                                         nodeSize={nodeSize}
                                         resource={{
                                             typeName,

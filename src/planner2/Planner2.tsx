@@ -3,7 +3,6 @@ import { PlannerActionConfig, PlannerContext } from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';
 import { BlockContextProvider } from './BlockContext';
-import { DragAndDrop } from './utils/dndUtils';
 import { PlannerCanvas } from './PlannerCanvas';
 import { PlannerConnection } from './components/PlannerConnection';
 import { getConnectionId, isConnectionTo } from './utils/connectionUtils';
@@ -48,48 +47,45 @@ export const Planner2: React.FC<Props> = (props) => {
     const focusModeEnabled = !!focusInfo;
 
     return (
-        <DragAndDrop.ContextProvider>
-            {/* Canvas and sidebars should be in the same dnd context */}
-            <PlannerCanvas>
-                {instances.map((instance, index) => {
-                    const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
-                    const isInFocus = !!(focusInfo && isBlockInFocus(focusInfo, instance.id));
-                    // Hide blocks that are not in focus or connected to the focused block
-                    const className = toClass({
-                        'planner-block': focusModeEnabled && !isInFocus,
-                        'linked-block': focusModeEnabled && isInFocus && !focusedBlock,
-                        'planner-focused-block': focusedBlock,
-                    });
+        <PlannerCanvas>
+            {instances.map((instance, index) => {
+                const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
+                const isInFocus = !!(focusInfo && isBlockInFocus(focusInfo, instance.id));
+                // Hide blocks that are not in focus or connected to the focused block
+                const className = toClass({
+                    'planner-block': focusModeEnabled && !isInFocus,
+                    'linked-block': focusModeEnabled && isInFocus && !focusedBlock,
+                    'planner-focused-block': focusedBlock,
+                });
 
-                    return (
-                        <BlockContextProvider key={instance.id} blockId={instance.id}>
-                            <PlannerBlockNode size={nodeSize} actions={props.actions || {}} className={className} />
-                        </BlockContextProvider>
-                    );
-                })}
+                return (
+                    <BlockContextProvider key={instance.id} blockId={instance.id}>
+                        <PlannerBlockNode size={nodeSize} actions={props.actions || {}} className={className} />
+                    </BlockContextProvider>
+                );
+            })}
 
-                {connections.map((connection) => {
-                    // Hide connections that are not connected to the focused block
-                    const className = toClass({
-                        'connection-hidden': !!(
-                            focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
-                        ),
-                    });
+            {connections.map((connection) => {
+                // Hide connections that are not connected to the focused block
+                const className = toClass({
+                    'connection-hidden': !!(
+                        focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
+                    ),
+                });
 
-                    return (
-                        <PlannerConnection
-                            size={nodeSize}
-                            key={getConnectionId(connection)}
-                            className={className}
-                            connection={connection}
-                            actions={props.actions?.connection || []}
-                        />
-                    );
-                })}
+                return (
+                    <PlannerConnection
+                        size={nodeSize}
+                        key={getConnectionId(connection)}
+                        className={className}
+                        connection={connection}
+                        actions={props.actions?.connection || []}
+                    />
+                );
+            })}
 
-                {/* Render temp connections to dragged resources */}
-                <DnDContext.Consumer>{renderTempResources}</DnDContext.Consumer>
-            </PlannerCanvas>
-        </DragAndDrop.ContextProvider>
+            {/* Render temp connections to dragged resources */}
+            <DnDContext.Consumer>{renderTempResources}</DnDContext.Consumer>
+        </PlannerCanvas>
     );
 };

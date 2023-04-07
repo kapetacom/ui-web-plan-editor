@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { ForwardedRef, forwardRef, MutableRefObject, useContext } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
 import { ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
@@ -6,200 +6,408 @@ import { ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-compo
 import { Planner2 } from '../src/planner2/Planner2';
 
 import { readPlanV2 } from './data/planReader';
-import { PlannerActionConfig, PlannerContext, withPlannerContext } from '../src/planner2/PlannerContext';
+import {
+    PlannerActionConfig,
+    PlannerContext,
+    PlannerContextData,
+    withPlannerContext,
+} from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
-import { BlockKind, ItemType, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
+import { Asset, BlockKind, ItemType, Point, ResourceConfig, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
 import { EditableItemInterface2 } from '../src/planner2/types';
-import { PlannerMode } from '../src';
+import { BlockNode, BlockResource, PlannerMode } from '../src';
+import { DragAndDrop } from '../src/planner2/utils/dndUtils';
+import './styles.less';
+import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { BlockServiceMock } from './data/BlockServiceMock';
+import { BLOCK_SIZE, getBlockHeightByResourceCount } from '../src/planner2/utils/planUtils';
 
-const PlanEditor = withPlannerContext(() => {
-    const planner = useContext(PlannerContext);
-    const [editItem, setEditItem] = React.useState<EditableItemInterface2 | undefined>();
-    const [inspectItem, setInspectItem] = React.useState<SchemaKind<any, any> | null>(null);
-    const [configureItem, setConfigureItem] = React.useState<SchemaKind<any, any> | null>(null);
+interface DraggableResourceItem {
+    type: ItemType.RESOURCE;
+    data: DraggableResourceProps;
+}
 
-    const actionConfig: PlannerActionConfig = {
-        block: [
-            {
-                enabled(): boolean {
-                    return true; // planner.mode !== PlannerMode.VIEW;
-                },
-                onClick(context, { block }) {
-                    setInspectItem(block!);
-                },
-                buttonStyle: ButtonStyle.PRIMARY,
-                icon: 'fa fa-search',
-                label: 'Inspect',
-            },
-            {
-                enabled(context, { blockInstance }): boolean {
-                    return (
-                        planner.mode !== PlannerMode.VIEW &&
-                        !!blockInstance &&
-                        parseKapetaUri(blockInstance.block.ref).version === 'local'
-                    );
-                },
-                onClick(context, { blockInstance }) {
-                    DialogControl.delete(
-                        `Delete Block Instance`,
-                        `Are you sure you want to delete ${blockInstance?.name || 'this block'}?`,
-                        (confirm) => {
-                            if (confirm) {
-                                planner.removeBlockInstance(blockInstance!.id);
-                            }
-                        }
-                    );
-                },
-                buttonStyle: ButtonStyle.DANGER,
-                icon: 'fa fa-trash',
-                label: 'Delete',
-            },
-            {
-                enabled(context, { blockInstance }): boolean {
-                    return (
-                        planner.mode !== PlannerMode.VIEW &&
-                        !!blockInstance &&
-                        parseKapetaUri(blockInstance.block.ref).version === 'local'
-                    );
-                },
-                onClick(context, { blockInstance, block }) {
-                    setEditItem({
-                        type: ItemType.BLOCK,
-                        item: block!,
-                        ref: blockInstance!.block.ref,
-                        creating: false,
-                    });
-                },
-                buttonStyle: ButtonStyle.SECONDARY,
-                icon: 'fa fa-pencil',
-                label: 'Edit',
-            },
-            {
-                enabled(context, { blockInstance }): boolean {
-                    return context.mode === PlannerMode.CONFIGURATION;
-                },
-                onClick(context, { block }) {
-                    setConfigureItem(block!);
-                },
-                buttonStyle: ButtonStyle.DEFAULT,
-                icon: 'fa fa-tools',
-                label: 'Configure',
-            },
-        ],
-        resource: [
-            {
-                enabled(context, { blockInstance }): boolean {
-                    return (
-                        planner.mode !== PlannerMode.VIEW &&
-                        !!blockInstance &&
-                        parseKapetaUri(blockInstance.block.ref).version === 'local'
-                    );
-                },
-                onClick(p, { resource }) {
-                    setEditItem({
-                        type: ItemType.RESOURCE,
-                        item: resource!,
-                        creating: false,
-                    });
-                },
-                buttonStyle: ButtonStyle.SECONDARY,
-                icon: 'fa fa-pencil',
-                label: 'Edit',
-            },
-            {
-                enabled(context, { blockInstance }): boolean {
-                    return (
-                        planner.mode !== PlannerMode.VIEW &&
-                        !!blockInstance &&
-                        parseKapetaUri(blockInstance.block.ref).version === 'local'
-                    );
-                },
-                onClick(context, { blockInstance, resource, resourceRole }) {
-                    DialogControl.delete(
-                        `Delete Resource`,
-                        `Are you sure you want to delete ${resource?.metadata.name || 'this resource'}?`,
-                        (confirm) => {
-                            if (confirm) {
-                                context.removeResource(
-                                    blockInstance!.block.ref,
-                                    resource!.metadata.name,
-                                    resourceRole!
-                                );
-                            }
-                        }
-                    );
-                },
-                buttonStyle: ButtonStyle.DANGER,
-                icon: 'fa fa-trash',
-                label: 'Delete',
-            },
-        ],
-        connection: [
-            {
-                enabled(context): boolean {
-                    return planner.mode === PlannerMode.EDIT;
-                },
-                onClick(context, { connection }) {
-                    const from = planner.getResourceByBlockIdAndName(
-                        connection!.from.blockId,
-                        connection!.from.resourceName,
-                        ResourceRole.PROVIDES
-                    );
-                    const to = planner.getResourceByBlockIdAndName(
-                        connection!.to.blockId,
-                        connection!.to.resourceName,
-                        ResourceRole.CONSUMES
-                    );
+interface DraggableBlockItem {
+    type: ItemType.BLOCK;
+    data: DraggableBlockProps;
+}
 
-                    DialogControl.delete(
-                        `Delete Connection?`,
-                        `from ${from?.metadata.name} to ${to?.metadata.name}?`,
-                        (confirm) => {
-                            if (confirm) {
-                                planner.removeConnection(connection!);
-                            }
-                        }
-                    );
-                },
-                buttonStyle: ButtonStyle.DANGER,
-                icon: 'fa fa-trash',
-                label: 'Delete',
-            },
-        ],
-    };
+type DraggableItem = DraggableResourceItem | DraggableBlockItem;
+
+interface DraggableBlockProps {
+    name: string;
+    title?: string;
+    block: Asset<BlockKind>;
+    planner: PlannerContextData;
+}
+
+const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
+    const center = BLOCK_SIZE / 2;
 
     return (
-        <>
-            <Planner2 systemId="system?" actions={actionConfig} />
-            <ItemEditorPanel
-                open={!!editItem}
-                editableItem={editItem}
-                onClose={() => setEditItem(undefined)}
-                onSubmit={(item) => {
-                    if (editItem?.type === ItemType.BLOCK) {
-                        if (editItem.creating) {
-                            // TODO: Save path/ref??
-                            // planner.addBlockDefinition(item);
-                        } else {
-                            planner.updateBlockDefinition(editItem.ref!, item as BlockKind);
-                        }
-                    }
-
-                    if (editItem?.type === ItemType.RESOURCE) {
-                        if (editItem.creating) {
-                            //     ???
-                        } else {
-                            // update mapping?
-                            // planner.updateResourceDefinition(); //
-                        }
-                    }
-                }}
+        <svg
+            className={'plan-item-dragged block'}
+            style={{
+                left: props.point.x - center,
+                top: props.point.y - center,
+                width: BLOCK_SIZE,
+                height: BLOCK_SIZE,
+                transformOrigin: `center`,
+                transform: `scale(${props.planner.zoom})`,
+            }}
+        >
+            <BlockNode
+                name={props.name}
+                valid={true}
+                instanceName={props.title ?? props.name}
+                version={props.block.version}
+                typeName={props.name}
+                readOnly={true}
+                status={InstanceStatus.STOPPED}
+                height={BLOCK_SIZE}
+                width={BLOCK_SIZE}
             />
-        </>
+        </svg>
     );
-});
+};
+
+interface DraggableResourceProps {
+    name: string;
+    resourceConfig: ResourceConfig;
+    planner: PlannerContextData;
+}
+
+const DraggableResource = (props: DraggableResourceProps & { point: Point }) => {
+    const width = 120;
+    const height = 40;
+    return (
+        <svg
+            className={'plan-item-dragged resource'}
+            style={{
+                left: props.point.x - width / 2,
+                top: props.point.y - height / 2,
+                width,
+                height,
+                transformOrigin: `center`,
+                transform: `scale(${props.planner.zoom})`,
+            }}
+        >
+            <BlockResource
+                role={props.resourceConfig.role}
+                size={props.planner.nodeSize}
+                name={props.name}
+                type={props.resourceConfig.type}
+                typeName={props.name}
+                width={width}
+                height={height}
+            />
+        </svg>
+    );
+};
+
+const PlanEditor = withPlannerContext(
+    forwardRef((props: {}, forwardedRef: MutableRefObject<HTMLDivElement>) => {
+        const planner = useContext(PlannerContext);
+        const [editItem, setEditItem] = React.useState<EditableItemInterface2 | undefined>();
+        const [inspectItem, setInspectItem] = React.useState<SchemaKind<any, any> | null>(null);
+        const [configureItem, setConfigureItem] = React.useState<SchemaKind<any, any> | null>(null);
+        const [draggableItem, setDraggableItem] = React.useState<DraggableItem | null>(null);
+        const [draggableItemPosition, setDraggableItemPosition] = React.useState<Point | null>(null);
+        const actionConfig: PlannerActionConfig = {
+            block: [
+                {
+                    enabled(): boolean {
+                        return true; // planner.mode !== PlannerMode.VIEW;
+                    },
+                    onClick(context, { block }) {
+                        setInspectItem(block!);
+                    },
+                    buttonStyle: ButtonStyle.PRIMARY,
+                    icon: 'fa fa-search',
+                    label: 'Inspect',
+                },
+                {
+                    enabled(context, { blockInstance }): boolean {
+                        return (
+                            planner.mode !== PlannerMode.VIEW &&
+                            !!blockInstance &&
+                            parseKapetaUri(blockInstance.block.ref).version === 'local'
+                        );
+                    },
+                    onClick(context, { blockInstance }) {
+                        DialogControl.delete(
+                            `Delete Block Instance`,
+                            `Are you sure you want to delete ${blockInstance?.name || 'this block'}?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    planner.removeBlockInstance(blockInstance!.id);
+                                }
+                            }
+                        );
+                    },
+                    buttonStyle: ButtonStyle.DANGER,
+                    icon: 'fa fa-trash',
+                    label: 'Delete',
+                },
+                {
+                    enabled(context, { blockInstance }): boolean {
+                        return (
+                            planner.mode !== PlannerMode.VIEW &&
+                            !!blockInstance &&
+                            parseKapetaUri(blockInstance.block.ref).version === 'local'
+                        );
+                    },
+                    onClick(context, { blockInstance, block }) {
+                        setEditItem({
+                            type: ItemType.BLOCK,
+                            item: block!,
+                            ref: blockInstance!.block.ref,
+                            creating: false,
+                        });
+                    },
+                    buttonStyle: ButtonStyle.SECONDARY,
+                    icon: 'fa fa-pencil',
+                    label: 'Edit',
+                },
+                {
+                    enabled(context, { blockInstance }): boolean {
+                        return context.mode === PlannerMode.CONFIGURATION;
+                    },
+                    onClick(context, { block }) {
+                        setConfigureItem(block!);
+                    },
+                    buttonStyle: ButtonStyle.DEFAULT,
+                    icon: 'fa fa-tools',
+                    label: 'Configure',
+                },
+            ],
+            resource: [
+                {
+                    enabled(context, { blockInstance }): boolean {
+                        return (
+                            planner.mode !== PlannerMode.VIEW &&
+                            !!blockInstance &&
+                            parseKapetaUri(blockInstance.block.ref).version === 'local'
+                        );
+                    },
+                    onClick(p, { resource }) {
+                        setEditItem({
+                            type: ItemType.RESOURCE,
+                            item: resource!,
+                            creating: false,
+                        });
+                    },
+                    buttonStyle: ButtonStyle.SECONDARY,
+                    icon: 'fa fa-pencil',
+                    label: 'Edit',
+                },
+                {
+                    enabled(context, { blockInstance }): boolean {
+                        return (
+                            planner.mode !== PlannerMode.VIEW &&
+                            !!blockInstance &&
+                            parseKapetaUri(blockInstance.block.ref).version === 'local'
+                        );
+                    },
+                    onClick(context, { blockInstance, resource, resourceRole }) {
+                        DialogControl.delete(
+                            `Delete Resource`,
+                            `Are you sure you want to delete ${resource?.metadata.name || 'this resource'}?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    context.removeResource(
+                                        blockInstance!.block.ref,
+                                        resource!.metadata.name,
+                                        resourceRole!
+                                    );
+                                }
+                            }
+                        );
+                    },
+                    buttonStyle: ButtonStyle.DANGER,
+                    icon: 'fa fa-trash',
+                    label: 'Delete',
+                },
+            ],
+            connection: [
+                {
+                    enabled(context): boolean {
+                        return planner.mode === PlannerMode.EDIT;
+                    },
+                    onClick(context, { connection }) {
+                        const from = planner.getResourceByBlockIdAndName(
+                            connection!.from.blockId,
+                            connection!.from.resourceName,
+                            ResourceRole.PROVIDES
+                        );
+                        const to = planner.getResourceByBlockIdAndName(
+                            connection!.to.blockId,
+                            connection!.to.resourceName,
+                            ResourceRole.CONSUMES
+                        );
+
+                        DialogControl.delete(
+                            `Delete Connection?`,
+                            `from ${from?.metadata.name} to ${to?.metadata.name}?`,
+                            (confirm) => {
+                                if (confirm) {
+                                    planner.removeConnection(connection!);
+                                }
+                            }
+                        );
+                    },
+                    buttonStyle: ButtonStyle.DANGER,
+                    icon: 'fa fa-trash',
+                    label: 'Delete',
+                },
+            ],
+        };
+
+        const blocks = useAsync(() => BlockServiceMock.list());
+
+        return (
+            <div ref={forwardedRef} className={'plan-container'}>
+                {draggableItem && draggableItemPosition && draggableItem.type === ItemType.RESOURCE && (
+                    <DraggableResource {...draggableItem.data} point={draggableItemPosition} />
+                )}
+
+                {draggableItem && draggableItemPosition && draggableItem.type === ItemType.BLOCK && (
+                    <DraggableBlock {...draggableItem.data} point={draggableItemPosition} />
+                )}
+
+                <Planner2 systemId="system?" actions={actionConfig} />
+                <ItemEditorPanel
+                    open={!!editItem}
+                    editableItem={editItem}
+                    onClose={() => setEditItem(undefined)}
+                    onSubmit={(item) => {
+                        if (editItem?.type === ItemType.BLOCK) {
+                            if (editItem.creating) {
+                                // TODO: Save path/ref??
+                                // planner.addBlockDefinition(item);
+                            } else {
+                                planner.updateBlockDefinition(editItem.ref!, item as BlockKind);
+                            }
+                        }
+
+                        if (editItem?.type === ItemType.RESOURCE) {
+                            if (editItem.creating) {
+                                //     ???
+                            } else {
+                                // update mapping?
+                                // planner.updateResourceDefinition(); //
+                            }
+                        }
+                    }}
+                />
+
+                <div className={'test-tool-panel'}>
+                    <h2>Resources</h2>
+                    <ul className={'resources'}>
+                        {ResourceTypeProvider.list().map((resourceConfig, ix) => {
+                            const name = resourceConfig.title ?? 'Unknown';
+
+                            return (
+                                <DragAndDrop.Draggable
+                                    key={`resource-${ix}`}
+                                    disabled={false}
+                                    data={{
+                                        type: 'resource-type',
+                                        data: {
+                                            title: resourceConfig.title || resourceConfig.kind,
+                                            kind: resourceConfig.kind,
+                                            config: resourceConfig,
+                                        },
+                                    }}
+                                    onDragStart={(evt) => {
+                                        setDraggableItem({
+                                            type: ItemType.RESOURCE,
+                                            data: {
+                                                resourceConfig,
+                                                name,
+                                                planner,
+                                            },
+                                        });
+                                    }}
+                                    onDrag={(evt) => {
+                                        setDraggableItemPosition({
+                                            x: evt.zone.end.x,
+                                            y: evt.zone.end.y,
+                                        });
+                                    }}
+                                    onDrop={(evt) => {
+                                        setDraggableItem(null);
+                                        setDraggableItemPosition(null);
+                                        console.log('Dropped', evt);
+                                    }}
+                                >
+                                    {(evt) => {
+                                        return (
+                                            <li {...evt.componentProps}>
+                                                <span className={'title'}>{name}</span>
+                                                <span className={'role'}>{resourceConfig.role.toLowerCase()}</span>
+                                            </li>
+                                        );
+                                    }}
+                                </DragAndDrop.Draggable>
+                            );
+                        })}
+                    </ul>
+
+                    <h2>Blocks</h2>
+                    <ul className={'blocks'}>
+                        {blocks?.value?.map((block, ix) => {
+                            const name = block.data.metadata.name;
+                            return (
+                                <DragAndDrop.Draggable
+                                    key={`blocl_${ix}`}
+                                    disabled={false}
+                                    data={{
+                                        type: 'block-type',
+                                        data: block,
+                                    }}
+                                    onDragStart={(evt) => {
+                                        setDraggableItem({
+                                            type: ItemType.BLOCK,
+                                            data: {
+                                                block,
+                                                name,
+                                                title: block.data.metadata.title,
+                                                planner,
+                                            },
+                                        });
+                                    }}
+                                    onDrag={(evt) => {
+                                        setDraggableItemPosition({
+                                            x: evt.zone.end.x,
+                                            y: evt.zone.end.y,
+                                        });
+                                    }}
+                                    onDrop={(evt) => {
+                                        setDraggableItem(null);
+                                        setDraggableItemPosition(null);
+                                        console.log('Dropped block', evt);
+                                    }}
+                                >
+                                    {(evt) => {
+                                        return (
+                                            <li {...evt.componentProps}>
+                                                <span className={'title'}>{name}</span>
+                                                <span className={'version'}>{block.version}</span>
+                                            </li>
+                                        );
+                                    }}
+                                </DragAndDrop.Draggable>
+                            );
+                        })}
+                    </ul>
+                </div>
+            </div>
+        );
+    })
+);
 
 const PlannerLoader = (props) => {
     const plan = useAsync(() => readPlanV2());

@@ -1,10 +1,12 @@
 import {
+    Asset,
     BlockConnectionSpec,
     BlockInstanceSpec,
     BlockKind,
     ItemType,
     PlanKind,
     Point,
+    ResourceConfig,
     ResourceKind,
     ResourceRole,
     SchemaKind,
@@ -17,6 +19,12 @@ export type BlockPayload = {
     type: 'block';
     data: BlockInstanceSpec;
 };
+
+export type BlockTypePayload = {
+    type: 'block-type';
+    data: Asset<BlockKind>;
+};
+
 export type ResourcePayload = {
     type: 'resource';
     data: {
@@ -26,7 +34,16 @@ export type ResourcePayload = {
     };
 };
 
-export type PlannerPayload = BlockPayload | ResourcePayload;
+export type ResourceTypePayload = {
+    type: 'resource-type';
+    data: {
+        title: string;
+        kind: string;
+        config: ResourceConfig;
+    };
+};
+
+export type PlannerPayload = BlockPayload | ResourcePayload | ResourceTypePayload | BlockTypePayload;
 
 export interface ActionContext {
     block?: BlockKind;
