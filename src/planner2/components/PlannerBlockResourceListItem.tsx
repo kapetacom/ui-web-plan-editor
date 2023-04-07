@@ -19,7 +19,6 @@ import { ActionButtons } from './ActionButtons';
 import { PlannerAction } from '../types';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
-const BUTTON_HEIGHT = 24; // Height of edit and delete buttons
 const COUNTER_SIZE = 8;
 
 interface PlannerBlockResourceListItemProps {
@@ -140,16 +139,21 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
 
     const isConsumer = props.role === ResourceRole.CONSUMES;
     const dragIsCompatible = useMemo(() => {
-        return (
-            isConsumer &&
-            draggable?.type === 'resource' &&
-            draggable.data.block.id !== blockInstance.id &&
-            ResourceTypeProvider.canApplyResourceToKind(draggable.data.resource.kind, props.resource.kind) &&
-            !planner.hasConnections({
-                blockId: blockInstance.id,
-                resourceName: props.resource.metadata.name,
-            })
-        );
+        try {
+            return (
+                isConsumer &&
+                draggable?.type === 'resource' &&
+                draggable.data.block.id !== blockInstance.id &&
+                ResourceTypeProvider.canApplyResourceToKind(draggable.data.resource.kind, props.resource.kind) &&
+                !planner.hasConnections({
+                    blockId: blockInstance.id,
+                    resourceName: props.resource.metadata.name,
+                })
+            );
+        } catch (e) {
+            console.warn('Failed to correctly determine if resource is draggable', e);
+            return false;
+        }
     }, [draggable, blockInstance, props.resource, planner, isConsumer]);
 
     // Change to inclusion list if necessary
