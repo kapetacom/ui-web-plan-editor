@@ -63,7 +63,7 @@ export interface PlannerAction<P extends unknown> {
     buttonStyle: ButtonStyle;
     icon: string;
     label: string;
-    onClick(planner: PlannerContextData, context: ActionContext): void|Promise<void>;
+    onClick(planner: PlannerContextData, context: ActionContext): void | Promise<void>;
 }
 
 export interface EditableItemInterface2 {
