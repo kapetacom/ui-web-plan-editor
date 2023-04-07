@@ -7,13 +7,6 @@ import { Point } from '@kapeta/ui-web-types';
 type Offset = { top: number; left: number };
 type ScrollListener = (offset: Offset) => void;
 
-function parsePixelValue(value) {
-    if (value.endsWith('px')) {
-        return parseFloat(value.slice(0, -2));
-    }
-    return 0;
-}
-
 export class DnDZoneInstance {
     private _listeners: ScrollListener[] = [];
     private offset: Offset = { top: 0, left: 0 };

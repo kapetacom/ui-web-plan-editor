@@ -130,27 +130,15 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 blockContext.setBlockMode(BlockMode.HIDDEN);
 
                                 if (draggable.type === 'resource-type') {
-                                    const newBlock = _.cloneDeep(blockContext.blockDefinition!);
                                     const config = draggable.data.config;
-                                    const target =
-                                        config.role === ResourceRole.CONSUMES
-                                            ? [...(newBlock.spec.consumers ?? [])]
-                                            : [...(newBlock.spec.providers ?? [])];
-
-                                    target.push({
-                                        kind: config.kind,
+                                    const ref = `${config.kind}:${config.version}`
+                                    planner.addResource(blockContext.blockReference?.id, {
+                                        kind: ref,
                                         metadata: {
                                             name: 'new-resource',
                                         },
                                         spec: {},
-                                    });
-
-                                    if (config.role === ResourceRole.CONSUMES) {
-                                        newBlock.spec.consumers = target;
-                                    } else {
-                                        newBlock.spec.providers = target;
-                                    }
-                                    planner.updateBlockDefinition(blockContext.blockInstance.block.ref, newBlock);
+                                    }, config.role);
                                     return;
                                 }
 
