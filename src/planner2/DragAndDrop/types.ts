@@ -1,7 +1,4 @@
-export type PositionDiff = {
-    x: number;
-    y: number;
-};
+import { Point } from '@kapeta/ui-web-types';
 
 export interface DnDPayload {
     type: string;
@@ -11,13 +8,13 @@ export interface DnDPayload {
 export interface DragEventInfo {
     // Client relative coordinates
     client: {
-        start: PositionDiff;
-        end: PositionDiff;
-        diff: PositionDiff;
+        start: Point;
+        end: Point;
+        diff: Point;
     };
     zone: {
-        start: PositionDiff;
-        end: PositionDiff;
-        diff: PositionDiff;
+        start: Point;
+        end: Point;
+        diff: Point;
     };
 }

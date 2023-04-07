@@ -11,14 +11,14 @@ import { Point, ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
-import { BlockInfo, PlannerPayload, ResourcePayload } from '../types';
+import { BlockInfo, PlannerPayload, ResourcePayload, ResourceTypePayload } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 
 interface Props {
     size: PlannerNodeSize;
-    actions: PlannerActionConfig;
+    actions?: PlannerActionConfig;
     className?: string;
 }
 
@@ -85,10 +85,10 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                 blockContext.setBlockMode(BlockMode.HIDDEN);
             }}
         >
-            {({ position, componentProps, isDragging }) => {
+            {(evt) => {
                 let point: Point = {
-                    x: blockContext.blockInstance.dimensions!.left + position.x / planner.zoom,
-                    y: blockContext.blockInstance.dimensions!.top + position.y / planner.zoom,
+                    x: blockContext.blockInstance.dimensions!.left + evt.zone.diff.x / planner.zoom,
+                    y: blockContext.blockInstance.dimensions!.top + evt.zone.diff.y / planner.zoom,
                 };
 
                 if (focusInfo) {
@@ -106,6 +106,11 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
                         <DragAndDrop.DropZone
                             accept={(draggable: PlannerPayload) => {
+                                if (draggable.type === 'resource-type') {
+                                    //New resource being added
+                                    return true;
+                                }
+
                                 return (
                                     draggable.type === 'resource' &&
                                     // don't connect to self
@@ -114,8 +119,33 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                     !blockContext.isReadOnly
                                 );
                             }}
-                            onDrop={(draggable: ResourcePayload) => {
+                            onDrop={(draggable: ResourcePayload | ResourceTypePayload) => {
                                 blockContext.setBlockMode(BlockMode.HIDDEN);
+
+                                if (draggable.type === 'resource-type') {
+                                    const newBlock = _.cloneDeep(blockContext.blockDefinition!);
+                                    const config = draggable.data.config;
+                                    const target =
+                                        config.role === ResourceRole.CONSUMES
+                                            ? [...(newBlock.spec.consumers ?? [])]
+                                            : [...(newBlock.spec.providers ?? [])];
+
+                                    target.push({
+                                        kind: config.kind,
+                                        metadata: {
+                                            name: 'new-resource',
+                                        },
+                                        spec: {},
+                                    });
+
+                                    if (config.role === ResourceRole.CONSUMES) {
+                                        newBlock.spec.consumers = target;
+                                    } else {
+                                        newBlock.spec.providers = target;
+                                    }
+                                    planner.updateBlockDefinition(blockContext.blockInstance.block.ref, newBlock);
+                                    return;
+                                }
 
                                 // Figure out what kind of consumer to create, and add a connection to it.
                                 const resourceConfigs = ResourceTypeProvider.list();
@@ -152,10 +182,14 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                     },
                                 });
                             }}
-                            onDragEnter={(draggable: ResourcePayload) => {
-                                if (draggable.data.role === ResourceRole.CONSUMES) {
+                            onDragEnter={(draggable: ResourcePayload | ResourceTypePayload) => {
+                                const role =
+                                    draggable.type === 'resource-type'
+                                        ? draggable.data.config.role
+                                        : draggable.data.role;
+                                if (role === ResourceRole.CONSUMES) {
                                     blockContext.setBlockMode(BlockMode.HOVER_DROP_CONSUMER);
-                                } else if (draggable.data.role === ResourceRole.PROVIDES) {
+                                } else {
                                     blockContext.setBlockMode(BlockMode.HOVER_DROP_PROVIDER);
                                 }
                             }}
@@ -165,7 +199,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                         >
                             {({ onRef }) => (
                                 <svg
-                                    className={`${className} ${isDragging ? 'dragging' : ''}`}
+                                    className={`${className} ${evt.isDragging ? 'dragging' : ''}`}
                                     onDoubleClick={() => planner.setFocusedBlock(blockContext.blockInstance)}
                                     style={{
                                         left: `${point.x}px`,
@@ -181,11 +215,11 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                     >
                                         <PlannerBlockResourceList
                                             role={ResourceRole.CONSUMES}
-                                            actions={props.actions.resource || []}
+                                            actions={props.actions?.resource || []}
                                         />
                                         <PlannerBlockResourceList
                                             role={ResourceRole.PROVIDES}
-                                            actions={props.actions.resource || []}
+                                            actions={props.actions?.resource || []}
                                         />
 
                                         <BlockNode
@@ -208,7 +242,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                             version={blockContext.blockReference.version}
                                             valid={isValid}
                                             blockRef={onRef}
-                                            {...componentProps}
+                                            {...evt.componentProps}
                                         />
                                     </g>
                                     <g>
@@ -217,7 +251,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                             x={75}
                                             y={blockContext.instanceBlockHeight + 10}
                                             show
-                                            actions={props.actions.block || []}
+                                            actions={props.actions?.block || []}
                                             actionContext={{
                                                 block: blockContext.blockDefinition,
                                                 blockInstance: blockContext.blockInstance,

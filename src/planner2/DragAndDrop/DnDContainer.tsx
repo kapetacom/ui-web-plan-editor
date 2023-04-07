@@ -1,62 +1,70 @@
 import React, { useMemo, useState } from 'react';
 import { DropZoneEntity, DropZoneManager } from './DropZoneManager';
-import { DnDPayload, PositionDiff } from './types';
-import { DnDContext } from './DnDContext';
+import { DnDPayload } from './types';
+import { DnDCallbacks, DnDContext } from './DnDContext';
+import { Point } from '@kapeta/ui-web-types';
 
 const defaultState = {
     state: 'IDLE',
     position: { x: 0, y: 0 },
 } as const;
 
-export const DnDContainer = <T extends unknown>(props) => {
+interface Props {
+    children: any;
+    root: React.RefObject<HTMLElement>;
+}
+
+export const DnDContainer = <T extends unknown>(props: Props) => {
     const [dragState, setDragState] = useState<{
         state: 'IDLE' | 'DRAGGING';
         draggable?: DnDPayload;
-        position: PositionDiff;
+        position: Point;
     }>(defaultState);
 
     const isDragging = dragState.state !== 'IDLE';
 
-    const { dzManager, callbacks } = useMemo(() => {
-        return {
-            dzManager: new DropZoneManager(),
-            callbacks: {
-                registerDropZone(id: string, zone: DropZoneEntity) {
-                    dzManager.addZone(id, zone);
-                },
-                unregisterDropZone(id: string) {
-                    dzManager.removeZoneById(id);
-                },
+    const dzManager = useMemo(() => new DropZoneManager(), []);
 
-                onDrag(draggable, dragEvent) {
-                    setDragState({
-                        state: 'DRAGGING',
-                        draggable,
-                        position: dragEvent.end,
-                    });
-                    dzManager.handleDragEvent(draggable, dragEvent);
-                },
-                onDrop(draggable, dragEvent) {
-                    // Loop all elements to check intersection
-                    dzManager.handleDropEvent(draggable, dragEvent);
-                    setDragState(defaultState);
-                },
-                onDragStart(draggable, dragEvent) {
-                    setDragState({
-                        state: 'DRAGGING',
-                        draggable,
-                        position: dragEvent.end,
-                    });
-                },
+    const callbacks = useMemo<DnDCallbacks>(() => {
+        const callbacks: DnDCallbacks = {
+            registerDropZone(id: string, zone: DropZoneEntity) {
+                dzManager.addZone(id, zone);
+            },
+            unregisterDropZone(id: string) {
+                dzManager.removeZoneById(id);
+            },
+
+            onDrag(draggable, dragEvent, fromZone) {
+                setDragState({
+                    state: 'DRAGGING',
+                    draggable,
+                    position: dragEvent.zone.end,
+                });
+                dzManager.handleDragEvent(draggable, dragEvent, fromZone, props.root.current);
+            },
+            onDrop(draggable, dragEvent, fromZone) {
+                console.log('props.root.current', props.root.current);
+                // Loop all elements to check intersection
+                dzManager.handleDropEvent(draggable, dragEvent, fromZone, props.root.current);
+                setDragState(defaultState);
+            },
+            onDragStart(draggable, dragEvent, fromZone) {
+                setDragState({
+                    state: 'DRAGGING',
+                    draggable,
+                    position: dragEvent.zone.end,
+                });
             },
         };
-    }, []);
+        return callbacks;
+    }, [props.root.current]);
 
     return (
         <DnDContext.Provider
             value={{
                 isDragging,
                 draggable: dragState.draggable || null,
+                root: props.root.current,
                 // setup methods
                 callbacks,
             }}

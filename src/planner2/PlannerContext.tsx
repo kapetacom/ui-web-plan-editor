@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Asset,
     BlockConnectionSpec,
@@ -19,6 +19,8 @@ import { PlannerAction, Rectangle } from './types';
 import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 import { getResourceId } from './utils/planUtils';
 import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
+import { DragAndDrop } from './DragAndDrop';
+import { DnDContainer } from './DragAndDrop/DnDContainer';
 
 type BlockUpdater = (block: BlockInstanceSpec) => BlockInstanceSpec;
 export interface PlannerActionConfig {
@@ -65,6 +67,7 @@ export interface PlannerContextData {
     updateBlockDefinition(ref: string, update: BlockKind): void;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
     removeBlockInstance(blockId: string): void;
+    addBlockInstance(blockInstance: BlockInstanceSpec): void;
 
     // resources
     addResource(blockRef: string, resource: ResourceKind, role: ResourceRole): void;
@@ -121,6 +124,7 @@ const defaultValue: PlannerContextData = {
         // noop
     },
     removeBlockInstance(blockId) {},
+    addBlockInstance(blockInstance) {},
     // resources
     addResource(blockId: string) {},
     removeResource(blockId: string, resourceName: string) {},
@@ -306,6 +310,13 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return newPlan;
                 });
             },
+            addBlockInstance(blockInstance: BlockInstanceSpec) {
+                setPlan((prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    newPlan.spec.blocks?.push(blockInstance);
+                    return newPlan;
+                });
+            },
             removeBlockInstance(blockId: string) {
                 setPlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
@@ -447,12 +458,15 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     ]);
 };
 
-export function withPlannerContext<T>(Inner: React.ComponentType<T>) {
+export function withPlannerContext<T>(Inner: React.ComponentType<T & RefAttributes<HTMLElement>>) {
     return (props: T & JSX.IntrinsicAttributes & PlannerContextProps) => {
         const context = usePlannerContext(props);
+        const rootRef = useRef(null);
         return (
             <PlannerContext.Provider value={context}>
-                <Inner {...props} />
+                <DnDContainer root={rootRef}>
+                    <Inner ref={rootRef} {...props} />
+                </DnDContainer>
             </PlannerContext.Provider>
         );
     };

@@ -1,5 +1,8 @@
 import { PlannerNodeSize } from '../../types';
 import { Asset, BlockInstanceSpec, BlockKind, ResourceRole, Size } from '@kapeta/ui-web-types';
+import { randomUUID } from '../../utils/cryptoUtils';
+
+export const BLOCK_SIZE = 150;
 
 export const resourceHeight = {
     [PlannerNodeSize.SMALL]: 30,
@@ -54,8 +57,8 @@ export const calculateCanvasSize = (
     return {
         x: minX,
         y: minY,
-        width: maxWidth > containerSize.width ? maxWidth : containerSize.width,
-        height: maxHeight > containerSize.height ? maxHeight : containerSize.height,
+        width: Math.max(maxWidth, containerSize.width),
+        height: Math.max(maxHeight, containerSize.height),
     };
 };
 
@@ -70,7 +73,7 @@ export function calculateBlockHeight(block: BlockKind, size: PlannerNodeSize) {
 }
 
 export function getBlockHeightByResourceCount(resourceCount: number, size: PlannerNodeSize) {
-    return Math.max(150, 70 + resourceCount * resourceHeight[size]);
+    return Math.max(BLOCK_SIZE, 70 + resourceCount * resourceHeight[size]);
 }
 
 export function getResourceId(blockId: string, resourceName: string, resourceRole: ResourceRole) {
@@ -79,4 +82,20 @@ export function getResourceId(blockId: string, resourceName: string, resourceRol
 
 export function getBlockInstance(plan, blockId) {
     return plan.spec.blocks.find((block) => block.id === blockId);
+}
+
+export function createBlockInstanceForBlock(blockAsset: Asset<BlockKind>): BlockInstanceSpec {
+    return {
+        block: {
+            ref: blockAsset.ref,
+        },
+        dimensions: {
+            width: BLOCK_SIZE,
+            height: -1,
+            top: 0,
+            left: 0,
+        },
+        id: randomUUID(),
+        name: blockAsset.data.metadata.title ?? blockAsset.data.metadata.name,
+    };
 }
