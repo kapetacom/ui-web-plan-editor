@@ -45,6 +45,12 @@ export type ResourceTypePayload = {
 
 export type PlannerPayload = BlockPayload | ResourcePayload | ResourceTypePayload | BlockTypePayload;
 
+export interface ValidationIssue {
+    level: string;
+    name?: string;
+    issue: string;
+}
+
 export interface ActionContext {
     block?: BlockKind;
     blockInstance?: BlockInstanceSpec;
