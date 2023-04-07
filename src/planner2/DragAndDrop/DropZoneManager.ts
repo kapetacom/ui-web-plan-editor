@@ -41,8 +41,6 @@ export class DropZoneManager {
             y: rootBox.y - zoneBox.y,
         };
 
-        console.log('Transposing elements', diff);
-
         return this.translateEvent(evt, diff);
     }
 
@@ -57,8 +55,6 @@ export class DropZoneManager {
             x: toOffset.left - fromOffset.left,
             y: toOffset.top - fromOffset.top,
         };
-
-        console.log('Transposing zones', diff, fromOffset, toOffset);
 
         return this.translateEvent(evt, diff);
     }
