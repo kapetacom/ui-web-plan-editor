@@ -15,8 +15,8 @@ export interface PlannerBlockContextData {
 
     blockMode: BlockMode;
     setBlockMode: (mode: BlockMode) => void;
-    isReadOnly: boolean;
-    isMovable: boolean;
+    isBlockDefinitionReadOnly: boolean;
+    isBlockInstanceReadOnly: boolean;
 }
 
 const defaultValue: PlannerBlockContextData = {
@@ -30,8 +30,8 @@ const defaultValue: PlannerBlockContextData = {
     setBlockMode(mode: BlockMode) {
         this.blockMode = mode;
     },
-    isReadOnly: false,
-    isMovable: false,
+    isBlockDefinitionReadOnly: false,
+    isBlockInstanceReadOnly: false,
 };
 
 export const BlockContext = React.createContext(defaultValue);
@@ -69,8 +69,8 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
             instanceBlockHeight,
             blockMode: focusedMode ?? overrideMode ?? blockMode,
             setBlockMode,
-            isMovable: planner.canEditBlocks === true,
-            isReadOnly: blockReference?.version !== 'local' || planner.canEditBlocks === false,
+            isBlockInstanceReadOnly: !planner.canEditBlocks,
+            isBlockDefinitionReadOnly: blockReference?.version !== 'local' || planner.canEditBlocks === false,
         };
     }, [
         planner.nodeSize,

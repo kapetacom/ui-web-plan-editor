@@ -59,15 +59,15 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
         className += ` ${props.className}`;
     }
 
-    const canMove = blockContext.isMovable && !focusInfo;
-    let canEditName = !blockContext.isReadOnly;
+    const canMove = !blockContext.isBlockInstanceReadOnly && !focusInfo;
+    let canEditInstance = !blockContext.isBlockInstanceReadOnly;
 
     if (
         focusInfo &&
         focusInfo.focus.instance.id !== blockContext.blockInstance.id &&
         isBlockInFocus(focusInfo, blockContext.blockInstance.id)
     ) {
-        canEditName = false;
+        canEditInstance = false;
     }
 
     const blockClassNames = toClass({
@@ -106,7 +106,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
                         <DragAndDrop.DropZone
                             accept={(draggable: PlannerPayload) => {
-                                if (blockContext.isReadOnly) {
+                                if (blockContext.isBlockDefinitionReadOnly) {
                                     return false;
                                 }
 
@@ -122,7 +122,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 );
                             }}
                             onDrop={(draggable: ResourcePayload | ResourceTypePayload) => {
-                                if (blockContext.isReadOnly) {
+                                if (blockContext.isBlockDefinitionReadOnly) {
                                     return;
                                 }
 
@@ -189,7 +189,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 });
                             }}
                             onDragEnter={(draggable: ResourcePayload | ResourceTypePayload) => {
-                                if (blockContext.isReadOnly) {
+                                if (blockContext.isBlockDefinitionReadOnly) {
                                     return;
                                 }
                                 const role =
@@ -203,7 +203,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 }
                             }}
                             onDragLeave={() => {
-                                if (blockContext.isReadOnly) {
+                                if (blockContext.isBlockDefinitionReadOnly) {
                                     return;
                                 }
                                 blockContext.setBlockMode(BlockMode.HIDDEN);
@@ -245,7 +245,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                                     };
                                                 })
                                             }
-                                            readOnly={!canEditName}
+                                            readOnly={!canEditInstance}
                                             // TODO: Move this to block context
                                             status={InstanceStatus.STOPPED}
                                             height={blockContext.instanceBlockHeight}
