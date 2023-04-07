@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react';
-import { BlockTypeProvider, InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import _ from 'lodash';
 
 import { BlockNode } from '../../components/BlockNode';
@@ -15,6 +15,7 @@ import { BlockInfo, PlannerPayload, ResourcePayload, ResourceTypePayload } from 
 import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
+import { BlockValidator } from '../validation/BlockValidator';
 
 interface Props {
     size: PlannerNodeSize;
@@ -40,15 +41,15 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
         () => ({ type: 'block', data: blockContext.blockInstance }),
         [blockContext.blockInstance]
     );
-    let errors = [] as string[];
-    try {
-        errors =
-            (blockContext.blockDefinition &&
-                BlockTypeProvider.get(blockContext.blockDefinition.kind)?.validate?.(blockContext.blockDefinition)) ||
-            [];
-    } catch (e: any) {
-        errors = [e.message];
-    }
+
+    const errors = useMemo(() => {
+        if (!blockContext.blockDefinition || !blockContext.blockInstance) {
+            return [];
+        }
+        const validator = new BlockValidator(blockContext.blockDefinition, blockContext.blockInstance);
+        return validator.validate();
+    }, [blockContext.blockDefinition, blockContext.blockInstance]);
+
     const isValid = errors.length === 0;
 
     let className = toClass({
