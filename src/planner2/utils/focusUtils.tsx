@@ -1,4 +1,4 @@
-import { BlockInstanceSpec, BlockKind, PlanKind, Point, ResourceRole, Size } from '@kapeta/ui-web-types';
+import { Point, ResourceRole, Size } from '@kapeta/ui-web-types';
 
 import { FocusPositioningData, PlannerNodeSize } from '../../types';
 import { BlockInfo, FocusBlockInfo, FocusBlockInfoShallow, ZOOM_STEP_SIZE, ZoomLevels } from '../types';
@@ -8,6 +8,7 @@ import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionM
 import { getConnectionsFor } from './connectionUtils';
 import { useContext, useEffect, useMemo } from 'react';
 import { PlannerContext } from '../PlannerContext';
+import { BlockDefinition, BlockInstance, Plan } from '@kapeta/schemas';
 
 export const POSITIONING_DATA = 'preFocusPosition';
 export const FOCUSED_ID = 'focusedID';
@@ -31,9 +32,9 @@ function getFocusedBlockPosition(blockInfo: BlockInfo, positionData: FocusPositi
     return { x, y };
 }
 
-function getBlockListTotalHeight(blocks: BlockKind[], nodeSize: PlannerNodeSize) {
+function getBlockListTotalHeight(blocks: BlockDefinition[], nodeSize: PlannerNodeSize) {
     let totalHeight = OFFSET_FROM_TOP;
-    blocks.forEach((block: BlockKind) => {
+    blocks.forEach((block: BlockDefinition) => {
         totalHeight += calculateBlockHeight(block, nodeSize) + FOCUS_BLOCK_SPACING;
     });
     return totalHeight;
@@ -171,14 +172,14 @@ function getFitBothSides(
     return fitLeft && fitRight;
 }
 
-export function getFocusBlockInfo(plan: PlanKind, focus: BlockInfo): FocusBlockInfoShallow {
-    const providerBlocks: BlockInstanceSpec[] = []; // blocks to the left
-    const consumerBlocks: BlockInstanceSpec[] = []; // blocks to the right
+export function getFocusBlockInfo(plan: Plan, focus: BlockInfo): FocusBlockInfoShallow {
+    const providerBlocks: BlockInstance[] = []; // blocks to the left
+    const consumerBlocks: BlockInstance[] = []; // blocks to the right
 
     focus.block.spec.consumers?.forEach((consumerResource) => {
         getConnectionsFor(plan, focus.instance.id, consumerResource.metadata.name).forEach(
             (connection: PlannerConnectionModelWrapper) => {
-                const instance = getBlockInstance(plan, connection.from.blockId);
+                const instance = getBlockInstance(plan, connection.provider.blockId);
                 if (instance) {
                     providerBlocks.push(instance);
                 }
@@ -188,7 +189,7 @@ export function getFocusBlockInfo(plan: PlanKind, focus: BlockInfo): FocusBlockI
 
     focus.block.spec.providers?.forEach((providerResource) => {
         getConnectionsFor(plan, focus.instance.id, providerResource.metadata.name).forEach((connection) => {
-            const instance = getBlockInstance(plan, connection.to.blockId);
+            const instance = getBlockInstance(plan, connection.consumer.blockId);
             if (instance) {
                 consumerBlocks.push(instance);
             }
@@ -283,7 +284,7 @@ export function isBlockInFocus(focusInfo: FocusBlockInfo, blockId: string) {
 export function useFocusInfo() {
     const planner = useContext(PlannerContext);
 
-    const toBlockInfoList = (instances: BlockInstanceSpec[]): BlockInfo[] => {
+    const toBlockInfoList = (instances: BlockInstance[]): BlockInfo[] => {
         return instances
             .map((instance): BlockInfo | null => {
                 const block = planner.getBlockById(instance.id);

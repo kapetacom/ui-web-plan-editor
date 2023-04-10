@@ -1,9 +1,9 @@
 import { action, observable } from 'mobx';
 import { Guid } from 'guid-typescript';
 
-import type { Asset, BlockInstanceSpec, BlockKind, Dimensions, ResourceConfig } from '@kapeta/ui-web-types';
+import type { Asset, IResourceTypeProvider } from '@kapeta/ui-web-types';
 
-import { ItemType, ResourceKind } from '@kapeta/ui-web-types';
+import { ItemType } from '@kapeta/ui-web-types';
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
@@ -11,6 +11,7 @@ import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
 import { Planner } from '../Planner';
 import { EditPanelHelper } from './EditPanelHelper';
+import {BlockDefinition, BlockInstance, Dimensions, Resource, ResourceType } from '@kapeta/schemas';
 
 /**
  * Helper class for handling drag-n-drop in the Planner UI
@@ -77,15 +78,16 @@ export class DnDHelper {
     @action
     private handleBlockItemDropped(data: Asset, dimensions: Dimensions) {
         if (BlockTypeProvider.exists(data.kind)) {
-            const blockDefinition: BlockKind = data.data;
+            const blockDefinition: BlockDefinition = data.data;
             const blockInstanceId = Guid.create().toString();
             const initialName = blockDefinition.metadata.title || blockDefinition.metadata.name;
-            const blockInstance: BlockInstanceSpec = {
+            const blockInstance: BlockInstance = {
                 id: blockInstanceId,
                 name: initialName,
                 block: {
                     ref: data.ref,
                 },
+                dimensions
             };
             const wrapper = new PlannerBlockModelWrapper(blockInstance, blockDefinition, this.planner.plan);
             wrapper.top = dimensions.top - 60; // Adjustment for SVG
@@ -99,7 +101,7 @@ export class DnDHelper {
     private handleToolItemDragged(data: any, dimensions: Dimensions) {
         if (ResourceTypeProvider.exists(data.kind) && !this.planner.plan.focusedBlock) {
             let activeBlock = this.planner.plan.findValidBlockTargetFromDimensions(this.planner.nodeSize, dimensions);
-            const resourceConfig: ResourceConfig = data;
+            const resourceConfig: IResourceTypeProvider = data;
 
             if (activeBlock && activeBlock.readonly) {
                 activeBlock = undefined;
@@ -121,7 +123,7 @@ export class DnDHelper {
             const blockInstanceId = Guid.create().toString();
             const initialName = 'MyBlock';
 
-            const blockDefinition: BlockKind = {
+            const blockDefinition: BlockDefinition = {
                 kind: asset.kind,
                 metadata: {
                     name: initialName,
@@ -133,12 +135,13 @@ export class DnDHelper {
                 },
             };
 
-            const blockInstance: BlockInstanceSpec = {
+            const blockInstance: BlockInstance = {
                 id: blockInstanceId,
                 name: initialName,
                 block: {
                     ref: asset.ref,
                 },
+                dimensions
             };
 
             const wrapper = new PlannerBlockModelWrapper(blockInstance, blockDefinition, this.planner.plan);
@@ -152,6 +155,8 @@ export class DnDHelper {
         }
 
         if (ResourceTypeProvider.exists(asset.kind)) {
+            const resourceType = asset as IResourceTypeProvider;
+
             this.planner.plan.blocks.forEach((block: PlannerBlockModelWrapper) => {
                 block.setMode(BlockMode.HIDDEN);
             });
@@ -161,14 +166,19 @@ export class DnDHelper {
                 return;
             }
 
-            const resourceConfig: ResourceConfig = asset;
+            const resourceConfig: IResourceTypeProvider = asset;
 
-            const resourceKind: ResourceKind = {
+            //We get first port from resource type for now
+            const port = resourceType.definition.spec.ports[0];
+
+            const resourceKind: Resource = {
                 kind: `${resourceConfig.kind}:${resourceConfig.version}`,
                 metadata: {
                     name: 'MyResource',
                 },
-                spec: {},
+                spec: {
+                    port
+                },
             };
 
             const wrapper = new PlannerResourceModelWrapper(resourceConfig.role, resourceKind, block);

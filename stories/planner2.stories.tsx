@@ -13,7 +13,7 @@ import {
     withPlannerContext,
 } from '../src/planner2/PlannerContext';
 import { useAsync } from 'react-use';
-import { Asset, BlockKind, ItemType, Point, ResourceConfig, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
+import { Asset, ItemType, Point, ResourceRole, IResourceTypeProvider, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
 import { EditableItemInterface2 } from '../src/planner2/types';
@@ -23,6 +23,7 @@ import './styles.less';
 import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockServiceMock } from './data/BlockServiceMock';
 import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
+import { BlockDefinition } from '@kapeta/schemas';
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -39,7 +40,7 @@ type DraggableItem = DraggableResourceItem | DraggableBlockItem;
 interface DraggableBlockProps {
     name: string;
     title?: string;
-    block: Asset<BlockKind>;
+    block: Asset<BlockDefinition>;
     planner: PlannerContextData;
 }
 
@@ -75,7 +76,7 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
 
 interface DraggableResourceProps {
     name: string;
-    resourceConfig: ResourceConfig;
+    resourceConfig: IResourceTypeProvider;
     planner: PlannerContextData;
 }
 
@@ -288,7 +289,7 @@ const PlanEditor = withPlannerContext(
                                 // TODO: Save path/ref??
                                 // planner.addBlockDefinition(item);
                             } else {
-                                planner.updateBlockDefinition(editItem.ref!, item as BlockKind);
+                                planner.updateBlockDefinition(editItem.ref!, item as BlockDefinition);
                             }
                         }
 

@@ -1,5 +1,5 @@
 import { BlockService, BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { ResourceRole, ResourceType } from '@kapeta/ui-web-types';
+import { ResourceRole, ResourceProviderType } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { cloneDeep } from 'lodash';
 
@@ -68,8 +68,9 @@ blocks.push(
         kind: resource.metadata.name,
         version: '1.2.3',
         title: resource.metadata.title,
-        type: ResourceType.DATABASE,
+        type: ResourceProviderType.OPERATOR,
         role: ResourceRole.CONSUMES,
+        definition: resource
     });
 });
 
@@ -78,12 +79,13 @@ blocks.push(
         kind: resource.metadata.name,
         version: '1.2.3',
         title: resource.metadata.title,
-        type: ResourceType.SERVICE,
+        type: ResourceProviderType.INTERNAL,
         role: ResourceRole.CONSUMES,
         converters: [{ fromKind: 'kapeta/resource-type-rest-api' }],
         getCounterValue() {
             return 2;
         },
+        definition: resource
     });
 });
 
@@ -92,8 +94,9 @@ blocks.push(
         kind: resource.metadata.name,
         version: '1.2.3',
         title: resource.metadata.title,
-        type: ResourceType.SERVICE,
+        type: ResourceProviderType.INTERNAL,
         role: ResourceRole.PROVIDES,
+        consumableKind: 'kapeta/resource-type-rest-client',
         validate: (data) => {
             const errors: string[] = [];
             parseKapetaUri(data.kind);
@@ -111,6 +114,7 @@ blocks.push(
         getCounterValue: (data) => {
             return 3;
         },
+        definition: resource
     });
 });
 
@@ -120,6 +124,12 @@ blocks.push(
         version: '1.2.3',
         title: 'Test',
         blockKinds: ['kapeta/block-type-service'],
+        definition: {
+            kind: 'kapeta/language-target',
+            metadata: {
+                name: targetKind,
+            }
+        }
     });
 });
 
@@ -132,6 +142,12 @@ blocks.push(
         validate: () => {
             return ['Fail target always fails'];
         },
+        definition: {
+            kind: 'kapeta/language-target',
+            metadata: {
+                name: targetKind,
+            }
+        }
     });
 });
 
@@ -151,6 +167,7 @@ blocks.push(
 
             return errors;
         },
+        definition: resource
     });
 });
 

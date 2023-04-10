@@ -3,16 +3,18 @@ import { PlannerNodeSize } from '../types';
 
 import { PlannerBlockModelWrapper } from './PlannerBlockModelWrapper';
 
-import type { DataWrapper, Dimensions, Point, ResourceKind } from '@kapeta/ui-web-types';
+import type { Point } from '@kapeta/ui-web-types';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 import { randomUUID } from '../utils/cryptoUtils';
+import {DataWrapper} from "./models";
+import {Dimensions, Resource } from '@kapeta/schemas';
 
 const DEFAULT_EXTENSION_SIZE = 110;
 
-export class PlannerResourceModelWrapper<T = any> implements DataWrapper<ResourceKind> {
+export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resource> {
     readonly block: PlannerBlockModelWrapper;
 
     readonly instanceId: string = '';
@@ -30,13 +32,13 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     errors: string[] = [];
 
     @observable
-    private data: ResourceKind<T>;
+    private data: Resource;
 
-    static getResourceID(resource: ResourceKind) {
+    static getResourceID(resource: Resource) {
         return resource.metadata.name;
     }
 
-    constructor(role: ResourceRole, resource: ResourceKind, block: PlannerBlockModelWrapper) {
+    constructor(role: ResourceRole, resource: Resource, block: PlannerBlockModelWrapper) {
         this.instanceId = randomUUID();
 
         this.role = role;
@@ -72,7 +74,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     }
 
     @action
-    setData(data: ResourceKind) {
+    setData(data: Resource) {
         this.data = toJS(data);
         this.block.plan.getConnectionsFor(this).forEach((connection: PlannerConnectionModelWrapper) => {
             connection.recalculateMapping(); // The connection will try to adjust to the changes made in the resource
@@ -82,7 +84,7 @@ export class PlannerResourceModelWrapper<T = any> implements DataWrapper<Resourc
     }
 
     @observable
-    getData(): ResourceKind {
+    getData(): Resource {
         return { ...toJS(this.data) };
     }
 

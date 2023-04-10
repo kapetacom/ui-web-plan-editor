@@ -19,10 +19,8 @@ import { BlockTypeProvider, IdentityService, ResourceTypeProvider } from '@kapet
 
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
-import type { BlockConnectionSpec, DataWrapper, SchemaEntity, SchemaKind } from '@kapeta/ui-web-types';
-import { ResourceKind } from '@kapeta/ui-web-types';
 
-import { EditableItemInterface } from '../../wrappers/models';
+import {DataWrapper, EditableItemInterface } from '../../wrappers/models';
 import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
 import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
@@ -30,6 +28,8 @@ import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModel
 import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useAsync } from 'react-use';
+import { Connection, Entity, Resource } from '@kapeta/schemas';
+import { SchemaKind } from '@kapeta/ui-web-types';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {
@@ -49,11 +49,11 @@ const withNamespaces = (ChildComponent) => {
 const AutoLoadAssetNameInput = withNamespaces(AssetNameInput);
 
 interface BlockConnectionEditData {
-    connection: BlockConnectionSpec;
-    target: ResourceKind;
-    targetEntities?: SchemaEntity[];
-    source: ResourceKind;
-    sourceEntities?: SchemaEntity[];
+    connection: Connection;
+    target: Resource;
+    targetEntities?: Entity[];
+    source: Resource;
+    sourceEntities?: Entity[];
 }
 
 interface Props {
@@ -146,8 +146,9 @@ export class ItemEditorPanel extends Component<Props, State> {
             source: change.source,
             sourceEntities: toJS(change.sourceEntities),
             connection: {
-                from: toJS(connection.from),
-                to: toJS(connection.to),
+                provider: toJS(connection.provider),
+                consumer: toJS(connection.consumer),
+                port: toJS(connection.port),
                 mapping: change.data,
             },
         };
@@ -369,7 +370,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                     >
                         <resourceType.componentType
                             key={editableItem.item.id}
-                            block={editableItem.item.block}
+                            block={editableItem.item.block.getData()}
                             creating={editableItem.creating}
                         />
                     </ErrorBoundary>

@@ -1,6 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { Simulate } from 'react-dom/test-utils';
-import drag = Simulate.drag;
 import { DragAndDrop } from '../src/planner2/DragAndDrop';
 
 export default {

@@ -1,11 +1,11 @@
 import React from 'react';
-import { BlockConfig } from '@kapeta/ui-web-types';
+import { IBlockTypeProvider } from '@kapeta/ui-web-types';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 
 import { PlannerToolboxPainterProps } from './PlannerToolbox';
 import { BlockNode } from '../../components/BlockNode';
 
-export function PlannerToolboxBlock(props: PlannerToolboxPainterProps<BlockConfig>) {
+export function PlannerToolboxBlock(props: PlannerToolboxPainterProps<IBlockTypeProvider>) {
     return (
         <svg width={120} height={120}>
             <BlockNode

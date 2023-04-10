@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 
 import { toClass } from '@kapeta/ui-web-utils';
-import { BlockKind, DataWrapper, Dimensions, ItemType, ResourceRole } from '@kapeta/ui-web-types';
+import { ItemType, ResourceRole } from '@kapeta/ui-web-types';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 import { ButtonStyle, DnDDrag, showDelete } from '@kapeta/ui-web-components';
 
@@ -16,6 +16,9 @@ import { BlockNode } from './BlockNode';
 import './PlannerBlockNode.less';
 import { action } from 'mobx';
 import { SVGCircleButton } from './SVGCircleButton';
+import { BlockDefinition, Dimensions } from '@kapeta/schemas';
+import {DataWrapper} from "../wrappers/models";
+
 
 interface PlannerBlockNodeProps {
     block: PlannerBlockModelWrapper;
@@ -27,9 +30,9 @@ interface PlannerBlockNodeProps {
     readOnly?: boolean;
     viewOnly?: boolean;
     onDrop?: () => void;
-    setItemToEdit?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
-    setItemToConfigure?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
-    setItemToInspect?: (res: DataWrapper<BlockKind>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
+    setItemToEdit?: (res: DataWrapper<BlockDefinition>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
+    setItemToConfigure?: (res: DataWrapper<BlockDefinition>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
+    setItemToInspect?: (res: DataWrapper<BlockDefinition>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
     planner?: PlannerModelWrapper;
 }
 

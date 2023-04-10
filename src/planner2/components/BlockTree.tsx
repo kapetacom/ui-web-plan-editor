@@ -1,19 +1,20 @@
 import React, { useContext, useState } from 'react';
-import { BlockInstanceSpec, ResourceKind, ResourceRole } from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 import { useFocusInfo } from '../utils/focusUtils';
 import { BlockInfo } from '../types';
 import { PlannerContext } from '../PlannerContext';
 import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
+import { BlockInstance, Resource } from '@kapeta/schemas';
 
 export interface Props {
-    block: BlockInstanceSpec;
-    onBlockClicked: (block: BlockInstanceSpec) => void;
+    block: BlockInstance;
+    onBlockClicked: (block: BlockInstance) => void;
 }
 
 export interface State {
-    hoveredBlock?: BlockInstanceSpec;
+    hoveredBlock?: BlockInstance;
 }
 
 export function BlockTree(props: Props) {
@@ -21,7 +22,7 @@ export function BlockTree(props: Props) {
     const focusInfo = useFocusInfo();
     const [hoveredBlock, setHoveredBlock] = useState<BlockInfo>();
 
-    function getBlockIcon(block: BlockInstanceSpec) {
+    function getBlockIcon(block: BlockInstance) {
         const isFocused = block.id === props.block.id;
         if (isFocused) {
             return (
@@ -60,7 +61,7 @@ export function BlockTree(props: Props) {
         );
     }
 
-    function getResourceIcon(resource: ResourceKind, role: ResourceRole) {
+    function getResourceIcon(resource: Resource, role: ResourceRole) {
         const resourceConfig = ResourceTypeProvider.get(resource.kind);
         const type = resourceConfig.type.toString().toLowerCase();
 

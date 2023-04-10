@@ -32,5 +32,16 @@ export * from './wrappers/PlannerResourceModelWrapper';
 export * from './wrappers/wrapperHelpers';
 export * from './types';
 
+export * from './planner2/DragAndDrop/index';
+export * from './planner2/DragAndDrop/DnDDropZone';
+export * from './planner2/DragAndDrop/DnDDraggable';
+export * from './planner2/DragAndDrop/DnDContainer';
+export * from './planner2/DragAndDrop/types';
+export * from './planner2/DragAndDrop/DnDContext';
+export * from './planner2/DragAndDrop/DropZoneManager';
+export * from './planner2/utils/planUtils';
+export * from './planner2/utils/connectionUtils';
 export * from './planner2/Planner2';
 export * from './planner2/PlannerContext';
+export * from './planner2/types';
+export * from './planner2/validation/BlockValidator';

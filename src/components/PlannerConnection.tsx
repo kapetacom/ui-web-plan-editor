@@ -2,7 +2,7 @@
 import React from 'react';
 import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';
 
-import { BlockConnectionSpec, DataWrapper, ItemType, Point } from '@kapeta/ui-web-types';
+import { ItemType, Point } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { DialogControl, DialogTypes, showToasty, ToastType } from '@kapeta/ui-web-components';
 
@@ -13,6 +13,8 @@ import { observer } from 'mobx-react';
 import { PlannerConnectionButtons } from './PlannerConnectionButtons';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import { action, computed, makeObservable, observable } from 'mobx';
+import { Connection } from '@kapeta/schemas';
+import {DataWrapper} from "../wrappers/models";
 
 interface PlannerConnectionProps {
     size: PlannerNodeSize;
@@ -22,7 +24,7 @@ interface PlannerConnectionProps {
     viewOnly?: boolean;
     onFocus?: () => void;
     onDelete?: (connection: PlannerConnectionModelWrapper) => void;
-    setItemToEdit?: (res: DataWrapper<BlockConnectionSpec>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
+    setItemToEdit?: (res: DataWrapper<Connection>, type: ItemType, block?: PlannerBlockModelWrapper) => void;
     handleInspectClick?: (connection: PlannerConnectionModelWrapper) => void;
 }
 
@@ -72,14 +74,14 @@ export class PlannerConnection extends React.Component<PlannerConnectionProps> {
         if (this.props.onDelete && this.props.connection) {
             DialogControl.show(
                 'Delete connection?',
-                `from ${this.props.connection.from.resourceName} to ${this.props.connection.to.resourceName}`,
+                `from ${this.props.connection.provider.resourceName} to ${this.props.connection.consumer.resourceName}`,
                 () => {
                     if (this.props.onDelete && this.props.connection) {
                         this.props.onDelete(this.props.connection);
                         showToasty({
                             type: ToastType.SUCCESS,
                             title: 'Connection deleted',
-                            message: `Connection between ${this.props.connection.from.resourceName} and ${this.props.connection.to.resourceName} has been deleted.`,
+                            message: `Connection between ${this.props.connection.provider.resourceName} and ${this.props.connection.consumer.resourceName} has been deleted.`,
                         });
                     }
                 },

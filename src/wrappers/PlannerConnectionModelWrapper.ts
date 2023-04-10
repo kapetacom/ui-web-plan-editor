@@ -1,7 +1,7 @@
 import { action, computed, makeObservable, observable, runInAction, toJS } from 'mobx';
 import _ from 'lodash';
 
-import type { Point, BlockConnectionSpec, DataWrapper } from '@kapeta/ui-web-types';
+import type { Point } from '@kapeta/ui-web-types';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { BasisCurve } from '@kapeta/ui-web-utils';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
@@ -9,8 +9,10 @@ import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
 import { PlannerModelWrapper } from './PlannerModelWrapper';
 import { PlannerNodeSize } from '../types';
+import {DataWrapper} from "./models";
+import { Connection } from '@kapeta/schemas';
 
-export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectionSpec> {
+export class PlannerConnectionModelWrapper implements DataWrapper<Connection> {
     @observable
     readonly fromResource: PlannerResourceModelWrapper;
 
@@ -18,7 +20,7 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
     readonly toResource: PlannerResourceModelWrapper;
 
     @observable
-    private data: BlockConnectionSpec;
+    private data: Connection;
 
     @observable
     errors: string[] = [];
@@ -26,32 +28,32 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
     @observable
     editing: boolean = false;
 
-    static createFromData(data: BlockConnectionSpec, planner: PlannerModelWrapper) {
+    static createFromData(data: Connection, planner: PlannerModelWrapper) {
         return runInAction(() => {
-            const fromBlock = planner.findBlockById(data.from.blockId);
-            if (!fromBlock) {
-                throw new Error(`Source Block not found: ${data.from.blockId}`);
+            const consumerBlock = planner.findBlockById(data.consumer.blockId);
+            if (!consumerBlock) {
+                throw new Error(`Consumer block not found: ${data.consumer.blockId}`);
             }
 
-            const toBlock = planner.findBlockById(data.to.blockId);
+            const providerBlock = planner.findBlockById(data.provider.blockId);
 
-            if (!toBlock) {
-                throw new Error(`Target Block not found: ${data.from.blockId}`);
+            if (!providerBlock) {
+                throw new Error(`Provider block not found: ${data.provider.blockId}`);
             }
 
-            const fromResource = fromBlock.findResourceById(ResourceRole.PROVIDES, data.from.resourceName);
+            const providerResource = providerBlock.findResourceById(ResourceRole.PROVIDES, data.provider.resourceName);
 
-            if (!fromResource) {
-                throw new Error(`Provider resource not found: ${data.from.resourceName}`);
+            if (!providerResource) {
+                throw new Error(`Provider resource not found: ${data.provider.blockId}.${data.provider.resourceName}`);
             }
 
-            const toResource = toBlock.findResourceById(ResourceRole.CONSUMES, data.to.resourceName);
+            const consumerResource = consumerBlock.findResourceById(ResourceRole.CONSUMES, data.consumer.resourceName);
 
-            if (!toResource) {
-                throw new Error(`Consumer resource not found: ${data.to.resourceName}`);
+            if (!consumerResource) {
+                throw new Error(`Consumer resource not found: ${data.consumer.blockId}.${data.consumer.resourceName}`);
             }
 
-            return makeObservable(new PlannerConnectionModelWrapper(data, fromResource, toResource));
+            return makeObservable(new PlannerConnectionModelWrapper(data, providerResource, consumerResource));
         });
     }
 
@@ -59,11 +61,11 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
         return makeObservable(
             new PlannerConnectionModelWrapper(
                 {
-                    from: {
+                    consumer: {
                         blockId: fromResource.block.id,
                         resourceName: fromResource.id,
                     },
-                    to: {
+                    provider: {
                         blockId: toResource.block.id,
                         resourceName: toResource.id,
                     },
@@ -75,7 +77,7 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
     }
 
     constructor(
-        connection: BlockConnectionSpec,
+        connection: Connection,
         fromResource: PlannerResourceModelWrapper,
         toResource: PlannerResourceModelWrapper
     ) {
@@ -89,33 +91,33 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
     @computed
     get id() {
         return [
-            this.data.from.blockId,
-            this.data.from.resourceName,
-            this.data.to.blockId,
-            this.data.to.resourceName,
+            this.data.consumer.blockId,
+            this.data.consumer.resourceName,
+            this.data.provider.blockId,
+            this.data.provider.resourceName,
         ].join('_');
     }
 
     @observable
-    getData(): BlockConnectionSpec {
+    getData(): Connection {
         return { ...toJS(this.data) };
     }
 
     @action
-    setData(data: BlockConnectionSpec) {
+    setData(data: Connection) {
         this.data = data;
 
         this.validate();
     }
 
     @computed
-    get from() {
-        return this.data.from;
+    get consumer() {
+        return this.data.consumer;
     }
 
     @computed
-    get to() {
-        return this.data.to;
+    get provider() {
+        return this.data.provider;
     }
 
     @computed
@@ -136,11 +138,11 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
     @action
     validate() {
         this.errors = [];
-        if (!this.data.from) {
+        if (!this.data.consumer) {
             this.errors.push('Missing source resource definition');
         }
 
-        if (!this.data.to) {
+        if (!this.data.provider) {
             this.errors.push('Missing target resource definition');
         }
 
@@ -173,13 +175,13 @@ export class PlannerConnectionModelWrapper implements DataWrapper<BlockConnectio
     /**
      * This method cleans up and re-organises mapping
      *
-     * Call this method after changing to or from resources
+     * Call this method after changing provider or from resources
      */
     @action
     recalculateMapping() {
         const converter = this.getConverter();
-        this.data.from.resourceName = this.fromResource.id;
-        this.data.to.resourceName = this.toResource.id;
+        this.data.consumer.resourceName = this.fromResource.id;
+        this.data.provider.resourceName = this.toResource.id;
 
         if (!converter || !converter.updateMapping) {
             return;

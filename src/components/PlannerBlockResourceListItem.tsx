@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 
-import { ItemType, Point, ResourceConfig, ResourceRole, ResourceType } from '@kapeta/ui-web-types';
+import { ItemType, Point, IResourceTypeProvider, ResourceRole, ResourceProviderType } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { ButtonStyle, showDelete } from '@kapeta/ui-web-components';
@@ -351,7 +351,7 @@ export class PlannerBlockResourceListItem extends Component<
         const heightInner = height - RESOURCE_SPACE;
         const yOffset = height * this.props.index;
         const buttonsVisible = this.props.resource.mode === ResourceMode.SHOW_OPTIONS;
-        let resourceConfig: ResourceConfig | null = null;
+        let resourceConfig: IResourceTypeProvider | null = null;
         const errors: string[] = [];
         try {
             resourceConfig = ResourceTypeProvider.get(this.props.resource.getKind());
@@ -359,7 +359,7 @@ export class PlannerBlockResourceListItem extends Component<
             errors.push(`Failed to read resource kind: ${e.message}`);
         }
 
-        const type = resourceConfig?.type.toString().toLowerCase() ?? ResourceType.SERVICE;
+        const type = resourceConfig?.type.toString().toLowerCase() ?? ResourceProviderType.INTERNAL;
         const title = resourceConfig?.title || resourceConfig?.kind;
         const typeName = title?.toString().toLowerCase() ?? 'unknown';
 
