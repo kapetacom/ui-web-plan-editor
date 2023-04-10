@@ -1,7 +1,8 @@
-import { ConnectionMethodMappingType, PLAN_KIND, PlanKind } from '@kapeta/ui-web-types';
+import { Plan } from '@kapeta/schemas';
+import { ConnectionMethodMappingType } from '@kapeta/ui-web-types';
 
-export const PlannerData: PlanKind = {
-    kind: PLAN_KIND,
+export const PlannerData: Plan = {
+    kind: 'core/plan',
     metadata: {
         name: 'kapeta/my-todo-system',
     },
@@ -81,13 +82,16 @@ export const PlannerData: PlanKind = {
 
         connections: [
             {
-                from: {
+                provider: {
                     blockId: 'user',
                     resourceName: 'users',
                 },
-                to: {
+                consumer: {
                     blockId: 'todo',
                     resourceName: 'users',
+                },
+                port: {
+                    type: 'rest'
                 },
                 mapping: {
                     getUser: {

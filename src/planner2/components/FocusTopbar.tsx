@@ -1,10 +1,11 @@
+import { BlockInstance } from '@kapeta/schemas';
 import { action } from 'mobx';
 import React from 'react';
-import { BlockInstanceSpec } from '@kapeta/ui-web-types';
+
 
 export function FocusTopbar(props: {
-    focusedBlock?: BlockInstanceSpec;
-    setFocusBlock: (block: BlockInstanceSpec) => void;
+    focusedBlock?: BlockInstance;
+    setFocusBlock: (block: BlockInstance) => void;
 }) {
     return (
         <div>

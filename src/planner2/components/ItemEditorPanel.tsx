@@ -17,8 +17,8 @@ import { BlockTypeProvider, IdentityService, ResourceTypeProvider } from '@kapet
 
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
-import type { BlockConnectionSpec, BlockKind, SchemaEntity, SchemaKind } from '@kapeta/ui-web-types';
-import { ItemType, ResourceKind, ResourceRole } from '@kapeta/ui-web-types';
+import type { SchemaKind } from '@kapeta/ui-web-types';
+import {ItemType, ResourceRole} from '@kapeta/ui-web-types';
 
 import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -26,6 +26,7 @@ import { useAsync } from 'react-use';
 import { EditableItemInterface2 } from '../types';
 import { cloneDeep } from 'lodash';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
+import {BlockDefinition, Connection, Entity, Resource } from '@kapeta/schemas';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {
@@ -45,11 +46,11 @@ const withNamespaces = (ChildComponent) => {
 const AutoLoadAssetNameInput = withNamespaces(AssetNameInput);
 
 interface BlockConnectionEditData {
-    connection: BlockConnectionSpec;
-    target: ResourceKind;
-    targetEntities?: SchemaEntity[];
-    source: ResourceKind;
-    sourceEntities?: SchemaEntity[];
+    connection: Connection;
+    target: Resource;
+    targetEntities?: Entity[];
+    source: Resource;
+    sourceEntities?: Entity[];
 }
 
 function renderBlockFields(data: SchemaKind) {
@@ -88,16 +89,16 @@ function renderBlockFields(data: SchemaKind) {
 
 function renderEditableItemForm(planner: PlannerContextData, editableItem: EditableItemInterface2): any {
     if (editableItem.type === ItemType.CONNECTION) {
-        const connection = editableItem.item as BlockConnectionSpec;
+        const connection = editableItem.item as Connection;
 
         const source = planner.getResourceByBlockIdAndName(
-            connection.from.blockId,
-            connection.from.resourceName,
+            connection.provider.blockId,
+            connection.provider.resourceName,
             ResourceRole.PROVIDES
         );
         const target = planner.getResourceByBlockIdAndName(
-            connection.to.blockId,
-            connection.to.resourceName,
+            connection.consumer.blockId,
+            connection.consumer.resourceName,
             ResourceRole.CONSUMES
         );
 
@@ -131,7 +132,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
     }
 
     if (editableItem.type === ItemType.BLOCK) {
-        const data = editableItem.item as BlockKind;
+        const data = editableItem.item as BlockDefinition;
 
         const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
@@ -159,7 +160,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
     // TODO: Implement resource editing
     // @ts-ignore
     if (editableItem.type === 'resource') {
-        const data = editableItem.item as ResourceKind;
+        const data = editableItem.item as Resource;
         const resourceType = ResourceTypeProvider.get(data.kind);
 
         if (!resourceType.componentType) {
@@ -197,7 +198,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
                 >
                     <resourceType.componentType
                         key={editableItem.ref}
-                        // TODO: make resource componentType accept ResourceKind/Schemakind
+                        // TODO: make resource componentType accept Resource/Schemakind
                         // @ts-ignore
                         block={data}
                         creating={editableItem.creating}

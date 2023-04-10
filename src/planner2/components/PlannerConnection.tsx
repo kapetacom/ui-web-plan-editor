@@ -2,15 +2,16 @@ import React, { useContext, useState } from 'react';
 import { PlannerContext } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
 import { calculatePathBetweenPoints, getCurveMainPoints, getMiddlePoint } from '../utils/connectionUtils';
-import { BlockConnectionSpec, ResourceRole } from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { getResourceId } from '../utils/planUtils';
 import { PlannerAction } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { Connection } from '@kapeta/schemas';
 
 export const PlannerConnection: React.FC<{
-    connection: BlockConnectionSpec;
+    connection: Connection;
     // eslint-disable-next-line react/no-unused-prop-types
     size: PlannerNodeSize;
     className?: string;
@@ -22,11 +23,11 @@ export const PlannerConnection: React.FC<{
     const [hasFocus, setHasFocus] = useState(false);
 
     const fromId = getResourceId(
-        props.connection.from.blockId,
-        props.connection.from.resourceName,
+        props.connection.provider.blockId,
+        props.connection.provider.resourceName,
         ResourceRole.PROVIDES
     );
-    const toId = getResourceId(props.connection.to.blockId, props.connection.to.resourceName, ResourceRole.CONSUMES);
+    const toId = getResourceId(props.connection.consumer.blockId, props.connection.consumer.resourceName, ResourceRole.CONSUMES);
     const from = planner.connectionPoints.getPointById(fromId);
     const to = planner.connectionPoints.getPointById(toId);
 
@@ -36,17 +37,17 @@ export const PlannerConnection: React.FC<{
     }
 
     const fromResource = planner.getResourceByBlockIdAndName(
-        props.connection.from.blockId,
-        props.connection.from.resourceName,
+        props.connection.provider.blockId,
+        props.connection.provider.resourceName,
         ResourceRole.PROVIDES
     );
     const toResource = planner.getResourceByBlockIdAndName(
-        props.connection.to.blockId,
-        props.connection.to.resourceName,
+        props.connection.consumer.blockId,
+        props.connection.consumer.resourceName,
         ResourceRole.CONSUMES
     );
-    const fromEntities = planner.getBlockById(props.connection.from.blockId)?.spec.entities?.types || [];
-    const toEntities = planner.getBlockById(props.connection.to.blockId)?.spec.entities?.types || [];
+    const fromEntities = planner.getBlockById(props.connection.provider.blockId)?.spec.entities?.types || [];
+    const toEntities = planner.getBlockById(props.connection.consumer.blockId)?.spec.entities?.types || [];
 
     let connectionValid = true;
     if (fromResource && toResource) {

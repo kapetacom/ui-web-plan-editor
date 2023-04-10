@@ -1,35 +1,33 @@
 import {
-    Asset,
-    BlockConnectionSpec,
-    BlockInstanceSpec,
-    BlockKind,
+    Asset, 
     ItemType,
-    PlanKind,
     Point,
-    ResourceConfig,
-    ResourceKind,
+    IResourceTypeProvider,
     ResourceRole,
     SchemaKind,
     Size,
 } from '@kapeta/ui-web-types';
+
+import {BlockDefinition, BlockInstance, Connection, Plan, Resource } from '@kapeta/schemas';
 import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
 
 export type BlockPayload = {
     type: 'block';
-    data: BlockInstanceSpec;
+    data: BlockInstance;
 };
 
 export type BlockTypePayload = {
     type: 'block-type';
-    data: Asset<BlockKind>;
+    data: Asset<BlockDefinition>;
 };
 
 export type ResourcePayload = {
     type: 'resource';
     data: {
-        resource: ResourceKind;
-        block: BlockInstanceSpec;
+        resource: Resource;
+        instance: BlockInstance;
+        block: BlockDefinition;
         role: ResourceRole;
     };
 };
@@ -39,7 +37,7 @@ export type ResourceTypePayload = {
     data: {
         title: string;
         kind: string;
-        config: ResourceConfig;
+        config: IResourceTypeProvider;
     };
 };
 
@@ -52,11 +50,11 @@ export interface ValidationIssue {
 }
 
 export interface ActionContext {
-    block?: BlockKind;
-    blockInstance?: BlockInstanceSpec;
-    resource?: ResourceKind;
+    block?: BlockDefinition;
+    blockInstance?: BlockInstance;
+    resource?: Resource;
     resourceRole?: ResourceRole;
-    connection?: BlockConnectionSpec;
+    connection?: Connection;
 }
 export interface PlannerAction<P extends unknown> {
     enabled(planner: PlannerContextData, info: ActionContext): boolean;
@@ -69,17 +67,17 @@ export interface PlannerAction<P extends unknown> {
 export interface EditableItemInterface2 {
     type: ItemType;
     ref?: string;
-    item: SchemaKind | BlockConnectionSpec;
+    item: SchemaKind | Connection;
     creating: boolean;
 }
 
 export interface BlockInfo {
-    block: BlockKind;
-    instance: BlockInstanceSpec;
+    block: BlockDefinition;
+    instance: BlockInstance;
 }
 
 export interface FocusBlockInfo {
-    plan: PlanKind;
+    plan: Plan;
     focus: BlockInfo;
     consumingBlocks: BlockInfo[];
     providingBlocks: BlockInfo[];
@@ -87,11 +85,11 @@ export interface FocusBlockInfo {
 }
 
 export interface FocusBlockInfoShallow {
-    plan: PlanKind;
+    plan: Plan;
     focus: BlockInfo;
-    consumingBlocks: BlockInstanceSpec[];
-    providingBlocks: BlockInstanceSpec[];
-    all: BlockInstanceSpec[];
+    consumingBlocks: BlockInstance[];
+    providingBlocks: BlockInstance[];
+    all: BlockInstance[];
 }
 
 export interface ZoomLevels {

@@ -1,6 +1,9 @@
-import { BlockConnectionSpec, PlanKind, Point, ResourceRole } from '@kapeta/ui-web-types';
+import {Connection, Plan, BlockResource, BlockInstanceResource } from '@kapeta/schemas';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { Point, ResourceRole } from '@kapeta/ui-web-types';
 import { BasisCurve } from '@kapeta/ui-web-utils';
 import { getResourceId } from './planUtils';
+
 
 export function calculatePathBetweenPoints(fromPoint: Point, toPoint: Point) {
     return getCurveFromPoints(getCurveMainPoints(fromPoint, toPoint));
@@ -16,12 +19,12 @@ export function getCurveFromPoints(points: Point[]) {
     return curve.toString();
 }
 
-export function getConnectionId(connection: BlockConnectionSpec) {
+export function getConnectionId(connection: Connection) {
     return `${getResourceId(
-        connection.from.blockId,
-        connection.from.resourceName,
+        connection.provider.blockId,
+        connection.provider.resourceName,
         ResourceRole.PROVIDES
-    )}-${getResourceId(connection.to.blockId, connection.to.resourceName, ResourceRole.CONSUMES)}`;
+    )}-${getResourceId(connection.consumer.blockId, connection.consumer.resourceName, ResourceRole.CONSUMES)}`;
 }
 
 export function getMiddlePoint(list: Point[]) {
@@ -55,21 +58,48 @@ export function getCurveMainPoints(fromPoint: Point, toPoint: Point) {
     return points;
 }
 
-export function isConnectionTo(connection: BlockConnectionSpec, instanceId: string, resourceName?: string) {
+export function isConnectionTo(connection: Connection, instanceId: string, resourceName?: string) {
     if (!resourceName) {
-        return connection.from.blockId === instanceId || connection.to.blockId === instanceId;
+        return connection.provider.blockId === instanceId || connection.consumer.blockId === instanceId;
     }
 
     return (
-        (connection.from.blockId === instanceId && connection.from.resourceName === resourceName) ||
-        (connection.to.blockId === instanceId && connection.to.resourceName === resourceName)
+        (connection.provider.blockId === instanceId && connection.provider.resourceName === resourceName) ||
+        (connection.consumer.blockId === instanceId && connection.consumer.resourceName === resourceName)
     );
 }
 
-export function getConnectionsFor(plan: PlanKind, blockId: string, resourceName: string) {
+export function getConnectionsFor(plan: Plan, blockId: string, resourceName: string) {
     return (
         plan.spec.connections?.filter((connection) => {
             return isConnectionTo(connection, blockId, resourceName);
         }) ?? []
     );
+}
+
+export function createConnection(provider:BlockInstanceResource, consumer:BlockInstanceResource) {
+    const connection:Connection = {
+        provider: {
+            resourceName: provider.resource.metadata.name,
+            blockId: provider.instance.id
+        },
+        consumer: {
+            resourceName: consumer.resource.metadata.name,
+            blockId: consumer.instance.id
+        }
+    }
+
+    const converter = ResourceTypeProvider.getConverterFor(provider.resource.kind, consumer.resource.kind);
+    if (converter &&
+        converter.createMapping) {
+        const mapping = converter.createMapping(
+            provider.resource,
+            consumer.resource,
+            provider.block.spec.entities?.types ?? [],
+            consumer.block.spec.entities?.types ?? []
+        );
+        connection.mapping = mapping;
+    }
+
+    return connection;
 }

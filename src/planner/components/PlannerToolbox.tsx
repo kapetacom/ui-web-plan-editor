@@ -3,7 +3,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 import { SidePanel, PanelAlignment, PanelSize, DnDDrag } from '@kapeta/ui-web-components';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { ResourceConfig, ResourceRole } from '@kapeta/ui-web-types';
+import { ResourceRole, IResourceTypeProvider } from '@kapeta/ui-web-types';
 import { toClass, SVGCornersHelper, ResourceTagSide } from '@kapeta/ui-web-utils';
 
 import { PlannerToolboxResource } from './PlannerToolboxResource';
@@ -54,19 +54,19 @@ export class PlannerToolbox extends React.Component<PlannerToolboxProps, Planner
     }
 
     private loadResourceSection() {
-        const providerSection: ToolSection<ResourceConfig> = {
+        const providerSection: ToolSection<IResourceTypeProvider> = {
             name: 'Providers',
             items: [],
             painter: PlannerToolboxResource,
         };
 
-        const consumerSection: ToolSection<ResourceConfig> = {
+        const consumerSection: ToolSection<IResourceTypeProvider> = {
             name: 'Consumers',
             items: [],
             painter: PlannerToolboxResource,
         };
 
-        ResourceTypeProvider.list().forEach((resourceConfig: ResourceConfig) => {
+        ResourceTypeProvider.list().forEach((resourceConfig: IResourceTypeProvider) => {
             const section = resourceConfig.role === ResourceRole.PROVIDES ? providerSection : consumerSection;
             section.items.push({
                 title: resourceConfig.title || resourceConfig.kind,

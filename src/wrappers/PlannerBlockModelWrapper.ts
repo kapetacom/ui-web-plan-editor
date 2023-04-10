@@ -3,17 +3,10 @@ import _ from 'lodash';
 import { Guid } from 'guid-typescript';
 
 import type {
-    BlockInstanceSpec,
-    BlockKind,
-    BlockReference,
-    DataWrapper,
-    Dimensions,
     Point,
-    ResourceKind,
-    SchemaEntity,
     Size,
 } from '@kapeta/ui-web-types';
-import { isSchemaEntityCompatible, ResourceRole } from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { parseKapetaUri, KapetaURI } from '@kapeta/nodejs-utils';
 
 import { BlockService, BlockTypeProvider } from '@kapeta/ui-web-context';
@@ -25,10 +18,20 @@ import { BlockMode, ResourceMode } from './wrapperHelpers';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 import { DSL_LANGUAGE_ID, DSLConverters, DSLWriter } from '@kapeta/ui-web-components';
 import { randomUUID } from '../utils/cryptoUtils';
+import {DataWrapper} from "./models";
+import {
+    AssetReference,
+    BlockDefinition,
+    BlockInstance,
+    Dimensions,
+    Entity,
+    Resource,
+    isSchemaEntityCompatible
+} from '@kapeta/schemas';
 
 type HeightCache = { [size: number]: number };
 
-export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
+export class PlannerBlockModelWrapper implements DataWrapper<BlockDefinition> {
     readonly plan: PlannerModelWrapper;
 
     readonly instanceId: string;
@@ -67,20 +70,20 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     provides = [] as PlannerResourceModelWrapper[];
 
     @observable
-    blockReference: BlockReference;
+    blockReference: AssetReference;
 
     @observable
     private blockReferenceUri?: KapetaURI;
 
     @observable
-    private data!: BlockKind;
+    private data!: BlockDefinition;
 
     private heightCache: HeightCache = {};
 
     @observable
     errors: string[] = [];
 
-    constructor(blockInstance: BlockInstanceSpec, blockDefinition: BlockKind, plan: PlannerModelWrapper) {
+    constructor(blockInstance: BlockInstance, blockDefinition: BlockDefinition, plan: PlannerModelWrapper) {
         this.instanceId = randomUUID();
 
         this.id = blockInstance.id;
@@ -159,7 +162,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @observable
-    getData(): BlockKind {
+    getData(): BlockDefinition {
         return {
             ...this.data,
             spec: {
@@ -171,7 +174,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @observable
-    getInstance(): BlockInstanceSpec {
+    getInstance(): BlockInstance {
         return {
             block: { ...this.blockReference },
             name: this.name,
@@ -186,7 +189,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @action
-    setEntities(entities: SchemaEntity[]) {
+    setEntities(entities: Entity[]) {
         if (!this.data.spec.entities) {
             this.data.spec.entities = {
                 types: [],
@@ -198,11 +201,16 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         }
 
         this.data.spec.entities.types = toJS(entities);
+        if (!this.data.spec.entities.source) {
+            this.data.spec.entities.source = {
+                value: ''
+            }
+        }
         this.data.spec.entities.source.value = DSLWriter.write(entities.map(DSLConverters.fromSchemaEntity));
     }
 
     @observable
-    getEntities(): SchemaEntity[] {
+    getEntities(): Entity[] {
         if (!this.data.spec.entities?.types) {
             return [];
         }
@@ -236,7 +244,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @action
-    private updateResources(role: ResourceRole, resources: ResourceKind[]): void {
+    private updateResources(role: ResourceRole, resources: Resource[]): void {
         const wrappers = role === ResourceRole.CONSUMES ? this.consumes : this.provides;
 
         // Get rid of wrappers for resources that no longer exist
@@ -266,7 +274,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @action
-    setData(data: BlockKind) {
+    setData(data: BlockDefinition) {
         this.data = data;
         this.updateResources(ResourceRole.CONSUMES, data.spec.consumers || []);
         this.updateResources(ResourceRole.PROVIDES, data.spec.providers || []);
@@ -282,18 +290,12 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         const providerBlocks: PlannerBlockModelWrapper[] = []; // blocks to the left
         this.provides.forEach((resource: PlannerResourceModelWrapper) => {
             this.plan.getConnectionsFor(resource).forEach((connection: PlannerConnectionModelWrapper) => {
-                if (!consumerBlocks[resource.id]) {
-                    consumerBlocks[resource.id] = [];
-                }
                 consumerBlocks.push(connection.toResource.block);
             });
         });
 
         this.consumes.forEach((resource: PlannerResourceModelWrapper) => {
             this.plan.getConnectionsFor(resource).forEach((connection: PlannerConnectionModelWrapper) => {
-                if (!providerBlocks[resource.id]) {
-                    providerBlocks[resource.id] = [];
-                }
                 providerBlocks.push(connection.fromResource.block);
             });
         });
@@ -334,7 +336,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
         return Math.max(totalConsumerHeight, totalProviderHeight);
     }
 
-    private createResourceWrapper(offset: number, role: ResourceRole, resource: ResourceKind) {
+    private createResourceWrapper(offset: number, role: ResourceRole, resource: Resource) {
         return new PlannerResourceModelWrapper(role, resource, this);
     }
 
@@ -545,12 +547,12 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @observable
-    getEntityByName(name: string): SchemaEntity | undefined {
+    getEntityByName(name: string): Entity | undefined {
         return _.find(this.data.spec.entities?.types, { name });
     }
 
     @observable
-    getMatchingEntity(entity: SchemaEntity, sourceEntities: SchemaEntity[]): SchemaEntity | undefined {
+    getMatchingEntity(entity: Entity, sourceEntities: Entity[]): Entity | undefined {
         const namedEntity = this.getEntityByName(entity.name);
         let matchedEntity;
 
@@ -562,7 +564,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @observable
-    public getConflictingEntity(entity: SchemaEntity, sourceEntities: SchemaEntity[]): SchemaEntity | undefined {
+    public getConflictingEntity(entity: Entity, sourceEntities: Entity[]): Entity | undefined {
         const namedEntity = this.getEntityByName(entity.name);
         let conflictingEntity;
 
@@ -574,7 +576,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockKind> {
     }
 
     @action
-    public addEntity(entity: SchemaEntity) {
+    public addEntity(entity: Entity) {
         if (!this.data.spec.entities) {
             this.data.spec.entities = {
                 types: [],

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BlockInstanceSpec, BlockKind, ResourceKind, ResourceRole } from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 
 import {
     PlannerBlockModelWrapper,
@@ -9,8 +9,9 @@ import {
     PlannerResourceModelWrapper,
     ResourceMode,
 } from '../src';
+import {BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 
-const ValidInstance: BlockInstanceSpec = {
+const ValidInstance: BlockInstance = {
     id: '1',
     name: 'Some Instance',
     block: {
@@ -24,7 +25,7 @@ const ValidInstance: BlockInstanceSpec = {
     },
 };
 
-const ValidDefinition: BlockKind = {
+const ValidDefinition: BlockDefinition = {
     kind: 'kapeta/block-type-service',
     metadata: {
         name: 'test/demo',
@@ -38,31 +39,43 @@ const ValidDefinition: BlockKind = {
     },
 };
 
-const MissingResourceKind: ResourceKind = {
+const MissingResourceKind: Resource = {
     kind: 'kapeta/test',
     metadata: {
         name: 'Name',
     },
-    spec: {},
+    spec: {
+        port: {
+            type: 'rest'
+        }
+    },
 };
 
-const InvalidResourceKind: ResourceKind = {
+const InvalidResourceKind: Resource = {
     kind: 'not-valid',
     metadata: {
         name: 'Name',
     },
-    spec: {},
+    spec: {
+        port: {
+            type: 'web'
+        }
+    },
 };
 
-const InvalidResourceSpec: ResourceKind = {
+const InvalidResourceSpec: Resource = {
     kind: 'kapeta/resource-type-rest-api:1.2.3',
     metadata: {
         name: 'Name',
     },
-    spec: {},
+    spec: {
+        port: {
+            type: 'rest'
+        }
+    },
 };
 
-const InvalidResourceSpecThrown: ResourceKind = {
+const InvalidResourceSpecThrown: Resource = {
     kind: 'kapeta/resource-type-rest-api:1.2.3',
     metadata: {
         name: 'Name',
@@ -70,7 +83,11 @@ const InvalidResourceSpecThrown: ResourceKind = {
     spec: {
         methods: {},
         throw: true,
+        port: {
+            type: 'http'
+        }
     },
+
 };
 
 export default {

@@ -4,5 +4,9 @@
         "name": "kapeta/resource-type-postgresql",
         "title": "Postgres"
     },
-    "spec": {}
+    "spec": {
+        "ports": [
+            {"type":  "postgres"}
+        ]
+    }
 }

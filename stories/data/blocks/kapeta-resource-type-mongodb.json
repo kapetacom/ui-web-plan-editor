@@ -4,5 +4,9 @@
         "name": "kapeta/resource-type-mongodb",
         "title": "MongoDB"
     },
-    "spec": {}
+    "spec": {
+        "ports": [
+            {"type":  "mongodb"}
+        ]
+    }
 }

@@ -1,6 +1,11 @@
 import { PlannerNodeSize } from '../../types';
-import { Asset, BlockInstanceSpec, BlockKind, ResourceRole, Size } from '@kapeta/ui-web-types';
+import { Asset,  ResourceRole, Size } from '@kapeta/ui-web-types';
 import { randomUUID } from '../../utils/cryptoUtils';
+import {BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
+import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
+import {PlannerConnectionModelWrapper} from "../../wrappers/PlannerConnectionModelWrapper";
+import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 export const BLOCK_SIZE = 150;
 
@@ -11,8 +16,8 @@ export const resourceHeight = {
 };
 
 export const calculateCanvasSize = (
-    blocks: BlockInstanceSpec[],
-    blockAssets: Asset<BlockKind>[],
+    blocks: BlockInstance[],
+    blockAssets: Asset<BlockDefinition>[],
     size: PlannerNodeSize,
     containerSize: Size
 ) => {
@@ -62,7 +67,7 @@ export const calculateCanvasSize = (
     };
 };
 
-export function calculateBlockHeight(block: BlockKind, size: PlannerNodeSize) {
+export function calculateBlockHeight(block: BlockDefinition, size: PlannerNodeSize) {
     // get connections for block?
     const providesCount = block.spec.providers?.length || 0;
     const consumesCount = block.spec.consumers?.length || 0;
@@ -82,20 +87,4 @@ export function getResourceId(blockId: string, resourceName: string, resourceRol
 
 export function getBlockInstance(plan, blockId) {
     return plan.spec.blocks.find((block) => block.id === blockId);
-}
-
-export function createBlockInstanceForBlock(blockAsset: Asset<BlockKind>): BlockInstanceSpec {
-    return {
-        block: {
-            ref: blockAsset.ref,
-        },
-        dimensions: {
-            width: BLOCK_SIZE,
-            height: -1,
-            top: 0,
-            left: 0,
-        },
-        id: randomUUID(),
-        name: blockAsset.data.metadata.title ?? blockAsset.data.metadata.name,
-    };
 }

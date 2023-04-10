@@ -5,13 +5,14 @@ import { SidePanel, PanelAlignment, PanelSize, SidePanelHeader } from '@kapeta/u
 import { BlockTree } from './BlockTree';
 
 import './PlannerFocusSideBar.less';
-import { BlockInstanceSpec } from '@kapeta/ui-web-types';
+import { BlockInstance } from '@kapeta/schemas';
+
 
 interface Props {
-    block?: BlockInstanceSpec;
+    block?: BlockInstance;
     blurFocus: () => void;
     onClose: () => void;
-    onFocusChange: (block: BlockInstanceSpec) => void;
+    onFocusChange: (block: BlockInstance) => void;
 }
 
 export const PlannerFocusSideBar = (props: Props) => {

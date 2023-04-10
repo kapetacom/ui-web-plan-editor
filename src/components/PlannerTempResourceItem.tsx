@@ -1,6 +1,6 @@
 /* eslint-disable react/sort-comp */
 import React, { Component } from 'react';
-import { ItemType, ResourceRole, DataWrapper, BlockConnectionSpec, Dimensions, Point } from '@kapeta/ui-web-types';
+import { ItemType, ResourceRole,  Point } from '@kapeta/ui-web-types';
 
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
@@ -17,15 +17,16 @@ import { BlockResource } from './BlockResource';
 import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
 
 import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';
-import { SelectedResourceItem } from '../wrappers/models';
+import {DataWrapper, SelectedResourceItem } from '../wrappers/models';
 import { asHTMLElement, DOMElement } from '@kapeta/ui-web-utils';
 import { observer } from 'mobx-react';
 import { action, computed, makeObservable, observable } from 'mobx';
+import { Connection, Dimensions } from '@kapeta/schemas';
 
 export interface PlannerTempResourceItemProps {
     selectedResource: SelectedResourceItem;
     size: PlannerNodeSize;
-    setItemToEdit?: (res: DataWrapper<BlockConnectionSpec>, type: ItemType, creating?: boolean) => void;
+    setItemToEdit?: (res: DataWrapper<Connection>, type: ItemType, creating?: boolean) => void;
     planner: PlannerModelWrapper;
     zoom?: number;
 }

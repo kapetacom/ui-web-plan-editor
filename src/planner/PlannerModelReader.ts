@@ -1,13 +1,13 @@
 import { BlockStore } from '@kapeta/ui-web-context';
-import { BlockReference, BlockInstanceSpec, PlanKind, BlockKind } from '@kapeta/ui-web-types';
 
 import { PlannerModelWrapper } from '../wrappers/PlannerModelWrapper';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import { PlannerConnectionModelWrapper } from '../wrappers/PlannerConnectionModelWrapper';
 import Path from 'path';
 import { runInAction } from 'mobx';
+import { AssetReference, BlockDefinition, BlockInstance, Plan } from '@kapeta/schemas';
 
-function toReferenceId(block: BlockReference) {
+function toReferenceId(block: AssetReference) {
     return block.ref;
 }
 
@@ -25,8 +25,8 @@ export class PlannerModelReader {
         return blockRef;
     }
 
-    private async loadBlockDefinitions(blockInstances: BlockInstanceSpec[], plan: PlannerModelWrapper) {
-        const definitions: { [key: string]: BlockKind } = {};
+    private async loadBlockDefinitions(blockInstances: BlockInstance[], plan: PlannerModelWrapper) {
+        const definitions: { [key: string]: BlockDefinition } = {};
 
         for (let i = 0; i < blockInstances.length; i++) {
             const blockInstance = blockInstances[i];
@@ -68,7 +68,7 @@ export class PlannerModelReader {
         }
     }
 
-    async load(planKind: PlanKind, planRef: string): Promise<PlannerModelWrapper> {
+    async load(planKind: Plan, planRef: string): Promise<PlannerModelWrapper> {
         const out = runInAction(() => new PlannerModelWrapper(planRef, planKind.metadata.name));
         if (planKind.spec.blocks) {
             await this.loadBlockDefinitions(planKind.spec.blocks, out);
