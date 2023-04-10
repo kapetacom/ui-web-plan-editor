@@ -1,19 +1,19 @@
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { BlockInstanceSpec, BlockKind, ResourceKind } from '@kapeta/ui-web-types';
+import { BlockInstance, BlockDefinition, Resource } from '@kapeta/schemas';
 import { ValidationIssue } from '../types';
 
 export class BlockValidator {
-    private readonly block: BlockKind;
+    private readonly block: BlockDefinition;
 
-    private instance: BlockInstanceSpec;
+    private instance: BlockInstance;
 
-    constructor(block: BlockKind, instance: BlockInstanceSpec) {
+    constructor(block: BlockDefinition, instance: BlockInstance) {
         this.block = block;
         this.instance = instance;
     }
 
-    public validateResource(resource: ResourceKind) {
+    public validateResource(resource: Resource) {
         const errors: string[] = [];
         if (!resource.metadata.name) {
             errors.push('No name is defined for resource');
@@ -60,7 +60,7 @@ export class BlockValidator {
                 parseKapetaUri(this.instance.block.ref);
             }
         } catch (e) {
-            errors.push(`Block reference was invalid: ${e.message}`);
+            errors.push(`BlockDefinition reference was invalid: ${e.message}`);
         }
 
         try {

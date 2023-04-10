@@ -2,7 +2,8 @@ import { PlannerModelReader } from '../../src/planner/PlannerModelReader';
 import { BlockServiceMock } from './BlockServiceMock';
 import { PlannerData } from './PlannerData';
 import { PlannerModelWrapper } from '../../src';
-import { Asset, BlockKind, PlanKind } from '@kapeta/ui-web-types';
+import { Asset} from '@kapeta/ui-web-types';
+import {BlockDefinition, Plan } from '@kapeta/schemas';
 
 export function readPlan(): Promise<PlannerModelWrapper> {
     const reader = new PlannerModelReader(BlockServiceMock);
@@ -16,8 +17,8 @@ export function readPlan(): Promise<PlannerModelWrapper> {
 }
 
 export async function readPlanV2(): Promise<{
-    plan: PlanKind;
-    blockAssets: Asset<BlockKind>[];
+    plan: Plan;
+    blockAssets: Asset<BlockDefinition>[];
 }> {
     for (const block of PlannerData.spec.blocks || []) {
         await BlockServiceMock.get(block.block.ref);

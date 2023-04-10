@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { InstanceStatus } from '@kapeta/ui-web-context';
-import { BlockInstanceSpec, BlockKind, BlockReference } from '@kapeta/ui-web-types';
 
 import { PlannerBlockModelWrapper, PlannerBlockNode, PlannerModelWrapper, PlannerNodeSize } from '../src';
+import {AssetReference, BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
-const InvalidTargetRefDefinition: BlockKind = {
+const InvalidTargetRefDefinition: BlockDefinition = {
     kind: 'kapeta/block-type-service:1.2.3',
     metadata: {
         name: 'test/demo',
@@ -19,7 +19,7 @@ const InvalidTargetRefDefinition: BlockKind = {
     },
 };
 
-const MissingTargetRefDefinition: BlockKind = {
+const MissingTargetRefDefinition: BlockDefinition = {
     kind: 'kapeta/block-type-service:1.2.3',
     metadata: {
         name: 'test/demo',
@@ -33,7 +33,7 @@ const MissingTargetRefDefinition: BlockKind = {
     },
 };
 
-const InvalidKindDefinition: BlockKind = {
+const InvalidKindDefinition: BlockDefinition = {
     kind: 'kapeta/not-real:1.2.3',
     metadata: {
         name: 'test/demo',
@@ -47,7 +47,7 @@ const InvalidKindDefinition: BlockKind = {
     },
 };
 
-const InvalidRefInstance: BlockInstanceSpec = {
+const InvalidRefInstance: BlockInstance = {
     id: '1',
     name: 'Some Instance',
     block: {
@@ -61,10 +61,10 @@ const InvalidRefInstance: BlockInstanceSpec = {
     },
 };
 
-const MissingRefInstance: BlockInstanceSpec = {
+const MissingRefInstance: BlockInstance = {
     id: '1',
     name: 'Some Instance',
-    block: {} as BlockReference,
+    block: {} as AssetReference,
     dimensions: {
         top: 0,
         width: 150,
@@ -73,7 +73,7 @@ const MissingRefInstance: BlockInstanceSpec = {
     },
 };
 
-const ValidInstance: BlockInstanceSpec = {
+const ValidInstance: BlockInstance = {
     id: '1',
     name: 'Some Instance',
     block: {

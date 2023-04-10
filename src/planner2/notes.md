@@ -25,7 +25,7 @@ Plan:
 -   block plan-id (plan specific)
 -   block name
 -   block dimensions
--   block ref -> BlockKind lookup (Definition)
+-   block ref -> BlockDefinition lookup (Definition)
 -   connections:
     -   block from
     -   block to
@@ -37,7 +37,7 @@ UI state:
 -   focus mode - Editor mode
 -   ...?"""
 
-Block UI state:
+BlockDefinition UI state:
 
 -   Hover?
 -   Focus?

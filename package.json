@@ -53,6 +53,7 @@
         "@types/react-dom": ">=18"
     },
     "devDependencies": {
+        "@kapeta/schemas": "^0.0.24",
         "@sambego/storybook-state": "^2.0.1",
         "@spotify/eslint-config": "^14.1.6",
         "@storybook/builder-webpack5": "^6.5.10",

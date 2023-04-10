@@ -1,13 +1,7 @@
 import React, { RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Asset,
-    BlockConnectionSpec,
-    BlockInstanceSpec,
-    BlockKind,
-    BlockResourceReferenceSpec,
-    PlanKind,
     Point,
-    ResourceKind,
     ResourceRole,
     SchemaKind,
 } from '@kapeta/ui-web-types';
@@ -20,12 +14,13 @@ import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 import { getResourceId } from './utils/planUtils';
 import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
+import {BlockDefinition, BlockInstance, Connection, Endpoint, Plan, Resource } from '@kapeta/schemas';
 
-type BlockUpdater = (block: BlockInstanceSpec) => BlockInstanceSpec;
+type BlockUpdater = (block: BlockInstance) => BlockInstance;
 type Callback = () => void;
-type InstanceAddedCallback = (blockInstance: BlockInstanceSpec) => void;
-type ResourceAddedCallback = (ref: string, block: BlockKind, resource: ResourceKind) => void;
-type ConnectionAddedCallback = (connection: BlockConnectionSpec) => void;
+type InstanceAddedCallback = (blockInstance: BlockInstance) => void;
+type ResourceAddedCallback = (ref: string, block: BlockDefinition, resource: Resource) => void;
+type ConnectionAddedCallback = (connection: Connection) => void;
 
 export interface PlannerActionConfig {
     block?: PlannerAction<any>[];
@@ -34,12 +29,12 @@ export interface PlannerActionConfig {
 }
 
 export interface PlannerContextData {
-    plan?: PlanKind;
-    blockAssets: Asset<BlockKind>[];
-    setBlockAssets(blockAssets: Asset<BlockKind>[]): void;
+    plan?: Plan;
+    blockAssets: Asset<BlockDefinition>[];
+    setBlockAssets(blockAssets: Asset<BlockDefinition>[]): void;
 
-    focusedBlock?: BlockInstanceSpec;
-    setFocusedBlock(block: BlockInstanceSpec | undefined): void;
+    focusedBlock?: BlockInstance;
+    setFocusedBlock(block: BlockInstance | undefined): void;
 
     canEditBlocks?: boolean;
     canEditConnections?: boolean;
@@ -47,49 +42,49 @@ export interface PlannerContextData {
     // view modes
     assetState: {
         getViewModeForResource(
-            blockInstance: BlockInstanceSpec,
-            resource: ResourceKind,
+            blockInstance: BlockInstance,
+            resource: Resource,
             role: ResourceRole
         ): ResourceMode | undefined;
         setViewModeForResource(
-            blockInstance: BlockInstanceSpec,
-            resource: ResourceKind,
+            blockInstance: BlockInstance,
+            resource: Resource,
             role: ResourceRole,
             mode?: ResourceMode
         ): void;
-        getViewModeForBlock(blockInstance: BlockInstanceSpec): BlockMode | undefined;
-        setViewModeForBlock(blockInstance: BlockInstanceSpec, mode?: BlockMode): void;
+        getViewModeForBlock(blockInstance: BlockInstance): BlockMode | undefined;
+        setViewModeForBlock(blockInstance: BlockInstance, mode?: BlockMode): void;
     };
 
     mode?: PlannerMode;
     zoom: number;
     setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
     nodeSize: PlannerNodeSize;
-    getBlockByRef(ref: string): BlockKind | undefined;
-    getBlockById(blockId: string): BlockKind | undefined;
+    getBlockByRef(ref: string): BlockDefinition | undefined;
+    getBlockById(blockId: string): BlockDefinition | undefined;
 
-    updateBlockDefinition(ref: string, update: BlockKind): void;
+    updateBlockDefinition(ref: string, update: BlockDefinition): void;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
     removeBlockInstance(blockId: string): void;
-    addBlockInstance(blockInstance: BlockInstanceSpec): void;
+    addBlockInstance(blockInstance: BlockInstance): void;
     onBlockInstanceAdded(callback: InstanceAddedCallback): Callback;
 
     // resources
-    addResource(blockRef: string, resource: ResourceKind, role: ResourceRole): void;
+    addResource(blockRef: string, resource: Resource, role: ResourceRole): void;
     removeResource(blockRef: string, resourceName: string, resourceRole: ResourceRole): void;
     onResourceAdded(callback: ResourceAddedCallback): Callback;
     getResourceByBlockIdAndName(
         blockId: string,
         resourceName: string,
         resourceRole: ResourceRole
-    ): ResourceKind | undefined;
+    ): Resource | undefined;
 
     // connection stuff
-    addConnection(connection: BlockConnectionSpec): void;
-    updateConnectionMapping(connection: BlockConnectionSpec): void;
+    addConnection(connection: Connection): void;
+    updateConnectionMapping(connection: Connection): void;
     onConnectionAdded(callback: ConnectionAddedCallback): Callback;
-    removeConnection(connection: BlockConnectionSpec): void;
-    hasConnections(connectionSpec: BlockResourceReferenceSpec): boolean;
+    removeConnection(connection: Connection): void;
+    hasConnections(connectionSpec: Endpoint): boolean;
     connectionPoints: {
         addPoint(id: string, point: Point): void;
         getPointById(id: string): Point | null;
@@ -116,15 +111,15 @@ const defaultValue: PlannerContextData = {
     zoom: 1,
     setZoomLevel() {},
 
-    setFocusedBlock(block: BlockInstanceSpec) {},
+    setFocusedBlock(block: BlockInstance) {},
 
     nodeSize: PlannerNodeSize.MEDIUM,
     blockAssets: [],
-    setBlockAssets(blockAssets: Asset<BlockKind>[]) {},
+    setBlockAssets(blockAssets: Asset<BlockDefinition>[]) {},
     getBlockByRef(_ref: string) {
         return undefined;
     },
-    getBlockById(blockId: string): BlockKind | undefined {
+    getBlockById(blockId: string): BlockDefinition | undefined {
         return undefined;
     },
 
@@ -147,9 +142,9 @@ const defaultValue: PlannerContextData = {
         return undefined;
     },
     // connection stuff
-    addConnection(connection: BlockConnectionSpec) {},
-    updateConnectionMapping(connection: BlockConnectionSpec) {},
-    removeConnection(connection: BlockConnectionSpec) {},
+    addConnection(connection: Connection) {},
+    updateConnectionMapping(connection: Connection) {},
+    removeConnection(connection: Connection) {},
     onConnectionAdded() {
         return () => {};
     },
@@ -170,10 +165,10 @@ const defaultValue: PlannerContextData = {
 
 export const PlannerContext = React.createContext(defaultValue);
 export type PlannerContextProps = {
-    plan: PlanKind;
-    blockAssets: Asset<BlockKind>[];
+    plan: Plan;
+    blockAssets: Asset<BlockDefinition>[];
     mode: PlannerMode;
-    onChange?: (plan: PlanKind) => void;
+    onChange?: (plan: Plan) => void;
     onAssetChange?: (asset: Asset<SchemaKind>) => void;
 };
 
@@ -209,7 +204,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     );
 
     // region View state
-    const [focusedBlock, setFocusedBlock] = useState<BlockInstanceSpec>();
+    const [focusedBlock, setFocusedBlock] = useState<BlockInstance>();
     const [canvasSize, setCanvasSize] = useState<Rectangle>({ x: 0, y: 0, width: 0, height: 0 });
     const [viewMode, setViewMode] = useState(props.mode);
     const [zoom, setZoomLevel] = useState(1);
@@ -220,7 +215,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     // Allow internal changes, but load from props in case props change
     const [plan, setPlan] = useState(props.plan);
-    function updatePlan(changer: (prev: PlanKind) => PlanKind) {
+    function updatePlan(changer: (prev: Plan) => Plan) {
         setPlan((prev) => {
             const newPlan = changer(prev);
             if (props.onChange && newPlan !== prev) {
@@ -237,7 +232,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     // Allow internal changes, but load from props in case props change
     const [blockAssets, setBlockAssets] = useState(props.blockAssets);
 
-    function updateBlockAssets(changer: (prev: Asset<BlockKind>[]) => Asset<BlockKind>[]) {
+    function updateBlockAssets(changer: (prev: Asset<BlockDefinition>[]) => Asset<BlockDefinition>[]) {
         setBlockAssets((prev) => {
             const newAssets = changer(prev);
             if (props.onAssetChange) {
@@ -257,7 +252,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     }, [props.blockAssets]);
 
     const toggleFocusBlock = useCallback(
-        (block: BlockInstanceSpec | undefined) => {
+        (block: BlockInstance | undefined) => {
             setFocusedBlock((prevFocus) => (prevFocus && block && block.id === prevFocus.id ? undefined : block));
         },
         [setFocusedBlock]
@@ -270,7 +265,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 const id = getResourceId(blockInstance.id, resource.metadata.name, role);
                 return viewStates[id] as ResourceMode | undefined;
             },
-            setViewModeForResource(blockInstance, resource: ResourceKind, role, resourceMode) {
+            setViewModeForResource(blockInstance, resource: Resource, role, resourceMode) {
                 const id = getResourceId(blockInstance.id, resource.metadata.name, role);
                 setViewStates((prev) => ({ ...prev, [id]: resourceMode }));
             },
@@ -317,7 +312,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             //
             plan: plan,
             blockAssets,
-            setBlockAssets(blockAssets: Asset<BlockKind>[]) {
+            setBlockAssets(blockAssets: Asset<BlockDefinition>[]) {
                 setBlockAssets(blockAssets);
             },
             getBlockByRef(ref: string) {
@@ -328,7 +323,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 const block = plan.spec.blocks?.find((bx) => bx.id === blockId);
                 return block && planner.getBlockByRef(block.block.ref);
             },
-            updateBlockDefinition(ref: string, update: BlockKind) {
+            updateBlockDefinition(ref: string, update: BlockDefinition) {
                 if (!canEditBlocks) {
                     return;
                 }
@@ -349,7 +344,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     const newPlan = cloneDeep(prevState);
                     const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
                     if (blockIx === -1) {
-                        throw new Error(`Block #${blockId} not found`);
+                        throw new Error(`BlockDefinition #${blockId} not found`);
                     }
 
                     const blocks = (newPlan.spec.blocks = newPlan.spec.blocks || []);
@@ -357,7 +352,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return newPlan;
                 });
             },
-            addBlockInstance(blockInstance: BlockInstanceSpec) {
+            addBlockInstance(blockInstance: BlockInstance) {
                 if (!canEditBlocks) {
                     return;
                 }
@@ -387,19 +382,19 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     const newPlan = cloneDeep(prevState);
                     const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
                     if (blockIx === -1) {
-                        throw new Error(`Block #${blockId} not found`);
+                        throw new Error(`BlockDefinition #${blockId} not found`);
                     }
                     newPlan.spec.blocks?.splice(blockIx, 1);
 
                     // Remove any connections that reference this block
                     newPlan.spec.connections = newPlan.spec.connections?.filter(
-                        (conn) => conn.to.blockId !== blockId && conn.from.blockId !== blockId
+                        (conn) => conn.consumer.blockId !== blockId && conn.provider.blockId !== blockId
                     );
                     return newPlan;
                 });
             },
             // resources
-            addResource(blockRef: string, resource: ResourceKind, role: ResourceRole) {
+            addResource(blockRef: string, resource: Resource, role: ResourceRole) {
                 if (!canEditBlocks) {
                     return;
                 }
@@ -409,7 +404,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     const blockIx = newAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ?? -1;
 
                     if (blockIx === -1) {
-                        throw new Error(`Block #${blockRef} not found`);
+                        throw new Error(`BlockDefinition #${blockRef} not found`);
                     }
 
                     const block = newAssets[blockIx];
@@ -447,7 +442,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                         -1;
 
                     if (blockIx === -1) {
-                        throw new Error(`Block #${blockRef} not found`);
+                        throw new Error(`BlockDefinition #${blockRef} not found`);
                     }
 
                     const block = cloneDeep(newAssets[blockIx]);
@@ -475,8 +470,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     for (const blockId of blockIds) {
                         const connectionIx = connections.findIndex((conn) =>
                             resourceRole === ResourceRole.PROVIDES
-                                ? conn.from.blockId === blockId && conn.from.resourceName === resourceName
-                                : conn.to.blockId === blockId && conn.to.resourceName === resourceName
+                                ? conn.provider.blockId === blockId && conn.provider.resourceName === resourceName
+                                : conn.consumer.blockId === blockId && conn.consumer.resourceName === resourceName
                         );
                         if (connectionIx !== -1) {
                             connections.splice(connectionIx, 1);
@@ -495,7 +490,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             },
 
             // connections
-            addConnection(connection: BlockConnectionSpec) {
+            addConnection(connection: Connection) {
                 if (!canEditConnections) {
                     return;
                 }
@@ -518,7 +513,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     );
                 };
             },
-            updateConnectionMapping({ from, to, mapping }: BlockConnectionSpec) {
+            updateConnectionMapping({ provider, consumer, mapping }: Connection) {
                 if (!canEditConnections) {
                     return;
                 }
@@ -527,19 +522,19 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     const ix =
                         newPlan.spec.connections?.findIndex((c) => {
                             return (
-                                c.from.blockId === from.blockId &&
-                                c.from.resourceName === from.resourceName &&
-                                c.to.blockId === to.blockId &&
-                                c.to.resourceName === to.resourceName
+                                c.provider.blockId === provider.blockId &&
+                                c.provider.resourceName === provider.resourceName &&
+                                c.consumer.blockId === consumer.blockId &&
+                                c.consumer.resourceName === consumer.resourceName
                             );
                         }) ?? -1;
                     if (ix > -1) {
-                        newPlan.spec.connections![ix] = { from, to, mapping: cloneDeep(mapping) };
+                        newPlan.spec.connections![ix] = { provider, consumer, mapping: cloneDeep(mapping) };
                     }
                     return newPlan;
                 });
             },
-            removeConnection(connection: BlockConnectionSpec) {
+            removeConnection(connection: Connection) {
                 if (!canEditConnections) {
                     return;
                 }
@@ -547,10 +542,10 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     const newPlan = cloneDeep(prevState);
                     const connectionIx = newPlan.spec.connections?.findIndex(
                         (conn) =>
-                            conn.from.blockId === connection.from.blockId &&
-                            conn.from.resourceName === connection.from.resourceName &&
-                            conn.to.blockId === connection.to.blockId &&
-                            conn.to.resourceName === connection.to.resourceName
+                            conn.provider.blockId === connection.provider.blockId &&
+                            conn.provider.resourceName === connection.provider.resourceName &&
+                            conn.consumer.blockId === connection.consumer.blockId &&
+                            conn.consumer.resourceName === connection.consumer.resourceName
                     );
                     if (connectionIx !== undefined) {
                         newPlan.spec.connections?.splice(connectionIx, 1);
@@ -558,13 +553,13 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return newPlan;
                 });
             },
-            hasConnections(connectionSpec: BlockResourceReferenceSpec) {
+            hasConnections(connectionSpec: Endpoint) {
                 return !!plan.spec.connections?.find(
                     (connection) =>
-                        (connection.from.blockId === connectionSpec.blockId &&
-                            connection.from.resourceName === connectionSpec.resourceName) ||
-                        (connection.to.blockId === connectionSpec.blockId &&
-                            connection.to.resourceName === connectionSpec.resourceName)
+                        (connection.provider.blockId === connectionSpec.blockId &&
+                            connection.provider.resourceName === connectionSpec.resourceName) ||
+                        (connection.consumer.blockId === connectionSpec.blockId &&
+                            connection.consumer.resourceName === connectionSpec.resourceName)
                 );
             },
             connectionPoints,

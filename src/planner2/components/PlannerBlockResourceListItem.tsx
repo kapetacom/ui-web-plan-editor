@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useState } from 'react';
 
-import { ResourceConfig, ResourceKind, ResourceRole, ResourceType } from '@kapeta/ui-web-types';
+import { IResourceTypeProvider, ResourceRole, ResourceProviderType } from '@kapeta/ui-web-types';
 
 import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
@@ -17,12 +17,13 @@ import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 import { ActionButtons } from './ActionButtons';
 import { PlannerAction } from '../types';
+import { Resource } from '@kapeta/schemas';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const COUNTER_SIZE = 8;
 
 interface PlannerBlockResourceListItemProps {
-    resource: ResourceKind;
+    resource: Resource;
     role: ResourceRole;
     index: number;
     size?: PlannerNodeSize;
@@ -98,7 +99,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const { blockInstance, blockDefinition } = useBlockContext();
     const { draggable } = useContext(DnDContext);
 
-    let resourceConfig: ResourceConfig | null = null;
+    let resourceConfig: IResourceTypeProvider | null = null;
     const errors: string[] = [];
     try {
         resourceConfig = ResourceTypeProvider.get(props.resource.kind);
@@ -106,7 +107,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         errors.push(`Failed to read resource kind: ${e.message}`);
     }
 
-    const type = resourceConfig?.type.toString().toLowerCase() ?? ResourceType.SERVICE;
+    const type = resourceConfig?.type.toString().toLowerCase() ?? ResourceProviderType.INTERNAL;
     const title = resourceConfig?.title || resourceConfig?.kind;
     const typeName = title?.toString().toLowerCase() ?? 'unknown';
 
@@ -120,14 +121,14 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     // expand if the resource is connected to a focused block
     const isConnectedToFocusedBlock = planner.plan?.spec.connections?.some((connection) => {
         const isConnectionToResource =
-            connection.from.blockId === planner.focusedBlock?.id &&
-            connection.to.blockId === blockInstance.id &&
-            connection.to.resourceName === props.resource.metadata.name &&
+            connection.provider.blockId === planner.focusedBlock?.id &&
+            connection.consumer.blockId === blockInstance.id &&
+            connection.consumer.resourceName === props.resource.metadata.name &&
             props.role === ResourceRole.CONSUMES;
         const isConnectionFromResource =
-            connection.to.blockId === planner.focusedBlock?.id &&
-            connection.from.blockId === blockInstance.id &&
-            connection.from.resourceName === props.resource.metadata.name &&
+            connection.consumer.blockId === planner.focusedBlock?.id &&
+            connection.provider.blockId === blockInstance.id &&
+            connection.provider.resourceName === props.resource.metadata.name &&
             props.role === ResourceRole.PROVIDES;
         return isConnectionToResource || isConnectionFromResource;
     });
@@ -219,11 +220,11 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                         return;
                     }
                     planner.addConnection({
-                        from: {
+                        provider: {
                             blockId: payload.data.block.id,
                             resourceName: payload.data.resource.metadata.name,
                         },
-                        to: {
+                        consumer: {
                             blockId: blockInstance.id,
                             resourceName: props.resource.metadata.name,
                         },
@@ -238,7 +239,8 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                             type: 'resource',
                             data: {
                                 resource: props.resource,
-                                block: blockInstance,
+                                instance: blockInstance,
+                                block: blockDefinition!,
                                 role: ResourceRole.CONSUMES,
                             },
                         }}

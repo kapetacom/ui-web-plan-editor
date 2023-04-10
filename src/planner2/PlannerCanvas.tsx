@@ -2,15 +2,17 @@ import React, { useContext, useEffect, useMemo } from 'react';
 import { PlannerContext } from './PlannerContext';
 import { DragAndDrop } from './utils/dndUtils';
 import { useBoundingBox } from './hooks/boundingBox';
-import { BLOCK_SIZE, calculateCanvasSize, createBlockInstanceForBlock } from './utils/planUtils';
+import { BLOCK_SIZE, calculateCanvasSize } from './utils/planUtils';
 import { toClass } from '@kapeta/ui-web-utils';
-import { BlockInstanceSpec, Point } from '@kapeta/ui-web-types';
+import { Point } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
 
 import { ZOOM_STEP_SIZE } from './types';
 import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 import { FocusTopbar } from './components/FocusTopbar';
 import { PlannerFocusSideBar } from './components/PlannerFocusSideBar';
+import { BlockInstance } from '@kapeta/schemas';
+import {createBlockInstanceForBlock} from "./utils/blockUtils";
 
 const PLAN_PADDING = 50;
 
@@ -21,7 +23,7 @@ const toBlockPoint = (mousePoint: Point, zoom: number): Point => {
     };
 };
 
-const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstanceSpec) => {
+const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstance) => {
     const point = toBlockPoint(diff, zoom);
     return {
         ...block,

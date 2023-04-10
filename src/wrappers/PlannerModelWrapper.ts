@@ -5,9 +5,10 @@ import type { SelectedResourceItem } from './models';
 import { PlannerBlockModelWrapper } from './PlannerBlockModelWrapper';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
-import { Dimensions, PLAN_KIND, PlanKind, ResourceRole } from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
+import {Dimensions, Plan } from '@kapeta/schemas';
 
 export interface PlannerModelRef {
     model: PlannerModelWrapper;
@@ -57,9 +58,9 @@ export class PlannerModelWrapper {
         makeAutoObservable(this);
     }
 
-    getData(): PlanKind {
+    getData(): Plan {
         return {
-            kind: PLAN_KIND,
+            kind: 'core/plan',
             metadata: {
                 name: this.name,
             },
@@ -183,7 +184,7 @@ export class PlannerModelWrapper {
     @action
     removeConnectionByResourceId(resourceId: string) {
         _.remove(this.connections, (connection) => {
-            return connection.from.resourceName === resourceId || connection.to.resourceName === resourceId;
+            return connection.provider.resourceName === resourceId || connection.consumer.resourceName === resourceId;
         });
 
         this.validate();
@@ -192,7 +193,7 @@ export class PlannerModelWrapper {
     @action
     removeConnectionByBlockId(blockId: string) {
         _.remove(this.connections, (connection) => {
-            return connection.from.blockId === blockId || connection.to.blockId === blockId;
+            return connection.provider.blockId === blockId || connection.consumer.blockId === blockId;
         });
 
         this.validate();
@@ -346,7 +347,7 @@ export class PlannerModelWrapper {
         const oldSize = this.blocks.length;
 
         _.remove(this.connections, (connection) => {
-            return connection.from.blockId === block.id || connection.to.blockId === block.id;
+            return connection.provider.blockId === block.id || connection.consumer.blockId === block.id;
         });
 
         _.pull(this.blocks, block);
@@ -542,9 +543,9 @@ export class PlannerModelWrapper {
 
         for (const connection of this.connections) {
             if (
-                connection.from.blockId === fromBlock.id &&
-                connection.from.resourceName === fromResource.id &&
-                connection.to.blockId === toBlock.id
+                connection.provider.blockId === fromBlock.id &&
+                connection.provider.resourceName === fromResource.id &&
+                connection.consumer.blockId === toBlock.id
             ) {
                 return false;
             }
