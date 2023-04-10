@@ -107,7 +107,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         errors.push(`Failed to read resource kind: ${e.message}`);
     }
 
-    const type = resourceConfig?.type.toString().toLowerCase() ?? ResourceProviderType.INTERNAL;
+    const type = resourceConfig?.type?.toString().toLowerCase() ?? ResourceProviderType.INTERNAL;
     const title = resourceConfig?.title || resourceConfig?.kind;
     const typeName = title?.toString().toLowerCase() ?? 'unknown';
 
