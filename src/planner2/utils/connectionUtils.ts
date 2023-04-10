@@ -21,10 +21,10 @@ export function getCurveFromPoints(points: Point[]) {
 
 export function getConnectionId(connection: Connection) {
     return `${getResourceId(
-        connection.provider.blockId,
-        connection.provider.resourceName,
+        connection.provider?.blockId,
+        connection.provider?.resourceName,
         ResourceRole.PROVIDES
-    )}-${getResourceId(connection.consumer.blockId, connection.consumer.resourceName, ResourceRole.CONSUMES)}`;
+    )}-${getResourceId(connection.consumer?.blockId, connection.consumer?.resourceName, ResourceRole.CONSUMES)}`;
 }
 
 export function getMiddlePoint(list: Point[]) {

@@ -1,6 +1,6 @@
 {
     "name": "@kapeta/ui-web-plan-editor",
-    "version": "0.0.41",
+    "version": "0.0.42",
     "main": "src/index.ts",
     "files": [
         "package.json",
