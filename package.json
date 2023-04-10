@@ -1,6 +1,6 @@
 {
     "name": "@kapeta/ui-web-plan-editor",
-    "version": "0.0.39",
+    "version": "0.0.40",
     "main": "src/index.ts",
     "files": [
         "package.json",
@@ -31,6 +31,7 @@
         "printWidth": 120
     },
     "peerDependencies": {
+        "@kapeta/schemas": "<2",
         "@kapeta/nodejs-utils": "<2",
         "@kapeta/ui-web-components": "<2",
         "@kapeta/ui-web-context": "<2",
@@ -53,7 +54,6 @@
         "@types/react-dom": ">=18"
     },
     "devDependencies": {
-        "@kapeta/schemas": "^0.0.24",
         "@sambego/storybook-state": "^2.0.1",
         "@spotify/eslint-config": "^14.1.6",
         "@storybook/builder-webpack5": "^6.5.10",

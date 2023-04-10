@@ -290,18 +290,12 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockDefinition> {
         const providerBlocks: PlannerBlockModelWrapper[] = []; // blocks to the left
         this.provides.forEach((resource: PlannerResourceModelWrapper) => {
             this.plan.getConnectionsFor(resource).forEach((connection: PlannerConnectionModelWrapper) => {
-                if (!consumerBlocks[resource.id]) {
-                    consumerBlocks[resource.id] = [];
-                }
                 consumerBlocks.push(connection.toResource.block);
             });
         });
 
         this.consumes.forEach((resource: PlannerResourceModelWrapper) => {
             this.plan.getConnectionsFor(resource).forEach((connection: PlannerConnectionModelWrapper) => {
-                if (!providerBlocks[resource.id]) {
-                    providerBlocks[resource.id] = [];
-                }
                 providerBlocks.push(connection.fromResource.block);
             });
         });
