@@ -155,7 +155,7 @@ export class DnDHelper {
         }
 
         if (ResourceTypeProvider.exists(asset.kind)) {
-            const resourceType = asset as ResourceType;
+            const resourceType = asset as IResourceTypeProvider;
 
             this.planner.plan.blocks.forEach((block: PlannerBlockModelWrapper) => {
                 block.setMode(BlockMode.HIDDEN);
@@ -169,7 +169,7 @@ export class DnDHelper {
             const resourceConfig: IResourceTypeProvider = asset;
 
             //We get first port from resource type for now
-            const port = resourceType.spec.ports[0];
+            const port = resourceType.definition.spec.ports[0];
 
             const resourceKind: Resource = {
                 kind: `${resourceConfig.kind}:${resourceConfig.version}`,

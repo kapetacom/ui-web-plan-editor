@@ -96,6 +96,7 @@ blocks.push(
         title: resource.metadata.title,
         type: ResourceProviderType.INTERNAL,
         role: ResourceRole.PROVIDES,
+        consumableKind: 'kapeta/resource-type-rest-client',
         validate: (data) => {
             const errors: string[] = [];
             parseKapetaUri(data.kind);

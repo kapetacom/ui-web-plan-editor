@@ -4,5 +4,9 @@
         "name": "kapeta/resource-type-rest-api",
         "title": "Rest API"
     },
-    "spec": {}
+    "spec": {
+        "ports": [
+            {"type":  "rest"}
+        ]
+    }
 }

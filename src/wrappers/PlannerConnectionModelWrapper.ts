@@ -30,30 +30,30 @@ export class PlannerConnectionModelWrapper implements DataWrapper<Connection> {
 
     static createFromData(data: Connection, planner: PlannerModelWrapper) {
         return runInAction(() => {
-            const fromBlock = planner.findBlockById(data.consumer.blockId);
-            if (!fromBlock) {
-                throw new Error(`Source Block not found: ${data.consumer.blockId}`);
+            const consumerBlock = planner.findBlockById(data.consumer.blockId);
+            if (!consumerBlock) {
+                throw new Error(`Consumer block not found: ${data.consumer.blockId}`);
             }
 
-            const toBlock = planner.findBlockById(data.provider.blockId);
+            const providerBlock = planner.findBlockById(data.provider.blockId);
 
-            if (!toBlock) {
-                throw new Error(`Target Block not found: ${data.consumer.blockId}`);
+            if (!providerBlock) {
+                throw new Error(`Provider block not found: ${data.provider.blockId}`);
             }
 
-            const fromResource = fromBlock.findResourceById(ResourceRole.PROVIDES, data.consumer.resourceName);
+            const providerResource = providerBlock.findResourceById(ResourceRole.PROVIDES, data.provider.resourceName);
 
-            if (!fromResource) {
-                throw new Error(`Provider resource not found: ${data.consumer.resourceName}`);
+            if (!providerResource) {
+                throw new Error(`Provider resource not found: ${data.provider.blockId}.${data.provider.resourceName}`);
             }
 
-            const toResource = toBlock.findResourceById(ResourceRole.CONSUMES, data.provider.resourceName);
+            const consumerResource = consumerBlock.findResourceById(ResourceRole.CONSUMES, data.consumer.resourceName);
 
-            if (!toResource) {
-                throw new Error(`Consumer resource not found: ${data.provider.resourceName}`);
+            if (!consumerResource) {
+                throw new Error(`Consumer resource not found: ${data.consumer.blockId}.${data.consumer.resourceName}`);
             }
 
-            return makeObservable(new PlannerConnectionModelWrapper(data, fromResource, toResource));
+            return makeObservable(new PlannerConnectionModelWrapper(data, providerResource, consumerResource));
         });
     }
 

@@ -4,5 +4,9 @@
         "name": "kapeta/resource-type-rest-client",
         "title": "REST Client"
     },
-    "spec": {}
+    "spec": {
+        "ports": [
+            {"type":  "rest"}
+        ]
+    }
 }
