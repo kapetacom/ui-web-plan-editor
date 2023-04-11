@@ -3,7 +3,7 @@ import React from 'react';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 
 import { PlannerBlockModelWrapper, PlannerBlockNode, PlannerModelWrapper, PlannerNodeSize } from '../src';
-import {AssetReference, BlockDefinition, BlockInstance } from '@kapeta/schemas';
+import { AssetReference, BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 const InvalidTargetRefDefinition: BlockDefinition = {
     kind: 'kapeta/block-type-service:1.2.3',

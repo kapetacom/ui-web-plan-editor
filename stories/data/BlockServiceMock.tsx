@@ -70,7 +70,7 @@ blocks.push(
         title: resource.metadata.title,
         type: ResourceProviderType.OPERATOR,
         role: ResourceRole.CONSUMES,
-        definition: resource
+        definition: resource,
     });
 });
 
@@ -85,7 +85,7 @@ blocks.push(
         getCounterValue() {
             return 2;
         },
-        definition: resource
+        definition: resource,
     });
 });
 
@@ -114,7 +114,7 @@ blocks.push(
         getCounterValue: (data) => {
             return 3;
         },
-        definition: resource
+        definition: resource,
     });
 });
 
@@ -128,8 +128,8 @@ blocks.push(
             kind: 'kapeta/language-target',
             metadata: {
                 name: targetKind,
-            }
-        }
+            },
+        },
     });
 });
 
@@ -146,8 +146,8 @@ blocks.push(
             kind: 'kapeta/language-target',
             metadata: {
                 name: targetKind,
-            }
-        }
+            },
+        },
     });
 });
 
@@ -167,7 +167,7 @@ blocks.push(
 
             return errors;
         },
-        definition: resource
+        definition: resource,
     });
 });
 

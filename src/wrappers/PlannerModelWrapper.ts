@@ -8,7 +8,7 @@ import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockMode, ResourceMode } from './wrapperHelpers';
-import {Dimensions, Plan } from '@kapeta/schemas';
+import { Dimensions, Plan } from '@kapeta/schemas';
 
 export interface PlannerModelRef {
     model: PlannerModelWrapper;

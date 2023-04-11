@@ -1,9 +1,7 @@
 import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
 import { ItemType } from '@kapeta/ui-web-types';
 
-export interface DataWrapper<T = any> {
-
-}
+export interface DataWrapper<T = any> {}
 
 export interface SelectedResourceItem {
     resource: PlannerResourceModelWrapper;

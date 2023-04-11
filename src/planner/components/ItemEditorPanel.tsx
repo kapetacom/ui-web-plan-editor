@@ -19,8 +19,7 @@ import { BlockTypeProvider, IdentityService, ResourceTypeProvider } from '@kapet
 
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
-
-import {DataWrapper, EditableItemInterface } from '../../wrappers/models';
+import { DataWrapper, EditableItemInterface } from '../../wrappers/models';
 import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
 import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';

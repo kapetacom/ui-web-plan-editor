@@ -1,5 +1,4 @@
 import React, { useContext, useMemo } from 'react';
-import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import _ from 'lodash';
 
 import { BlockNode } from '../../components/BlockNode';
@@ -16,8 +15,8 @@ import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { BlockValidator } from '../validation/BlockValidator';
-import {copyResourceToBlock} from "../utils/blockUtils";
-import {createConnection} from "../utils/connectionUtils";
+import { copyResourceToBlock } from '../utils/blockUtils';
+import { createConnection } from '../utils/connectionUtils';
 
 interface Props {
     size: PlannerNodeSize;
@@ -131,7 +130,6 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
 
                                 blockContext.setBlockMode(BlockMode.HIDDEN);
 
-
                                 if (draggable.type === 'resource-type') {
                                     const config = draggable.data.config;
 
@@ -146,7 +144,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                                 name: 'new-resource',
                                             },
                                             spec: {
-                                                port
+                                                port,
                                             },
                                         },
                                         config.role
@@ -154,13 +152,10 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                     return;
                                 }
 
-                                const newResource = copyResourceToBlock(
-                                    blockContext.blockDefinition!,
-                                    {
-                                        block: draggable.data.block,
-                                        resource: draggable.data.resource,
-                                    }
-                                );
+                                const newResource = copyResourceToBlock(blockContext.blockDefinition!, {
+                                    block: draggable.data.block,
+                                    resource: draggable.data.resource,
+                                });
 
                                 if (!newResource) {
                                     return;
@@ -181,7 +176,6 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
 
                                 // Add connection to new consumer
                                 planner.addConnection(newConnection);
-
                             }}
                             onDragEnter={(draggable: ResourcePayload | ResourceTypePayload) => {
                                 if (blockContext.isBlockDefinitionReadOnly) {
@@ -241,8 +235,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                                 })
                                             }
                                             readOnly={!canEditInstance}
-                                            // TODO: Move this to block context
-                                            status={InstanceStatus.STOPPED}
+                                            status={blockContext.instanceStatus}
                                             height={blockContext.instanceBlockHeight}
                                             width={blockContext.blockInstance.dimensions!.width}
                                             typeName={blockContext.blockDefinition?.metadata.name}

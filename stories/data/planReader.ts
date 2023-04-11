@@ -2,9 +2,9 @@ import { PlannerModelReader } from '../../src/planner/PlannerModelReader';
 import { BlockServiceMock } from './BlockServiceMock';
 import { PlannerData } from './PlannerData';
 import { PlannerModelWrapper } from '../../src';
-import { Asset} from '@kapeta/ui-web-types';
-import {BlockDefinition, Plan } from '@kapeta/schemas';
-import _ from "lodash";
+import { Asset } from '@kapeta/ui-web-types';
+import { BlockDefinition, Plan } from '@kapeta/schemas';
+import _ from 'lodash';
 
 export function readPlan(): Promise<PlannerModelWrapper> {
     const reader = new PlannerModelReader(BlockServiceMock);
@@ -24,7 +24,6 @@ export async function readPlanV2(): Promise<{
     for (const block of PlannerData.spec.blocks || []) {
         await BlockServiceMock.get(block.block.ref);
     }
-
 
     return {
         plan: _.cloneDeep(PlannerData),

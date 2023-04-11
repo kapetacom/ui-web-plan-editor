@@ -5,8 +5,6 @@
         "title": "REST Client"
     },
     "spec": {
-        "ports": [
-            {"type":  "rest"}
-        ]
+        "ports": [{ "type": "rest" }]
     }
 }

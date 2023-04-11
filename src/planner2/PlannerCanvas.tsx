@@ -12,7 +12,7 @@ import { PlannerMode } from '../wrappers/PlannerModelWrapper';
 import { FocusTopbar } from './components/FocusTopbar';
 import { PlannerFocusSideBar } from './components/PlannerFocusSideBar';
 import { BlockInstance } from '@kapeta/schemas';
-import {createBlockInstanceForBlock} from "./utils/blockUtils";
+import { createBlockInstanceForBlock } from './utils/blockUtils';
 
 const PLAN_PADDING = 50;
 

@@ -17,8 +17,7 @@ import './PlannerBlockNode.less';
 import { action } from 'mobx';
 import { SVGCircleButton } from './SVGCircleButton';
 import { BlockDefinition, Dimensions } from '@kapeta/schemas';
-import {DataWrapper} from "../wrappers/models";
-
+import { DataWrapper } from '../wrappers/models';
 
 interface PlannerBlockNodeProps {
     block: PlannerBlockModelWrapper;

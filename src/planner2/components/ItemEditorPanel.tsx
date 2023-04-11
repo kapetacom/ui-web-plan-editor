@@ -18,7 +18,7 @@ import { BlockTypeProvider, IdentityService, ResourceTypeProvider } from '@kapet
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 import type { SchemaKind } from '@kapeta/ui-web-types';
-import {ItemType, ResourceRole} from '@kapeta/ui-web-types';
+import { ItemType, ResourceRole } from '@kapeta/ui-web-types';
 
 import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -26,7 +26,7 @@ import { useAsync } from 'react-use';
 import { EditableItemInterface2 } from '../types';
 import { cloneDeep } from 'lodash';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
-import {BlockDefinition, Connection, Entity, Resource } from '@kapeta/schemas';
+import { BlockDefinition, Connection, Entity, Resource } from '@kapeta/schemas';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {

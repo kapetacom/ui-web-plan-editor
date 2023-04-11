@@ -91,7 +91,7 @@ export const PlannerData: Plan = {
                     resourceName: 'users',
                 },
                 port: {
-                    type: 'rest'
+                    type: 'rest',
                 },
                 mapping: {
                     getUser: {

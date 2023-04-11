@@ -6,7 +6,7 @@ import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModel
 import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
 import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
-import {DataWrapper} from "../../wrappers/models";
+import { DataWrapper } from '../../wrappers/models';
 
 /**
  * Helper class for handling editing items in the Planner UI

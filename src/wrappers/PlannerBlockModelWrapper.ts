@@ -2,10 +2,7 @@ import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import _ from 'lodash';
 import { Guid } from 'guid-typescript';
 
-import type {
-    Point,
-    Size,
-} from '@kapeta/ui-web-types';
+import type { Point, Size } from '@kapeta/ui-web-types';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { parseKapetaUri, KapetaURI } from '@kapeta/nodejs-utils';
 
@@ -18,7 +15,7 @@ import { BlockMode, ResourceMode } from './wrapperHelpers';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 import { DSL_LANGUAGE_ID, DSLConverters, DSLWriter } from '@kapeta/ui-web-components';
 import { randomUUID } from '../utils/cryptoUtils';
-import {DataWrapper} from "./models";
+import { DataWrapper } from './models';
 import {
     AssetReference,
     BlockDefinition,
@@ -26,7 +23,7 @@ import {
     Dimensions,
     Entity,
     Resource,
-    isSchemaEntityCompatible
+    isSchemaEntityCompatible,
 } from '@kapeta/schemas';
 
 type HeightCache = { [size: number]: number };
@@ -203,8 +200,8 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockDefinition> {
         this.data.spec.entities.types = toJS(entities);
         if (!this.data.spec.entities.source) {
             this.data.spec.entities.source = {
-                value: ''
-            }
+                value: '',
+            };
         }
         this.data.spec.entities.source.value = DSLWriter.write(entities.map(DSLConverters.fromSchemaEntity));
     }

@@ -10,7 +10,7 @@ import { DnDContext, DnDContextType } from './DragAndDrop/DnDContext';
 import { PlannerPayload } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
-import {ErrorBoundary, ErrorBoundaryProps} from "react-error-boundary";
+import { ErrorBoundary } from 'react-error-boundary';
 
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
@@ -34,8 +34,8 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
                     resourceName: 'temp-resource',
                 },
                 port: {
-                    type: 'rest'
-                }
+                    type: 'rest',
+                },
             }}
         />
     ) : null;
@@ -53,13 +53,12 @@ export const Planner2: React.FC<Props> = (props) => {
     return (
         <ErrorBoundary
             onError={(error, info) => {
+                // eslint-disable-next-line no-console
                 console.error('Error rendering plan', error, info, plan);
             }}
-            fallback={<div>
-                    Failed to render plan. Please contact support.
-                </div>
-            }
-            resetKeys={[props.systemId]}>
+            fallback={<div>Failed to render plan. Please contact support.</div>}
+            resetKeys={[props.systemId]}
+        >
             <PlannerCanvas>
                 {instances.map((instance, index) => {
                     const focusedBlock = focusInfo?.focus?.instance.id === instance.id;

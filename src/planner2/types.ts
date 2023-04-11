@@ -1,14 +1,6 @@
-import {
-    Asset, 
-    ItemType,
-    Point,
-    IResourceTypeProvider,
-    ResourceRole,
-    SchemaKind,
-    Size,
-} from '@kapeta/ui-web-types';
+import { Asset, ItemType, Point, IResourceTypeProvider, ResourceRole, SchemaKind, Size } from '@kapeta/ui-web-types';
 
-import {BlockDefinition, BlockInstance, Connection, Plan, Resource } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, Connection, Plan, Resource } from '@kapeta/schemas';
 import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
 
