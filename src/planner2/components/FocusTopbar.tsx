@@ -2,11 +2,7 @@ import { BlockInstance } from '@kapeta/schemas';
 import { action } from 'mobx';
 import React from 'react';
 
-
-export function FocusTopbar(props: {
-    focusedBlock?: BlockInstance;
-    setFocusBlock: (block: BlockInstance) => void;
-}) {
+export function FocusTopbar(props: { focusedBlock?: BlockInstance; setFocusBlock: (block: BlockInstance) => void }) {
     return (
         <div>
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}

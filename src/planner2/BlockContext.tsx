@@ -4,7 +4,7 @@ import { PlannerContext } from './PlannerContext';
 import { getBlockHeightByResourceCount } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';
 import { InstanceStatus } from '@kapeta/ui-web-context';
-import {BlockDefinition, BlockInstance, Resource} from "@kapeta/schemas";
+import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 
 export interface PlannerBlockContextData {
     blockInstance: BlockInstance | null;

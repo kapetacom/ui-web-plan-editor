@@ -5,8 +5,6 @@
         "title": "MongoDB"
     },
     "spec": {
-        "ports": [
-            {"type":  "mongodb"}
-        ]
+        "ports": [{ "type": "mongodb" }]
     }
 }

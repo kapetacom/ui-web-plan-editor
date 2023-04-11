@@ -5,8 +5,6 @@
         "title": "Rest API"
     },
     "spec": {
-        "ports": [
-            {"type":  "rest"}
-        ]
+        "ports": [{ "type": "rest" }]
     }
 }

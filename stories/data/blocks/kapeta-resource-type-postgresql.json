@@ -5,8 +5,6 @@
         "title": "Postgres"
     },
     "spec": {
-        "ports": [
-            {"type":  "postgres"}
-        ]
+        "ports": [{ "type": "postgres" }]
     }
 }

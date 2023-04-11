@@ -27,7 +27,11 @@ export const PlannerConnection: React.FC<{
         props.connection.provider.resourceName,
         ResourceRole.PROVIDES
     );
-    const toId = getResourceId(props.connection.consumer.blockId, props.connection.consumer.resourceName, ResourceRole.CONSUMES);
+    const toId = getResourceId(
+        props.connection.consumer.blockId,
+        props.connection.consumer.resourceName,
+        ResourceRole.CONSUMES
+    );
     const from = planner.connectionPoints.getPointById(fromId);
     const to = planner.connectionPoints.getPointById(toId);
 

@@ -1,10 +1,10 @@
 import { action, makeObservable, observable } from 'mobx';
-import type {  ItemType } from '@kapeta/ui-web-types';
+import type { ItemType } from '@kapeta/ui-web-types';
 
 import { Planner } from '../Planner';
 import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { PlannerBlockModelWrapper } from '../../wrappers/PlannerBlockModelWrapper';
-import {DataWrapper} from "../../wrappers/models";
+import { DataWrapper } from '../../wrappers/models';
 
 /**
  * Helper class for handling inspecting blocks in the Planner UI

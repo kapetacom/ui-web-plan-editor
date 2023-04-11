@@ -7,7 +7,6 @@ import { BlockTree } from './BlockTree';
 import './PlannerFocusSideBar.less';
 import { BlockInstance } from '@kapeta/schemas';
 
-
 interface Props {
     block?: BlockInstance;
     blurFocus: () => void;

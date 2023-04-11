@@ -9,8 +9,8 @@ import { BlockMode, ResourceMode } from './wrapperHelpers';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { PlannerConnectionModelWrapper } from './PlannerConnectionModelWrapper';
 import { randomUUID } from '../utils/cryptoUtils';
-import {DataWrapper} from "./models";
-import {Dimensions, Resource } from '@kapeta/schemas';
+import { DataWrapper } from './models';
+import { Dimensions, Resource } from '@kapeta/schemas';
 
 const DEFAULT_EXTENSION_SIZE = 110;
 

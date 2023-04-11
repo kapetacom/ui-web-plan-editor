@@ -9,7 +9,7 @@ import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { PlannerResourceModelWrapper } from './PlannerResourceModelWrapper';
 import { PlannerModelWrapper } from './PlannerModelWrapper';
 import { PlannerNodeSize } from '../types';
-import {DataWrapper} from "./models";
+import { DataWrapper } from './models';
 import { Connection } from '@kapeta/schemas';
 
 export class PlannerConnectionModelWrapper implements DataWrapper<Connection> {

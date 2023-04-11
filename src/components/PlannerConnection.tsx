@@ -14,7 +14,7 @@ import { PlannerConnectionButtons } from './PlannerConnectionButtons';
 import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import { action, computed, makeObservable, observable } from 'mobx';
 import { Connection } from '@kapeta/schemas';
-import {DataWrapper} from "../wrappers/models";
+import { DataWrapper } from '../wrappers/models';
 
 interface PlannerConnectionProps {
     size: PlannerNodeSize;

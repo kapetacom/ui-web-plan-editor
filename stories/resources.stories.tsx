@@ -9,7 +9,7 @@ import {
     PlannerResourceModelWrapper,
     ResourceMode,
 } from '../src';
-import {BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 
 const ValidInstance: BlockInstance = {
     id: '1',
@@ -46,8 +46,8 @@ const MissingResourceKind: Resource = {
     },
     spec: {
         port: {
-            type: 'rest'
-        }
+            type: 'rest',
+        },
     },
 };
 
@@ -58,8 +58,8 @@ const InvalidResourceKind: Resource = {
     },
     spec: {
         port: {
-            type: 'web'
-        }
+            type: 'web',
+        },
     },
 };
 
@@ -70,8 +70,8 @@ const InvalidResourceSpec: Resource = {
     },
     spec: {
         port: {
-            type: 'rest'
-        }
+            type: 'rest',
+        },
     },
 };
 
@@ -84,10 +84,9 @@ const InvalidResourceSpecThrown: Resource = {
         methods: {},
         throw: true,
         port: {
-            type: 'http'
-        }
+            type: 'http',
+        },
     },
-
 };
 
 export default {
