@@ -202,19 +202,10 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         [addPoint, removePoint, points]
     );
 
-    // region View state
     const [focusedBlock, setFocusedBlock] = useState<BlockInstance>();
     const [canvasSize, setCanvasSize] = useState<Rectangle>({ x: 0, y: 0, width: 0, height: 0 });
-    const [viewMode, setViewMode] = useState(props.mode);
-    useEffect(() => {
-        setViewMode(props.mode);
-    }, [props.mode]);
 
     const [zoom, setZoomLevel] = useState(1);
-
-    // zoom
-    // size
-    // endregion
 
     // Allow internal changes, but load from props in case props change
     const [plan, setPlan] = useState(props.plan);
@@ -298,6 +289,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         [onAssetChange]
     );
 
+    const viewMode = props.mode;
     return useMemo(() => {
         const canEditBlocks = viewMode === PlannerMode.EDIT;
         const canEditConnections = viewMode === PlannerMode.EDIT;
