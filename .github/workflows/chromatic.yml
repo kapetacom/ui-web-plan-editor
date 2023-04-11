@@ -32,5 +32,3 @@ jobs:
               with:
                   projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
                   exitOnceUploaded: true
-                  # Tests seem to break w/ some crypto stuff, maybe because they run in electron?
-                  skip: true
