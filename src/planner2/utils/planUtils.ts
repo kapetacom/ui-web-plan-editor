@@ -1,11 +1,6 @@
 import { PlannerNodeSize } from '../../types';
-import { Asset,  ResourceRole, Size } from '@kapeta/ui-web-types';
-import { randomUUID } from '../../utils/cryptoUtils';
-import {BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
-import {PlannerResourceModelWrapper} from "../../wrappers/PlannerResourceModelWrapper";
-import {PlannerConnectionModelWrapper} from "../../wrappers/PlannerConnectionModelWrapper";
-import {PlannerBlockModelWrapper} from "../../wrappers/PlannerBlockModelWrapper";
-import { ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { Asset, ResourceRole, Size } from '@kapeta/ui-web-types';
+import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 export const BLOCK_SIZE = 150;
 

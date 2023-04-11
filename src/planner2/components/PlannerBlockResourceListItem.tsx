@@ -152,6 +152,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                 })
             );
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.warn('Failed to correctly determine if resource is draggable', e);
             return false;
         }

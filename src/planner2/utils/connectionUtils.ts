@@ -1,9 +1,8 @@
-import {Connection, Plan, BlockResource, BlockInstanceResource } from '@kapeta/schemas';
+import { Connection, Plan, BlockInstanceResource } from '@kapeta/schemas';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { Point, ResourceRole } from '@kapeta/ui-web-types';
 import { BasisCurve } from '@kapeta/ui-web-utils';
 import { getResourceId } from './planUtils';
-
 
 export function calculatePathBetweenPoints(fromPoint: Point, toPoint: Point) {
     return getCurveFromPoints(getCurveMainPoints(fromPoint, toPoint));
@@ -77,21 +76,20 @@ export function getConnectionsFor(plan: Plan, blockId: string, resourceName: str
     );
 }
 
-export function createConnection(provider:BlockInstanceResource, consumer:BlockInstanceResource) {
-    const connection:Connection = {
+export function createConnection(provider: BlockInstanceResource, consumer: BlockInstanceResource) {
+    const connection: Connection = {
         provider: {
             resourceName: provider.resource.metadata.name,
-            blockId: provider.instance.id
+            blockId: provider.instance.id,
         },
         consumer: {
             resourceName: consumer.resource.metadata.name,
-            blockId: consumer.instance.id
-        }
-    }
+            blockId: consumer.instance.id,
+        },
+    };
 
     const converter = ResourceTypeProvider.getConverterFor(provider.resource.kind, consumer.resource.kind);
-    if (converter &&
-        converter.createMapping) {
+    if (converter && converter.createMapping) {
         const mapping = converter.createMapping(
             provider.resource,
             consumer.resource,

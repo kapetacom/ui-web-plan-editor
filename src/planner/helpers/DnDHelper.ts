@@ -11,7 +11,7 @@ import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModelWrapper';
 import { Planner } from '../Planner';
 import { EditPanelHelper } from './EditPanelHelper';
-import {BlockDefinition, BlockInstance, Dimensions, Resource, ResourceType } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, Dimensions, Resource } from '@kapeta/schemas';
 
 /**
  * Helper class for handling drag-n-drop in the Planner UI
@@ -87,7 +87,7 @@ export class DnDHelper {
                 block: {
                     ref: data.ref,
                 },
-                dimensions
+                dimensions,
             };
             const wrapper = new PlannerBlockModelWrapper(blockInstance, blockDefinition, this.planner.plan);
             wrapper.top = dimensions.top - 60; // Adjustment for SVG
@@ -141,7 +141,7 @@ export class DnDHelper {
                 block: {
                     ref: asset.ref,
                 },
-                dimensions
+                dimensions,
             };
 
             const wrapper = new PlannerBlockModelWrapper(blockInstance, blockDefinition, this.planner.plan);
@@ -168,7 +168,7 @@ export class DnDHelper {
 
             const resourceConfig: IResourceTypeProvider = asset;
 
-            //We get first port from resource type for now
+            // We get first port from resource type for now
             const port = resourceType.definition.spec.ports[0];
 
             const resourceKind: Resource = {
@@ -177,7 +177,7 @@ export class DnDHelper {
                     name: 'MyResource',
                 },
                 spec: {
-                    port
+                    port,
                 },
             };
 
