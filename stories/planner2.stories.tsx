@@ -24,6 +24,7 @@ import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockServiceMock } from './data/BlockServiceMock';
 import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
 import { BlockDefinition } from '@kapeta/schemas';
+import { PlannerOutlet, plannerRenderer } from '../src/planner2/renderers/plannerRenderer';
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -493,4 +494,17 @@ export const ConfigureMode: Story = {
         plannerMode: PlannerMode.CONFIGURATION,
         instanceStatus: InstanceStatus.READY,
     },
+};
+
+export const CustomRenderer = () => {
+    const outlets: Parameters<typeof plannerRenderer.Provider>[0]['outlets'] = {
+        [PlannerOutlet.ResourceSubTitle]: (props) => {
+            return <button>Select operator</button>;
+        },
+    };
+    return (
+        <plannerRenderer.Provider outlets={outlets}>
+            <PlannerLoader plannerMode={PlannerMode.EDIT} instanceStatus={InstanceStatus.STARTING} />
+        </plannerRenderer.Provider>
+    );
 };

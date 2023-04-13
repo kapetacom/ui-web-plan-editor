@@ -45,3 +45,4 @@ export * from './planner2/Planner2';
 export * from './planner2/PlannerContext';
 export * from './planner2/types';
 export * from './planner2/validation/BlockValidator';
+export * from './planner2/renderers/plannerRenderer';
