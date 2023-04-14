@@ -16,8 +16,9 @@ import { useBlockContext } from '../BlockContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 import { ActionButtons } from './ActionButtons';
-import { PlannerAction } from '../types';
+import { PlannerAction, ResourcePayload } from '../types';
 import { Resource } from '@kapeta/schemas';
+import { createConnection } from '../utils/connectionUtils';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const COUNTER_SIZE = 8;
@@ -215,21 +216,24 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
             <DragAndDrop.DropZone
                 onDragEnter={() => setDragOver(true)}
                 onDragLeave={() => setDragOver(false)}
-                onDrop={(payload) => {
+                onDrop={(payload: ResourcePayload) => {
                     setDragOver(false);
                     if (payload.type !== 'resource') {
                         return;
                     }
-                    planner.addConnection({
-                        provider: {
-                            blockId: payload.data.block.id,
-                            resourceName: payload.data.resource.metadata.name,
+                    const connection = createConnection(
+                        {
+                            instance: payload.data.instance,
+                            block: payload.data.block,
+                            resource: payload.data.resource,
                         },
-                        consumer: {
-                            blockId: blockInstance.id,
-                            resourceName: props.resource.metadata.name,
-                        },
-                    });
+                        {
+                            instance: blockInstance!,
+                            block: blockDefinition!,
+                            resource: props.resource,
+                        }
+                    );
+                    planner.addConnection(connection);
                 }}
                 // TODO: flip this around, pass down to children
                 accept={() => dragIsCompatible}

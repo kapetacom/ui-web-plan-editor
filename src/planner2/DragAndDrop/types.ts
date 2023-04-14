@@ -1,8 +1,8 @@
 import { Point } from '@kapeta/ui-web-types';
 
-export interface DnDPayload {
+export interface DnDPayload<T = any> {
     type: string;
-    data: any;
+    data: T;
 }
 
 export interface DragEventInfo {

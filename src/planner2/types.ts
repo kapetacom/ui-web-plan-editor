@@ -3,35 +3,40 @@ import { Asset, ItemType, Point, IResourceTypeProvider, ResourceRole, SchemaKind
 import { BlockDefinition, BlockInstance, Connection, Plan, Resource } from '@kapeta/schemas';
 import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
+import { DnDPayload } from './DragAndDrop/types';
 
-export type BlockPayload = {
+export interface BlockPayload extends DnDPayload<BlockInstance> {
     type: 'block';
     data: BlockInstance;
-};
+}
 
-export type BlockTypePayload = {
+export interface BlockTypePayload extends DnDPayload<Asset<BlockDefinition>> {
     type: 'block-type';
     data: Asset<BlockDefinition>;
-};
+}
 
-export type ResourcePayload = {
+interface ResourcePayloadData {
+    resource: Resource;
+    instance: BlockInstance;
+    block: BlockDefinition;
+    role: ResourceRole;
+}
+
+export interface ResourcePayload extends DnDPayload<ResourcePayloadData> {
     type: 'resource';
-    data: {
-        resource: Resource;
-        instance: BlockInstance;
-        block: BlockDefinition;
-        role: ResourceRole;
-    };
-};
+    data: ResourcePayloadData;
+}
 
-export type ResourceTypePayload = {
+interface ResourceTypePayloadData {
+    title: string;
+    kind: string;
+    config: IResourceTypeProvider;
+}
+
+export interface ResourceTypePayload extends DnDPayload<ResourceTypePayloadData> {
     type: 'resource-type';
-    data: {
-        title: string;
-        kind: string;
-        config: IResourceTypeProvider;
-    };
-};
+    data: ResourceTypePayloadData;
+}
 
 export type PlannerPayload = BlockPayload | ResourcePayload | ResourceTypePayload | BlockTypePayload;
 

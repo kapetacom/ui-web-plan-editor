@@ -34,7 +34,7 @@ export function hasResource(toBlock: BlockDefinition, name: string, role: Resour
     if (!resources) {
         return false;
     }
-    return resources.some((r) => r.resource.metadata.name === name);
+    return resources.some((r) => r.metadata.name === name);
 }
 
 export function canAddResourceToBlock(toBlock: BlockDefinition, fromBlock: BlockDefinition) {
@@ -107,7 +107,11 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
 }
 
 function getEntityByName(block: BlockDefinition, entityName: string): Entity | undefined {
-    return block.spec.entities?.types?.find((t) => t.name === entityName);
+    if (!block.spec.entities?.types) {
+        return undefined;
+    }
+
+    return block.spec.entities.types.find((t: Entity) => t.name === entityName);
 }
 
 function getMatchingEntity(block: BlockDefinition, entity: Entity, sourceEntities: Entity[]): Entity | undefined {

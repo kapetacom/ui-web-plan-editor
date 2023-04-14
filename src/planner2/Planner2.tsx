@@ -26,16 +26,14 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
             size={PlannerNodeSize.MEDIUM}
             connection={{
                 provider: {
-                    blockId: draggable.data.block.id,
+                    blockId: draggable.data.instance.id,
                     resourceName: draggable.data.resource.metadata.name,
                 },
                 consumer: {
                     blockId: 'temp-block',
                     resourceName: 'temp-resource',
                 },
-                port: {
-                    type: 'rest',
-                },
+                port: draggable.data.resource.spec.port,
             }}
         />
     ) : null;
