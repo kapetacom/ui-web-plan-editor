@@ -68,6 +68,7 @@ export interface PlannerContextData {
 
     // resources
     addResource(blockRef: string, resource: Resource, role: ResourceRole): void;
+    updateResource(blockId: string, resourceName: string, role: ResourceRole, resource: Resource): void;
     removeResource(blockRef: string, resourceName: string, resourceRole: ResourceRole): void;
     onResourceAdded(callback: ResourceAddedCallback): Callback;
     getResourceByBlockIdAndName(
@@ -132,6 +133,7 @@ const defaultValue: PlannerContextData = {
     },
     // resources
     addResource(blockId: string) {},
+    updateResource(blockId: string, resourceName: string, role: ResourceRole, resource: Resource) {},
     removeResource(blockId: string, resourceName: string) {},
     onResourceAdded() {
         return () => {};
@@ -429,6 +431,78 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return newAssets;
                 });
             },
+            updateResource(blockRef: string, resourceName: string, role: ResourceRole, resource: Resource) {
+                if (!canEditBlocks) {
+                    return;
+                }
+                const blockUri = parseKapetaUri(blockRef);
+
+                updateBlockAssets((prevState) => {
+                    const newAssets = cloneDeep(prevState);
+                    const blockIx = newAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ?? -1;
+
+                    if (blockIx === -1) {
+                        throw new Error(`Block #${blockRef} not found`);
+                    }
+
+                    const block = cloneDeep(newAssets[blockIx]);
+
+                    const resources: Resource[] =
+                        role === ResourceRole.PROVIDES
+                            ? block.data.spec.providers ?? []
+                            : block.data.spec.consumers ?? [];
+
+                    const existingResourceIx = resources.findIndex((r: Resource) => r.metadata.name === resourceName);
+                    if (existingResourceIx === -1) {
+                        throw new Error(`Resource ${resourceName} on block #${blockRef} not found`);
+                    }
+
+                    const existingResource = resources[existingResourceIx];
+
+                    if (existingResource.metadata.name !== resource.metadata.name) {
+                        // We changed the name of the resource.
+                        // We need to update all connections that reference this resource
+                        updatePlan((prevState) => {
+                            const newPlan = cloneDeep(prevState);
+                            const affectedInstances = newPlan.spec.blocks.filter((instance) =>
+                                parseKapetaUri(instance.block.ref).equals(blockUri)
+                            );
+
+                            affectedInstances.forEach((instance) => {
+                                newPlan.spec.connections.filter((conn) => {
+                                    if (
+                                        role === ResourceRole.CONSUMES &&
+                                        conn.consumer.blockId === instance.id &&
+                                        conn.consumer.resourceName === resourceName
+                                    ) {
+                                        conn.consumer.resourceName = resource.metadata.name;
+                                    }
+
+                                    if (
+                                        role === ResourceRole.PROVIDES &&
+                                        conn.provider.blockId === instance.id &&
+                                        conn.provider.resourceName === resourceName
+                                    ) {
+                                        conn.provider.resourceName = resource.metadata.name;
+                                    }
+                                });
+                            });
+
+                            return newPlan;
+                        });
+                    }
+
+                    resources[existingResourceIx] = resource;
+                    if (role === ResourceRole.PROVIDES) {
+                        block.data.spec.providers = resources;
+                    } else {
+                        block.data.spec.consumers = resources;
+                    }
+                    newAssets.splice(blockIx, 1, block);
+
+                    return newAssets;
+                });
+            },
             onResourceAdded(callback: ResourceAddedCallback) {
                 callbackHandlers.onResourceAdded.push(callback);
                 return () => {
@@ -439,7 +513,6 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditBlocks) {
                     return;
                 }
-                // Remove connection point
                 updateBlockAssets((prevState) => {
                     const newAssets = [...prevState];
                     const blockIx =
@@ -518,7 +591,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     );
                 };
             },
-            updateConnectionMapping({ provider, consumer, mapping }: Connection) {
+            updateConnectionMapping(connection: Connection) {
                 if (!canEditConnections) {
                     return;
                 }
@@ -527,14 +600,14 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     const ix =
                         newPlan.spec.connections?.findIndex((c) => {
                             return (
-                                c.provider.blockId === provider.blockId &&
-                                c.provider.resourceName === provider.resourceName &&
-                                c.consumer.blockId === consumer.blockId &&
-                                c.consumer.resourceName === consumer.resourceName
+                                c.provider.blockId === connection.provider.blockId &&
+                                c.provider.resourceName === connection.provider.resourceName &&
+                                c.consumer.blockId === connection.consumer.blockId &&
+                                c.consumer.resourceName === connection.consumer.resourceName
                             );
                         }) ?? -1;
                     if (ix > -1) {
-                        newPlan.spec.connections![ix] = { provider, consumer, mapping: cloneDeep(mapping) };
+                        newPlan.spec.connections![ix] = { ...connection, mapping: cloneDeep(connection.mapping) };
                     }
                     return newPlan;
                 });
