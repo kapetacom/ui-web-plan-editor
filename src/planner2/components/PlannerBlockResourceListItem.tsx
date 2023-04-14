@@ -16,8 +16,9 @@ import { useBlockContext } from '../BlockContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 import { ActionButtons } from './ActionButtons';
-import { PlannerAction } from '../types';
+import { PlannerAction, ResourcePayload } from '../types';
 import { Resource } from '@kapeta/schemas';
+import { createConnection } from '../utils/connectionUtils';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const COUNTER_SIZE = 8;
