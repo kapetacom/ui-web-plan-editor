@@ -1,4 +1,4 @@
-import React, { forwardRef, MutableRefObject, useContext } from 'react';
+import React, { ForwardedRef, forwardRef, MutableRefObject, useContext } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
 import { ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
@@ -109,7 +109,7 @@ const DraggableResource = (props: DraggableResourceProps & { point: Point }) => 
 };
 
 const PlanEditor = withPlannerContext(
-    forwardRef((props: {}, forwardedRef: MutableRefObject<HTMLDivElement>) => {
+    forwardRef((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
         const planner = useContext(PlannerContext);
         const [editItem, setEditItem] = React.useState<EditableItemInterface2 | undefined>();
         const [inspectItem, setInspectItem] = React.useState<SchemaKind<any, any> | null>(null);
@@ -238,20 +238,20 @@ const PlanEditor = withPlannerContext(
                         return planner.mode === PlannerMode.EDIT;
                     },
                     onClick(context, { connection }) {
-                        const from = planner.getResourceByBlockIdAndName(
-                            connection!.from.blockId,
-                            connection!.from.resourceName,
+                        const provider = planner.getResourceByBlockIdAndName(
+                            connection!.provider.blockId,
+                            connection!.provider.resourceName,
                             ResourceRole.PROVIDES
                         );
-                        const to = planner.getResourceByBlockIdAndName(
-                            connection!.to.blockId,
-                            connection!.to.resourceName,
+                        const consumer = planner.getResourceByBlockIdAndName(
+                            connection!.consumer.blockId,
+                            connection!.consumer.resourceName,
                             ResourceRole.CONSUMES
                         );
 
                         DialogControl.delete(
                             `Delete Connection?`,
-                            `from ${from?.metadata.name} to ${to?.metadata.name}?`,
+                            `from ${provider?.metadata.name} to ${consumer?.metadata.name}?`,
                             (confirm) => {
                                 if (confirm) {
                                     planner.removeConnection(connection!);

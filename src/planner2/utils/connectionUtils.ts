@@ -86,6 +86,7 @@ export function createConnection(provider: BlockInstanceResource, consumer: Bloc
             resourceName: consumer.resource.metadata.name,
             blockId: consumer.instance.id,
         },
+        port: provider.resource.spec.port,
     };
 
     const converter = ResourceTypeProvider.getConverterFor(provider.resource.kind, consumer.resource.kind);
