@@ -1,7 +1,7 @@
 import React from 'react';
 
 type OutletConfig<TOutletId extends string, TContext> = {
-    [id in TOutletId]: (context: TContext) => JSX.Element;
+    [id in TOutletId]: React.FC<TContext>;
 };
 
 const rendererContext = React.createContext<{
@@ -13,16 +13,46 @@ const rendererContext = React.createContext<{
  * @param props
  * @constructor
  */
-const RendererOutlet = <TOutletId extends string, TOutletContext>(
-    props: React.PropsWithChildren<{ id: TOutletId; context: TOutletContext }>
-): JSX.Element => {
-    const ctx: { outlets: OutletConfig<TOutletId, TOutletContext> } = useContext(rendererContext);
-
-    if (ctx.outlets[props.id]) {
-        return ctx.outlets[props.id](props.context);
+class RendererOutlet<TOutletId extends string, TOutletContext> extends React.Component<
+    React.PropsWithChildren<{
+        id: TOutletId;
+        context: TOutletContext;
+    }>,
+    {
+        hasError?: boolean;
     }
-    return <>{props.children}</>;
-};
+> {
+    static contextType = rendererContext;
+
+    static getDerivedStateFromError(error: Error) {
+        return { hasError: true };
+    }
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        // eslint-disable-next-line no-console
+        console.error('Error rendering outlet', error, errorInfo);
+    }
+
+    render() {
+        const ctx = this.context as { outlets: OutletConfig<TOutletId, TOutletContext> };
+
+        if (this.state.hasError) {
+            return <div>Failed to render outlet.</div>;
+        }
+
+        if (ctx.outlets[this.props.id]) {
+            const Component = ctx.outlets[this.props.id];
+            // render as component in order to allow hooks in the outlet code
+            // @ts-ignore - ignore intrinsicAttributes error
+            return <Component {...this.props.context} />;
+        }
+        return <>{this.props.children}</>;
+    }
+}
 
 const RendererProvider = <TOutletIds extends string, TContext>(
     props: React.PropsWithChildren<{
