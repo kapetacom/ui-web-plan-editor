@@ -8,7 +8,7 @@ import { ResourceMode } from '../../wrappers/wrapperHelpers';
 import { getResourceId, resourceHeight } from '../utils/planUtils';
 import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
 import { PlannerConnectionPoint } from './PlannerConnectionPoint';
-import { BlockResource } from '../../components/BlockResource';
+import { BlockResource } from './BlockResource';
 import { DragAndDrop } from '../utils/dndUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
@@ -55,7 +55,7 @@ const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 })
     return baseOffset + (expansionWidth + buttonWidth) * expansionSign;
 };
 
-const TempResource = ({ resource, nodeSize, x, y }) => {
+const TempResource = ({ resource, nodeSize, x, y, actionContext }) => {
     const height = resourceHeight[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     const mouseCatcherWidth = 210;
@@ -88,6 +88,7 @@ const TempResource = ({ resource, nodeSize, x, y }) => {
                         typeName={resource.typeName}
                         width={mouseCatcherWidth}
                         height={heightInner}
+                        actionContext={actionContext}
                     />
                 </svg>
             </g>
@@ -210,6 +211,12 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         hover: dragIsCompatible && dragOver,
         invalid: !valid,
     });
+    const actionContext = {
+        block: blockDefinition,
+        blockInstance,
+        resource: props.resource,
+        resourceRole: props.role,
+    };
 
     return (
         <SVGLayoutNode x={0} y={yOffset}>
@@ -300,12 +307,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                             y={buttonY}
                                             show={buttonsVisible}
                                             actions={props.actions || []}
-                                            actionContext={{
-                                                block: blockDefinition,
-                                                blockInstance,
-                                                resource: props.resource,
-                                                resourceRole: props.role,
-                                            }}
+                                            actionContext={actionContext}
                                             onSizeChange={(width) => {
                                                 setActionButtonsWidth(width);
                                             }}
@@ -337,6 +339,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                                 typeName={typeName}
                                                 width={blockInstance.dimensions!.width}
                                                 height={heightInner}
+                                                actionContext={actionContext}
                                             />
                                         </svg>
 
@@ -376,6 +379,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                             typeName,
                                             name: props.resource.metadata.name,
                                         }}
+                                        actionContext={actionContext}
                                     />
                                 ) : null}
                             </>
