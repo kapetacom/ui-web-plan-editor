@@ -112,11 +112,11 @@ export function BlockTree(props: Props) {
                         className="connected-block-line"
                         onMouseEnter={() => {
                             setHoveredBlock(block);
-                            planner.assetState.setViewModeForBlock(block.instance, BlockMode.HIGHLIGHT);
+                            planner.assetState.setViewModeForBlock(block.instance.id, BlockMode.HIGHLIGHT);
                         }}
                         onMouseLeave={() => {
                             setHoveredBlock(undefined);
-                            planner.assetState.setViewModeForBlock(block.instance, undefined);
+                            planner.assetState.setViewModeForBlock(block.instance.id, undefined);
                         }}
                         onClick={() => {
                             props.onBlockClicked(block.instance);
@@ -141,8 +141,8 @@ export function BlockTree(props: Props) {
                                         key={`resource_${ix}`}
                                         onMouseMove={() => {
                                             planner.assetState.setViewModeForResource(
-                                                hoveredBlock!.instance,
-                                                resource,
+                                                hoveredBlock!.instance.id,
+                                                resource.metadata.name,
                                                 role,
                                                 ResourceMode.SHOW
                                             );
@@ -150,8 +150,8 @@ export function BlockTree(props: Props) {
                                         onMouseLeave={() => {
                                             // null to reset the state
                                             planner.assetState.setViewModeForResource(
-                                                hoveredBlock!.instance,
-                                                resource,
+                                                hoveredBlock!.instance.id,
+                                                resource.metadata.name,
                                                 role,
                                                 undefined
                                             );

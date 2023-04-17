@@ -38,18 +38,18 @@ export interface PlannerContextData {
     // view modes
     assetState: {
         getViewModeForResource(
-            blockInstance: BlockInstance,
-            resource: Resource,
+            blockInstanceId: string,
+            resourceName: string,
             role: ResourceRole
         ): ResourceMode | undefined;
         setViewModeForResource(
-            blockInstance: BlockInstance,
-            resource: Resource,
+            blockInstanceId: string,
+            resourceName: string,
             role: ResourceRole,
             mode?: ResourceMode
         ): void;
-        getViewModeForBlock(blockInstance: BlockInstance): BlockMode | undefined;
-        setViewModeForBlock(blockInstance: BlockInstance, mode?: BlockMode): void;
+        getViewModeForBlock(blockInstanceId: string): BlockMode | undefined;
+        setViewModeForBlock(blockInstanceId: string, mode?: BlockMode): void;
     };
     instanceStates: { [id: string]: InstanceStatus };
 
@@ -233,19 +233,19 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     const [viewStates, setViewStates] = useState({});
     const assetState: PlannerContextData['assetState'] = useMemo(
         () => ({
-            getViewModeForResource(blockInstance, resource, role) {
-                const id = getResourceId(blockInstance.id, resource.metadata.name, role);
+            getViewModeForResource(blockInstanceId, resourceName, role) {
+                const id = getResourceId(blockInstanceId, resourceName, role);
                 return viewStates[id] as ResourceMode | undefined;
             },
-            setViewModeForResource(blockInstance, resource: Resource, role, resourceMode) {
-                const id = getResourceId(blockInstance.id, resource.metadata.name, role);
+            setViewModeForResource(blockInstanceId, resourceName, role, resourceMode) {
+                const id = getResourceId(blockInstanceId, resourceName, role);
                 setViewStates((prev) => ({ ...prev, [id]: resourceMode }));
             },
-            getViewModeForBlock(blockInstance) {
-                return viewStates[blockInstance.id] as BlockMode | undefined;
+            getViewModeForBlock(blockInstanceId) {
+                return viewStates[blockInstanceId] as BlockMode | undefined;
             },
-            setViewModeForBlock(blockInstance, blockMode) {
-                setViewStates((prev) => ({ ...prev, [blockInstance.id]: blockMode }));
+            setViewModeForBlock(blockInstanceId, blockMode) {
+                setViewStates((prev) => ({ ...prev, [blockInstanceId]: blockMode }));
             },
         }),
         [viewStates, setViewStates]
