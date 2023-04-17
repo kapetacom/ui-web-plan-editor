@@ -462,8 +462,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     if (existingResource.metadata.name !== resource.metadata.name) {
                         // We changed the name of the resource.
                         // We need to update all connections that reference this resource
-                        updatePlan((prevState) => {
-                            const newPlan = cloneDeep(prevState);
+                        updatePlan((prevPlanState) => {
+                            const newPlan = cloneDeep(prevPlanState);
                             const affectedInstances = newPlan.spec.blocks.filter((instance) =>
                                 parseKapetaUri(instance.block.ref).equals(blockUri)
                             );

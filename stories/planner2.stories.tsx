@@ -1,4 +1,4 @@
-import React, { ForwardedRef, forwardRef, useContext } from 'react';
+import React, { ForwardedRef, useContext } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
 import { ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
