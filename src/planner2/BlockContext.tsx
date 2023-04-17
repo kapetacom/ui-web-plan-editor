@@ -49,7 +49,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
     const blockInstance = planner.plan?.spec.blocks?.find((block) => block.id === blockId) || null;
     const blockDefinition = planner.getBlockByRef(blockInstance?.block.ref || '');
     // Overrides from external sources, such as the sidebar
-    const overrideMode = blockInstance && planner.assetState.getViewModeForBlock(blockInstance);
+    const overrideMode = blockInstance && planner.assetState.getViewModeForBlock(blockInstance.id);
     const focusedMode = planner.focusedBlock?.id === blockId ? BlockMode.FOCUSED : undefined;
     const instanceStatus = planner.instanceStates[blockId] || InstanceStatus.STOPPED;
 

@@ -117,8 +117,11 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const valid = errors.length === 0 && true; // TODO props.resource.isValid();
 
     const [isHovered, setHoverState] = useState(false);
-    // Mode is complicated;
-    const overrideMode = planner.assetState.getViewModeForResource(blockInstance, props.resource, props.role);
+    const overrideMode = planner.assetState.getViewModeForResource(
+        blockInstance.id,
+        props.resource.metadata.name,
+        props.role
+    );
 
     // expand if the resource is connected to a focused block
     const isConnectedToFocusedBlock = planner.plan?.spec.connections?.some((connection) => {
