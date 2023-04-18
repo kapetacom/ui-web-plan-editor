@@ -10,11 +10,13 @@ import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
 import { resourceHeight } from '../utils/planUtils';
 import { SVGLayoutNode } from '../LayoutContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
-import { PlannerAction, PlannerPayload } from '../types';
+import { ActionContext, PlannerAction, PlannerPayload } from '../types';
 
 export interface PlannerBlockResourceListProps {
     role: ResourceRole;
     actions: PlannerAction<any>[];
+    onResourceMouseEnter?: (context: ActionContext) => void;
+    onResourceMouseLeave?: (context: ActionContext) => void;
 }
 
 export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> = (props) => {
@@ -80,6 +82,8 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
                         // show_options unless viewOnly or we're dragging
                         hoverMode={ResourceMode.SHOW_OPTIONS}
                         actions={props.actions}
+                        onMouseEnter={props.onResourceMouseEnter}
+                        onMouseLeave={props.onResourceMouseLeave}
                     />
                 );
             })}

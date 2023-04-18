@@ -10,7 +10,7 @@ import { Point, ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode } from '../../wrappers/wrapperHelpers';
 import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
-import { BlockInfo, PlannerPayload, ResourcePayload, ResourceTypePayload } from '../types';
+import { ActionContext, BlockInfo, PlannerPayload, ResourcePayload, ResourceTypePayload } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
@@ -22,6 +22,10 @@ interface Props {
     size: PlannerNodeSize;
     actions?: PlannerActionConfig;
     className?: string;
+    onMouseEnter?: (context: ActionContext) => void;
+    onMouseLeave?: (context: ActionContext) => void;
+    onResourceMouseEnter?: (context: ActionContext) => void;
+    onResourceMouseLeave?: (context: ActionContext) => void;
 }
 
 export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
@@ -76,6 +80,10 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
         'planner-block-node': true,
         highlight: blockContext.blockMode === BlockMode.HIGHLIGHT,
     });
+    const actionContext = {
+        block: blockContext.blockDefinition,
+        blockInstance: blockContext.blockInstance,
+    };
 
     return (
         // TODO: Readonly/ viewonly
@@ -202,6 +210,16 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                 <svg
                                     className={`${className} ${evt.isDragging ? 'dragging' : ''}`}
                                     onDoubleClick={() => planner.setFocusedBlock(blockContext.blockInstance)}
+                                    onMouseEnter={() => {
+                                        if (props.onMouseEnter) {
+                                            props.onMouseEnter(actionContext);
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        if (props.onMouseLeave) {
+                                            props.onMouseLeave(actionContext);
+                                        }
+                                    }}
                                     style={{
                                         left: `${point.x}px`,
                                         top: `${point.y}px`,
@@ -217,10 +235,14 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                         <PlannerBlockResourceList
                                             role={ResourceRole.CONSUMES}
                                             actions={props.actions?.resource || []}
+                                            onResourceMouseEnter={props.onResourceMouseEnter}
+                                            onResourceMouseLeave={props.onResourceMouseLeave}
                                         />
                                         <PlannerBlockResourceList
                                             role={ResourceRole.PROVIDES}
                                             actions={props.actions?.resource || []}
+                                            onResourceMouseEnter={props.onResourceMouseEnter}
+                                            onResourceMouseLeave={props.onResourceMouseLeave}
                                         />
 
                                         <BlockNode
@@ -252,10 +274,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                             y={blockContext.instanceBlockHeight + 10}
                                             show
                                             actions={props.actions?.block || []}
-                                            actionContext={{
-                                                block: blockContext.blockDefinition,
-                                                blockInstance: blockContext.blockInstance,
-                                            }}
+                                            actionContext={actionContext}
                                         />
                                     </g>
                                 </svg>

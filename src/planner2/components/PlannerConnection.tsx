@@ -5,7 +5,7 @@ import { calculatePathBetweenPoints, getCurveMainPoints, getMiddlePoint } from '
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { getResourceId } from '../utils/planUtils';
-import { PlannerAction } from '../types';
+import { ActionContext, PlannerAction } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { Connection } from '@kapeta/schemas';
@@ -18,6 +18,8 @@ export const PlannerConnection: React.FC<{
     // eslint-disable-next-line react/no-unused-prop-types
     viewOnly?: boolean;
     actions?: PlannerAction<any>[];
+    onMouseEnter?: (context: ActionContext) => void;
+    onMouseLeave?: (context: ActionContext) => void;
 }> = (props) => {
     const planner = useContext(PlannerContext);
     const [hasFocus, setHasFocus] = useState(false);
@@ -85,10 +87,27 @@ export const PlannerConnection: React.FC<{
     const path = calculatePathBetweenPoints(from, to);
     const points = getCurveMainPoints(from, to);
     const middlePoint = getMiddlePoint(points);
+    const actionContext = {
+        connection: props.connection,
+    };
 
     return (
         <svg style={{ position: 'absolute', zIndex: -1 }}>
-            <g className={className.trim()} onMouseOver={() => setHasFocus(true)} onMouseOut={() => setHasFocus(false)}>
+            <g
+                className={className.trim()}
+                onMouseEnter={() => {
+                    if (props.onMouseEnter) {
+                        props.onMouseEnter(actionContext);
+                    }
+                }}
+                onMouseOver={() => setHasFocus(true)}
+                onMouseOut={() => {
+                    setHasFocus(false);
+                    if (props.onMouseLeave) {
+                        props.onMouseLeave(actionContext);
+                    }
+                }}
+            >
                 <path className="background" d={path} />
                 <path className="line" d={path} />
 
@@ -99,9 +118,7 @@ export const PlannerConnection: React.FC<{
                         // TODO: how can we avoid the magic number?
                         y={middlePoint.y - 5}
                         actions={props.actions}
-                        actionContext={{
-                            connection: props.connection,
-                        }}
+                        actionContext={actionContext}
                     />
                 )}
             </g>
