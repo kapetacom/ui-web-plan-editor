@@ -7,7 +7,7 @@ import { PlannerCanvas } from './PlannerCanvas';
 import { PlannerConnection } from './components/PlannerConnection';
 import { getConnectionId, isConnectionTo } from './utils/connectionUtils';
 import { DnDContext, DnDContextType } from './DragAndDrop/DnDContext';
-import { PlannerPayload } from './types';
+import { ActionContext, PlannerPayload } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -18,6 +18,13 @@ interface Props {
 
     // Should we instead augment the
     actions?: PlannerActionConfig;
+
+    onBlockMouseEnter?: (context: ActionContext) => void;
+    onBlockMouseLeave?: (context: ActionContext) => void;
+    onResourceMouseEnter?: (context: ActionContext) => void;
+    onResourceMouseLeave?: (context: ActionContext) => void;
+    onConnectionMouseEnter?: (context: ActionContext) => void;
+    onConnectionMouseLeave?: (context: ActionContext) => void;
 }
 
 const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
@@ -70,7 +77,15 @@ export const Planner2: React.FC<Props> = (props) => {
 
                     return (
                         <BlockContextProvider key={instance.id} blockId={instance.id}>
-                            <PlannerBlockNode size={nodeSize} actions={props.actions || {}} className={className} />
+                            <PlannerBlockNode
+                                size={nodeSize}
+                                actions={props.actions || {}}
+                                className={className}
+                                onMouseEnter={props.onBlockMouseEnter}
+                                onMouseLeave={props.onBlockMouseLeave}
+                                onResourceMouseEnter={props.onResourceMouseEnter}
+                                onResourceMouseLeave={props.onResourceMouseLeave}
+                            />
                         </BlockContextProvider>
                     );
                 })}
@@ -90,6 +105,8 @@ export const Planner2: React.FC<Props> = (props) => {
                             className={className}
                             connection={connection}
                             actions={props.actions?.connection || []}
+                            onMouseEnter={props.onConnectionMouseEnter}
+                            onMouseLeave={props.onConnectionMouseLeave}
                         />
                     );
                 })}

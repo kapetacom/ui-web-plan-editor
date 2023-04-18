@@ -16,7 +16,7 @@ import { useBlockContext } from '../BlockContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 import { ActionButtons } from './ActionButtons';
-import { PlannerAction, ResourcePayload } from '../types';
+import { ActionContext, PlannerAction, ResourcePayload } from '../types';
 import { Resource } from '@kapeta/schemas';
 import { createConnection } from '../utils/connectionUtils';
 
@@ -32,6 +32,8 @@ interface PlannerBlockResourceListItemProps {
     mode: ResourceMode;
     hoverMode?: ResourceMode;
     actions?: PlannerAction<any>[];
+    onMouseEnter?: (context: ActionContext) => void;
+    onMouseLeave?: (context: ActionContext) => void;
 }
 
 const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) => {
@@ -113,7 +115,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const title = resourceConfig?.title || resourceConfig?.kind;
     const typeName = title?.toString().toLowerCase() ?? 'unknown';
 
-    const counterValue = resourceConfig?.getCounterValue ? resourceConfig.getCounterValue(props.resource) : 0;
+    const counterValue = resourceConfig?.getCounterValue ? resourceConfig!.getCounterValue(props.resource) : 0;
     const valid = errors.length === 0 && true; // TODO props.resource.isValid();
 
     const [isHovered, setHoverState] = useState(false);
@@ -279,7 +281,17 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                     clipPath={`url(#${fixedClipPathId})`}
                                     x={0}
                                     y={0}
-                                    onMouseLeave={() => setHoverState(false)}
+                                    onMouseEnter={() => {
+                                        if (props.onMouseEnter) {
+                                            props.onMouseEnter(actionContext);
+                                        }
+                                    }}
+                                    onMouseLeave={() => {
+                                        setHoverState(false);
+                                        if (props.onMouseLeave) {
+                                            props.onMouseLeave(actionContext);
+                                        }
+                                    }}
                                     onMouseMove={() => setHoverState(true)}
                                     // Only register the drag handler if the resource should be draggable (Providers only atm)
                                     {...(props.role === ResourceRole.PROVIDES ? evt.componentProps : {})}
