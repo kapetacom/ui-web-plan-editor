@@ -2,7 +2,16 @@ import React, {ExoticComponent, RefAttributes, useCallback, useEffect, useMemo, 
 import { Asset, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { InstanceStatus } from '@kapeta/ui-web-context';
-import { BlockDefinition, BlockInstance, Connection, Endpoint, Plan, Resource } from '@kapeta/schemas';
+import {
+    BlockDefinition,
+    BlockInstance,
+    Connection,
+    Endpoint,
+    EntityList,
+    Metadata,
+    Plan,
+    Resource
+} from '@kapeta/schemas';
 import { cloneDeep } from 'lodash';
 import { PlannerNodeSize } from '../types';
 import { PlannerAction, Rectangle } from './types';
@@ -59,6 +68,8 @@ export interface PlannerContextData {
     nodeSize: PlannerNodeSize;
     getBlockByRef(ref: string): BlockDefinition | undefined;
     getBlockById(blockId: string): BlockDefinition | undefined;
+
+    updatePlanMetadata(metadata:Metadata, configuration:EntityList): void;
 
     updateBlockDefinition(ref: string, update: BlockDefinition): void;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
@@ -145,6 +156,7 @@ const defaultValue: PlannerContextData = {
     addConnection(connection: Connection) {},
     updateConnectionMapping(connection: Connection) {},
     removeConnection(connection: Connection) {},
+    updatePlanMetadata(metadata:Metadata, configuration:EntityList) {},
     onConnectionAdded() {
         return () => {};
     },
@@ -582,6 +594,14 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 });
 
                 callbackHandlers.onConnectionAdded.forEach((cb) => cb(connection));
+            },
+            updatePlanMetadata(metadata:Metadata, configuration:EntityList) {
+                updatePlan((prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    newPlan.metadata = metadata;
+                    newPlan.spec.configuration = configuration;
+                    return newPlan;
+                });
             },
             onConnectionAdded(callback: ConnectionAddedCallback) {
                 callbackHandlers.onConnectionAdded.push(callback);
