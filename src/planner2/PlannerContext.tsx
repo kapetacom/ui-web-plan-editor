@@ -1,4 +1,4 @@
-import React, { RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {ExoticComponent, RefAttributes, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import { Asset, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { InstanceStatus } from '@kapeta/ui-web-context';
@@ -661,7 +661,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     ]);
 };
 
-export function withPlannerContext<T>(Inner: React.ComponentType<T & RefAttributes<HTMLElement>>) {
+export function withPlannerContext<T>(Inner: ExoticComponent<T & RefAttributes<HTMLElement>>) {
     return (props: T & JSX.IntrinsicAttributes & PlannerContextProps) => {
         const context = usePlannerContext(props);
         const rootRef = useRef(null);

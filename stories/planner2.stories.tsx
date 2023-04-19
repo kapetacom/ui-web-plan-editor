@@ -109,7 +109,7 @@ const DraggableResource = (props: DraggableResourceProps & { point: Point }) => 
     );
 };
 
-const PlanEditor = withPlannerContext((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
+const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const planner = useContext(PlannerContext);
     const [editItem, setEditItem] = React.useState<EditableItemInterface2 | undefined>();
     const [inspectItem, setInspectItem] = React.useState<SchemaKind<any, any> | null>(null);
@@ -362,7 +362,7 @@ const PlanEditor = withPlannerContext((props: any, forwardedRef: ForwardedRef<HT
                         const name = block.data.metadata.name;
                         return (
                             <DragAndDrop.Draggable
-                                key={`blocl_${ix}`}
+                                key={`block_${ix}`}
                                 disabled={false}
                                 data={{
                                     type: 'block-type',
@@ -406,6 +406,8 @@ const PlanEditor = withPlannerContext((props: any, forwardedRef: ForwardedRef<HT
         </div>
     );
 });
+
+const PlanEditor = withPlannerContext(InnerPlanEditor);
 
 const PlannerLoader = (props) => {
     const plan = useAsync(() => readPlanV2());
