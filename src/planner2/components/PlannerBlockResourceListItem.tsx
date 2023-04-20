@@ -16,9 +16,11 @@ import { useBlockContext } from '../BlockContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 import { ActionButtons } from './ActionButtons';
-import { ActionContext, PlannerAction, ResourcePayload } from '../types';
+import { ActionContext, PlannerAction, PlannerPayload, ResourcePayload } from '../types';
 import { Resource } from '@kapeta/schemas';
 import { createConnection } from '../utils/connectionUtils';
+import { PlannerMode } from '../../wrappers/PlannerModelWrapper';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const COUNTER_SIZE = 8;
@@ -146,18 +148,38 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const mode = overrideMode ?? focusMode ?? propsMode;
 
     const isConsumer = props.role === ResourceRole.CONSUMES;
+    // in view mode, never
+    // in edit mode, if the resource is not connected to anything
+    // in config mode, if the resource is not connected to anything
+
     const dragIsCompatible = useMemo(() => {
         try {
-            return (
-                isConsumer &&
-                draggable?.type === 'resource' &&
-                draggable.data.block.id !== blockInstance.id &&
-                ResourceTypeProvider.canApplyResourceToKind(draggable.data.resource.kind, props.resource.kind) &&
-                !planner.hasConnections({
-                    blockId: blockInstance.id,
-                    resourceName: props.resource.metadata.name,
-                })
-            );
+            switch (planner.mode) {
+                case PlannerMode.EDIT:
+                    return (
+                        isConsumer &&
+                        draggable?.type === 'resource' &&
+                        draggable.data.block.id !== blockInstance.id &&
+                        ResourceTypeProvider.canApplyResourceToKind(
+                            draggable.data.resource.kind,
+                            props.resource.kind
+                        ) &&
+                        !planner.hasConnections({
+                            blockId: blockInstance.id,
+                            resourceName: props.resource.metadata.name,
+                        })
+                    );
+                case PlannerMode.CONFIGURATION:
+                    return (
+                        isConsumer &&
+                        draggable?.type === 'operator' &&
+                        parseKapetaUri(props.resource.kind).equals(parseKapetaUri(draggable.data.operator?.ref))
+                    );
+
+                case PlannerMode.VIEW:
+                default:
+                    return false;
+            }
         } catch (e) {
             // eslint-disable-next-line no-console
             console.warn('Failed to correctly determine if resource is draggable', e);
@@ -226,6 +248,17 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     return (
         <SVGLayoutNode x={0} y={yOffset}>
             <DragAndDrop.DropZone
+                data={
+                    {
+                        type: 'resource',
+                        data: {
+                            resource: props.resource,
+                            instance: blockInstance,
+                            block: blockDefinition,
+                            role: ResourceRole.CONSUMES,
+                        },
+                    } as PlannerPayload
+                }
                 onDragEnter={() => setDragOver(true)}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={(payload: ResourcePayload) => {

@@ -15,9 +15,9 @@ interface DnDDraggableProps<T> {
     // payload for drag events
     data: T;
     disabled?: boolean;
-    onDrag?: (dragEvent: DragEventInfo) => void;
-    onDragStart?: (dragEvent: DragEventInfo) => void;
-    onDrop?: (dragEvent: DragEventInfo) => void;
+    onDrag?: (dragEvent: DragEventInfo<T>) => void;
+    onDragStart?: (dragEvent: DragEventInfo<T>) => void;
+    onDrop?: (dragEvent: DragEventInfo<T>) => void;
     children: (props: DnDCallbackProps) => JSX.Element;
 }
 
@@ -28,7 +28,7 @@ enum DragStatus {
 }
 
 // TODO: change to include different coordinates: pageX/Y, zoneX/Y
-const getDragEvent = (windowPosition: Point, initialPosition: Point): DragEventInfo['client'] => ({
+const getDragEvent = (windowPosition: Point, initialPosition: Point): DragEventInfo<any>['client'] => ({
     diff: {
         x: windowPosition.x - initialPosition.x,
         y: windowPosition.y - initialPosition.y,
@@ -38,6 +38,7 @@ const getDragEvent = (windowPosition: Point, initialPosition: Point): DragEventI
 });
 
 const getDragEventInfo = (
+    data: DnDPayload,
     root: HTMLElement | null | undefined,
     parentZone: DnDZoneInstance,
     currentPosition: Point,
@@ -58,6 +59,7 @@ const getDragEventInfo = (
     }
 
     return {
+        sourceDraggable: data,
         client: getDragEvent(currentPosition, initialPosition),
         zone: getDragEvent(currentZonePosition, initialPosition),
     };
@@ -65,6 +67,7 @@ const getDragEventInfo = (
 
 const zeroPosition = { x: 0, y: 0 };
 const zeroDragEvent = {
+    sourceDraggable: { type: '', data: {} },
     client: getDragEvent(zeroPosition, zeroPosition),
     zone: getDragEvent(zeroPosition, zeroPosition),
 };
@@ -77,7 +80,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
     const parentZone = useContext(DnDZoneContext);
 
     const [state, setState] = useState<{
-        dragEvent: DragEventInfo;
+        dragEvent: DragEventInfo<any>;
         status: DragStatus;
     }>({
         dragEvent: zeroDragEvent,
@@ -102,16 +105,19 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
 
             // Initial client position includes scroll
             const initialClientPosition = parentZone.getZoneCoordinates(initialPoint);
-            const initialDragEvt = getDragEventInfo(ctx.root, parentZone, initialPoint, initialClientPosition);
-            const dragTimeout = setTimeout(() => {
-                setState({
-                    status: DragStatus.DRAGGING,
-                    dragEvent: initialDragEvt,
-                });
-            }, dragMinTime);
+            const initialDragEvt = getDragEventInfo(
+                props.data,
+                ctx.root,
+                parentZone,
+                initialPoint,
+                initialClientPosition
+            );
 
+            let dragTimeout: NodeJS.Timeout | undefined;
             const setStatusFromEvent = (evt: typeof initialDragEvt) => {
                 clearTimeout(dragTimeout);
+                dragTimeout = undefined;
+
                 setState((prevState) => {
                     if (prevState.status === DragStatus.DRAGGING) {
                         return {
@@ -124,6 +130,8 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                         Math.abs(evt.zone.diff.x) + Math.abs(evt.zone.diff.y) > 2 ||
                         Date.now() - startTime > dragMinTime
                     ) {
+                        // We have started dragging
+                        ctx.callbacks.onDragStart(initialDragEvt, parentZone);
                         return {
                             status: DragStatus.DRAGGING,
                             dragEvent: evt,
@@ -135,18 +143,20 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                     };
                 });
             };
+            dragTimeout = setTimeout(() => {
+                setStatusFromEvent(initialDragEvt);
+            }, dragMinTime);
 
             setState({
                 status: DragStatus.IDLE,
                 dragEvent: initialDragEvt,
             });
 
-            ctx.callbacks.onDragStart(props.data, initialDragEvt, parentZone);
-
             let lastEvt = downEvt;
             // Transform scroll into drag events
             const unsubscribeZone = parentZone.onScrollChange(() => {
                 const dragEvt = getDragEventInfo(
+                    props.data,
                     ctx.root,
                     parentZone,
                     {
@@ -161,6 +171,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 lastEvt = evt;
 
                 const dragEvt = getDragEventInfo(
+                    props.data,
                     ctx.root,
                     parentZone,
                     {
@@ -172,7 +183,11 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 setStatusFromEvent(dragEvt);
             };
             const onMouseUp = (evt: MouseEvent) => {
+                // Remember cleanup in case the drag is cancelled (mouseup)
+                clearTimeout(dragTimeout);
+
                 const dragEvt = getDragEventInfo(
+                    props.data,
                     ctx.root,
                     parentZone,
                     {
@@ -211,7 +226,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
             if (props.onDrag) {
                 props.onDrag(state.dragEvent);
             }
-            ctx.callbacks.onDrag(props.data, state.dragEvent, parentZone);
+            ctx.callbacks.onDrag(state.dragEvent, parentZone);
         }
     });
 
@@ -221,11 +236,8 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
     useEffect(() => {
         if (isDropped) {
             // Wait with resetting the position state, so the state is consistent when triggering onDrop
-            if (onDrop) {
-                onDrop(state.dragEvent);
-            }
 
-            ctx.callbacks.onDrop(data, state.dragEvent, parentZone);
+            ctx.callbacks.onDrop(state.dragEvent, parentZone, onDrop);
 
             // Reset
             setState({

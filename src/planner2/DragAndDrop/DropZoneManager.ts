@@ -1,4 +1,4 @@
-import { DragEventInfo } from './types';
+import { DnDPayload, DragEventInfo } from './types';
 import { DnDZoneInstance } from './DnDDropZone';
 import { Point } from '@kapeta/ui-web-types';
 
@@ -16,6 +16,7 @@ interface DropZoneState<T = any> {
     id: string;
     zone: DropZoneEntity<T>;
     state: 'IDLE' | 'ACTIVE';
+    payload: DnDPayload;
 }
 export class DropZoneManager {
     private zones: DropZoneState[] = [];
@@ -78,41 +79,43 @@ export class DropZoneManager {
         };
     }
 
-    addZone(id: string, zone: DropZoneEntity) {
+    addZone(id: string, zone: DropZoneEntity, payload: DnDPayload) {
         const entry: DropZoneState = this.zones.find((z) => z.id === id) || {
             id,
             zone,
             state: 'IDLE',
+            payload,
         };
         entry.zone = zone;
+        entry.payload = payload;
         if (!this.zones.includes(entry)) {
             this.zones.push(entry);
         }
     }
 
-    handleDragEvent(draggable, evt: DragEventInfo, fromZone: DnDZoneInstance, root: HTMLElement | null) {
+    handleDragEvent(evt: DragEventInfo, fromZone: DnDZoneInstance, root: HTMLElement | null) {
         // callbacks based on state change?, or kept "instant"?
         // Loop all elements to check intersection
         let foundZone = false;
-        for (const dropZone of this.getValidZones(draggable)) {
+        for (const dropZone of this.getValidZones(evt.sourceDraggable)) {
             const isContained = this.checkContainment(dropZone.zone, evt.client.end);
 
             if (isContained && !foundZone) {
                 foundZone = true;
                 if (dropZone.state === 'IDLE') {
                     if (dropZone.zone.onDragEnter) {
-                        dropZone.zone.onDragEnter(draggable);
+                        dropZone.zone.onDragEnter(evt.sourceDraggable);
                     }
                 } else if (dropZone.state === 'ACTIVE') {
                     if (dropZone.zone.onDragOver) {
-                        dropZone.zone.onDragOver(draggable);
+                        dropZone.zone.onDragOver(evt.sourceDraggable);
                     }
                 }
                 dropZone.state = 'ACTIVE';
             } else {
                 if (dropZone.state === 'ACTIVE') {
                     if (dropZone.zone.onDragLeave) {
-                        dropZone.zone.onDragLeave(draggable);
+                        dropZone.zone.onDragLeave(evt.sourceDraggable);
                     }
                 }
                 dropZone.state = 'IDLE';
@@ -120,10 +123,15 @@ export class DropZoneManager {
         }
     }
 
-    handleDropEvent(draggable, event: DragEventInfo, fromZone: DnDZoneInstance, root: HTMLElement | null) {
-        let eventCopy = { ...event };
+    handleDropEvent(
+        event: DragEventInfo,
+        fromZone: DnDZoneInstance,
+        root: HTMLElement | null,
+        draggableDropCallback?: (evt: DragEventInfo) => void
+    ) {
         // Loop all elements to check intersection
-        for (const dropZone of this.getValidZones(draggable)) {
+        for (const dropZone of this.getValidZones(event.sourceDraggable)) {
+            let eventCopy = { ...event };
             const isContained = this.checkContainment(dropZone.zone, eventCopy.client.end);
 
             if (isContained) {
@@ -138,7 +146,13 @@ export class DropZoneManager {
                     eventCopy = this.translateFromZoneToZone(eventCopy, fromZone, dropZone.zone.instance);
                 }
                 if (dropZone.zone.onDrop) {
-                    dropZone.zone.onDrop(draggable, eventCopy);
+                    dropZone.zone.onDrop(event.sourceDraggable, eventCopy);
+                }
+                if (draggableDropCallback) {
+                    draggableDropCallback({
+                        ...eventCopy,
+                        targetZone: dropZone.payload,
+                    });
                 }
                 dropZone.state = 'IDLE';
             }
