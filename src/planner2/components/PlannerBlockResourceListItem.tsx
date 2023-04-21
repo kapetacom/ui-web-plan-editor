@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useState } from 'react';
 
-import { IResourceTypeProvider, ResourceRole, ResourceProviderType } from '@kapeta/ui-web-types';
+import { IResourceTypeProvider, ResourceProviderType, ResourceRole } from '@kapeta/ui-web-types';
 
 import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
@@ -173,7 +173,9 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                     return (
                         isConsumer &&
                         draggable?.type === 'operator' &&
-                        parseKapetaUri(props.resource.kind).equals(parseKapetaUri(draggable.data.operator?.ref))
+                        // compare without versions
+                        parseKapetaUri(props.resource.kind).fullName ===
+                            parseKapetaUri(draggable.data.operator?.ref).fullName
                     );
 
                 case PlannerMode.VIEW:
@@ -188,7 +190,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     }, [draggable, blockInstance, props.resource, planner, isConsumer]);
 
     // Change to inclusion list if necessary
-    const isExpanded = mode !== ResourceMode.HIDDEN || dragIsCompatible;
+    const isExpanded = overrideMode !== ResourceMode.HIDDEN && (mode !== ResourceMode.HIDDEN || dragIsCompatible);
     const buttonsVisible = mode === ResourceMode.SHOW_OPTIONS;
 
     const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
