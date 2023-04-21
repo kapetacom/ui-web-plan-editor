@@ -3,18 +3,18 @@ import { DnDPayload, DragEventInfo } from './types';
 import { DropZoneEntity } from './DropZoneManager';
 import { DnDZoneInstance } from './DnDDropZone';
 
-export interface DnDCallbacks {
+export interface DnDCallbacks<T> {
     /**
      * Add a drop zone target
      * Returns a deregistration callback
      */
-    registerDropZone(id: string, zone: DropZoneEntity): void;
+    registerDropZone(id: string, zone: DropZoneEntity, payload?: DnDPayload): void;
     unregisterDropZone(id: string): void;
 
-    onDragStart(draggable: DnDPayload, dragEvent: DragEventInfo, fromZone: DnDZoneInstance): void;
-    onDrop(draggable: DnDPayload, dragEvent: DragEventInfo, fromZone: DnDZoneInstance): void;
+    onDragStart(dragEvent: DragEventInfo<T>, fromZone: DnDZoneInstance): void;
+    onDrop(dragEvent: DragEventInfo<T>, fromZone: DnDZoneInstance, cb?: (dragEvent: DragEventInfo<T>) => void): void;
     // While dragging, this fires every n ms
-    onDrag(draggable: DnDPayload, dragEvent: DragEventInfo, fromZone: DnDZoneInstance): void;
+    onDrag(dragEvent: DragEventInfo<T>, fromZone: DnDZoneInstance): void;
 }
 
 export interface DnDContextType<D extends DnDPayload = DnDPayload> {
@@ -26,7 +26,7 @@ export interface DnDContextType<D extends DnDPayload = DnDPayload> {
 
     root?: HTMLElement | null;
 
-    callbacks: DnDCallbacks;
+    callbacks: DnDCallbacks<D>;
 }
 
 export const DnDContext = React.createContext<DnDContextType<any>>({

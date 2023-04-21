@@ -115,6 +115,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                     // Effective layout includes drag status
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
                         <DragAndDrop.DropZone
+                            data={{ type: 'block', data: blockContext.blockInstance }}
                             accept={(draggable: PlannerPayload) => {
                                 if (blockContext.isBlockDefinitionReadOnly) {
                                     return false;

@@ -14,10 +14,10 @@ interface Props {
     root: React.RefObject<HTMLElement>;
 }
 
-export const DnDContainer = <T extends unknown>(props: Props) => {
+export const DnDContainer = <T extends DnDPayload>(props: Props) => {
     const [dragState, setDragState] = useState<{
         state: 'IDLE' | 'DRAGGING';
-        draggable?: DnDPayload;
+        draggable?: DnDPayload<T>;
         position: Point;
     }>(defaultState);
 
@@ -25,32 +25,32 @@ export const DnDContainer = <T extends unknown>(props: Props) => {
 
     const dzManager = useMemo(() => new DropZoneManager(), []);
 
-    const callbacks = useMemo<DnDCallbacks>(() => {
+    const callbacks = useMemo<DnDCallbacks<T>>(() => {
         return {
-            registerDropZone(id: string, zone: DropZoneEntity) {
-                dzManager.addZone(id, zone);
+            registerDropZone(id: string, zone: DropZoneEntity, payload: DnDPayload<T>) {
+                dzManager.addZone(id, zone, payload);
             },
             unregisterDropZone(id: string) {
                 dzManager.removeZoneById(id);
             },
 
-            onDrag(draggable, dragEvent, fromZone) {
+            onDrag(dragEvent, fromZone) {
                 setDragState({
                     state: 'DRAGGING',
-                    draggable,
+                    draggable: dragEvent.sourceDraggable,
                     position: dragEvent.zone.end,
                 });
-                dzManager.handleDragEvent(draggable, dragEvent, fromZone, props.root.current);
+                dzManager.handleDragEvent(dragEvent, fromZone, props.root.current);
             },
-            onDrop(draggable, dragEvent, fromZone) {
+            onDrop(dragEvent, fromZone, callback) {
                 // Loop all elements to check intersection
-                dzManager.handleDropEvent(draggable, dragEvent, fromZone, props.root.current);
+                dzManager.handleDropEvent(dragEvent, fromZone, props.root.current, callback);
                 setDragState(defaultState);
             },
-            onDragStart(draggable, dragEvent, fromZone) {
+            onDragStart(dragEvent, _fromZone) {
                 setDragState({
                     state: 'DRAGGING',
-                    draggable,
+                    draggable: dragEvent.sourceDraggable,
                     position: dragEvent.zone.end,
                 });
             },

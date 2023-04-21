@@ -3,6 +3,7 @@ import { DropZoneEntity } from './DropZoneManager';
 import { DnDContext } from './DnDContext';
 import { randomUUID } from '../../utils/cryptoUtils';
 import { Point } from '@kapeta/ui-web-types';
+import { DnDPayload } from './types';
 
 type Offset = { top: number; left: number };
 type ScrollListener = (offset: Offset) => void;
@@ -46,7 +47,8 @@ export class DnDZoneInstance {
 }
 export const DnDZoneContext = React.createContext(new DnDZoneInstance(false));
 
-interface DropZoneProps<T> {
+interface DropZoneProps<T extends DnDPayload> {
+    data?: T;
     scale?: number;
     accept?: DropZoneEntity<T>['accept'];
     onDragEnter?: DropZoneEntity<T>['onDragEnter'];
@@ -59,7 +61,9 @@ type DropZoneChildrenProps = {
     children: (props: { onRef: (elm: Element | null) => void }) => JSX.Element;
 };
 
-export const DnDDropZone: <T>(props: DropZoneProps<T> & DropZoneChildrenProps) => JSX.Element = (props) => {
+export const DnDDropZone: <T extends DnDPayload>(props: DropZoneProps<T> & DropZoneChildrenProps) => JSX.Element = (
+    props
+) => {
     const id = useMemo(() => randomUUID(), []);
     const { callbacks } = useContext(DnDContext);
     const [element, setElement] = useState<HTMLElement | null>(null);
@@ -73,11 +77,15 @@ export const DnDDropZone: <T>(props: DropZoneProps<T> & DropZoneChildrenProps) =
     useEffect(() => {
         if (!element) return;
 
-        callbacks.registerDropZone(id, {
-            ...props,
-            element,
-            instance,
-        });
+        callbacks.registerDropZone(
+            id,
+            {
+                ...props,
+                element,
+                instance,
+            },
+            props.data
+        );
     });
 
     useEffect(

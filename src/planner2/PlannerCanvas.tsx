@@ -81,6 +81,7 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
 
             <div className="planner-area-position-parent" ref={onRef}>
                 <DragAndDrop.DropZone
+                    data={{ type: 'plan', data: planner.plan! }}
                     scale={planner.zoom}
                     accept={(draggable) => {
                         // Filter types

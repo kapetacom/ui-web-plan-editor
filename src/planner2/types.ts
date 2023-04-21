@@ -38,7 +38,12 @@ export interface ResourceTypePayload extends DnDPayload<ResourceTypePayloadData>
     data: ResourceTypePayloadData;
 }
 
-export type PlannerPayload = BlockPayload | ResourcePayload | ResourceTypePayload | BlockTypePayload;
+export interface PlanPayload extends DnDPayload<Plan> {
+    type: 'plan';
+    data: Plan;
+}
+
+export type PlannerPayload = PlanPayload | BlockPayload | ResourcePayload | ResourceTypePayload | BlockTypePayload;
 
 export interface ValidationIssue {
     level: string;
