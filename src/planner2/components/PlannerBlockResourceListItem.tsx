@@ -190,7 +190,8 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     }, [draggable, blockInstance, props.resource, planner, isConsumer]);
 
     // Change to inclusion list if necessary
-    const isExpanded = overrideMode !== ResourceMode.HIDDEN && (mode !== ResourceMode.HIDDEN || dragIsCompatible);
+    const isForceDisabled = overrideMode === ResourceMode.HIDDEN;
+    const isExpanded = !isForceDisabled && (mode !== ResourceMode.HIDDEN || dragIsCompatible);
     const buttonsVisible = mode === ResourceMode.SHOW_OPTIONS;
 
     const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
@@ -236,8 +237,8 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         'resource-item-body': true,
         [typeName]: true,
         // highlight: props.resource.mode === ResourceMode.HIGHLIGHT,
-        compatible: dragIsCompatible,
-        hover: dragIsCompatible && dragOver,
+        compatible: !isForceDisabled && dragIsCompatible,
+        hover: !isForceDisabled && dragIsCompatible && dragOver,
         invalid: !valid,
     });
     const actionContext = {
@@ -283,7 +284,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                     planner.addConnection(connection);
                 }}
                 // TODO: flip this around, pass down to children
-                accept={() => dragIsCompatible}
+                accept={() => !isForceDisabled && dragIsCompatible}
             >
                 {({ onRef }) => (
                     <DragAndDrop.Draggable
