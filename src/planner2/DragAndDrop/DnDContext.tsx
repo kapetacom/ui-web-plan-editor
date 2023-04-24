@@ -3,7 +3,7 @@ import { DnDPayload, DragEventInfo } from './types';
 import { DropZoneEntity } from './DropZoneManager';
 import { DnDZoneInstance } from './DnDDropZone';
 
-export interface DnDCallbacks<T> {
+export interface DnDCallbacks<T extends DnDPayload> {
     /**
      * Add a drop zone target
      * Returns a deregistration callback

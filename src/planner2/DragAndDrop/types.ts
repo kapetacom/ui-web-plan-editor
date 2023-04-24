@@ -5,9 +5,9 @@ export interface DnDPayload<T = any> {
     data: T;
 }
 
-export interface DragEventInfo<T = any> {
-    sourceDraggable: DnDPayload<T>;
-    targetZone?: DnDPayload<T>;
+export interface DragEventInfo<T extends DnDPayload> {
+    sourceDraggable: T;
+    targetZone?: T;
 
     // Client relative coordinates
     client: {
