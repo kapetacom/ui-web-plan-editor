@@ -17,7 +17,7 @@ interface Props {
 export const DnDContainer = <T extends DnDPayload>(props: Props) => {
     const [dragState, setDragState] = useState<{
         state: 'IDLE' | 'DRAGGING';
-        draggable?: DnDPayload<T>;
+        draggable?: T;
         position: Point;
     }>(defaultState);
 

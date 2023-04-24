@@ -2,26 +2,26 @@ import { DnDPayload, DragEventInfo } from './types';
 import { DnDZoneInstance } from './DnDDropZone';
 import { Point } from '@kapeta/ui-web-types';
 
-export interface DropZoneEntity<T = any> {
+export interface DropZoneEntity<T extends DnDPayload = any> {
     element: HTMLElement;
     instance: DnDZoneInstance;
     accept?: (draggable: T) => boolean;
-    onDrop?: (draggable: T, info: DragEventInfo) => Promise<void> | void;
+    onDrop?: (draggable: T, info: DragEventInfo<T>) => Promise<void> | void;
     onDragEnter?: (draggable: T) => Promise<void> | void;
     onDragLeave?: (draggable: T) => Promise<void> | void;
     onDragOver?: (draggable: T) => Promise<void> | void;
 }
 
-interface DropZoneState<T = any> {
+interface DropZoneState<T extends DnDPayload = any> {
     id: string;
     zone: DropZoneEntity<T>;
     state: 'IDLE' | 'ACTIVE';
-    payload: DnDPayload;
+    payload: T;
 }
-export class DropZoneManager {
+export class DropZoneManager<T extends DnDPayload> {
     private zones: DropZoneState[] = [];
 
-    private checkContainment<T>(dropZone: DropZoneEntity, evt: { x: number; y: number }): boolean {
+    private checkContainment(dropZone: DropZoneEntity, evt: { x: number; y: number }): boolean {
         const bounds = dropZone.element.getBoundingClientRect();
         const isContained =
             bounds.x <= evt.x &&
@@ -35,7 +35,7 @@ export class DropZoneManager {
         return this.zones.filter((zone) => (zone.zone.accept ? zone.zone.accept(draggable) : true));
     }
 
-    private translateFromElementToRoot(evt: DragEventInfo, rootBox: DOMRect, zoneBox: DOMRect): DragEventInfo {
+    private translateFromElementToRoot(evt: DragEventInfo<T>, rootBox: DOMRect, zoneBox: DOMRect): DragEventInfo<T> {
         const diff = {
             x: rootBox.x - zoneBox.x,
             y: rootBox.y - zoneBox.y,
@@ -45,10 +45,10 @@ export class DropZoneManager {
     }
 
     private translateFromZoneToZone(
-        evt: DragEventInfo,
+        evt: DragEventInfo<T>,
         fromZone: DnDZoneInstance,
         toZone: DnDZoneInstance
-    ): DragEventInfo {
+    ): DragEventInfo<T> {
         const fromOffset = fromZone.getOffset();
         const toOffset = toZone.getOffset();
         const diff = {
@@ -59,7 +59,7 @@ export class DropZoneManager {
         return this.translateEvent(evt, diff);
     }
 
-    private translateEvent(evt: DragEventInfo, diff: Point): DragEventInfo {
+    private translateEvent(evt: DragEventInfo<T>, diff: Point): DragEventInfo<T> {
         return {
             ...evt,
             zone: {
@@ -93,7 +93,7 @@ export class DropZoneManager {
         }
     }
 
-    handleDragEvent(evt: DragEventInfo, fromZone: DnDZoneInstance, root: HTMLElement | null) {
+    handleDragEvent(evt: DragEventInfo<T>, fromZone: DnDZoneInstance, root: HTMLElement | null) {
         // callbacks based on state change?, or kept "instant"?
         // Loop all elements to check intersection
         let foundZone = false;
@@ -124,10 +124,10 @@ export class DropZoneManager {
     }
 
     handleDropEvent(
-        event: DragEventInfo,
+        event: DragEventInfo<T>,
         fromZone: DnDZoneInstance,
         root: HTMLElement | null,
-        draggableDropCallback?: (evt: DragEventInfo) => void
+        draggableDropCallback?: (evt: DragEventInfo<T>) => void
     ) {
         // Loop all elements to check intersection
         let foundZone = false;

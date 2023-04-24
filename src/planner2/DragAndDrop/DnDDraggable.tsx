@@ -4,21 +4,21 @@ import { DnDContext } from './DnDContext';
 import { DnDZoneContext, DnDZoneInstance } from './DnDDropZone';
 import { Point } from '@kapeta/ui-web-types';
 
-interface DnDCallbackProps extends DragEventInfo {
+interface DnDCallbackProps<T extends DnDPayload> extends DragEventInfo<T> {
     isDragging: boolean;
     componentProps: {
         onMouseDown;
     };
 }
 
-interface DnDDraggableProps<T> {
+interface DnDDraggableProps<T extends DnDPayload> {
     // payload for drag events
     data: T;
     disabled?: boolean;
     onDrag?: (dragEvent: DragEventInfo<T>) => void;
     onDragStart?: (dragEvent: DragEventInfo<T>) => void;
     onDrop?: (dragEvent: DragEventInfo<T>) => void;
-    children: (props: DnDCallbackProps) => JSX.Element;
+    children: (props: DnDCallbackProps<T>) => JSX.Element;
 }
 
 enum DragStatus {
