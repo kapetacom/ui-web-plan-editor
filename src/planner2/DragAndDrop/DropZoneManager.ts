@@ -130,6 +130,7 @@ export class DropZoneManager {
         draggableDropCallback?: (evt: DragEventInfo) => void
     ) {
         // Loop all elements to check intersection
+        let foundZone = false;
         for (const dropZone of this.getValidZones(event.sourceDraggable)) {
             let eventCopy = { ...event };
             const isContained = this.checkContainment(dropZone.zone, eventCopy.client.end);
@@ -156,11 +157,13 @@ export class DropZoneManager {
                     });
                 }
                 dropZone.state = 'IDLE';
-            } else {
-                if (draggableDropCallback) {
-                    draggableDropCallback(eventCopy);
-                }
+                foundZone = true;
             }
+        }
+        if (!foundZone && draggableDropCallback) {
+            draggableDropCallback({
+                ...event,
+            });
         }
     }
 
