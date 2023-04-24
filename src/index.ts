@@ -32,7 +32,8 @@ export * from './wrappers/PlannerResourceModelWrapper';
 export * from './wrappers/wrapperHelpers';
 export * from './types';
 
-export * from './planner2/DragAndDrop/index';
+export { createDragAndDrop } from './planner2/DragAndDrop/index';
+export { DragAndDrop } from './planner2/utils/dndUtils';
 export * from './planner2/DragAndDrop/DnDDropZone';
 export * from './planner2/DragAndDrop/DnDDraggable';
 export * from './planner2/DragAndDrop/DnDContainer';

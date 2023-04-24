@@ -135,6 +135,7 @@ export class DropZoneManager {
             const isContained = this.checkContainment(dropZone.zone, eventCopy.client.end);
 
             if (isContained) {
+                // if the root zone is not the same as the matched zone, we need to translate the event coordinates
                 if (fromZone !== dropZone.zone.instance) {
                     if (!fromZone.isValid() && root) {
                         // First adjust the event to root to element
@@ -155,6 +156,10 @@ export class DropZoneManager {
                     });
                 }
                 dropZone.state = 'IDLE';
+            } else {
+                if (draggableDropCallback) {
+                    draggableDropCallback(eventCopy);
+                }
             }
         }
     }
