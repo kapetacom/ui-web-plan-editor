@@ -27,7 +27,7 @@ import { PlannerResourceModelWrapper } from '../../wrappers/PlannerResourceModel
 import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useAsync } from 'react-use';
-import { Connection, Entity, Resource } from '@kapeta/schemas';
+import { Connection, Entity, Resource, BlockDefinition } from '@kapeta/schemas';
 import { SchemaKind } from '@kapeta/ui-web-types';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
@@ -307,7 +307,7 @@ export class ItemEditorPanel extends Component<Props, State> {
 
             const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
-            if (!BlockTypeConfig.componentType) {
+            if (!BlockTypeConfig.editorComponent) {
                 return <div key={editableItem.item.id}>{this.renderBlockFields(data)}</div>;
             }
 
@@ -322,7 +322,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                             </div>
                         )}
                     >
-                        <BlockTypeConfig.componentType creating={editableItem.creating} />
+                        <BlockTypeConfig.editorComponent block={data as BlockDefinition} creating={editableItem.creating} />
                     </ErrorBoundary>
                 </div>
             );
@@ -332,7 +332,7 @@ export class ItemEditorPanel extends Component<Props, State> {
             const data = this.getData();
             const resourceType = ResourceTypeProvider.get(data.kind);
 
-            if (!resourceType.componentType) {
+            if (!resourceType.editorComponent) {
                 return <></>;
             }
 
@@ -367,7 +367,7 @@ export class ItemEditorPanel extends Component<Props, State> {
                             </div>
                         )}
                     >
-                        <resourceType.componentType
+                        <resourceType.editorComponent
                             key={editableItem.item.id}
                             block={editableItem.item.block.getData()}
                             creating={editableItem.creating}

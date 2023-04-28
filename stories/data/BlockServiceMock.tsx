@@ -155,7 +155,7 @@ blocks.push(
     BlockTypeProvider.register({
         kind: resource.metadata.name,
         version: '1.2.3',
-        componentType: null as any,
+        editorComponent: null as any,
         validate: (block) => {
             const errors: string[] = [];
             if (!block?.spec?.target?.kind) {

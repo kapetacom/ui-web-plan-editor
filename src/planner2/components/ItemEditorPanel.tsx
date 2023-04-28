@@ -136,7 +136,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
 
         const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
-        if (!BlockTypeConfig.componentType) {
+        if (!BlockTypeConfig.editorComponent) {
             return <div key={editableItem.ref}>{renderBlockFields(data)}</div>;
         }
 
@@ -151,7 +151,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
                         </div>
                     )}
                 >
-                    <BlockTypeConfig.componentType creating={editableItem.creating} />
+                    <BlockTypeConfig.editorComponent block={data} creating={editableItem.creating} />
                 </ErrorBoundary>
             </div>
         );
@@ -163,7 +163,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
         const data = editableItem.item as Resource;
         const resourceType = ResourceTypeProvider.get(data.kind);
 
-        if (!resourceType.componentType) {
+        if (!resourceType.editorComponent) {
             return <></>;
         }
 
@@ -196,9 +196,9 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
                         </div>
                     )}
                 >
-                    <resourceType.componentType
+                    <resourceType.editorComponent
                         key={editableItem.ref}
-                        // TODO: make resource componentType accept Resource/Schemakind
+                        // TODO: make resource editorComponent accept Resource/Schemakind
                         // @ts-ignore
                         block={data}
                         creating={editableItem.creating}

@@ -201,6 +201,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockDefinition> {
         if (!this.data.spec.entities.source) {
             this.data.spec.entities.source = {
                 value: '',
+                type: DSL_LANGUAGE_ID,
             };
         }
         this.data.spec.entities.source.value = DSLWriter.write(entities.map(DSLConverters.fromSchemaEntity));
@@ -545,7 +546,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockDefinition> {
 
     @observable
     getEntityByName(name: string): Entity | undefined {
-        return _.find(this.data.spec.entities?.types, { name });
+        return this.data.spec.entities?.types?.find(t => t.name === name);
     }
 
     @observable
