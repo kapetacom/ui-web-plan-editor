@@ -41,6 +41,26 @@ export class BlockValidator {
         return errors;
     }
 
+    public validateBlockConfiguration(config:any) {
+        const errors: string[] = [];
+
+        try {
+            const blockType = BlockTypeProvider.get(this.block.kind);
+            if (blockType?.validateConfiguration) {
+                try {
+                    const configErrors = blockType.validateConfiguration(this.block, this.instance, config);
+
+                    errors.push(...configErrors);
+                } catch (e) {
+                    errors.push(`Kind-specific config validation failed: ${e.message}`);
+                }
+            }
+        } catch (e) {
+            errors.push(`Failed to validate kind: ${e.message}`);
+        }
+        return errors;
+    }
+
     public validateBlock() {
         const errors: string[] = [];
         if (!this.block.metadata.name) {
@@ -94,17 +114,25 @@ export class BlockValidator {
         return errors;
     }
 
-    public toIssues(): ValidationIssue[] {
+    public toIssues(configuration?:any): ValidationIssue[] {
         const errors = this.validateBlock();
-
+        const name = this.instance.name ?? this.block.metadata.title ?? this.block.metadata.name;
         const out = [
             ...errors.map((issue) => {
                 return {
                     level: 'block',
-                    name: this.instance.name ?? this.block.metadata.title ?? this.block.metadata.name,
+                    name,
                     issue,
                 };
             }),
+
+            ...this.validateBlockConfiguration(configuration).map((issue) => {
+                return {
+                    level: 'configuration',
+                    name,
+                    issue,
+                };
+            })
         ];
 
         this.block.spec.providers?.forEach((resource) => {
