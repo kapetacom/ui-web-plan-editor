@@ -90,6 +90,7 @@ export const BlockContextProvider = (props:BlockProviderProps) => {
         setBlockMode,
         overrideMode,
         focusedMode,
+        props.configuration,
     ]);
     return <BlockContext.Provider value={value}>{props.children}</BlockContext.Provider>;
 };
