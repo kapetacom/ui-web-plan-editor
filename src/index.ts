@@ -9,7 +9,6 @@ export * from './components/PlannerConnectionButtons';
 export * from './components/PlannerTempResourceConnection';
 export * from './components/PlannerTempResourceItem';
 export * from './logs/LogPanel';
-export * from './planner/components/BlockInspectorPanel';
 export * from './planner/components/BlockTree';
 export * from './planner/components/InspectConnectionPanel';
 export * from './planner/components/ItemEditorPanel';
@@ -47,3 +46,5 @@ export * from './planner2/PlannerContext';
 export * from './planner2/types';
 export * from './planner2/validation/BlockValidator';
 export * from './planner2/renderers/plannerRenderer';
+
+export * from './panels/BlockInspectorPanel';

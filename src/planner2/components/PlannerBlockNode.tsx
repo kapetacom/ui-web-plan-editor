@@ -52,8 +52,11 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
             return [];
         }
         const validator = new BlockValidator(blockContext.blockDefinition, blockContext.blockInstance);
-        return validator.validate();
-    }, [blockContext.blockDefinition, blockContext.blockInstance]);
+        return [
+            ...validator.validate(),
+            ...validator.validateBlockConfiguration(blockContext.configuration)
+        ];
+    }, [blockContext.blockDefinition, blockContext.blockInstance, blockContext.configuration]);
 
     const isValid = errors.length === 0;
 

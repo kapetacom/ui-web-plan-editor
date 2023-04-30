@@ -10,6 +10,7 @@ export interface PlannerBlockContextData {
     blockInstance: BlockInstance | null;
     blockDefinition?: BlockDefinition;
     blockReference: KapetaURI | null;
+    configuration?: any;
     consumers: Resource[];
     providers: Resource[];
     instanceStatus: InstanceStatus;
@@ -41,17 +42,18 @@ export const BlockContext = React.createContext(defaultValue);
 
 interface BlockProviderProps extends React.PropsWithChildren {
     blockId: string;
+    configuration?: any;
 }
-export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, children }) => {
+export const BlockContextProvider = (props:BlockProviderProps) => {
     const planner = useContext(PlannerContext);
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
 
-    const blockInstance = planner.plan?.spec.blocks?.find((block) => block.id === blockId) || null;
+    const blockInstance = planner.plan?.spec.blocks?.find((block) => block.id === props.blockId) || null;
     const blockDefinition = planner.getBlockByRef(blockInstance?.block.ref || '');
     // Overrides from external sources, such as the sidebar
     const overrideMode = blockInstance && planner.assetState.getViewModeForBlock(blockInstance.id);
-    const focusedMode = planner.focusedBlock?.id === blockId ? BlockMode.FOCUSED : undefined;
-    const instanceStatus = planner.instanceStates[blockId] || InstanceStatus.STOPPED;
+    const focusedMode = planner.focusedBlock?.id === props.blockId ? BlockMode.FOCUSED : undefined;
+    const instanceStatus = planner.instanceStates[props.blockId] || InstanceStatus.STOPPED;
 
     const value = useMemo(() => {
         // calculate Resource height
@@ -68,6 +70,7 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
             blockInstance,
             blockDefinition,
             blockReference,
+            configuration: props.configuration,
             consumers,
             providers,
             instanceStatus,
@@ -87,8 +90,9 @@ export const BlockContextProvider: React.FC<BlockProviderProps> = ({ blockId, ch
         setBlockMode,
         overrideMode,
         focusedMode,
+        props.configuration,
     ]);
-    return <BlockContext.Provider value={value}>{children}</BlockContext.Provider>;
+    return <BlockContext.Provider value={value}>{props.children}</BlockContext.Provider>;
 };
 
 // TODO: theres got to be a better way to do this (non-null a field)
