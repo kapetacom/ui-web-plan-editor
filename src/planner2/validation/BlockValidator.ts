@@ -52,7 +52,8 @@ export class BlockValidator {
         const errors: string[] = [];
         try {
             const blockType = BlockTypeProvider.get(this.block.kind);
-            if (this.block.spec.configuration?.types?.length > 0) {
+            if (this.block.spec?.configuration?.types &&
+                this.block.spec?.configuration?.types?.length > 0) {
                 const typeList = this.block.spec.configuration?.types;
                 if (typeList?.length > 0) {
                     errors.push(...validateEntities(typeList, config));
