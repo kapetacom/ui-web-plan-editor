@@ -26,7 +26,9 @@ const useUniqueBlockNameValidation = (instance?: BlockInstance | null) => {
     if (planner.plan) {
         planner.plan.spec?.blocks?.forEach((block) => {
             if (normalizedName(block.name) === instanceName && block.id !== instance.id) {
-                errors.push(`Block instance name "${instance.name}" is not unique. Note that uniqueness is case insensitive and ignores non-alphanumeric characters.`);
+                errors.push(
+                    `Block instance name "${instance.name}" is not unique. Note that uniqueness is case insensitive and ignores non-alphanumeric characters.`
+                );
             }
         });
     }
