@@ -109,12 +109,8 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const errors: string[] = [];
     try {
         resourceConfig = ResourceTypeProvider.get(props.resource.kind);
-        if (resourceConfig &&
-            resourceConfig.validate) {
-            errors.push(...resourceConfig.validate(
-                props.resource,
-                blockDefinition?.spec.entities?.types ?? []
-            ));
+        if (resourceConfig && resourceConfig.validate) {
+            errors.push(...resourceConfig.validate(props.resource, blockDefinition?.spec.entities?.types ?? []));
         }
     } catch (e) {
         errors.push(`Failed to read resource kind: ${e.message}`);
