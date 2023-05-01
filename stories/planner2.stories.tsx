@@ -1,4 +1,4 @@
-import React, {ForwardedRef, forwardRef, useContext} from 'react';
+import React, { ForwardedRef, forwardRef, useContext } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
 import { ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
@@ -23,8 +23,9 @@ import './styles.less';
 import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockServiceMock } from './data/BlockServiceMock';
 import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
-import { BlockDefinition } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { PlannerOutlet, plannerRenderer } from '../src/planner2/renderers/plannerRenderer';
+import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -112,7 +113,7 @@ const DraggableResource = (props: DraggableResourceProps & { point: Point }) => 
 const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const planner = useContext(PlannerContext);
     const [editItem, setEditItem] = React.useState<EditableItemInterface2 | undefined>();
-    const [inspectItem, setInspectItem] = React.useState<SchemaKind<any, any> | null>(null);
+    const [inspectItem, setInspectItem] = React.useState<BlockInstance | null>(null);
     const [configureItem, setConfigureItem] = React.useState<SchemaKind<any, any> | null>(null);
     const [draggableItem, setDraggableItem] = React.useState<DraggableItem | null>(null);
     const [draggableItemPosition, setDraggableItemPosition] = React.useState<Point | null>(null);
@@ -122,8 +123,8 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 enabled(): boolean {
                     return true; // planner.mode !== PlannerMode.VIEW;
                 },
-                onClick(context, { block }) {
-                    setInspectItem(block!);
+                onClick(context, action) {
+                    setInspectItem(action.blockInstance!);
                 },
                 buttonStyle: ButtonStyle.PRIMARY,
                 icon: 'fa fa-search',
@@ -302,6 +303,13 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                         }
                     }
                 }}
+            />
+            <BlockInspectorPanel
+                systemId={props.systemId}
+                open={!!inspectItem}
+                configuration={{}}
+                instance={inspectItem ?? undefined}
+                onClosed={() => setInspectItem(null)}
             />
 
             <div className="test-tool-panel">

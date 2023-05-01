@@ -1,4 +1,4 @@
-import React, {ExoticComponent, RefAttributes, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, { ExoticComponent, RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Asset, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { InstanceStatus } from '@kapeta/ui-web-context';
@@ -10,7 +10,7 @@ import {
     EntityList,
     Metadata,
     Plan,
-    Resource
+    Resource,
 } from '@kapeta/schemas';
 import { cloneDeep } from 'lodash';
 import { PlannerNodeSize } from '../types';
@@ -69,7 +69,7 @@ export interface PlannerContextData {
     getBlockByRef(ref: string): BlockDefinition | undefined;
     getBlockById(blockId: string): BlockDefinition | undefined;
 
-    updatePlanMetadata(metadata:Metadata, configuration:EntityList): void;
+    updatePlanMetadata(metadata: Metadata, configuration: EntityList): void;
 
     updateBlockDefinition(ref: string, update: BlockDefinition): void;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
@@ -156,7 +156,7 @@ const defaultValue: PlannerContextData = {
     addConnection(connection: Connection) {},
     updateConnectionMapping(connection: Connection) {},
     removeConnection(connection: Connection) {},
-    updatePlanMetadata(metadata:Metadata, configuration:EntityList) {},
+    updatePlanMetadata(metadata: Metadata, configuration: EntityList) {},
     onConnectionAdded() {
         return () => {};
     },
@@ -595,7 +595,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
                 callbackHandlers.onConnectionAdded.forEach((cb) => cb(connection));
             },
-            updatePlanMetadata(metadata:Metadata, configuration:EntityList) {
+            updatePlanMetadata(metadata: Metadata, configuration: EntityList) {
                 updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     newPlan.metadata = metadata;

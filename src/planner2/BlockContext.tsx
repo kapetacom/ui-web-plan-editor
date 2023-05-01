@@ -44,7 +44,7 @@ interface BlockProviderProps extends React.PropsWithChildren {
     blockId: string;
     configuration?: any;
 }
-export const BlockContextProvider = (props:BlockProviderProps) => {
+export const BlockContextProvider = (props: BlockProviderProps) => {
     const planner = useContext(PlannerContext);
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
 

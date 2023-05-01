@@ -322,7 +322,10 @@ export class ItemEditorPanel extends Component<Props, State> {
                             </div>
                         )}
                     >
-                        <BlockTypeConfig.editorComponent block={data as BlockDefinition} creating={editableItem.creating} />
+                        <BlockTypeConfig.editorComponent
+                            block={data as BlockDefinition}
+                            creating={editableItem.creating}
+                        />
                     </ErrorBoundary>
                 </div>
             );

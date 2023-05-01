@@ -1,14 +1,14 @@
-import {parseKapetaUri} from '@kapeta/nodejs-utils';
-import {BlockTypeProvider, ResourceTypeProvider} from '@kapeta/ui-web-context';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import {
     BlockDefinition,
     BlockInstance,
     Resource,
     validateEntities,
     validateSchema,
-    stripUndefinedProps
+    stripUndefinedProps,
 } from '@kapeta/schemas';
-import {ValidationIssue} from '../types';
+import { ValidationIssue } from '../types';
 
 export class BlockValidator {
     private readonly block: BlockDefinition;
@@ -52,8 +52,7 @@ export class BlockValidator {
         const errors: string[] = [];
         try {
             const blockType = BlockTypeProvider.get(this.block.kind);
-            if (this.block.spec?.configuration?.types &&
-                this.block.spec?.configuration?.types?.length > 0) {
+            if (this.block.spec?.configuration?.types && this.block.spec?.configuration?.types?.length > 0) {
                 const typeList = this.block.spec.configuration?.types;
                 if (typeList?.length > 0) {
                     errors.push(...validateEntities(typeList, config));
@@ -82,7 +81,6 @@ export class BlockValidator {
         }
 
         if (this.instance) {
-
             if (!this.instance.name) {
                 errors.push('No name is defined for instance');
             }
@@ -98,7 +96,14 @@ export class BlockValidator {
             } catch (e) {
                 errors.push(`BlockDefinition reference was invalid: ${e.message}`);
             }
+        }
 
+        if (this.block.spec.providers) {
+            errors.push(...this.validateUniqueNames(this.block.spec.providers));
+        }
+
+        if (this.block.spec.consumers) {
+            errors.push(...this.validateUniqueNames(this.block.spec.consumers));
         }
 
         try {
@@ -109,7 +114,7 @@ export class BlockValidator {
                 const schemaIssues = validateSchema(blockType?.definition?.spec?.schema, stripped);
                 schemaIssues.forEach((issue) => {
                     errors.push(`Schema validation failed: ${issue.message}`);
-                })
+                });
             }
             if (blockType?.validate) {
                 try {
@@ -140,6 +145,25 @@ export class BlockValidator {
         return errors;
     }
 
+    private validateUniqueNames(resources: Resource[]): string[] {
+        const errors: string[] = [];
+        const errorAppended: string[] = [];
+        const map = new Map<string, Resource>();
+        resources.forEach((resource) => {
+            if (map.has(resource.metadata.name)) {
+                if (!errorAppended.includes(resource.metadata.name)) {
+                    errorAppended.push(resource.metadata.name);
+                    errors.push(`Resource name ${resource.metadata.name} is not unique`);
+                }
+                return;
+            }
+
+            map.set(resource.metadata.name, resource);
+        });
+
+        return errors;
+    }
+
     public toIssues(configuration?: any): ValidationIssue[] {
         const errors = this.validateBlock();
         const name = this.instance?.name ?? this.block.metadata.title ?? this.block.metadata.name;
@@ -158,7 +182,7 @@ export class BlockValidator {
                     name,
                     issue,
                 };
-            })
+            }),
         ];
 
         this.block.spec.providers?.forEach((resource) => {

@@ -1,21 +1,16 @@
-import React, {useContext, useMemo} from 'react';
-import {
-    PanelSize,
-    SidePanel,
-    TabContainer,
-    TabPage,
-} from '@kapeta/ui-web-components';
+import React, { useContext, useMemo } from 'react';
+import { PanelSize, SidePanel, TabContainer, TabPage } from '@kapeta/ui-web-components';
 
 import './BlockInspectorPanel.less';
-import {BlockDefinition, BlockInstance} from "@kapeta/schemas";
-import {BlockValidator} from "../planner2/validation/BlockValidator";
-import {LogEmitter, LogEntry, LogPanel} from "../logs/LogPanel";
-import {PlannerContext} from "../planner2/PlannerContext";
+import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
+import { BlockValidator } from '../planner2/validation/BlockValidator';
+import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
+import { PlannerContext } from '../planner2/PlannerContext';
 
 interface BlockInspectorPanelProps {
     systemId: string;
-    instance?: BlockInstance
-    configuration?: any
+    instance?: BlockInstance;
+    configuration?: any;
     logs?: LogEntry[];
     emitter?: LogEmitter;
     open: boolean;
@@ -25,10 +20,12 @@ interface BlockInspectorPanelProps {
 export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
     const planner = useContext(PlannerContext);
 
-    let block:BlockDefinition|undefined = undefined;
+    let block: BlockDefinition | undefined = undefined;
     if (props.instance?.block.ref) {
         block = planner.getBlockByRef(props.instance.block.ref);
     }
+
+    console.log('block', block);
 
     const issues = useMemo(() => {
         if (!block || !props.instance) {
@@ -45,16 +42,11 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
     }, [props.instance]);
 
     return (
-        <SidePanel
-            title={title}
-            size={PanelSize.large}
-            open={props.open}
-            onClose={props.onClosed}
-        >
+        <SidePanel title={title} size={PanelSize.large} open={props.open} onClose={props.onClosed}>
             {props.instance && (
                 <div className="item-inspector-panel">
                     <TabContainer>
-                        {props.emitter &&
+                        {props.emitter && (
                             <TabPage id="logs" title="Logs">
                                 <LogPanel
                                     key={`${props.instance.block.ref}_logs`}
@@ -62,33 +54,21 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
                                     emitter={props.emitter}
                                 />
                             </TabPage>
-                        }
+                        )}
                         <TabPage id="issues" title="Issues">
-                            <div
-                                className="issues-container"
-                                key={`${props.instance.block.ref}_issues`}
-                            >
+                            <div className="issues-container" key={`${props.instance.block.ref}_issues`}>
                                 {(!valid && (
                                     <>
-                                        <span>
-                                            Found the following issues in block
-                                        </span>
+                                        <span>Found the following issues in block</span>
                                         <ul className="issues-list">
                                             {issues.map((issue, ix) => {
                                                 return (
                                                     <li key={`issue_${ix}`}>
                                                         <div className="issue-context">
-                                                            <span className="level">
-                                                                {issue.level}
-                                                            </span>
-                                                            :
-                                                            <span className="name">
-                                                                {issue.name}
-                                                            </span>
+                                                            <span className="level">{issue.level}</span>:
+                                                            <span className="name">{issue.name}</span>
                                                         </div>
-                                                        <div className="issue-message">
-                                                            {issue.issue}
-                                                        </div>
+                                                        <div className="issue-message">{issue.issue}</div>
                                                     </li>
                                                 );
                                             })}

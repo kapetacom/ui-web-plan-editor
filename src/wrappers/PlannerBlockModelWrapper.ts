@@ -546,7 +546,7 @@ export class PlannerBlockModelWrapper implements DataWrapper<BlockDefinition> {
 
     @observable
     getEntityByName(name: string): Entity | undefined {
-        return this.data.spec.entities?.types?.find(t => t.name === name);
+        return this.data.spec.entities?.types?.find((t) => t.name === name);
     }
 
     @observable

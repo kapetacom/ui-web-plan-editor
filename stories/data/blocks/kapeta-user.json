@@ -36,6 +36,12 @@
                 "metadata": {
                     "name": "usersdb"
                 }
+            },
+            {
+                "kind": "kapeta/resource-type-postgresql",
+                "metadata": {
+                    "name": "usersdb"
+                }
             }
         ],
         "providers": [

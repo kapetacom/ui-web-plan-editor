@@ -18,7 +18,7 @@ interface Props {
 
     // Should we instead augment the
     actions?: PlannerActionConfig;
-    configurations?: { [key:string]: any };
+    configurations?: { [key: string]: any };
 
     onBlockMouseEnter?: (context: ActionContext) => void;
     onBlockMouseLeave?: (context: ActionContext) => void;
@@ -47,7 +47,7 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
     ) : null;
 };
 
-export const Planner2 = (props:Props) => {
+export const Planner2 = (props: Props) => {
     const { nodeSize = PlannerNodeSize.MEDIUM, plan } = useContext(PlannerContext);
 
     const instances = plan?.spec.blocks ?? [];
