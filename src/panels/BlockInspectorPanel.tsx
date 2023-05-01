@@ -3,12 +3,11 @@ import { PanelSize, SidePanel, TabContainer, TabPage } from '@kapeta/ui-web-comp
 
 import './BlockInspectorPanel.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
-import { BlockValidator } from '../planner2/validation/BlockValidator';
 import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
 import { PlannerContext } from '../planner2/PlannerContext';
+import { useBlockValidationIssues } from '../planner2/hooks/block-validation';
 
 interface BlockInspectorPanelProps {
-    systemId: string;
     instance?: BlockInstance;
     configuration?: any;
     logs?: LogEntry[];
@@ -25,15 +24,11 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
         block = planner.getBlockByRef(props.instance.block.ref);
     }
 
-    console.log('block', block);
-
-    const issues = useMemo(() => {
-        if (!block || !props.instance) {
-            return [];
-        }
-        const validator = new BlockValidator(block, props.instance);
-        return validator.toIssues(props.configuration);
-    }, [block, props.instance, props.configuration]);
+    const issues = useBlockValidationIssues({
+        blockInstance: props.instance ?? null,
+        blockDefinition: block,
+        configuration: props.configuration,
+    });
 
     const valid = issues.length === 0;
 

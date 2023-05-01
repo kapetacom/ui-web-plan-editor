@@ -14,9 +14,9 @@ import { ActionContext, BlockInfo, PlannerPayload, ResourcePayload, ResourceType
 import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
-import { BlockValidator } from '../validation/BlockValidator';
 import { copyResourceToBlock } from '../utils/blockUtils';
 import { createConnection } from '../utils/connectionUtils';
+import { useBlockValidation } from '../hooks/block-validation';
 
 interface Props {
     size: PlannerNodeSize;
@@ -47,13 +47,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
         [blockContext.blockInstance]
     );
 
-    const errors = useMemo(() => {
-        if (!blockContext.blockDefinition || !blockContext.blockInstance) {
-            return [];
-        }
-        const validator = new BlockValidator(blockContext.blockDefinition, blockContext.blockInstance);
-        return [...validator.validate(), ...validator.validateBlockConfiguration(blockContext.configuration)];
-    }, [blockContext.blockDefinition, blockContext.blockInstance, blockContext.configuration]);
+    const errors = useBlockValidation(blockContext);
 
     const isValid = errors.length === 0;
 
