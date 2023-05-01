@@ -14,10 +14,9 @@ import { ActionContext, BlockInfo, PlannerPayload, ResourcePayload, ResourceType
 import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
-import { BlockValidator } from '../validation/BlockValidator';
 import { copyResourceToBlock } from '../utils/blockUtils';
 import { createConnection } from '../utils/connectionUtils';
-import {useBlockValidation} from "../hooks/block-validation";
+import { useBlockValidation } from '../hooks/block-validation';
 
 interface Props {
     size: PlannerNodeSize;

@@ -305,7 +305,6 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 }}
             />
             <BlockInspectorPanel
-                systemId={props.systemId}
                 open={!!inspectItem}
                 configuration={{}}
                 instance={inspectItem ?? undefined}

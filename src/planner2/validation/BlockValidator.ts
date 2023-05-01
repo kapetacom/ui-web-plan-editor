@@ -109,7 +109,7 @@ export class BlockValidator {
         try {
             const blockType = BlockTypeProvider.get(this.block.kind);
             if (blockType?.definition?.spec?.schema) {
-                //Get rid of null or undefined properties - usually left over by java or similar
+                // Get rid of null or undefined properties - usually left over by java or similar
                 const stripped = stripUndefinedProps(this.block.spec);
                 const schemaIssues = validateSchema(blockType?.definition?.spec?.schema, stripped);
                 schemaIssues.forEach((issue) => {

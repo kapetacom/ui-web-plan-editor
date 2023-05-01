@@ -3,13 +3,11 @@ import { PanelSize, SidePanel, TabContainer, TabPage } from '@kapeta/ui-web-comp
 
 import './BlockInspectorPanel.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
-import { BlockValidator } from '../planner2/validation/BlockValidator';
 import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
 import { PlannerContext } from '../planner2/PlannerContext';
-import {useBlockValidationIssues} from "../planner2/hooks/block-validation";
+import { useBlockValidationIssues } from '../planner2/hooks/block-validation';
 
 interface BlockInspectorPanelProps {
-    systemId: string;
     instance?: BlockInstance;
     configuration?: any;
     logs?: LogEntry[];
