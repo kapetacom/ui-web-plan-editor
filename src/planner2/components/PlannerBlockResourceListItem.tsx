@@ -129,7 +129,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
             return props.index !== ix && provider.metadata.name === props.resource.metadata.name;
         });
         if (hasNameConflict) {
-            errors.push('Name conflicts with another resource');
+            errors.push('Name conflicts with another provider');
         }
     }
 
