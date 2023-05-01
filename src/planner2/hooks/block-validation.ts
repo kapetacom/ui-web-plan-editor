@@ -9,6 +9,10 @@ interface Props {
     configuration?: any;
 }
 
+function normalizedName(name: string) {
+    return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 const useUniqueBlockNameValidation = (instance?: BlockInstance | null) => {
     const planner = useContext(PlannerContext);
 
@@ -17,10 +21,12 @@ const useUniqueBlockNameValidation = (instance?: BlockInstance | null) => {
         return errors;
     }
 
+    const instanceName = normalizedName(instance.name);
+
     if (planner.plan) {
         planner.plan.spec?.blocks?.forEach((block) => {
-            if (block.name === instance.name && block.id !== instance.id) {
-                errors.push(`Block instance name "${instance.name}" is not unique`);
+            if (normalizedName(block.name) === instanceName && block.id !== instance.id) {
+                errors.push(`Block instance name "${instance.name}" is not unique. Note that uniqueness is case insensitive and ignores non-alphanumeric characters.`);
             }
         });
     }
