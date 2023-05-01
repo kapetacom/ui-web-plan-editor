@@ -101,6 +101,14 @@ export class BlockValidator {
 
         }
 
+        if (this.block.spec.providers) {
+            errors.push(...this.validateUniqueNames(this.block.spec.providers));
+        }
+
+        if (this.block.spec.consumers) {
+            errors.push(...this.validateUniqueNames(this.block.spec.consumers));
+        }
+
         try {
             const blockType = BlockTypeProvider.get(this.block.kind);
             if (blockType?.definition?.spec?.schema) {
@@ -129,12 +137,32 @@ export class BlockValidator {
     public validate() {
         const errors = this.validateBlock();
 
+
         this.block.spec.providers?.forEach((resource) => {
             errors.push(...this.validateResource(resource));
         });
 
         this.block.spec.consumers?.forEach((resource) => {
             errors.push(...this.validateResource(resource));
+        });
+
+        return errors;
+    }
+
+    private validateUniqueNames(resources: Resource[]): string[] {
+        const errors: string[] = [];
+        const errorAppended:string[] = [];
+        const map = new Map<string, Resource>();
+        resources.forEach((resource) => {
+            if (map.has(resource.metadata.name)) {
+                if (!errorAppended.includes(resource.metadata.name)) {
+                    errorAppended.push(resource.metadata.name);
+                    errors.push(`Resource name ${resource.metadata.name} is not unique`);
+                }
+                return;
+            }
+
+            map.set(resource.metadata.name, resource);
         });
 
         return errors;

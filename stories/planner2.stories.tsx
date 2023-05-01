@@ -1,30 +1,31 @@
 import React, {ForwardedRef, forwardRef, useContext} from 'react';
-import { Meta, StoryObj } from '@storybook/react';
+import {Meta, StoryObj} from '@storybook/react';
 
-import { ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
+import {ButtonStyle, DefaultContext, DialogControl} from '@kapeta/ui-web-components';
 
-import { Planner2 } from '../src/planner2/Planner2';
+import {Planner2} from '../src/planner2/Planner2';
 
-import { readPlanV2 } from './data/planReader';
+import {readPlanV2} from './data/planReader';
 import {
     PlannerActionConfig,
     PlannerContext,
     PlannerContextData,
     withPlannerContext,
 } from '../src/planner2/PlannerContext';
-import { useAsync } from 'react-use';
-import { Asset, ItemType, Point, ResourceRole, IResourceTypeProvider, SchemaKind } from '@kapeta/ui-web-types';
-import { parseKapetaUri } from '@kapeta/nodejs-utils';
-import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
-import { EditableItemInterface2 } from '../src/planner2/types';
-import { BlockNode, BlockResource, PlannerMode } from '../src';
-import { DragAndDrop } from '../src/planner2/utils/dndUtils';
+import {useAsync} from 'react-use';
+import {Asset, ItemType, Point, ResourceRole, IResourceTypeProvider, SchemaKind} from '@kapeta/ui-web-types';
+import {parseKapetaUri} from '@kapeta/nodejs-utils';
+import {ItemEditorPanel} from '../src/planner2/components/ItemEditorPanel';
+import {EditableItemInterface2} from '../src/planner2/types';
+import {BlockNode, BlockResource, PlannerMode} from '../src';
+import {DragAndDrop} from '../src/planner2/utils/dndUtils';
 import './styles.less';
-import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { BlockServiceMock } from './data/BlockServiceMock';
-import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
-import { BlockDefinition } from '@kapeta/schemas';
-import { PlannerOutlet, plannerRenderer } from '../src/planner2/renderers/plannerRenderer';
+import {InstanceStatus, ResourceTypeProvider} from '@kapeta/ui-web-context';
+import {BlockServiceMock} from './data/BlockServiceMock';
+import {BLOCK_SIZE} from '../src/planner2/utils/planUtils';
+import {BlockDefinition, BlockInstance} from '@kapeta/schemas';
+import {PlannerOutlet, plannerRenderer} from '../src/planner2/renderers/plannerRenderer';
+import {BlockInspectorPanel} from "../src/panels/BlockInspectorPanel";
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -112,7 +113,7 @@ const DraggableResource = (props: DraggableResourceProps & { point: Point }) => 
 const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const planner = useContext(PlannerContext);
     const [editItem, setEditItem] = React.useState<EditableItemInterface2 | undefined>();
-    const [inspectItem, setInspectItem] = React.useState<SchemaKind<any, any> | null>(null);
+    const [inspectItem, setInspectItem] = React.useState<BlockInstance|null>(null);
     const [configureItem, setConfigureItem] = React.useState<SchemaKind<any, any> | null>(null);
     const [draggableItem, setDraggableItem] = React.useState<DraggableItem | null>(null);
     const [draggableItemPosition, setDraggableItemPosition] = React.useState<Point | null>(null);
@@ -122,22 +123,22 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 enabled(): boolean {
                     return true; // planner.mode !== PlannerMode.VIEW;
                 },
-                onClick(context, { block }) {
-                    setInspectItem(block!);
+                onClick(context, action) {
+                    setInspectItem(action.blockInstance!);
                 },
                 buttonStyle: ButtonStyle.PRIMARY,
                 icon: 'fa fa-search',
                 label: 'Inspect',
             },
             {
-                enabled(context, { blockInstance }): boolean {
+                enabled(context, {blockInstance}): boolean {
                     return (
                         planner.mode !== PlannerMode.VIEW &&
                         !!blockInstance &&
                         parseKapetaUri(blockInstance.block.ref).version === 'local'
                     );
                 },
-                onClick(context, { blockInstance }) {
+                onClick(context, {blockInstance}) {
                     DialogControl.delete(
                         `Delete Block Instance`,
                         `Are you sure you want to delete ${blockInstance?.name || 'this block'}?`,
@@ -153,14 +154,14 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 label: 'Delete',
             },
             {
-                enabled(context, { blockInstance }): boolean {
+                enabled(context, {blockInstance}): boolean {
                     return (
                         planner.mode !== PlannerMode.VIEW &&
                         !!blockInstance &&
                         parseKapetaUri(blockInstance.block.ref).version === 'local'
                     );
                 },
-                onClick(context, { blockInstance, block }) {
+                onClick(context, {blockInstance, block}) {
                     setEditItem({
                         type: ItemType.BLOCK,
                         item: block!,
@@ -173,10 +174,10 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 label: 'Edit',
             },
             {
-                enabled(context, { blockInstance }): boolean {
+                enabled(context, {blockInstance}): boolean {
                     return context.mode === PlannerMode.CONFIGURATION;
                 },
-                onClick(context, { block }) {
+                onClick(context, {block}) {
                     setConfigureItem(block!);
                 },
                 buttonStyle: ButtonStyle.DEFAULT,
@@ -186,14 +187,14 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
         ],
         resource: [
             {
-                enabled(context, { blockInstance }): boolean {
+                enabled(context, {blockInstance}): boolean {
                     return (
                         planner.mode !== PlannerMode.VIEW &&
                         !!blockInstance &&
                         parseKapetaUri(blockInstance.block.ref).version === 'local'
                     );
                 },
-                onClick(p, { resource }) {
+                onClick(p, {resource}) {
                     setEditItem({
                         type: ItemType.RESOURCE,
                         item: resource!,
@@ -205,14 +206,14 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 label: 'Edit',
             },
             {
-                enabled(context, { blockInstance }): boolean {
+                enabled(context, {blockInstance}): boolean {
                     return (
                         planner.mode !== PlannerMode.VIEW &&
                         !!blockInstance &&
                         parseKapetaUri(blockInstance.block.ref).version === 'local'
                     );
                 },
-                onClick(context, { blockInstance, resource, resourceRole }) {
+                onClick(context, {blockInstance, resource, resourceRole}) {
                     DialogControl.delete(
                         `Delete Resource`,
                         `Are you sure you want to delete ${resource?.metadata.name || 'this resource'}?`,
@@ -237,7 +238,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 enabled(context): boolean {
                     return planner.mode === PlannerMode.EDIT;
                 },
-                onClick(context, { connection }) {
+                onClick(context, {connection}) {
                     const provider = planner.getResourceByBlockIdAndName(
                         connection!.provider.blockId,
                         connection!.provider.resourceName,
@@ -271,14 +272,14 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
     return (
         <div ref={forwardedRef} className="plan-container">
             {draggableItem && draggableItemPosition && draggableItem.type === ItemType.RESOURCE && (
-                <DraggableResource {...draggableItem.data} point={draggableItemPosition} />
+                <DraggableResource {...draggableItem.data} point={draggableItemPosition}/>
             )}
 
             {draggableItem && draggableItemPosition && draggableItem.type === ItemType.BLOCK && (
-                <DraggableBlock {...draggableItem.data} point={draggableItemPosition} />
+                <DraggableBlock {...draggableItem.data} point={draggableItemPosition}/>
             )}
 
-            <Planner2 systemId="system?" actions={actionConfig} />
+            <Planner2 systemId="system?" actions={actionConfig}/>
             <ItemEditorPanel
                 open={!!editItem}
                 editableItem={editItem}
@@ -303,6 +304,11 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                     }
                 }}
             />
+            <BlockInspectorPanel systemId={props.systemId}
+                                 open={!!inspectItem}
+                                 configuration={{}}
+                                 instance={inspectItem ?? undefined}
+                                 onClosed={() => setInspectItem(null)}/>
 
             <div className="test-tool-panel">
                 <h2>Resources</h2>
@@ -504,7 +510,7 @@ export const CustomRenderer = () => {
     };
     return (
         <plannerRenderer.Provider outlets={outlets}>
-            <PlannerLoader plannerMode={PlannerMode.EDIT} instanceStatus={InstanceStatus.STARTING} />
+            <PlannerLoader plannerMode={PlannerMode.EDIT} instanceStatus={InstanceStatus.STARTING}/>
         </plannerRenderer.Provider>
     );
 };

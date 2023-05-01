@@ -109,8 +109,32 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const errors: string[] = [];
     try {
         resourceConfig = ResourceTypeProvider.get(props.resource.kind);
+        if (resourceConfig &&
+            resourceConfig.validate) {
+            errors.push(...resourceConfig.validate(
+                props.resource,
+                blockDefinition?.spec.entities?.types ?? []
+            ));
+        }
     } catch (e) {
         errors.push(`Failed to read resource kind: ${e.message}`);
+    }
+
+    // Check for name conflicts
+    if (props.role === ResourceRole.CONSUMES) {
+        const hasNameConflict = blockDefinition?.spec.consumers?.some((consumer, ix) => {
+            return props.index !== ix && consumer.metadata.name === props.resource.metadata.name;
+        });
+        if (hasNameConflict) {
+            errors.push('Name conflicts with another resource');
+        }
+    } else if (props.role === ResourceRole.PROVIDES) {
+        const hasNameConflict = blockDefinition?.spec.providers?.some((provider, ix) => {
+            return props.index !== ix && provider.metadata.name === props.resource.metadata.name;
+        });
+        if (hasNameConflict) {
+            errors.push('Name conflicts with another resource');
+        }
     }
 
     const type = resourceConfig?.type?.toString().toLowerCase() ?? ResourceProviderType.INTERNAL;
