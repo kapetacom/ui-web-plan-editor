@@ -481,7 +481,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                             );
 
                             affectedInstances.forEach((instance) => {
-                                newPlan.spec.connections.filter((conn) => {
+                                newPlan.spec.connections?.filter((conn) => {
                                     if (
                                         role === ResourceRole.CONSUMES &&
                                         conn.consumer.blockId === instance.id &&
