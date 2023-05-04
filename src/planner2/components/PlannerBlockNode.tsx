@@ -139,12 +139,19 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                     const port = config.definition.spec.ports[0];
 
                                     const ref = `${config.kind}:${config.version}`;
+                                    // default the name to resource type name w/o special chars, e.g.
+                                    // resource-type-mongodb => mongodb
+                                    const name = config.kind
+                                        .split('/')[1]
+                                        .toLowerCase()
+                                        .replace('resource-type', '')
+                                        .replace(/[^a-z]/g, '');
                                     planner.addResource(
                                         blockContext.blockReference?.id,
                                         {
                                             kind: ref,
                                             metadata: {
-                                                name: 'new-resource',
+                                                name,
                                             },
                                             spec: {
                                                 port,
