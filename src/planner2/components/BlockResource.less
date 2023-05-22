@@ -1,6 +1,9 @@
 @import '~@kapeta/ui-web-components/styles/values';
 @import '~@kapeta/ui-web-components/styles/functions';
 
+@kapeta-block-resource-background: #ffffff;
+@kapeta-block-outline: rgba(0,0,0, 0.12);
+
 .block-resource {
     position: relative;
     overflow: visible;
@@ -13,13 +16,14 @@
     }
 
     .block-resource-body {
-        fill: @bw-orange;
+        fill: @kapeta-block-resource-background;
+        stroke: @kapeta-block-outline;
     }
 
     .block-resource-text {
         .no-select();
         stroke-width: 1;
-        color: #ffffff;
+        color: @bw-gray;
         text-anchor: start;
         height: 18px;
 
@@ -35,33 +39,8 @@
         &.sub {
             opacity: 0.7;
         }
-    }
-
-    &.operator {
-        .block-resource-body,
-        .resource-counter .background {
-            fill: @bw-green;
-        }
-
-        .block-resource-text {
-            fill: @bw-green-light;
-            &.sub {
-                fill-opacity: 0.5;
-            }
-        }
-    }
-
-    &.extension {
-        .block-resource-body,
-        .resource-counter .background {
-            fill: @bw-gray-light;
-        }
-
-        .block-resource-text {
-            fill: @bw-gray;
-            &.sub {
-                fill-opacity: 0.5;
-            }
+        &.resource-name {
+            font-weight: 700;
         }
     }
 

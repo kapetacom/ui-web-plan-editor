@@ -4,7 +4,7 @@ import { ItemType, ResourceRole, Point } from '@kapeta/ui-web-types';
 
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 
-import './PlannerBlockResourceListItem.less';
+// import './PlannerBlockResourceListItem.less';
 
 import { PlannerNodeSize } from '../types';
 import { PlannerResourceModelWrapper } from '../wrappers/PlannerResourceModelWrapper';

@@ -14,7 +14,7 @@ import { PlannerBlockModelWrapper } from '../wrappers/PlannerBlockModelWrapper';
 import { ResourceMode } from '../wrappers/wrapperHelpers';
 import { BlockResource } from './BlockResource';
 
-import './PlannerBlockResourceListItem.less';
+// import './PlannerBlockResourceListItem.less';
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import { SVGCircleButton } from './SVGCircleButton';
 
