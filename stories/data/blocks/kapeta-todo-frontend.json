@@ -1,0 +1,12 @@
+{
+    "kind": "kapeta/block-type-frontend:1.2.3",
+    "metadata": {
+        "name": "kapeta/todo-frontend",
+        "title": "Todo frontend"
+    },
+    "spec": {
+        "entities": [],
+        "consumers": [],
+        "providers": []
+    }
+}

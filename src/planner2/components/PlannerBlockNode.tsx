@@ -17,6 +17,9 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { copyResourceToBlock } from '../utils/blockUtils';
 import { createConnection } from '../utils/connectionUtils';
 import { useBlockValidation } from '../hooks/block-validation';
+import { BlockTypeProvider } from '@kapeta/ui-web-context';
+import { BlockOutlet, blockRenderer } from '../renderers/blockRenderer';
+import { SVGAutoSizeText } from '@kapeta/ui-web-components';
 
 interface Props {
     size: PlannerNodeSize;
@@ -31,6 +34,7 @@ interface Props {
 export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
     const planner = useContext(PlannerContext);
     const blockContext = useBlockContext();
+    const blockType = BlockTypeProvider.get(blockContext.blockDefinition!.kind);
 
     if (!blockContext.blockInstance) {
         throw new Error('PlannerBlockNode requires a BlockDefinition context');
@@ -105,6 +109,9 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                         point = focusPoint;
                     }
                 }
+
+                const NodeComponent = blockType.shapeComponent || BlockNode;
+
                 return (
                     // Effective layout includes drag status
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
@@ -247,33 +254,88 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                             onResourceMouseLeave={props.onResourceMouseLeave}
                                         />
 
-                                        <BlockNode
-                                            name={blockContext.blockInstance.name}
-                                            instanceName={blockContext.blockInstance.name}
-                                            onInstanceNameChange={(name) =>
-                                                planner.updateBlockInstance(blockContext.blockInstance.id, (bx) => {
-                                                    return {
-                                                        ...bx,
-                                                        name,
-                                                    };
-                                                })
-                                            }
-                                            readOnly={!canEditInstance}
-                                            status={blockContext.instanceStatus}
-                                            height={blockContext.instanceBlockHeight}
-                                            width={blockContext.blockInstance.dimensions!.width}
-                                            typeName={blockContext.blockDefinition?.metadata.name}
-                                            version={blockContext.blockReference.version}
-                                            valid={isValid}
-                                            blockRef={onRef}
-                                            {...evt.componentProps}
-                                        />
+                                        <g {...evt.componentProps} ref={onRef}>
+                                            {/* Something something dimensions? */}
+                                            <blockRenderer.Provider
+                                                outlets={{
+                                                    [BlockOutlet.BlockStatus]: ({ status }) =>
+                                                        status ? (
+                                                            <circle
+                                                                className={`instance_${status}`}
+                                                                r={4}
+                                                                cx={10}
+                                                                cy={40}
+                                                            />
+                                                        ) : null,
+                                                    [BlockOutlet.BlockInstanceName]: ({ instance, readOnly }) => (
+                                                        <SVGAutoSizeText
+                                                            className="block-body-text instance-name"
+                                                            y={0}
+                                                            x={0}
+                                                            lineHeight={24}
+                                                            maxHeight={36}
+                                                            maxWidth={150}
+                                                            maxChars={15}
+                                                            maxLines={2}
+                                                            onChange={
+                                                                readOnly
+                                                                    ? undefined
+                                                                    : (name) =>
+                                                                          planner.updateBlockInstance(
+                                                                              instance.id,
+                                                                              (bx) => {
+                                                                                  return {
+                                                                                      ...bx,
+                                                                                      name,
+                                                                                  };
+                                                                              }
+                                                                          )
+                                                            }
+                                                            value={instance.name}
+                                                        />
+                                                    ),
+                                                    [BlockOutlet.BlockName]: ({ readOnly }) => (
+                                                        <SVGAutoSizeText
+                                                            className="block-body-text block-name"
+                                                            y={0}
+                                                            x={0}
+                                                            lineHeight={12}
+                                                            maxHeight={20}
+                                                            maxChars={25}
+                                                            maxLines={1}
+                                                            maxWidth={150}
+                                                            value={'typeName'}
+                                                        />
+                                                    ),
+                                                }}
+                                            >
+                                                <NodeComponent
+                                                    block={blockContext.blockDefinition!}
+                                                    instance={blockContext.blockInstance}
+                                                    readOnly={!canEditInstance}
+                                                    status={blockContext.instanceStatus}
+                                                    width={blockContext.blockInstance.dimensions!.width}
+                                                    height={blockContext.instanceBlockHeight}
+                                                    valid={isValid}
+                                                />
+                                            </blockRenderer.Provider>
+                                            {/* name={blockContext.blockInstance.name}
+                                                instanceName={blockContext.blockInstance.name}
+                                                onInstanceNameChange={
+                                                readOnly={!canEditInstance}
+                                                height={blockContext.instanceBlockHeight}
+                                                width={blockContext.blockInstance.dimensions!.width}
+                                                typeName={blockContext.blockDefinition?.metadata.name}
+                                                version={blockContext.blockReference.version}
+                                                valid={isValid}
+                                            /> */}
+                                        </g>
                                     </g>
                                     <g>
                                         {/* TODO: Render block actions w/ the wheel/staggered transitions */}
                                         <ActionButtons
                                             x={75}
-                                            y={blockContext.instanceBlockHeight + 10}
+                                            y={blockContext.instanceBlockHeight + 15}
                                             show
                                             actions={props.actions?.block || []}
                                             actionContext={actionContext}

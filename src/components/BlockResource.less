@@ -1,6 +1,9 @@
 @import '~@kapeta/ui-web-components/styles/values';
 @import '~@kapeta/ui-web-components/styles/functions';
 
+@kapeta-text-primary: #000000de;
+@kapeta-block-bg: #ffffff;
+
 .block-resource {
     position: relative;
     overflow: visible;
@@ -13,13 +16,13 @@
     }
 
     .block-resource-body {
-        fill: @bw-orange;
+        fill: @kapeta-block-bg;
     }
 
     .block-resource-text {
         .no-select();
         stroke-width: 1;
-        color: #ffffff;
+        color: @kapeta-text-primary;
         text-anchor: start;
         height: 18px;
 
@@ -40,11 +43,11 @@
     &.operator {
         .block-resource-body,
         .resource-counter .background {
-            fill: @bw-green;
+            // fill: @bw-green;
         }
 
         .block-resource-text {
-            fill: @bw-green-light;
+            // fill: @bw-green-light;
             &.sub {
                 fill-opacity: 0.5;
             }

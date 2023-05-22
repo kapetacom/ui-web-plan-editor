@@ -1,0 +1,12 @@
+{
+    "kind": "kapeta/block-type-mobile:1.2.3",
+    "metadata": {
+        "name": "kapeta/todo-mobile",
+        "title": "Todo mobile"
+    },
+    "spec": {
+        "entities": [],
+        "consumers": [],
+        "providers": []
+    }
+}
