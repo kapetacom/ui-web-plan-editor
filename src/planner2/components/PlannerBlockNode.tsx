@@ -327,6 +327,22 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                                             />
                                                         );
                                                     },
+                                                    [BlockOutlet.BlockVersion]: ({ instance }) => {
+                                                        const kindUri = parseKapetaUri(instance.block.ref);
+                                                        return (
+                                                            <SVGAutoSizeText
+                                                                className="block-body-text block-version"
+                                                                y={0}
+                                                                x={0}
+                                                                lineHeight={12}
+                                                                maxHeight={20}
+                                                                maxChars={25}
+                                                                maxLines={1}
+                                                                maxWidth={150}
+                                                                value={kindUri.version}
+                                                            />
+                                                        );
+                                                    },
                                                 }}
                                             >
                                                 <NodeComponent

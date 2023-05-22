@@ -5,6 +5,7 @@ export enum BlockOutlet {
     BlockStatus = 'BlockStatus',
     BlockName = 'BlockName',
     BlockHandle = 'BlockHandle',
+    BlockVersion = 'BlockVersion',
 }
 
 export const blockRenderer = initRenderer<{}, BlockOutlet>();

@@ -258,6 +258,10 @@ BlockTypeProvider.register({
                 <svg y={105} x={width / 2}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={context} />
                 </svg>
+
+                <svg y={height - 20} x={width / 2}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={context} />
+                </svg>
             </g>
         );
     },
@@ -331,6 +335,9 @@ BlockTypeProvider.register({
                 </svg>
                 <svg y={105} x={width / 2}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={context} />
+                </svg>
+                <svg y={height - 20} x={width / 2}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={context} />
                 </svg>
             </g>
         );

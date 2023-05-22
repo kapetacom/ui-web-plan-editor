@@ -9,7 +9,6 @@ import { blockRenderer, BlockOutlet } from '../planner2/renderers/blockRenderer'
 interface BlockNodeProps {
     name: string;
     typeName?: string;
-    version?: string;
     height: number;
     width: number;
     pointSize?: number;
@@ -19,10 +18,6 @@ interface BlockNodeProps {
 }
 
 export const BlockNode = (props: BlockNodeProps) => {
-    const maxWidth = props.width - 20;
-    const typeFullName = props.typeName || 'unknown/unknown';
-    const [typeHandle, typeName] = typeFullName.split('/');
-
     const variant = props.variant ? props.variant : 'service';
 
     const className = toClass({
@@ -55,15 +50,9 @@ export const BlockNode = (props: BlockNodeProps) => {
                     <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={props} />
                 </svg>
 
-                {props.version && (
-                    <SVGText
-                        className="block-body-text block-version"
-                        y={props.height - 24}
-                        x={props.width / 2 - 4}
-                        maxWidth={maxWidth}
-                        value={props.version}
-                    />
-                )}
+                <svg y={120} x={centeredX}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={props} />
+                </svg>
             </g>
         </>
     );
