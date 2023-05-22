@@ -371,7 +371,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                         {/* TODO: Render block actions w/ the wheel/staggered transitions */}
                                         <ActionButtons
                                             x={75}
-                                            y={blockContext.instanceBlockHeight + 15}
+                                            y={blockContext.instanceBlockHeight + 25}
                                             show
                                             actions={props.actions?.block || []}
                                             actionContext={actionContext}
