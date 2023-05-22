@@ -52,17 +52,7 @@ export const BlockNode = (props: BlockNodeProps) => {
                     <blockRenderer.Outlet id={BlockOutlet.BlockName} context={props} />
                 </svg>
                 <svg y={100} x={centeredX}>
-                    <SVGAutoSizeText
-                        className="block-body-text block-handle"
-                        y={0}
-                        x={0}
-                        lineHeight={10}
-                        maxHeight={20}
-                        maxChars={25}
-                        maxLines={1}
-                        maxWidth={maxWidth}
-                        value={typeHandle}
-                    />
+                    <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={props} />
                 </svg>
 
                 {props.version && (

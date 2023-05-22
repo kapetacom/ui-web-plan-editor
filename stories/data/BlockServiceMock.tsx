@@ -254,6 +254,10 @@ BlockTypeProvider.register({
                 <svg fill="none" x={width / 2} y={90}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockName} context={context} />
                 </svg>
+
+                <svg y={105} x={width / 2}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={context} />
+                </svg>
             </g>
         );
     },
@@ -317,12 +321,16 @@ BlockTypeProvider.register({
                 <svg fill="none" x={130} y={-28}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockStatus} context={context} />
                 </svg>
-                {/* Offset if block has error */}
+                {/* TODO: add y-offset if block has error */}
                 <svg fill="none" x={width / 2} y={40} width={width - 20} viewBox={`0 0 ${width} 150`}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockInstanceName} context={context} />
                 </svg>
+                {/* Name + handle */}
                 <svg fill="none" x={width / 2} y={90}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockName} context={context} />
+                </svg>
+                <svg y={105} x={width / 2}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={context} />
                 </svg>
             </g>
         );

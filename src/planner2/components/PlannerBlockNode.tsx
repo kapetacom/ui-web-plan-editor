@@ -20,6 +20,7 @@ import { useBlockValidation } from '../hooks/block-validation';
 import { BlockTypeProvider } from '@kapeta/ui-web-context';
 import { BlockOutlet, blockRenderer } from '../renderers/blockRenderer';
 import { SVGAutoSizeText } from '@kapeta/ui-web-components';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 interface Props {
     size: PlannerNodeSize;
@@ -294,19 +295,38 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                                             value={instance.name}
                                                         />
                                                     ),
-                                                    [BlockOutlet.BlockName]: ({ readOnly }) => (
-                                                        <SVGAutoSizeText
-                                                            className="block-body-text block-name"
-                                                            y={0}
-                                                            x={0}
-                                                            lineHeight={12}
-                                                            maxHeight={20}
-                                                            maxChars={25}
-                                                            maxLines={1}
-                                                            maxWidth={150}
-                                                            value={'typeName'}
-                                                        />
-                                                    ),
+                                                    [BlockOutlet.BlockName]: ({ block }) => {
+                                                        const kindUri = parseKapetaUri(block.kind);
+                                                        return (
+                                                            <SVGAutoSizeText
+                                                                className="block-body-text block-name"
+                                                                y={0}
+                                                                x={0}
+                                                                lineHeight={12}
+                                                                maxHeight={20}
+                                                                maxChars={25}
+                                                                maxLines={1}
+                                                                maxWidth={150}
+                                                                value={kindUri.name}
+                                                            />
+                                                        );
+                                                    },
+                                                    [BlockOutlet.BlockHandle]: ({ block }) => {
+                                                        const kindUri = parseKapetaUri(block.kind);
+                                                        return (
+                                                            <SVGAutoSizeText
+                                                                className="block-body-text block-handle"
+                                                                y={0}
+                                                                x={0}
+                                                                lineHeight={12}
+                                                                maxHeight={20}
+                                                                maxChars={25}
+                                                                maxLines={1}
+                                                                maxWidth={150}
+                                                                value={kindUri.handle}
+                                                            />
+                                                        );
+                                                    },
                                                 }}
                                             >
                                                 <NodeComponent
