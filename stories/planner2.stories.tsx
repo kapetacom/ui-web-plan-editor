@@ -62,11 +62,14 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
             }}
         >
             <BlockNode
-                name={props.name}
+                block={props.block.data}
+                instance={{
+                    id: 'temp-block',
+                    name: props.name,
+                    block: { ref: props.block.ref },
+                    dimensions: { height: 0, width: 0, top: 0, left: 0 },
+                }}
                 valid
-                instanceName={props.title ?? props.name}
-                version={props.block.version}
-                typeName={props.name}
                 readOnly
                 status={InstanceStatus.STOPPED}
                 height={BLOCK_SIZE}

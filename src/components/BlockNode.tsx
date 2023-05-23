@@ -1,20 +1,22 @@
 import React from 'react';
 import { createHexagonPath, Orientation, toClass } from '@kapeta/ui-web-utils';
-import { SVGText, SVGAutoSizeText } from '@kapeta/ui-web-components';
 
 import './BlockNode.less';
 import { PlannerBlockWarningTag } from './PlannerBlockWarningTag';
 import { blockRenderer, BlockOutlet } from '../planner2/renderers/blockRenderer';
+import { InstanceStatus } from '@kapeta/ui-web-context';
+import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 interface BlockNodeProps {
-    name: string;
-    typeName?: string;
+    block: BlockDefinition;
+    instance: BlockInstance;
     height: number;
     width: number;
     pointSize?: number;
     valid?: boolean;
     variant?: string;
     readOnly?: boolean;
+    status: InstanceStatus;
 }
 
 export const BlockNode = (props: BlockNodeProps) => {
@@ -34,7 +36,7 @@ export const BlockNode = (props: BlockNodeProps) => {
             <g className={className} x={50}>
                 <path className="block-body" d={path} />
 
-                <PlannerBlockWarningTag show={!props.valid} blockName={props.name} />
+                <PlannerBlockWarningTag show={!props.valid} blockName={props.block.metadata.name} />
 
                 <svg y={0} x={props.width - 20}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockStatus} context={props} />

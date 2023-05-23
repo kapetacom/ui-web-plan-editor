@@ -195,28 +195,28 @@ BlockTypeProvider.register({
 
         return errors;
     },
-    shapeComponent: ({ height, width, ...context }) => {
+    shapeComponent: (context) => {
         // Scaling the topbar svg to fit the block
         const svgWidth = 192;
-        const svgHeight = 170 * (width / svgWidth);
+        const svgHeight = 170 * (context.width / svgWidth);
 
         return (
             <g className="block-node" style={{ cursor: context.readOnly ? 'default' : 'move' }}>
                 {/* Background */}
-                <rect width={width} height={height} rx="6" fill="white" />
+                <rect width={context.width} height={context.height} rx="6" fill="white" />
                 {/* Border */}
                 <rect
                     x="0.5"
                     y="0.5"
-                    width={width - 1}
-                    height={height - 1}
+                    width={context.width - 1}
+                    height={context.height - 1}
                     rx="5.5"
                     fill="none"
                     stroke="black"
                     strokeOpacity="0.12"
                 />
                 {/* Topbar */}
-                <svg width={width} height={svgHeight} viewBox="0 0 192 170" fill="none">
+                <svg width={context.width} height={svgHeight} viewBox="0 0 192 170" fill="none">
                     <path
                         d="M1 6C1 3.23858 3.23858 1 6 1H186C188.761 1 191 3.23858 191 6V24H1V6Z"
                         fill="black"
@@ -248,18 +248,24 @@ BlockTypeProvider.register({
                     <blockRenderer.Outlet id={BlockOutlet.BlockStatus} context={context} />
                 </svg>
                 {/* Offset if block has error */}
-                <svg fill="none" x={width / 2} y={40} width={width - 20} viewBox={`0 0 ${width} 150`}>
+                <svg
+                    fill="none"
+                    x={context.width / 2}
+                    y={40}
+                    width={context.width - 20}
+                    viewBox={`0 0 ${context.width} 150`}
+                >
                     <blockRenderer.Outlet id={BlockOutlet.BlockInstanceName} context={context} />
                 </svg>
-                <svg fill="none" x={width / 2} y={90}>
+                <svg fill="none" x={context.width / 2} y={90}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockName} context={context} />
                 </svg>
 
-                <svg y={105} x={width / 2}>
+                <svg y={105} x={context.width / 2}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={context} />
                 </svg>
 
-                <svg y={height - 20} x={width / 2}>
+                <svg y={context.height - 20} x={context.width / 2}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={context} />
                 </svg>
             </g>
@@ -284,20 +290,20 @@ BlockTypeProvider.register({
 
         return errors;
     },
-    shapeComponent: ({ width, height, ...context }) => {
+    shapeComponent: (context) => {
         // Make the mobile block a bit smaller
         const svgWidth = 152;
-        const svgHeight = 104 * (width / svgWidth);
+        const svgHeight = 104 * (context.width / svgWidth);
         return (
             <g className="block-node" style={{ cursor: context.readOnly ? 'default' : 'move' }}>
                 {/* Background */}
-                <rect x={0} y={0} width={width} fill="white" height={height} rx="5px" ry="5px" />
+                <rect x={0} y={0} width={context.width} fill="white" height={context.height} rx="5px" ry="5px" />
                 {/* Border */}
                 <rect
                     x="0.5"
                     y="0.5"
-                    width={width - 1}
-                    height={height - 1}
+                    width={context.width - 1}
+                    height={context.height - 1}
                     rx="5.5"
                     fill="none"
                     stroke="black"
@@ -305,7 +311,7 @@ BlockTypeProvider.register({
                 />
                 {/* Notch and pill */}
                 <svg
-                    width={width}
+                    width={context.width}
                     height={svgHeight}
                     viewBox="0 0 152 104"
                     fill="none"
@@ -326,17 +332,23 @@ BlockTypeProvider.register({
                     <blockRenderer.Outlet id={BlockOutlet.BlockStatus} context={context} />
                 </svg>
                 {/* TODO: add y-offset if block has error */}
-                <svg fill="none" x={width / 2} y={40} width={width - 20} viewBox={`0 0 ${width} 150`}>
+                <svg
+                    fill="none"
+                    x={context.width / 2}
+                    y={40}
+                    width={context.width - 20}
+                    viewBox={`0 0 ${context.width} 150`}
+                >
                     <blockRenderer.Outlet id={BlockOutlet.BlockInstanceName} context={context} />
                 </svg>
                 {/* Name + handle */}
-                <svg fill="none" x={width / 2} y={90}>
+                <svg fill="none" x={context.width / 2} y={90}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockName} context={context} />
                 </svg>
-                <svg y={105} x={width / 2}>
+                <svg y={105} x={context.width / 2}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={context} />
                 </svg>
-                <svg y={height - 20} x={width / 2}>
+                <svg y={context.height - 20} x={context.width / 2}>
                     <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={context} />
                 </svg>
             </g>

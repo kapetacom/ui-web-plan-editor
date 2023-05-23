@@ -267,7 +267,9 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                                                 cx={10}
                                                                 cy={40}
                                                             />
-                                                        ) : null,
+                                                        ) : (
+                                                            <></>
+                                                        ),
                                                     [BlockOutlet.BlockInstanceName]: ({ instance, readOnly }) => (
                                                         <SVGAutoSizeText
                                                             className="block-body-text instance-name"
