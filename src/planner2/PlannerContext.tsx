@@ -671,6 +671,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         };
         return planner;
     }, [
+        updateBlockInstance,
         updatePlan,
         updateBlockAssets,
         instanceStates,

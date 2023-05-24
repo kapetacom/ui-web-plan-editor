@@ -388,7 +388,6 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                                         data: {
                                             block,
                                             name,
-                                            title: block.data.metadata.title,
                                             planner,
                                         },
                                     });
