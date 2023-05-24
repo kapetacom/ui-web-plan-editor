@@ -34,6 +34,91 @@ interface Props {
     onResourceMouseLeave?: (context: ActionContext) => void;
 }
 
+export const BlockOutletProvider = (props) => {
+    const planner = useContext(PlannerContext);
+
+    const outlets = useMemo(() => {
+        return {
+            [BlockOutlet.BlockStatus]: (ctx) =>
+                ctx.status ? <circle className={`instance_${ctx.status}`} r={4} cx={10} cy={40} /> : <></>,
+            [BlockOutlet.BlockInstanceName]: (ctx) => (
+                <SVGAutoSizeText
+                    className="block-body-text instance-name"
+                    y={0}
+                    x={0}
+                    lineHeight={24}
+                    maxHeight={36}
+                    maxWidth={150}
+                    maxChars={15}
+                    maxLines={2}
+                    onChange={
+                        ctx.readOnly
+                            ? undefined
+                            : (name) =>
+                                  planner.updateBlockInstance.call(null, ctx.instance.id, (bx) => {
+                                      return {
+                                          ...bx,
+                                          name,
+                                      };
+                                  })
+                    }
+                    value={ctx.instance.name}
+                />
+            ),
+            [BlockOutlet.BlockName]: (ctx) => {
+                const kindUri = parseKapetaUri(ctx.block.kind);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-name"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.name}
+                    />
+                );
+            },
+            [BlockOutlet.BlockHandle]: (ctx) => {
+                const kindUri = parseKapetaUri(ctx.block.kind);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-handle"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.handle}
+                    />
+                );
+            },
+            [BlockOutlet.BlockVersion]: (ctx) => {
+                const kindUri = parseKapetaUri(ctx.instance.block.ref);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-version"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.version}
+                    />
+                );
+            },
+        };
+    }, [planner.updateBlockInstance]);
+
+    return <blockRenderer.Provider outlets={outlets}>{props.children}</blockRenderer.Provider>;
+};
+
 export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
     const planner = useContext(PlannerContext);
     const blockContext = useBlockContext();
@@ -85,85 +170,6 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
         block: blockContext.blockDefinition,
         blockInstance: blockContext.blockInstance,
     };
-
-    const outlets = useMemo(() => {
-        return {
-            [BlockOutlet.BlockStatus]: ({ status }) =>
-                status ? <circle className={`instance_${status}`} r={4} cx={10} cy={40} /> : <></>,
-            [BlockOutlet.BlockInstanceName]: ({ instance, readOnly }) => (
-                <SVGAutoSizeText
-                    className="block-body-text instance-name"
-                    y={0}
-                    x={0}
-                    lineHeight={24}
-                    maxHeight={36}
-                    maxWidth={150}
-                    maxChars={15}
-                    maxLines={2}
-                    onChange={
-                        readOnly
-                            ? undefined
-                            : (name) =>
-                                  planner.updateBlockInstance.call(null, instance.id, (bx) => {
-                                      return {
-                                          ...bx,
-                                          name,
-                                      };
-                                  })
-                    }
-                    value={instance.name}
-                />
-            ),
-            [BlockOutlet.BlockName]: ({ block }) => {
-                const kindUri = parseKapetaUri(block.kind);
-                return (
-                    <SVGAutoSizeText
-                        className="block-body-text block-name"
-                        y={0}
-                        x={0}
-                        lineHeight={12}
-                        maxHeight={20}
-                        maxChars={25}
-                        maxLines={1}
-                        maxWidth={150}
-                        value={kindUri.name}
-                    />
-                );
-            },
-            [BlockOutlet.BlockHandle]: ({ block }) => {
-                const kindUri = parseKapetaUri(block.kind);
-                return (
-                    <SVGAutoSizeText
-                        className="block-body-text block-handle"
-                        y={0}
-                        x={0}
-                        lineHeight={12}
-                        maxHeight={20}
-                        maxChars={25}
-                        maxLines={1}
-                        maxWidth={150}
-                        value={kindUri.handle}
-                    />
-                );
-            },
-            [BlockOutlet.BlockVersion]: ({ instance }) => {
-                const kindUri = parseKapetaUri(instance.block.ref);
-                return (
-                    <SVGAutoSizeText
-                        className="block-body-text block-version"
-                        y={0}
-                        x={0}
-                        lineHeight={12}
-                        maxHeight={20}
-                        maxChars={25}
-                        maxLines={1}
-                        maxWidth={150}
-                        value={kindUri.version}
-                    />
-                );
-            },
-        };
-    }, []);
 
     return (
         // TODO: Readonly/ viewonly
@@ -338,7 +344,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
 
                                         <g {...evt.componentProps} ref={onRef}>
                                             {/* Something something dimensions? */}
-                                            <blockRenderer.Provider outlets={outlets}>
+                                            <BlockOutletProvider>
                                                 <NodeComponent
                                                     block={blockContext.blockDefinition!}
                                                     instance={blockContext.blockInstance}
@@ -348,7 +354,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                                     height={blockContext.instanceBlockHeight}
                                                     valid={isValid}
                                                 />
-                                            </blockRenderer.Provider>
+                                            </BlockOutletProvider>
                                             {/* name={blockContext.blockInstance.name}
                                                 instanceName={blockContext.blockInstance.name}
                                                 onInstanceNameChange={
