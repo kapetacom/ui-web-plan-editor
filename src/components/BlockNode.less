@@ -1,8 +1,15 @@
 @import '~@kapeta/ui-web-components/styles/values';
 @import '~@kapeta/ui-web-components/styles/functions';
 
+@kapeta-text-primary: #000000de;
+@kapeta-block-bg: #ffffff;
+@kapeta-block-outline: rgba(0,0,0, 0.12);
+
 .block-node {
     overflow: visible;
+    > svg {
+        overflow: visible;
+    }
 
     .instance_exited {
         fill: @red;
@@ -33,8 +40,8 @@
 
     .block-body {
         .transition(fill 150ms);
-        fill: @bw-service-bg;
-        stroke: transparent;
+        fill: @kapeta-block-bg;
+        stroke: @kapeta-block-outline;
         stroke-width: 1.5;
     }
 
@@ -43,7 +50,7 @@
         .transition();
         font-family: inherit;
         text-anchor: middle;
-        fill: white;
+        fill: @kapeta-text-primary;
         transform-origin: top left;
 
         &.instance-name {

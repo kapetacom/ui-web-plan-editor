@@ -20,12 +20,13 @@ import { EditableItemInterface2 } from '../src/planner2/types';
 import { BlockNode, BlockResource, PlannerMode } from '../src';
 import { DragAndDrop } from '../src/planner2/utils/dndUtils';
 import './styles.less';
-import { InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { BlockTypeProvider, InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockServiceMock } from './data/BlockServiceMock';
 import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { PlannerOutlet, plannerRenderer } from '../src/planner2/renderers/plannerRenderer';
 import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
+import { BlockOutletProvider } from '../src/planner2/components/PlannerBlockNode';
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -41,13 +42,14 @@ type DraggableItem = DraggableResourceItem | DraggableBlockItem;
 
 interface DraggableBlockProps {
     name: string;
-    title?: string;
     block: Asset<BlockDefinition>;
     planner: PlannerContextData;
 }
 
 const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
     const center = BLOCK_SIZE / 2;
+    const blockType = BlockTypeProvider.get(props.block.data!.kind);
+    const Shape = blockType.shapeComponent || BlockNode;
 
     return (
         <svg
@@ -61,17 +63,22 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
                 transform: `scale(${props.planner.zoom})`,
             }}
         >
-            <BlockNode
-                name={props.name}
-                valid
-                instanceName={props.title ?? props.name}
-                version={props.block.version}
-                typeName={props.name}
-                readOnly
-                status={InstanceStatus.STOPPED}
-                height={BLOCK_SIZE}
-                width={BLOCK_SIZE}
-            />
+            <BlockOutletProvider>
+                <Shape
+                    block={props.block.data}
+                    instance={{
+                        id: 'temp-block',
+                        name: props.name,
+                        block: { ref: props.block.ref },
+                        dimensions: { height: 0, width: 0, top: 0, left: 0 },
+                    }}
+                    valid
+                    readOnly
+                    status={InstanceStatus.STOPPED}
+                    height={BLOCK_SIZE}
+                    width={BLOCK_SIZE}
+                />
+            </BlockOutletProvider>
         </svg>
     );
 };
@@ -381,7 +388,6 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                                         data: {
                                             block,
                                             name,
-                                            title: block.data.metadata.title,
                                             planner,
                                         },
                                     });

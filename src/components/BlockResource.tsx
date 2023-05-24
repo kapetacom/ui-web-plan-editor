@@ -4,7 +4,8 @@ import { toClass, createHexagonPath, Orientation } from '@kapeta/ui-web-utils';
 import { ResourceRole } from '@kapeta/ui-web-types';
 
 import { PlannerNodeSize } from '../types';
-import './BlockResource.less';
+// Duplicate styles from src/planner2/components/BlockResource.less:
+// import './BlockResource.less';
 import { observer } from 'mobx-react';
 
 interface PlannerResourceProps {

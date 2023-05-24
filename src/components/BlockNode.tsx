@@ -1,44 +1,25 @@
-import React, { MouseEventHandler, useState } from 'react';
+import React from 'react';
 import { createHexagonPath, Orientation, toClass } from '@kapeta/ui-web-utils';
-import { SVGText, SVGAutoSizeText } from '@kapeta/ui-web-components';
-import { InstanceStatus } from '@kapeta/ui-web-context';
 
 import './BlockNode.less';
 import { PlannerBlockWarningTag } from './PlannerBlockWarningTag';
-import { Guid } from 'guid-typescript';
-import { Point } from '@kapeta/ui-web-types';
+import { blockRenderer, BlockOutlet } from '../planner2/renderers/blockRenderer';
+import { InstanceStatus } from '@kapeta/ui-web-context';
+import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 interface BlockNodeProps {
-    name: string;
-    typeName?: string;
-    instanceName: string;
-    version?: string;
+    block: BlockDefinition;
+    instance: BlockInstance;
     height: number;
     width: number;
-    status?: InstanceStatus;
     pointSize?: number;
-    position?: Point;
     valid?: boolean;
     variant?: string;
     readOnly?: boolean;
-    blockRef?: (elm: SVGPathElement) => void;
-    onInstanceNameChange?: (newName: string) => void;
-    onMouseDown?: MouseEventHandler;
+    status: InstanceStatus;
 }
 
 export const BlockNode = (props: BlockNodeProps) => {
-    const maxWidth = props.width - 20;
-    const typeFullName = props.typeName || 'unknown/unknown';
-    const [typeHandle, typeName] = typeFullName.split('/');
-    const [id] = useState(Guid.create().toString());
-    function blockOrTypeName() {
-        if (props.name === props.instanceName) {
-            return typeFullName;
-        }
-
-        return props.name;
-    }
-
     const variant = props.variant ? props.variant : 'service';
 
     const className = toClass({
@@ -47,77 +28,34 @@ export const BlockNode = (props: BlockNodeProps) => {
         'read-only': !!props.readOnly,
     });
     const pointSize = props.pointSize ? props.pointSize : 30;
-    const clipWidth = 4;
-    const hexagonClipPath = `hex_clip${id}`;
     const path = createHexagonPath(props.width, props.height, 5, Orientation.VERTICAL, pointSize);
-    const clipPath = createHexagonPath(
-        props.width + clipWidth,
-        props.height + clipWidth,
-        5,
-        Orientation.VERTICAL,
-        pointSize
-    );
+    const centeredX = props.width / 2;
 
     return (
-        <g onMouseDown={props.onMouseDown}>
-            <clipPath id={hexagonClipPath}>
-                <path x={20} d={clipPath} fill="transparent" />
-            </clipPath>
+        <>
+            <g className={className} x={50}>
+                <path className="block-body" d={path} />
 
-            <g className={className} clipPath={`url(#${hexagonClipPath})`} x={props.position ? props.position.x : 50}>
-                <path className="block-body" ref={props.blockRef} d={path} />
-                <PlannerBlockWarningTag show={!props.valid} blockName={props.name} />
+                <PlannerBlockWarningTag show={!props.valid} blockName={props.block.metadata.name} />
 
-                {props.status && (
-                    <circle className={`instance_${props.status}`} r={4} cx={props.width * 0.75} cy={pointSize + 10} />
-                )}
-                <SVGAutoSizeText
-                    className="block-body-text instance-name"
-                    y={50}
-                    x={props.width / 2}
-                    lineHeight={24}
-                    maxHeight={36}
-                    maxWidth={maxWidth}
-                    maxChars={15}
-                    maxLines={2}
-                    onChange={props.readOnly ? undefined : props.onInstanceNameChange}
-                    value={props.instanceName}
-                />
+                <svg y={0} x={props.width - 20}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockStatus} context={props} />
+                </svg>
 
-                <SVGAutoSizeText
-                    className="block-body-text block-name"
-                    y={85}
-                    x={props.width / 2}
-                    lineHeight={12}
-                    maxHeight={20}
-                    maxChars={25}
-                    maxLines={1}
-                    maxWidth={maxWidth}
-                    value={typeName}
-                />
+                <svg y={50} x={centeredX}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockInstanceName} context={props} />
+                </svg>
+                <svg y={85} x={centeredX}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockName} context={props} />
+                </svg>
+                <svg y={100} x={centeredX}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={props} />
+                </svg>
 
-                <SVGAutoSizeText
-                    className="block-body-text block-handle"
-                    y={100}
-                    x={props.width / 2}
-                    lineHeight={10}
-                    maxHeight={20}
-                    maxChars={25}
-                    maxLines={1}
-                    maxWidth={maxWidth}
-                    value={typeHandle}
-                />
-
-                {props.version && (
-                    <SVGText
-                        className="block-body-text block-version"
-                        y={props.height - 24}
-                        x={props.width / 2 - 4}
-                        maxWidth={maxWidth}
-                        value={props.version}
-                    />
-                )}
+                <svg y={120} x={centeredX}>
+                    <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={props} />
+                </svg>
             </g>
-        </g>
+        </>
     );
 };

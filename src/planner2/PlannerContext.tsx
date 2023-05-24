@@ -304,6 +304,29 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     );
 
     const viewMode = props.mode;
+
+    const updateBlockInstance = useCallback(
+        (blockId: string, updater) => {
+            const canEditBlocks = viewMode === PlannerMode.EDIT;
+            if (!canEditBlocks) {
+                return;
+            }
+            // Use state callback to reference the previous state (avoid stale ref)
+            updatePlan((prevState) => {
+                const newPlan = cloneDeep(prevState);
+                const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
+                if (blockIx === -1) {
+                    throw new Error(`BlockDefinition #${blockId} not found`);
+                }
+
+                const blocks = (newPlan.spec.blocks = newPlan.spec.blocks || []);
+                blocks[blockIx] = updater(blocks[blockIx]);
+                return newPlan;
+            });
+        },
+        [updatePlan, viewMode]
+    );
+
     return useMemo(() => {
         const canEditBlocks = viewMode === PlannerMode.EDIT;
         const canEditConnections = viewMode === PlannerMode.EDIT;
@@ -354,23 +377,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     )
                 );
             },
-            updateBlockInstance(blockId: string, updater) {
-                if (!canEditBlocks) {
-                    return;
-                }
-                // Use state callback to reference the previous state (avoid stale ref)
-                updatePlan((prevState) => {
-                    const newPlan = cloneDeep(prevState);
-                    const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
-                    if (blockIx === -1) {
-                        throw new Error(`BlockDefinition #${blockId} not found`);
-                    }
-
-                    const blocks = (newPlan.spec.blocks = newPlan.spec.blocks || []);
-                    blocks[blockIx] = updater(blocks[blockIx]);
-                    return newPlan;
-                });
-            },
+            updateBlockInstance,
             addBlockInstance(blockInstance: BlockInstance) {
                 if (!canEditBlocks) {
                     return;
@@ -664,6 +671,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         };
         return planner;
     }, [
+        updateBlockInstance,
         updatePlan,
         updateBlockAssets,
         instanceStates,

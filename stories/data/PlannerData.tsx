@@ -78,6 +78,34 @@ export const PlannerData: Plan = {
                     height: -1,
                 },
             },
+            {
+                id: 'todo-frontend',
+                name: 'Todo frontend',
+                block: {
+                    ref: 'kapeta/todo-frontend:local',
+                },
+
+                dimensions: {
+                    top: 300,
+                    width: 150,
+                    left: 850,
+                    height: -1,
+                },
+            },
+            {
+                id: 'todo-mobile',
+                name: 'Todo mobile app',
+                block: {
+                    ref: 'kapeta/todo-mobile:local',
+                },
+
+                dimensions: {
+                    top: 500,
+                    width: 150,
+                    left: 850,
+                    height: -1,
+                },
+            },
         ],
 
         connections: [

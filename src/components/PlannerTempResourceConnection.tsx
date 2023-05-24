@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Point } from '@kapeta/ui-web-types';
 
-import './PlannerBlockResourceListItem.less';
+// import './PlannerBlockResourceListItem.less';
 
 import { PlannerNodeSize } from '../types';
 

@@ -12,6 +12,8 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
 
+import './Planner2.less';
+
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
     systemId: string;

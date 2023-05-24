@@ -17,6 +17,12 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { copyResourceToBlock } from '../utils/blockUtils';
 import { createConnection } from '../utils/connectionUtils';
 import { useBlockValidation } from '../hooks/block-validation';
+import { BlockTypeProvider } from '@kapeta/ui-web-context';
+import { BlockOutlet, blockRenderer } from '../renderers/blockRenderer';
+import { SVGAutoSizeText } from '@kapeta/ui-web-components';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
+
+import './PlannerBlockNode.less';
 
 interface Props {
     size: PlannerNodeSize;
@@ -28,9 +34,95 @@ interface Props {
     onResourceMouseLeave?: (context: ActionContext) => void;
 }
 
+export const BlockOutletProvider = (props) => {
+    const planner = useContext(PlannerContext);
+
+    const outlets = useMemo(() => {
+        return {
+            [BlockOutlet.BlockStatus]: (ctx) =>
+                ctx.status ? <circle className={`instance_${ctx.status}`} r={4} cx={10} cy={40} /> : <></>,
+            [BlockOutlet.BlockInstanceName]: (ctx) => (
+                <SVGAutoSizeText
+                    className="block-body-text instance-name"
+                    y={0}
+                    x={0}
+                    lineHeight={24}
+                    maxHeight={36}
+                    maxWidth={150}
+                    maxChars={15}
+                    maxLines={2}
+                    onChange={
+                        ctx.readOnly
+                            ? undefined
+                            : (name) =>
+                                  planner.updateBlockInstance.call(null, ctx.instance.id, (bx) => {
+                                      return {
+                                          ...bx,
+                                          name,
+                                      };
+                                  })
+                    }
+                    value={ctx.instance.name}
+                />
+            ),
+            [BlockOutlet.BlockName]: (ctx) => {
+                const kindUri = parseKapetaUri(ctx.block.kind);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-name"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.name}
+                    />
+                );
+            },
+            [BlockOutlet.BlockHandle]: (ctx) => {
+                const kindUri = parseKapetaUri(ctx.block.kind);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-handle"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.handle}
+                    />
+                );
+            },
+            [BlockOutlet.BlockVersion]: (ctx) => {
+                const kindUri = parseKapetaUri(ctx.instance.block.ref);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-version"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.version}
+                    />
+                );
+            },
+        };
+    }, [planner.updateBlockInstance]);
+
+    return <blockRenderer.Provider outlets={outlets}>{props.children}</blockRenderer.Provider>;
+};
+
 export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
     const planner = useContext(PlannerContext);
     const blockContext = useBlockContext();
+    const blockType = BlockTypeProvider.get(blockContext.blockDefinition!.kind);
 
     if (!blockContext.blockInstance) {
         throw new Error('PlannerBlockNode requires a BlockDefinition context');
@@ -105,6 +197,9 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                         point = focusPoint;
                     }
                 }
+
+                const NodeComponent = blockType.shapeComponent || BlockNode;
+
                 return (
                     // Effective layout includes drag status
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
@@ -247,33 +342,36 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                                             onResourceMouseLeave={props.onResourceMouseLeave}
                                         />
 
-                                        <BlockNode
-                                            name={blockContext.blockInstance.name}
-                                            instanceName={blockContext.blockInstance.name}
-                                            onInstanceNameChange={(name) =>
-                                                planner.updateBlockInstance(blockContext.blockInstance.id, (bx) => {
-                                                    return {
-                                                        ...bx,
-                                                        name,
-                                                    };
-                                                })
-                                            }
-                                            readOnly={!canEditInstance}
-                                            status={blockContext.instanceStatus}
-                                            height={blockContext.instanceBlockHeight}
-                                            width={blockContext.blockInstance.dimensions!.width}
-                                            typeName={blockContext.blockDefinition?.metadata.name}
-                                            version={blockContext.blockReference.version}
-                                            valid={isValid}
-                                            blockRef={onRef}
-                                            {...evt.componentProps}
-                                        />
+                                        <g {...evt.componentProps} ref={onRef}>
+                                            {/* Something something dimensions? */}
+                                            <BlockOutletProvider>
+                                                <NodeComponent
+                                                    block={blockContext.blockDefinition!}
+                                                    instance={blockContext.blockInstance}
+                                                    readOnly={!canEditInstance}
+                                                    status={blockContext.instanceStatus}
+                                                    width={blockContext.blockInstance.dimensions!.width}
+                                                    height={blockContext.instanceBlockHeight}
+                                                    valid={isValid}
+                                                />
+                                            </BlockOutletProvider>
+                                            {/* name={blockContext.blockInstance.name}
+                                                instanceName={blockContext.blockInstance.name}
+                                                onInstanceNameChange={
+                                                readOnly={!canEditInstance}
+                                                height={blockContext.instanceBlockHeight}
+                                                width={blockContext.blockInstance.dimensions!.width}
+                                                typeName={blockContext.blockDefinition?.metadata.name}
+                                                version={blockContext.blockReference.version}
+                                                valid={isValid}
+                                            /> */}
+                                        </g>
                                     </g>
                                     <g>
                                         {/* TODO: Render block actions w/ the wheel/staggered transitions */}
                                         <ActionButtons
                                             x={75}
-                                            y={blockContext.instanceBlockHeight + 10}
+                                            y={blockContext.instanceBlockHeight + 25}
                                             show
                                             actions={props.actions?.block || []}
                                             actionContext={actionContext}

@@ -42,7 +42,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
     return (
         <g className={resourceClass}>
             <path className="block-resource-body" d={hexagonPath} />
-            <foreignObject width={maxTextWidth} className="block-resource-text" y={padding} x={textX}>
+            <foreignObject width={maxTextWidth} className="block-resource-text resource-name" y={padding} x={textX}>
                 <plannerRenderer.Outlet id={PlannerOutlet.ResourceTitle} context={props.actionContext}>
                     <span>{props.name}</span>
                 </plannerRenderer.Outlet>

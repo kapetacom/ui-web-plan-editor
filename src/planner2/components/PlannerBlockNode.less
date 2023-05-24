@@ -86,7 +86,7 @@
 
             &:hover {
                 .background {
-                    fill: rgba(255, 255, 255, 0.1);
+                    fill: rgba(0, 0, 0, 0.05);
                 }
 
                 .edit {
@@ -96,6 +96,16 @@
                     &:hover {
                         fill: @gray-xdark;
                     }
+                }
+            }
+        }
+
+        // TODO: these are overrides and should not be necessary
+        .svg-auto-size-text {
+            .editing {
+                input {
+                    background-color: rgba(0, 0, 0, 0.05) !important;
+                    color: inherit;
                 }
             }
         }
