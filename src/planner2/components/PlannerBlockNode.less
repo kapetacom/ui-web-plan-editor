@@ -1,0 +1,158 @@
+@import '~@kapeta/ui-web-components/styles/values';
+@import '~@kapeta/ui-web-components/styles/functions';
+
+.planner-block-node {
+    .transition(d 100ms);
+    .transition(transform 150ms);
+    overflow: visible;
+
+    &.block-dragging {
+        .transition(transform 0ms);
+    }
+
+    & > .mouse-catcher {
+        cursor: move;
+    }
+
+    .block-actions {
+        overflow: visible;
+        .svg-circle-button {
+            .transition(transform 200ms);
+        }
+
+        &.buttons-2 {
+            .svg-circle-button {
+                &:nth-child(1) {
+                    .transform(translate(15px, -40px));
+                }
+
+                &:nth-child(2) {
+                    .transform(translate(-15px, -40px));
+                    transition-delay: 80ms;
+                }
+            }
+        }
+
+        &.buttons-3 {
+            .svg-circle-button {
+                &:nth-child(1) {
+                    .transform(translate(25px, -40px));
+                }
+
+                &:nth-child(2) {
+                    .transform(translate(0px, -40px));
+                    transition-delay: 60ms;
+                }
+
+                &:nth-child(3) {
+                    .transform(translate(-25px, -40px));
+                    transition-delay: 120ms;
+                }
+            }
+        }
+
+        &.buttons-4 {
+            .svg-circle-button {
+                &:nth-child(1) {
+                    .transform(translate(25px, -40px));
+                }
+
+                &:nth-child(2) {
+                    .transform(translate(15px, -40px));
+                    transition-delay: 40ms;
+                }
+
+                &:nth-child(3) {
+                    .transform(translate(-15px, -40px));
+                    transition-delay: 80ms;
+                }
+
+                &:nth-child(4) {
+                    .transform(translate(-25px, -40px));
+                    transition-delay: 120ms;
+                }
+            }
+        }
+    }
+
+    .block-body-text.instance-name {
+        .pointer-event-all();
+    }
+
+    .block-node:not(.read-only) {
+        .instance-name-container {
+            cursor: text;
+            .pointer-event-all();
+
+            &:hover {
+                .background {
+                    fill: rgba(0, 0, 0, 0.05);
+                }
+
+                .edit {
+                    cursor: pointer;
+                    visibility: visible;
+
+                    &:hover {
+                        fill: @gray-xdark;
+                    }
+                }
+            }
+        }
+
+        // TODO: these are overrides and should not be necessary
+        .svg-auto-size-text {
+            .editing {
+                input {
+                    background-color: rgba(0, 0, 0, 0.05) !important;
+                    color: inherit;
+                }
+            }
+        }
+
+        .block-body {
+            cursor: move;
+        }
+    }
+
+    &:not(.highlight, .focused-link) {
+        .block-action-container:hover,
+        &.buttons-visible {
+            .block-actions {
+                .svg-circle-button {
+                    .transform(translate(0,0));
+                }
+            }
+        }
+    }
+
+    &.invalid {
+        .block-node .block-body {
+            fill: @status-warning-fg;
+        }
+    }
+
+    &.focused-link {
+        .block-body {
+            cursor: pointer;
+        }
+
+        .instance-name-container {
+            cursor: default;
+            pointer-events: none;
+
+            .block-body-text {
+                pointer-events: none;
+            }
+        }
+    }
+}
+
+.planner-block-node-container {
+    width: 150px;
+    &.linked-block {
+        .planner-resource-list {
+            pointer-events: none;
+        }
+    }
+}

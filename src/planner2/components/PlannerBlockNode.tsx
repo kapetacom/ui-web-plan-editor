@@ -22,6 +22,8 @@ import { BlockOutlet, blockRenderer } from '../renderers/blockRenderer';
 import { SVGAutoSizeText } from '@kapeta/ui-web-components';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
+import './PlannerBlockNode.less';
+
 interface Props {
     size: PlannerNodeSize;
     actions?: PlannerActionConfig;
@@ -83,6 +85,85 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
         block: blockContext.blockDefinition,
         blockInstance: blockContext.blockInstance,
     };
+
+    const outlets = useMemo(() => {
+        return {
+            [BlockOutlet.BlockStatus]: ({ status }) =>
+                status ? <circle className={`instance_${status}`} r={4} cx={10} cy={40} /> : <></>,
+            [BlockOutlet.BlockInstanceName]: ({ instance, readOnly }) => (
+                <SVGAutoSizeText
+                    className="block-body-text instance-name"
+                    y={0}
+                    x={0}
+                    lineHeight={24}
+                    maxHeight={36}
+                    maxWidth={150}
+                    maxChars={15}
+                    maxLines={2}
+                    onChange={
+                        readOnly
+                            ? undefined
+                            : (name) =>
+                                  planner.updateBlockInstance.call(null, instance.id, (bx) => {
+                                      return {
+                                          ...bx,
+                                          name,
+                                      };
+                                  })
+                    }
+                    value={instance.name}
+                />
+            ),
+            [BlockOutlet.BlockName]: ({ block }) => {
+                const kindUri = parseKapetaUri(block.kind);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-name"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.name}
+                    />
+                );
+            },
+            [BlockOutlet.BlockHandle]: ({ block }) => {
+                const kindUri = parseKapetaUri(block.kind);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-handle"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.handle}
+                    />
+                );
+            },
+            [BlockOutlet.BlockVersion]: ({ instance }) => {
+                const kindUri = parseKapetaUri(instance.block.ref);
+                return (
+                    <SVGAutoSizeText
+                        className="block-body-text block-version"
+                        y={0}
+                        x={0}
+                        lineHeight={12}
+                        maxHeight={20}
+                        maxChars={25}
+                        maxLines={1}
+                        maxWidth={150}
+                        value={kindUri.version}
+                    />
+                );
+            },
+        };
+    }, []);
 
     return (
         // TODO: Readonly/ viewonly
@@ -257,96 +338,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
 
                                         <g {...evt.componentProps} ref={onRef}>
                                             {/* Something something dimensions? */}
-                                            <blockRenderer.Provider
-                                                outlets={{
-                                                    [BlockOutlet.BlockStatus]: ({ status }) =>
-                                                        status ? (
-                                                            <circle
-                                                                className={`instance_${status}`}
-                                                                r={4}
-                                                                cx={10}
-                                                                cy={40}
-                                                            />
-                                                        ) : (
-                                                            <></>
-                                                        ),
-                                                    [BlockOutlet.BlockInstanceName]: ({ instance, readOnly }) => (
-                                                        <SVGAutoSizeText
-                                                            className="block-body-text instance-name"
-                                                            y={0}
-                                                            x={0}
-                                                            lineHeight={24}
-                                                            maxHeight={36}
-                                                            maxWidth={150}
-                                                            maxChars={15}
-                                                            maxLines={2}
-                                                            onChange={
-                                                                readOnly
-                                                                    ? undefined
-                                                                    : (name) =>
-                                                                          planner.updateBlockInstance(
-                                                                              instance.id,
-                                                                              (bx) => {
-                                                                                  return {
-                                                                                      ...bx,
-                                                                                      name,
-                                                                                  };
-                                                                              }
-                                                                          )
-                                                            }
-                                                            value={instance.name}
-                                                        />
-                                                    ),
-                                                    [BlockOutlet.BlockName]: ({ block }) => {
-                                                        const kindUri = parseKapetaUri(block.kind);
-                                                        return (
-                                                            <SVGAutoSizeText
-                                                                className="block-body-text block-name"
-                                                                y={0}
-                                                                x={0}
-                                                                lineHeight={12}
-                                                                maxHeight={20}
-                                                                maxChars={25}
-                                                                maxLines={1}
-                                                                maxWidth={150}
-                                                                value={kindUri.name}
-                                                            />
-                                                        );
-                                                    },
-                                                    [BlockOutlet.BlockHandle]: ({ block }) => {
-                                                        const kindUri = parseKapetaUri(block.kind);
-                                                        return (
-                                                            <SVGAutoSizeText
-                                                                className="block-body-text block-handle"
-                                                                y={0}
-                                                                x={0}
-                                                                lineHeight={12}
-                                                                maxHeight={20}
-                                                                maxChars={25}
-                                                                maxLines={1}
-                                                                maxWidth={150}
-                                                                value={kindUri.handle}
-                                                            />
-                                                        );
-                                                    },
-                                                    [BlockOutlet.BlockVersion]: ({ instance }) => {
-                                                        const kindUri = parseKapetaUri(instance.block.ref);
-                                                        return (
-                                                            <SVGAutoSizeText
-                                                                className="block-body-text block-version"
-                                                                y={0}
-                                                                x={0}
-                                                                lineHeight={12}
-                                                                maxHeight={20}
-                                                                maxChars={25}
-                                                                maxLines={1}
-                                                                maxWidth={150}
-                                                                value={kindUri.version}
-                                                            />
-                                                        );
-                                                    },
-                                                }}
-                                            >
+                                            <blockRenderer.Provider outlets={outlets}>
                                                 <NodeComponent
                                                     block={blockContext.blockDefinition!}
                                                     instance={blockContext.blockInstance}
