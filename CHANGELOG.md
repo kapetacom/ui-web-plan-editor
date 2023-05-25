@@ -1,3 +1,10 @@
+## [0.0.61](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.0.60...v0.0.61) (2023-05-25)
+
+
+### Bug Fixes
+
+* add export of outlet provider and error handler ([6b83295](https://github.com/kapetacom/ui-web-plan-editor/commit/6b83295a042602632f68192de77c8ce4cf1850ac))
+
 ## [0.0.60](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.0.59...v0.0.60) (2023-05-24)
 
 
