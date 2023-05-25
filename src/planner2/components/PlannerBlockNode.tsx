@@ -23,6 +23,7 @@ import { SVGAutoSizeText } from '@kapeta/ui-web-components';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 import './PlannerBlockNode.less';
+import { withErrorBoundary } from 'react-error-boundary';
 
 interface Props {
     size: PlannerNodeSize;
@@ -119,10 +120,10 @@ export const BlockOutletProvider = (props) => {
     return <blockRenderer.Provider outlets={outlets}>{props.children}</blockRenderer.Provider>;
 };
 
-export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
+const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     const planner = useContext(PlannerContext);
     const blockContext = useBlockContext();
-    const blockType = BlockTypeProvider.get(blockContext.blockDefinition!.kind);
+    const blockType = BlockTypeProvider.get(blockContext.blockDefinition?.kind || '');
 
     if (!blockContext.blockInstance) {
         throw new Error('PlannerBlockNode requires a BlockDefinition context');
@@ -198,7 +199,7 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
                     }
                 }
 
-                const NodeComponent = blockType.shapeComponent || BlockNode;
+                const NodeComponent = blockType?.shapeComponent || BlockNode;
 
                 return (
                     // Effective layout includes drag status
@@ -386,3 +387,25 @@ export const PlannerBlockNode: React.FC<Props> = (props: Props) => {
         </DragAndDrop.Draggable>
     );
 };
+
+export const PlannerBlockNode = withErrorBoundary(PlannerBlockNodeBase, {
+    fallbackRender: ({ error }) => {
+        const body = <div>Error: {error.message}</div>;
+        try {
+            const blockContext = useBlockContext();
+            return (
+                <foreignObject
+                    x={blockContext.blockInstance.dimensions!.left}
+                    y={blockContext.blockInstance.dimensions!.top}
+                >
+                    {body}
+                </foreignObject>
+            );
+        } catch (err) {
+            return body;
+        }
+    },
+    onError(error, info) {
+        console.error('Error rendering block', error, info);
+    },
+});
