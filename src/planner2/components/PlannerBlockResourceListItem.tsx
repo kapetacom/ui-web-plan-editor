@@ -384,6 +384,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                             }}
                                         />
 
+                                        {/* TODO: To avoid shifting, maybe remove this */}
                                         <LayoutNode
                                             x={getResourceConnectionPoint({
                                                 isConsumer,
