@@ -27,6 +27,7 @@ export const PlannerConnection: React.FC<{
     onMouseEnter?: (context: ActionContext) => void;
     onMouseLeave?: (context: ActionContext) => void;
 }> = (props) => {
+    const { draggable } = useContext(DnDContext);
     const planner = useContext(PlannerContext);
     const [hasFocus, setHasFocus] = useState(false);
 
@@ -92,8 +93,12 @@ export const PlannerConnection: React.FC<{
     // More horizontal than vertical
     const cellCount = useMemo(() => [30, 20], []);
 
-    const blocks = planner.plan?.spec.blocks || empty;
+    // Remove the dragged block from the list of blocks, so that the pathfinding algorithm
+    // can is not obstructed by the dragged block
+    const draggedBlockId = draggable?.data?.id;
+    const blocks = planner.plan?.spec.blocks.filter((block) => block.id !== draggedBlockId) || empty;
 
+    // Minimum connection indent - straight line
     const indent = 20;
 
     const points = useMemo(() => {
@@ -131,7 +136,6 @@ export const PlannerConnection: React.FC<{
             [Math.ceil(planner.canvasSize.width / cellSizeX), Math.ceil(planner.canvasSize.height / cellSizeY)],
             [cellSizeX, cellSizeY]
         );
-        console.log(matrix);
 
         const grid = new PF.Grid(matrix);
         const matrixPath = findMatrixPath(
@@ -168,7 +172,7 @@ export const PlannerConnection: React.FC<{
             //
             [to.x, to.y],
         ];
-    }, [from, to, blocks, cellCount, planner.canvasSize.width, planner.canvasSize.height]);
+    }, [from, to, blocks, cellCount, planner.canvasSize.width, planner.canvasSize.height, isTemp]);
 
     if (!from || !to) {
         // Where can we render this error if there is no destination?
