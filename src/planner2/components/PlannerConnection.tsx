@@ -1,7 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { PlannerContext } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
-import { calculatePathBetweenPoints, getCurveMainPoints, getMiddlePoint } from '../utils/connectionUtils';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { getResourceId } from '../utils/planUtils';
@@ -9,6 +8,13 @@ import { ActionContext, PlannerAction } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { Connection } from '@kapeta/schemas';
+import * as PF from 'pathfinding';
+
+import { fillMatrix } from '../utils/connectionUtils/src/matrix';
+import { convertMatrixPathToPoints, findMatrixPath, getPathMidpoint } from '../utils/connectionUtils/src/path';
+import { DnDContext } from '../DragAndDrop/DnDContext';
+
+const empty = [];
 
 export const PlannerConnection: React.FC<{
     connection: Connection;
@@ -21,8 +27,13 @@ export const PlannerConnection: React.FC<{
     onMouseEnter?: (context: ActionContext) => void;
     onMouseLeave?: (context: ActionContext) => void;
 }> = (props) => {
+    const { draggable } = useContext(DnDContext);
     const planner = useContext(PlannerContext);
     const [hasFocus, setHasFocus] = useState(false);
+
+    const isTemp =
+        props.connection.consumer.blockId === 'temp-block' &&
+        props.connection.consumer.resourceName === 'temp-resource';
 
     const fromId = getResourceId(
         props.connection.provider.blockId,
@@ -36,11 +47,6 @@ export const PlannerConnection: React.FC<{
     );
     const from = planner.connectionPoints.getPointById(fromId);
     const to = planner.connectionPoints.getPointById(toId);
-
-    if (!from || !to) {
-        // Where can we render this error if there is no destination?
-        return null;
-    }
 
     const fromResource = planner.getResourceByBlockIdAndName(
         props.connection.provider.blockId,
@@ -84,9 +90,99 @@ export const PlannerConnection: React.FC<{
         className += ` ${props.className}`;
     }
 
-    const path = calculatePathBetweenPoints(from, to);
-    const points = getCurveMainPoints(from, to);
-    const middlePoint = getMiddlePoint(points);
+    // More horizontal than vertical
+    const cellCount = useMemo(() => [30, 20], []);
+
+    // Remove the dragged block from the list of blocks, so that the pathfinding algorithm
+    // can is not obstructed by the dragged block
+    const draggedBlockId = draggable?.data?.id;
+    const blocks = planner.plan?.spec.blocks.filter((block) => block.id !== draggedBlockId) || empty;
+
+    // Minimum connection indent - straight line
+    const indent = 20;
+
+    const points = useMemo(() => {
+        if (!from || !to) {
+            return [];
+        }
+        const fromX = from.x + indent;
+        const toX = to.x - indent;
+
+        const fallbackPath = [
+            [from.x, from.y],
+            [fromX, from.y],
+            [toX, from.y],
+            [toX, to.y],
+            [to.x, to.y],
+        ];
+
+        // Special handling of temp-connections
+        if (isTemp) {
+            return fallbackPath;
+        }
+
+        // Do a dynamic cell size based on the distance, to try to get perfect alignment
+        // Catch: set a minimum size to avoid creating too many cells
+        const cellSizeX = Math.max(5, (toX - fromX) / cellCount[0]);
+        const cellSizeY = Math.max(5, (to.y - from.y) / cellCount[1]);
+
+        const matrix = fillMatrix(
+            blocks.map((block) => ({
+                x: block.dimensions.left,
+                y: block.dimensions.top,
+                width: block.dimensions.width + 40 || 190,
+                height: Math.max(block.dimensions.height + 40, 190),
+            })) || [],
+            [Math.ceil(planner.canvasSize.width / cellSizeX), Math.ceil(planner.canvasSize.height / cellSizeY)],
+            [cellSizeX, cellSizeY]
+        );
+
+        const grid = new PF.Grid(matrix);
+        const matrixPath = findMatrixPath(
+            [Math.floor(fromX / cellSizeX), Math.floor(from.y / cellSizeY)],
+            [Math.floor(toX / cellSizeX), Math.floor(to.y / cellSizeY)],
+            grid
+        );
+        if (!matrixPath.length) {
+            // If the path is
+            return fallbackPath;
+        }
+        const rawPath = convertMatrixPathToPoints(matrixPath, {
+            offsetX: 0,
+            offsetY: from.y % cellSizeY,
+            stepX: cellSizeX,
+            stepY: cellSizeY,
+        });
+
+        // We always want to end on a horizontal line
+        const prevPoint = rawPath[rawPath.length - 2];
+        const lastPoint = rawPath[rawPath.length - 1];
+        // vertical line, replace last point
+        if (lastPoint[0] === prevPoint[0]) {
+            lastPoint[1] = to.y;
+        } else {
+            // horizontal line, add a new point
+            rawPath.push([lastPoint[0], to.y]);
+        }
+
+        return [
+            [from.x, from.y],
+            [Math.min(fromX, rawPath[0][0]), from.y],
+            ...rawPath,
+            //
+            [to.x, to.y],
+        ];
+    }, [from, to, blocks, cellCount, planner.canvasSize.width, planner.canvasSize.height, isTemp]);
+
+    if (!from || !to) {
+        // Where can we render this error if there is no destination?
+        return null;
+    }
+
+    const path = `M ${points.map(([x, y]) => `${x} ${y}`).join(' L ')}`;
+
+    const middlePoint = getPathMidpoint(points);
+
     const actionContext = {
         connection: props.connection,
     };

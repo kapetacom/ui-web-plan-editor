@@ -1,22 +1,7 @@
 import { Connection, Plan, BlockInstanceResource } from '@kapeta/schemas';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { Point, ResourceRole } from '@kapeta/ui-web-types';
-import { BasisCurve } from '@kapeta/ui-web-utils';
 import { getResourceId } from './planUtils';
-
-export function calculatePathBetweenPoints(fromPoint: Point, toPoint: Point) {
-    return getCurveFromPoints(getCurveMainPoints(fromPoint, toPoint));
-}
-
-export function getCurveFromPoints(points: Point[]) {
-    const curve = new BasisCurve();
-    curve.lineStart();
-    points.forEach((point) => {
-        curve.point(point);
-    });
-    curve.lineEnd();
-    return curve.toString();
-}
 
 export function getConnectionId(connection: Connection) {
     return `${getResourceId(
