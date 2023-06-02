@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { convertMatrixPathToPoints, getPathMidpoint } from './path';
+import { convertMatrixPathToPoints, getPathMidpoint, replaceJoinsWithArcs } from './path';
 import { MatrixObstacle, fillMatrix } from './matrix';
 import { findMatrixPath } from './path';
 import * as PF from 'pathfinding';
@@ -97,5 +97,29 @@ describe('getPathMidpoint', () => {
             x: 0,
             y: 1.5,
         });
+    });
+});
+
+describe('convertSVGPathToRoundedCornerPath', () => {
+    it('converts a path with only straight lines to rounded corners', () => {
+        // Arc format: A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+        // https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#Arcs
+        const convertedPath = replaceJoinsWithArcs('M 0 0 L 0 10 L 10 10', 5);
+        expect(convertedPath).toEqual('M 0 0 L 0 5 A 5 5 0 0 0 5 10 L 10 10');
+    });
+
+    it('generates clockwise arcs', () => {
+        // Check that it gets the clockwise flag right - generate a path that goes around the outside of a square
+        const convertedPath2 = replaceJoinsWithArcs('M 0 0 L 10 0 L 10 10 L 0 10 L 0 0', 5);
+        expect(convertedPath2).toEqual(
+            'M 0 0 L 5 0 A 5 5 0 0 1 10 5 L 10 5 A 5 5 0 0 1 5 10 L 5 10 A 5 5 0 0 1 0 5 L 0 0'
+        );
+    });
+    it('generates counter-clockwise arcs', () => {
+        // Check that it gets the clockwise flag right - generate a path that goes around the outside of a square
+        const convertedPath2 = replaceJoinsWithArcs('M 0 0 L 0 10 L 10 10 L 10 0 L 0 0', 5);
+        expect(convertedPath2).toEqual(
+            'M 0 0 L 0 5 A 5 5 0 0 0 5 10 L 5 10 A 5 5 0 0 0 10 5 L 10 5 A 5 5 0 0 0 5 0 L 0 0'
+        );
     });
 });

@@ -11,7 +11,12 @@ import { Connection } from '@kapeta/schemas';
 import * as PF from 'pathfinding';
 
 import { fillMatrix } from '../utils/connectionUtils/src/matrix';
-import { convertMatrixPathToPoints, findMatrixPath, getPathMidpoint } from '../utils/connectionUtils/src/path';
+import {
+    convertMatrixPathToPoints,
+    findMatrixPath,
+    getPathMidpoint,
+    replaceJoinsWithArcs,
+} from '../utils/connectionUtils/src/path';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 
 const empty = [];
@@ -179,7 +184,7 @@ export const PlannerConnection: React.FC<{
         return null;
     }
 
-    const path = `M ${points.map(([x, y]) => `${x} ${y}`).join(' L ')}`;
+    const path = replaceJoinsWithArcs(`M ${points.map(([x, y]) => `${x} ${y}`).join(' L ')}`, 10);
 
     const middlePoint = getPathMidpoint(points);
 
