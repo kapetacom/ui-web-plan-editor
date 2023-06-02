@@ -122,3 +122,62 @@ export function getPathMidpoint(path: number[][]) {
     }
     return { x: 0, y: 0 };
 }
+
+//
+// https://codesandbox.io/s/goofy-monad-6ecf6k?file=/src/index.ts
+export function replaceJoinsWithArcs(svgPath: string, radius: number): string {
+    const pathSegments = svgPath.split(/\s?[ML]\s?/).filter(Boolean);
+    const replacedSegments: string[] = [`M ${pathSegments[0]}`];
+
+    for (let i = 1; i < pathSegments.length - 1; i++) {
+        const prevSegment = pathSegments[i - 1];
+        const segment = pathSegments[i];
+        const nextSegment = pathSegments[i + 1];
+
+        const [prevX, prevY] = prevSegment.split(' ').map(parseFloat);
+        const [x, y] = segment.split(' ').map(parseFloat);
+        const [nextX, nextY] = nextSegment.split(' ').map(parseFloat);
+
+        if (!isNaN(x) && !isNaN(y) && !isNaN(nextX) && !isNaN(nextY)) {
+            const dynamicRadius = Math.min(
+                radius,
+                Math.max(Math.abs(x - prevX), Math.abs(y - prevY)) / 2,
+                Math.max(Math.abs(x - nextX), Math.abs(y - nextY)) / 2
+            );
+            if (x === nextX && x !== prevX) {
+                // current -> next is Vertical line
+                // If current segment is down (Y++), and previous was right (X++), then clockwise
+                // If current segment is up (Y--), and previous was left (X--), then clockwise
+                const isClockwise = (y > nextY && x < prevX) || (y < nextY && x > prevX);
+                const line1EndX = x > prevX ? x - dynamicRadius : x + dynamicRadius;
+                const line2StartY = y > nextY ? y - dynamicRadius : y + dynamicRadius;
+
+                replacedSegments.push(`L ${line1EndX} ${y}`);
+                replacedSegments.push(
+                    `A ${dynamicRadius} ${dynamicRadius} 0 0 ${isClockwise ? 1 : 0} ${x} ${line2StartY}`
+                );
+            } else if (y === nextY && y !== prevY) {
+                // current -> next is Horizontal line
+                // If current segment is right (X++), and previous was up (Y--), then clockwise
+                // If current segment is left (X--), and previous was down (Y++), then clockwise
+                const isClockwise = (x < nextX && y < prevY) || (x > nextX && y > prevY);
+
+                const line1EndY = y > prevY ? y - dynamicRadius : y + dynamicRadius;
+                const line2StartX = x > nextX ? x - dynamicRadius : x + dynamicRadius;
+
+                replacedSegments.push(`L ${x} ${line1EndY}`);
+                replacedSegments.push(
+                    `A ${dynamicRadius} ${dynamicRadius} 0 0 ${isClockwise ? 1 : 0} ${line2StartX} ${y}`
+                );
+            } else {
+                replacedSegments.push(`L ${x} ${y}`);
+            }
+        }
+    }
+
+    // Append the last segment of the original path
+    const lastSegment = pathSegments[pathSegments.length - 1];
+    replacedSegments.push(`L ${lastSegment}`);
+
+    return `${replacedSegments.join(' ')}`;
+}

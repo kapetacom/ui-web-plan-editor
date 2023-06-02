@@ -11,7 +11,12 @@ import { Connection } from '@kapeta/schemas';
 import * as PF from 'pathfinding';
 
 import { fillMatrix } from '../utils/connectionUtils/src/matrix';
-import { convertMatrixPathToPoints, findMatrixPath, getPathMidpoint } from '../utils/connectionUtils/src/path';
+import {
+    convertMatrixPathToPoints,
+    findMatrixPath,
+    getPathMidpoint,
+    replaceJoinsWithArcs,
+} from '../utils/connectionUtils/src/path';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 
 const empty = [];
@@ -108,13 +113,23 @@ export const PlannerConnection: React.FC<{
         const fromX = from.x + indent;
         const toX = to.x - indent;
 
-        const fallbackPath = [
-            [from.x, from.y],
-            [fromX, from.y],
-            [toX, from.y],
-            [toX, to.y],
-            [to.x, to.y],
-        ];
+        const fallbackPath =
+            fromX > toX
+                ? [
+                      [from.x, from.y],
+                      [fromX, from.y],
+                      [fromX, from.y + (to.y - from.y) / 2],
+                      [toX, from.y + (to.y - from.y) / 2],
+                      [toX, to.y],
+                      [to.x, to.y],
+                  ]
+                : [
+                      [from.x, from.y],
+                      [fromX, from.y],
+                      [toX, from.y],
+                      [toX, to.y],
+                      [to.x, to.y],
+                  ];
 
         // Special handling of temp-connections
         if (isTemp) {
@@ -127,12 +142,22 @@ export const PlannerConnection: React.FC<{
         const cellSizeY = Math.max(5, (to.y - from.y) / cellCount[1]);
 
         const matrix = fillMatrix(
-            blocks.map((block) => ({
-                x: block.dimensions.left,
-                y: block.dimensions.top,
-                width: block.dimensions.width + 40 || 190,
-                height: Math.max(block.dimensions.height + 40, 190),
-            })) || [],
+            blocks
+                .map((block) => ({
+                    x: block.dimensions.left,
+                    y: block.dimensions.top,
+                    width: block.dimensions.width + 40 || 190,
+                    height: Math.max(block.dimensions.height + 40, 190),
+                }))
+                // block the path from ending from the right during dragging
+                .concat([
+                    {
+                        x: toX + cellSizeX,
+                        y: to.y,
+                        width: 2,
+                        height: 20,
+                    },
+                ]),
             [Math.ceil(planner.canvasSize.width / cellSizeX), Math.ceil(planner.canvasSize.height / cellSizeY)],
             [cellSizeX, cellSizeY]
         );
@@ -143,8 +168,8 @@ export const PlannerConnection: React.FC<{
             [Math.floor(toX / cellSizeX), Math.floor(to.y / cellSizeY)],
             grid
         );
-        if (!matrixPath.length) {
-            // If the path is
+        if (matrixPath.length < 2) {
+            // If the path is blocked, just draw a straight line
             return fallbackPath;
         }
         const rawPath = convertMatrixPathToPoints(matrixPath, {
@@ -160,14 +185,15 @@ export const PlannerConnection: React.FC<{
         // vertical line, replace last point
         if (lastPoint[0] === prevPoint[0]) {
             lastPoint[1] = to.y;
-        } else {
+        } else if (lastPoint[1] === prevPoint[1]) {
             // horizontal line, add a new point
             rawPath.push([lastPoint[0], to.y]);
         }
 
         return [
             [from.x, from.y],
-            [Math.min(fromX, rawPath[0][0]), from.y],
+            // [Math.min(fromX, rawPath[0][0]), from.y],
+
             ...rawPath,
             //
             [to.x, to.y],
@@ -179,7 +205,7 @@ export const PlannerConnection: React.FC<{
         return null;
     }
 
-    const path = `M ${points.map(([x, y]) => `${x} ${y}`).join(' L ')}`;
+    const path = replaceJoinsWithArcs(`M ${points.map(([x, y]) => `${x} ${y}`).join(' L ')}`, 10);
 
     const middlePoint = getPathMidpoint(points);
 
