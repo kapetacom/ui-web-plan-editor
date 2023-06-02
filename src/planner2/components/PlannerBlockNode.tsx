@@ -123,7 +123,9 @@ export const BlockOutletProvider = (props) => {
 const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     const planner = useContext(PlannerContext);
     const blockContext = useBlockContext();
-    const blockType = BlockTypeProvider.get(blockContext.blockDefinition?.kind || '');
+    const blockType = blockContext.blockDefinition?.kind
+        ? BlockTypeProvider.get(blockContext.blockDefinition?.kind)
+        : null;
 
     if (!blockContext.blockInstance) {
         throw new Error('PlannerBlockNode requires a BlockDefinition context');
@@ -344,18 +346,29 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                         />
 
                                         <g {...evt.componentProps} ref={onRef}>
-                                            {/* Something something dimensions? */}
-                                            <BlockOutletProvider>
-                                                <NodeComponent
-                                                    block={blockContext.blockDefinition!}
-                                                    instance={blockContext.blockInstance}
-                                                    readOnly={!canEditInstance}
-                                                    status={blockContext.instanceStatus}
+                                            {blockContext.blockDefinition ? (
+                                                <BlockOutletProvider>
+                                                    <NodeComponent
+                                                        block={blockContext.blockDefinition}
+                                                        instance={blockContext.blockInstance}
+                                                        readOnly={!canEditInstance}
+                                                        status={blockContext.instanceStatus}
+                                                        width={blockContext.blockInstance.dimensions!.width}
+                                                        height={blockContext.instanceBlockHeight}
+                                                        valid={isValid}
+                                                    />
+                                                </BlockOutletProvider>
+                                            ) : (
+                                                <foreignObject
                                                     width={blockContext.blockInstance.dimensions!.width}
                                                     height={blockContext.instanceBlockHeight}
-                                                    valid={isValid}
-                                                />
-                                            </BlockOutletProvider>
+                                                    style={{ textAlign: 'center' }}
+                                                >
+                                                    <p>Failed to load</p>
+                                                    <pre>{blockContext.blockInstance.name}</pre>
+                                                    <code>{blockContext.blockInstance.block.ref}</code>
+                                                </foreignObject>
+                                            )}
                                             {/* name={blockContext.blockInstance.name}
                                                 instanceName={blockContext.blockInstance.name}
                                                 onInstanceNameChange={
