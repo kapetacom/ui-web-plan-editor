@@ -1,3 +1,15 @@
+# [0.1.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.0.61...v0.1.0) (2023-06-02)
+
+
+### Bug Fixes
+
+* remove dragged blocks from path matrix ([6fc5488](https://github.com/kapetacom/ui-web-plan-editor/commit/6fc54889fa66279d99bf774bcae215b0585cfffd))
+
+
+### Features
+
+* KAP-513 new connections w/ object avoidance ([9ce2f12](https://github.com/kapetacom/ui-web-plan-editor/commit/9ce2f125cfed92de1f9609bb3042015408cffa07))
+
 ## [0.0.61](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.0.60...v0.0.61) (2023-05-25)
 
 
