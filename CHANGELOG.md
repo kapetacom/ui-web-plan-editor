@@ -1,3 +1,16 @@
+# [0.2.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.1.0...v0.2.0) (2023-06-02)
+
+
+### Bug Fixes
+
+* bugfix for short path and nicer fallbacks ([dcaf5c8](https://github.com/kapetacom/ui-web-plan-editor/commit/dcaf5c88a8a5f9d36f70a74435b40f123fd735e4))
+* fallback render on missing block definition ([b00e440](https://github.com/kapetacom/ui-web-plan-editor/commit/b00e4409ed5ed5f5900ae5eea8d3c7867c87e74e))
+
+
+### Features
+
+* rounded corners on connections using Arcs ([9a4d86d](https://github.com/kapetacom/ui-web-plan-editor/commit/9a4d86d7b883535499dc0fd3b71267463d1cfe20))
+
 # [0.1.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.0.61...v0.1.0) (2023-06-02)
 
 
