@@ -285,8 +285,8 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
             {draggableItem && draggableItemPosition && draggableItem.type === ItemType.BLOCK && (
                 <DraggableBlock {...draggableItem.data} point={draggableItemPosition} />
             )}
-
             <Planner2 systemId="system?" actions={actionConfig} />
+
             <ItemEditorPanel
                 open={!!editItem}
                 editableItem={editItem}

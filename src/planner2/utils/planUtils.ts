@@ -16,6 +16,8 @@ export const calculateCanvasSize = (
     size: PlannerNodeSize,
     containerSize: Size
 ) => {
+    // We want the canvas to always have enough space for the block + connections, even at the edges
+    const canvasPadding = 150;
     let maxWidth = 50;
     let maxHeight = 50;
     let minX = 0;
@@ -36,7 +38,7 @@ export const calculateCanvasSize = (
                 return;
             }
             const bottom = dimensions.top + calculateBlockHeight(blockKind.data, size);
-            const right = dimensions.left + dimensions.width;
+            const right = dimensions.left + dimensions.width + canvasPadding;
             const y = dimensions.top;
             const x = dimensions.left;
             if (maxHeight < bottom) {

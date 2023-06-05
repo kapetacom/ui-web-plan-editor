@@ -63,8 +63,13 @@ export function findMatrixPath(
     grid: PF.Grid
 ): number[][] {
     // const finder = new PF.JumpPointFinder({ diagonalMovement: PF.DiagonalMovement.Never });
+    const boundedStart = [
+        Math.max(0, Math.min(grid.width - 1, start[0])),
+        Math.max(0, Math.min(grid.height - 1, start[1])),
+    ];
+    const boundedEnd = [Math.max(0, Math.min(grid.width - 1, end[0])), Math.max(0, Math.min(grid.height - 1, end[1]))];
     const finder = new PF.AStarFinder({ diagonalMovement: PF.DiagonalMovement.Never });
-    const path = finder.findPath(...start, ...end, grid);
+    const path = finder.findPath(...boundedStart, ...boundedEnd, grid);
     // Simplify the path by converting lines to single [start, end] instead of [start, ...intermediate, end]
     // EDIT: Maybe we dont want this, since it animates better with more points
     if (path.length > 2) {
