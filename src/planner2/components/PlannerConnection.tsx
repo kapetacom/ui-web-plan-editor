@@ -138,8 +138,8 @@ export const PlannerConnection: React.FC<{
 
         // Do a dynamic cell size based on the distance, to try to get perfect alignment
         // Catch: set a minimum size to avoid creating too many cells
-        const cellSizeX = Math.max(5, (toX - fromX) / cellCount[0]);
-        const cellSizeY = Math.max(5, (to.y - from.y) / cellCount[1]);
+        const cellSizeX = Math.max(5, Math.abs(toX - fromX) / cellCount[0]);
+        const cellSizeY = Math.max(5, Math.abs(to.y - from.y) / cellCount[1]);
 
         const matrix = fillMatrix(
             blocks
@@ -153,9 +153,15 @@ export const PlannerConnection: React.FC<{
                 .concat([
                     {
                         x: toX + cellSizeX,
-                        y: to.y,
+                        y: to.y - 190 / 2,
                         width: 2,
-                        height: 20,
+                        height: 190,
+                    },
+                    {
+                        x: fromX - cellSizeX,
+                        y: from.y - 190 / 2,
+                        width: 2,
+                        height: 190,
                     },
                 ]),
             [Math.ceil(planner.canvasSize.width / cellSizeX), Math.ceil(planner.canvasSize.height / cellSizeY)],
