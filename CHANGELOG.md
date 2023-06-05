@@ -1,3 +1,11 @@
+## [0.2.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.2.0...v0.2.1) (2023-06-05)
+
+
+### Bug Fixes
+
+* grid cell size with negative diffs ([8d43d2f](https://github.com/kapetacom/ui-web-plan-editor/commit/8d43d2faff156c8f8ba477866cf8e277316b6437))
+* handle out-of-bounds for connection pathing ([5a7b4ba](https://github.com/kapetacom/ui-web-plan-editor/commit/5a7b4baf8ba269fe72d1354835176a50fa2bc46d))
+
 # [0.2.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.1.0...v0.2.0) (2023-06-02)
 
 
