@@ -36,7 +36,6 @@ export * from './planner2/utils/planUtils';
 export * from './planner2/utils/connectionUtils';
 export * from './planner2/Planner2';
 export * from './planner2/PlannerContext';
-export { BlockOutletProvider } from './planner2/components/PlannerBlockNode';
 export * from './planner2/types';
 export * from './planner2/validation/BlockValidator';
 export * from './planner2/renderers/plannerRenderer';
