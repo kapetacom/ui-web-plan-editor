@@ -134,7 +134,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                 return (
                                     draggable.type === 'resource' &&
                                     // don't connect to self
-                                    draggable.data.block.id !== blockContext.blockInstance.id
+                                    draggable.data.instance.id !== blockContext.blockInstance.id
                                 );
                             }}
                             onDrop={(draggable: ResourcePayload | ResourceTypePayload) => {

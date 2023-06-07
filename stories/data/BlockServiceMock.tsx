@@ -202,7 +202,9 @@ BlockTypeProvider.register({
 
         return errors;
     },
-    shapeComponent: (props) => {
+    shapeWidth: 200,
+    getShapeHeight: (resourceHeight: number) => Math.max(120, resourceHeight + 40),
+    shapeComponent: function ShapeComponent(props) {
         // Scaling the topbar svg to fit the block
         const block = useBlock();
         const svgWidth = 192;
@@ -292,7 +294,7 @@ BlockTypeProvider.register({
 
         return errors;
     },
-    shapeComponent: (props) => {
+    shapeComponent: function ShapeComponent(props) {
         const block = useBlock();
         // Make the mobile block a bit smaller
         const svgWidth = 152;

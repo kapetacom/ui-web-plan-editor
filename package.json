@@ -34,7 +34,7 @@
     "peerDependencies": {
         "@kapeta/nodejs-utils": "<2",
         "@kapeta/schemas": "<2",
-        "@kapeta/ui-web-components": "file:../ui-web-components",
+        "@kapeta/ui-web-components": "^0.2.0",
         "@kapeta/ui-web-context": "<2",
         "@kapeta/ui-web-types": "<2",
         "@kapeta/ui-web-utils": "<2",

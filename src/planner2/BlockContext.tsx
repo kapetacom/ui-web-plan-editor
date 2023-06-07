@@ -1,9 +1,9 @@
 import React, { useContext, useMemo, useState } from 'react';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerContext } from './PlannerContext';
-import { getBlockHeightByResourceCount } from './utils/planUtils';
+import { getDefaultBlockHeight, resourceHeight } from './utils/planUtils';
 import { BlockMode } from '../wrappers/wrapperHelpers';
-import { InstanceStatus } from '@kapeta/ui-web-context';
+import { BlockTypeProvider, InstanceStatus } from '@kapeta/ui-web-context';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 
 export interface PlannerBlockContextData {
@@ -54,6 +54,7 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
     const overrideMode = blockInstance && planner.assetState.getViewModeForBlock(blockInstance.id);
     const focusedMode = planner.focusedBlock?.id === props.blockId ? BlockMode.FOCUSED : undefined;
     const instanceStatus = planner.instanceStates[props.blockId] || InstanceStatus.STOPPED;
+    const blockType = blockDefinition?.kind ? BlockTypeProvider.get(blockDefinition!.kind) : undefined;
 
     const value = useMemo(() => {
         // calculate Resource height
@@ -63,7 +64,10 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
         const pendingConsumers = blockMode === BlockMode.HOVER_DROP_CONSUMER ? 1 : 0;
         const pendingProviders = blockMode === BlockMode.HOVER_DROP_PROVIDER ? 1 : 0;
         const resourceCount = Math.max(consumers.length + pendingConsumers, providers.length + pendingProviders);
-        const instanceBlockHeight = getBlockHeightByResourceCount(resourceCount, planner.nodeSize);
+        const blockResourceHeight = resourceHeight[planner.nodeSize] * resourceCount;
+        const instanceBlockHeight = blockType?.getShapeHeight
+            ? blockType.getShapeHeight(blockResourceHeight)
+            : getDefaultBlockHeight(blockResourceHeight);
         const blockReference = blockInstance && parseKapetaUri(blockInstance?.block.ref);
 
         return {
@@ -75,6 +79,7 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
             providers,
             instanceStatus,
             instanceBlockHeight,
+            instanceBlockWidth: blockType?.shapeWidth || 150,
             blockMode: focusedMode ?? overrideMode ?? blockMode,
             setBlockMode,
             isBlockInstanceReadOnly: !planner.canEditBlocks,
@@ -91,6 +96,7 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
         overrideMode,
         focusedMode,
         props.configuration,
+        blockType,
     ]);
     return <BlockContext.Provider value={value}>{props.children}</BlockContext.Provider>;
 };

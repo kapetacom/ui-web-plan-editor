@@ -50,6 +50,12 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
     const blockType = BlockTypeProvider.get(props.block.data!.kind);
     const Shape = blockType.shapeComponent || BlockNode;
 
+    const instance = {
+        id: 'temp-block',
+        name: props.name,
+        block: { ref: props.block.ref },
+        dimensions: { height: 0, width: 0, top: 0, left: 0 },
+    };
     return (
         <svg
             className="plan-item-dragged block"
@@ -62,16 +68,8 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
                 transform: `scale(${props.planner.zoom})`,
             }}
         >
-            <BlockLayout
-                definition={props.block.data}
-                instance={{
-                    id: 'temp-block',
-                    name: props.name,
-                    block: { ref: props.block.ref },
-                    dimensions: { height: 0, width: 0, top: 0, left: 0 },
-                }}
-            >
-                <Shape height={BLOCK_SIZE} width={BLOCK_SIZE} />
+            <BlockLayout definition={props.block.data} instance={instance}>
+                <Shape block={props.block.data} instance={instance} height={BLOCK_SIZE} width={BLOCK_SIZE} />
             </BlockLayout>
         </svg>
     );
