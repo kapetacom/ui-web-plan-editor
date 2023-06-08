@@ -2,14 +2,18 @@ import React from 'react';
 import { ResourceRole } from '@kapeta/ui-web-types';
 
 import {
+    BlockValidator,
     PlannerBlockModelWrapper,
-    PlannerBlockResourceListItem,
+    // PlannerBlockResourceListItem,
     PlannerModelWrapper,
     PlannerNodeSize,
     PlannerResourceModelWrapper,
     ResourceMode,
 } from '../src';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
+import { PlannerBlockResourceListItem } from '../src/planner2/components/PlannerBlockResourceListItem';
+import { BlockContext, BlockContextProvider, PlannerBlockContextData } from '../src/planner2/BlockContext';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 const ValidInstance: BlockInstance = {
     id: '1',
@@ -97,57 +101,105 @@ export default {
 };
 
 export const ResourceMissingKind = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
-    const block = new PlannerBlockModelWrapper(ValidInstance, ValidDefinition, somePlan);
-    const resource = new PlannerResourceModelWrapper(ResourceRole.PROVIDES, MissingResourceKind, block);
-    resource.setMode(ResourceMode.SHOW);
-
+    const resource = MissingResourceKind;
+    const errors = new BlockValidator(ValidDefinition, ValidInstance).validateResource(resource);
     return (
-        <div style={{ position: 'relative' }}>
-            <PlannerBlockResourceListItem size={PlannerNodeSize.FULL} zoom={1} resource={resource} index={0} />
-            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...resource.errors].join('\n')}</pre>
-        </div>
+        <BlockContext.Provider
+            value={
+                {
+                    blockInstance: ValidInstance,
+                    blockReference: parseKapetaUri(ValidInstance.block.ref),
+                } as Partial<PlannerBlockContextData> as any
+            }
+        >
+            <div style={{ padding: '20px' }}>
+                <PlannerBlockResourceListItem
+                    size={PlannerNodeSize.FULL}
+                    index={0}
+                    mode={ResourceMode.SHOW}
+                    resource={resource}
+                    role={ResourceRole.PROVIDES}
+                />
+                <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...(errors || [])].join('\n')}</pre>
+            </div>
+        </BlockContext.Provider>
     );
 };
 
 export const ResourceInvalidKind = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
-    const block = new PlannerBlockModelWrapper(ValidInstance, ValidDefinition, somePlan);
-    const resource = new PlannerResourceModelWrapper(ResourceRole.PROVIDES, InvalidResourceKind, block);
-    resource.setMode(ResourceMode.SHOW);
-
+    const resource = InvalidResourceKind;
+    const errors = new BlockValidator(ValidDefinition, ValidInstance).validateResource(resource);
     return (
-        <div style={{ position: 'relative' }}>
-            <PlannerBlockResourceListItem size={PlannerNodeSize.FULL} zoom={1} resource={resource} index={0} />
-            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...resource.errors].join('\n')}</pre>
-        </div>
+        <BlockContext.Provider
+            value={
+                {
+                    blockInstance: ValidInstance,
+                    blockReference: parseKapetaUri(ValidInstance.block.ref),
+                } as Partial<PlannerBlockContextData> as any
+            }
+        >
+            <div style={{ padding: '20px' }}>
+                <PlannerBlockResourceListItem
+                    size={PlannerNodeSize.FULL}
+                    index={0}
+                    mode={ResourceMode.SHOW}
+                    resource={resource}
+                    role={ResourceRole.PROVIDES}
+                />
+                <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...(errors || [])].join('\n')}</pre>
+            </div>
+        </BlockContext.Provider>
     );
 };
 
 export const ResourceInvalidResourceSpec = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
-    const block = new PlannerBlockModelWrapper(ValidInstance, ValidDefinition, somePlan);
-    const resource = new PlannerResourceModelWrapper(ResourceRole.PROVIDES, InvalidResourceSpec, block);
-    resource.setMode(ResourceMode.SHOW);
-
+    const resource = InvalidResourceSpec;
+    const errors = new BlockValidator(ValidDefinition, ValidInstance).validateResource(resource);
     return (
-        <div style={{ position: 'relative' }}>
-            <PlannerBlockResourceListItem size={PlannerNodeSize.FULL} zoom={1} resource={resource} index={0} />
-            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...resource.errors].join('\n')}</pre>
-        </div>
+        <BlockContext.Provider
+            value={
+                {
+                    blockInstance: ValidInstance,
+                    blockReference: parseKapetaUri(ValidInstance.block.ref),
+                } as Partial<PlannerBlockContextData> as any
+            }
+        >
+            <div style={{ padding: '20px' }}>
+                <PlannerBlockResourceListItem
+                    size={PlannerNodeSize.FULL}
+                    index={0}
+                    mode={ResourceMode.SHOW}
+                    resource={resource}
+                    role={ResourceRole.PROVIDES}
+                />
+                <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...(errors || [])].join('\n')}</pre>
+            </div>
+        </BlockContext.Provider>
     );
 };
 
 export const ResourceInvalidResourceSpecThrown = () => {
-    const somePlan: PlannerModelWrapper = new PlannerModelWrapper('test-plan', 'Some Plan');
-    const block = new PlannerBlockModelWrapper(ValidInstance, ValidDefinition, somePlan);
-    const resource = new PlannerResourceModelWrapper(ResourceRole.PROVIDES, InvalidResourceSpecThrown, block);
-    resource.setMode(ResourceMode.SHOW);
-
+    const resource = InvalidResourceSpecThrown;
+    const errors = new BlockValidator(ValidDefinition, ValidInstance).validateResource(resource);
     return (
-        <div style={{ position: 'relative' }}>
-            <PlannerBlockResourceListItem size={PlannerNodeSize.FULL} zoom={1} resource={resource} index={0} />
-            <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...resource.errors].join('\n')}</pre>
-        </div>
+        <BlockContext.Provider
+            value={
+                {
+                    blockInstance: ValidInstance,
+                    blockReference: parseKapetaUri(ValidInstance.block.ref),
+                } as Partial<PlannerBlockContextData> as any
+            }
+        >
+            <div style={{ padding: '20px' }}>
+                <PlannerBlockResourceListItem
+                    size={PlannerNodeSize.FULL}
+                    index={0}
+                    mode={ResourceMode.SHOW}
+                    resource={resource}
+                    role={ResourceRole.PROVIDES}
+                />
+                <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...(errors || [])].join('\n')}</pre>
+            </div>
+        </BlockContext.Provider>
     );
 };

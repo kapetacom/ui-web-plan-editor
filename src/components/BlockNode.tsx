@@ -3,24 +3,24 @@ import { createHexagonPath, Orientation, toClass } from '@kapeta/ui-web-utils';
 
 import './BlockNode.less';
 import { PlannerBlockWarningTag } from './PlannerBlockWarningTag';
-import { blockRenderer, BlockOutlet } from '../planner2/renderers/blockRenderer';
-import { InstanceStatus } from '@kapeta/ui-web-context';
-import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
+import { BlockStatus, useBlock } from '@kapeta/ui-web-components';
+import { BlockInstanceName } from '@kapeta/ui-web-components';
+import { BlockName } from '@kapeta/ui-web-components';
+import { BlockHandle } from '@kapeta/ui-web-components';
+import { BlockVersion } from '@kapeta/ui-web-components';
 
 interface BlockNodeProps {
-    block: BlockDefinition;
-    instance: BlockInstance;
     height: number;
     width: number;
     pointSize?: number;
     valid?: boolean;
     variant?: string;
     readOnly?: boolean;
-    status: InstanceStatus;
 }
 
 export const BlockNode = (props: BlockNodeProps) => {
     const variant = props.variant ? props.variant : 'service';
+    const block = useBlock();
 
     const className = toClass({
         'block-node': true,
@@ -36,24 +36,29 @@ export const BlockNode = (props: BlockNodeProps) => {
             <g className={className} x={50}>
                 <path className="block-body" d={path} />
 
-                <PlannerBlockWarningTag show={!props.valid} blockName={props.block.metadata.name} />
+                <PlannerBlockWarningTag
+                    show={props.valid === false}
+                    blockName={block.definition?.metadata.name || 'block'}
+                />
 
-                <svg y={0} x={props.width - 20}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockStatus} context={props} />
-                </svg>
+                <g transform={`translate(${props.width - 20}, 0)`}>
+                    <BlockStatus />
+                </g>
 
-                <svg y={50} x={centeredX}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockInstanceName} context={props} />
-                </svg>
+                <g transform={`translate(${centeredX}, 50)`}>
+                    <BlockInstanceName />
+                </g>
+
                 <svg y={85} x={centeredX}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockName} context={props} />
+                    <BlockName />
                 </svg>
+
                 <svg y={100} x={centeredX}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={props} />
+                    <BlockHandle />
                 </svg>
 
                 <svg y={120} x={centeredX}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={props} />
+                    <BlockVersion />
                 </svg>
             </g>
         </>

@@ -4,7 +4,14 @@ import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { cloneDeep } from 'lodash';
 import React from 'react';
 
-import { blockRenderer, BlockOutlet } from '../../src/planner2/renderers/blockRenderer';
+import {
+    BlockHandle,
+    BlockInstanceName,
+    BlockName,
+    BlockStatus,
+    BlockVersion,
+    useBlock,
+} from '@kapeta/ui-web-components';
 
 export const BlockServiceMock = BlockService;
 
@@ -195,28 +202,31 @@ BlockTypeProvider.register({
 
         return errors;
     },
-    shapeComponent: (context) => {
+    shapeWidth: 150,
+    getShapeHeight: (resourceHeight: number) => Math.max(140, resourceHeight + 50),
+    shapeComponent: function ShapeComponent(props) {
         // Scaling the topbar svg to fit the block
+        const block = useBlock();
         const svgWidth = 192;
-        const svgHeight = 170 * (context.width / svgWidth);
+        const svgHeight = 170 * (props.width / svgWidth);
 
         return (
-            <g className="block-node" style={{ cursor: context.readOnly ? 'default' : 'move' }}>
+            <g className="block-node" style={{ cursor: block.readOnly ? 'default' : 'move' }}>
                 {/* Background */}
-                <rect width={context.width} height={context.height} rx="6" fill="white" />
+                <rect width={props.width} height={props.height} rx="6" fill="white" />
                 {/* Border */}
                 <rect
                     x="0.5"
                     y="0.5"
-                    width={context.width - 1}
-                    height={context.height - 1}
+                    width={props.width - 1}
+                    height={props.height - 1}
                     rx="5.5"
                     fill="none"
                     stroke="black"
                     strokeOpacity="0.12"
                 />
                 {/* Topbar */}
-                <svg width={context.width} height={svgHeight} viewBox="0 0 192 170" fill="none">
+                <svg width={props.width} height={svgHeight} viewBox="0 0 192 170" fill="none">
                     <path
                         d="M1 6C1 3.23858 3.23858 1 6 1H186C188.761 1 191 3.23858 191 6V24H1V6Z"
                         fill="black"
@@ -244,29 +254,23 @@ BlockTypeProvider.register({
                     />
                 </svg>
 
-                <svg fill="none" x={130} y={-30}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockStatus} context={context} />
+                <svg fill="none" x={props.width - 20} y={-30}>
+                    <BlockStatus />
                 </svg>
                 {/* Offset if block has error */}
-                <svg
-                    fill="none"
-                    x={context.width / 2}
-                    y={40}
-                    width={context.width - 20}
-                    viewBox={`0 0 ${context.width} 150`}
-                >
-                    <blockRenderer.Outlet id={BlockOutlet.BlockInstanceName} context={context} />
+                <svg fill="none" x={props.width / 2} y={35} width={props.width - 20} viewBox="0 0 150 150">
+                    <BlockInstanceName />
                 </svg>
-                <svg fill="none" x={context.width / 2} y={90}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockName} context={context} />
+                <svg fill="none" x={props.width / 2} y={75}>
+                    <BlockName />
                 </svg>
 
-                <svg y={105} x={context.width / 2}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={context} />
+                <svg x={props.width / 2} y={95}>
+                    <BlockHandle />
                 </svg>
 
-                <svg y={context.height - 20} x={context.width / 2}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={context} />
+                <svg y={props.height - 20} x={props.width / 2}>
+                    <BlockVersion />
                 </svg>
             </g>
         );
@@ -290,20 +294,23 @@ BlockTypeProvider.register({
 
         return errors;
     },
-    shapeComponent: (context) => {
+    shapeWidth: 120,
+    getShapeHeight: (resourceHeight: number) => Math.max(160, resourceHeight + 60),
+    shapeComponent: function ShapeComponent(props) {
+        const block = useBlock();
         // Make the mobile block a bit smaller
         const svgWidth = 152;
-        const svgHeight = 104 * (context.width / svgWidth);
+        const svgHeight = 104 * (props.width / svgWidth);
         return (
-            <g className="block-node" style={{ cursor: context.readOnly ? 'default' : 'move' }}>
+            <g className="block-node" style={{ cursor: block.readOnly ? 'default' : 'move' }}>
                 {/* Background */}
-                <rect x={0} y={0} width={context.width} fill="white" height={context.height} rx="5px" ry="5px" />
+                <rect x={0} y={0} width={props.width} fill="white" height={props.height} rx="5px" ry="5px" />
                 {/* Border */}
                 <rect
                     x="0.5"
                     y="0.5"
-                    width={context.width - 1}
-                    height={context.height - 1}
+                    width={props.width - 1}
+                    height={props.height - 1}
                     rx="5.5"
                     fill="none"
                     stroke="black"
@@ -311,7 +318,7 @@ BlockTypeProvider.register({
                 />
                 {/* Notch and pill */}
                 <svg
-                    width={context.width}
+                    width={props.width}
                     height={svgHeight}
                     viewBox="0 0 152 104"
                     fill="none"
@@ -328,28 +335,22 @@ BlockTypeProvider.register({
                         fill="white"
                     />
                 </svg>
-                <svg fill="none" x={130} y={-28}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockStatus} context={context} />
-                </svg>
+                <g transform={`translate(${props.width - 20}, -30)`}>
+                    <BlockStatus />
+                </g>
                 {/* TODO: add y-offset if block has error */}
-                <svg
-                    fill="none"
-                    x={context.width / 2}
-                    y={40}
-                    width={context.width - 20}
-                    viewBox={`0 0 ${context.width} 150`}
-                >
-                    <blockRenderer.Outlet id={BlockOutlet.BlockInstanceName} context={context} />
+                <svg fill="none" x={props.width / 2} y={10} width={props.width - 20} viewBox={`0 0 150 150`}>
+                    <BlockInstanceName />
                 </svg>
                 {/* Name + handle */}
-                <svg fill="none" x={context.width / 2} y={90}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockName} context={context} />
+                <svg fill="none" x={props.width / 2} y={70}>
+                    <BlockName />
                 </svg>
-                <svg y={105} x={context.width / 2}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockHandle} context={context} />
+                <svg x={props.width / 2} y={90}>
+                    <BlockHandle />
                 </svg>
-                <svg y={context.height - 20} x={context.width / 2}>
-                    <blockRenderer.Outlet id={BlockOutlet.BlockVersion} context={context} />
+                <svg y={props.height - 20} x={props.width / 2}>
+                    <BlockVersion />
                 </svg>
             </g>
         );

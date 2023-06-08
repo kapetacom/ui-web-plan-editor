@@ -3,7 +3,7 @@ import { Point, ResourceRole, Size } from '@kapeta/ui-web-types';
 import { FocusPositioningData, PlannerNodeSize } from '../../types';
 import { BlockInfo, FocusBlockInfo, FocusBlockInfoShallow, ZOOM_STEP_SIZE, ZoomLevels } from '../types';
 
-import { calculateBlockHeight, getBlockInstance } from './planUtils';
+import { getBlockInstance, getReservedBlockHeight } from './planUtils';
 import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
 import { getConnectionsFor } from './connectionUtils';
 import { useContext, useEffect, useMemo } from 'react';
@@ -28,14 +28,14 @@ function getFocusedBlockPosition(blockInfo: BlockInfo, positionData: FocusPositi
     }
 
     const x = positionData.plannerWidth / 2 - blockInfo.instance.dimensions?.width / 2;
-    const y = positionData.totalUsedHeight / 2 - calculateBlockHeight(blockInfo.block, nodeSize) / 2;
+    const y = positionData.totalUsedHeight / 2 - getReservedBlockHeight(blockInfo.block, nodeSize) / 2;
     return { x, y };
 }
 
 function getBlockListTotalHeight(blocks: BlockDefinition[], nodeSize: PlannerNodeSize) {
     let totalHeight = OFFSET_FROM_TOP;
     blocks.forEach((block: BlockDefinition) => {
-        totalHeight += calculateBlockHeight(block, nodeSize) + FOCUS_BLOCK_SPACING;
+        totalHeight += getReservedBlockHeight(block, nodeSize) + FOCUS_BLOCK_SPACING;
     });
     return totalHeight;
 }
@@ -58,7 +58,7 @@ function getBlocksFitToScreen(
     // since we don't know what the height of the blocks are we calculate for the worst case scenario
     // starting from the tallest block and adding
     for (const blockInfo of focusInfo.providingBlocks) {
-        const blockHeight = calculateBlockHeight(blockInfo.block, nodeSize);
+        const blockHeight = getReservedBlockHeight(blockInfo.block, nodeSize);
         if (availableHeight - blockHeight > 0) {
             verticalBlockNumberLeft++;
             availableHeight -= blockHeight;
@@ -67,7 +67,7 @@ function getBlocksFitToScreen(
         }
     }
     for (const blockInfo of focusInfo.consumingBlocks) {
-        const blockHeight = calculateBlockHeight(blockInfo.block, nodeSize);
+        const blockHeight = getReservedBlockHeight(blockInfo.block, nodeSize);
         if (availableHeight - blockHeight > 0) {
             verticalBlockNumberRight++;
             availableHeight -= blockHeight;
@@ -86,7 +86,7 @@ function getBlocksFitToScreen(
         nodeSize
     );
 
-    const focusBlockHeight = OFFSET_FROM_TOP + calculateBlockHeight(focusInfo.focus.block, nodeSize);
+    const focusBlockHeight = OFFSET_FROM_TOP + getReservedBlockHeight(focusInfo.focus.block, nodeSize);
 
     return {
         maxHorizontalBlocks: 3,
@@ -128,7 +128,7 @@ function getFocusedLinkedBlockPosition(
         // We start
         y = (positionData.totalUsedHeight - totalHeight) / 2;
         for (let i = 0; i < blockIndex; i++) {
-            y += calculateBlockHeight(focusBlockInfo.providingBlocks[i].block, nodeSize) + FOCUS_BLOCK_SPACING;
+            y += getReservedBlockHeight(focusBlockInfo.providingBlocks[i].block, nodeSize) + FOCUS_BLOCK_SPACING;
         }
         y += OFFSET_FROM_TOP;
         return { x, y };
@@ -141,7 +141,7 @@ function getFocusedLinkedBlockPosition(
 
     y = (positionData.totalUsedHeight - totalHeight) / 2;
     for (let i = 0; i < blockIndex; i++) {
-        y += calculateBlockHeight(focusBlockInfo.consumingBlocks[i].block, nodeSize) + FOCUS_BLOCK_SPACING;
+        y += getReservedBlockHeight(focusBlockInfo.consumingBlocks[i].block, nodeSize) + FOCUS_BLOCK_SPACING;
     }
     y += OFFSET_FROM_TOP;
 

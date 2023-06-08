@@ -21,23 +21,25 @@ export interface PlannerBlockResourceListProps {
 
 export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> = (props) => {
     const planner = useContext(PlannerContext);
-    const { blockInstance, providers, consumers, blockMode } = useBlockContext();
+    const blockCtx = useBlockContext();
     const { draggable } = useContext(DnDContext);
 
     const list = {
-        [ResourceRole.CONSUMES]: consumers,
-        [ResourceRole.PROVIDES]: providers,
+        [ResourceRole.CONSUMES]: blockCtx.consumers,
+        [ResourceRole.PROVIDES]: blockCtx.providers,
     }[props.role];
 
     // Can we move layout stuff to its own helpers?
     const offsetX = 1;
     const placeholderWidth = 4;
     const placeholderX =
-        props.role === ResourceRole.PROVIDES ? blockInstance.dimensions!.width + offsetX : -placeholderWidth;
+        props.role === ResourceRole.PROVIDES ? blockCtx.instanceBlockWidth + offsetX : -placeholderWidth;
 
     // Enable SHOW mode if the whole block is in SHOW mode
     const mode =
-        blockMode === BlockMode.SHOW || blockMode === BlockMode.FOCUSED ? ResourceMode.SHOW : ResourceMode.HIDDEN;
+        blockCtx.blockMode === BlockMode.SHOW || blockCtx.blockMode === BlockMode.FOCUSED
+            ? ResourceMode.SHOW
+            : ResourceMode.HIDDEN;
 
     const showPlaceholder = () => {
         const payload = draggable as PlannerPayload | null;
@@ -49,7 +51,8 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
             (payload.type === 'resource-type' && payload.data.config.role === props.role);
         return (
             rightTypeAndRole &&
-            (blockMode === BlockMode.HOVER_DROP_CONSUMER || blockMode === BlockMode.HOVER_DROP_PROVIDER)
+            (blockCtx.blockMode === BlockMode.HOVER_DROP_CONSUMER ||
+                blockCtx.blockMode === BlockMode.HOVER_DROP_PROVIDER)
         );
     };
 
@@ -60,37 +63,39 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
     });
 
     // Offset for the top of the hexagon, plus centering if there is only 1
-    const hexagonTopHeight = 35 + 2;
-    const resourceCount = list.length + (showPlaceholder() ? 1 : 0);
-    const yPosition = resourceCount === 1 ? hexagonTopHeight + resourceHeight[planner.nodeSize] / 2 : hexagonTopHeight;
-    const placeholderHeight = list.length * resourceHeight[planner.nodeSize];
+    const placeholderCount = showPlaceholder() ? 1 : 0;
+    const listHeight = list.length * resourceHeight[planner.nodeSize];
+    const yPosition =
+        (blockCtx.instanceBlockHeight - listHeight - placeholderCount * resourceHeight[planner.nodeSize]) / 2;
 
     return (
         <SVGLayoutNode className={plannerResourceListClass} overflow="visible" x={0} y={yPosition}>
-            {list.map((resource, index: number) => {
-                return (
-                    <PlannerBlockResourceListItem
-                        size={planner.nodeSize}
-                        key={`${blockInstance.id}_${resource.metadata.name}_${index}`}
-                        index={index}
-                        resource={resource}
-                        // Should we render a consumer or provider?
-                        role={props.role}
-                        // Default to hidden unless the block has focus or the planner has a drag in progress
-                        mode={mode}
-                        // If hovering should trigger a different state, put it here
-                        // show_options unless viewOnly or we're dragging
-                        hoverMode={ResourceMode.SHOW_OPTIONS}
-                        actions={props.actions}
-                        onMouseEnter={props.onResourceMouseEnter}
-                        onMouseLeave={props.onResourceMouseLeave}
-                    />
-                );
-            })}
+            <svg x={placeholderX}>
+                {list.map((resource, index: number) => {
+                    return (
+                        <PlannerBlockResourceListItem
+                            size={planner.nodeSize}
+                            key={`${blockCtx.blockInstance.id}_${resource.metadata.name}_${index}`}
+                            index={index}
+                            resource={resource}
+                            // Should we render a consumer or provider?
+                            role={props.role}
+                            // Default to hidden unless the block has focus or the planner has a drag in progress
+                            mode={mode}
+                            // If hovering should trigger a different state, put it here
+                            // show_options unless viewOnly or we're dragging
+                            hoverMode={ResourceMode.SHOW_OPTIONS}
+                            actions={props.actions}
+                            onMouseEnter={props.onResourceMouseEnter}
+                            onMouseLeave={props.onResourceMouseLeave}
+                        />
+                    );
+                })}
 
-            {/* Blinking "ghost" target when we're about to create a new connection */}
-            <svg className="resource-placeholder" x={placeholderX} y={placeholderHeight}>
-                <rect height={resourceHeight[planner.nodeSize] - 4} width={placeholderWidth - offsetX} />
+                {/* Blinking "ghost" target when we're about to create a new connection */}
+                <svg className="resource-placeholder" x={0} y={listHeight}>
+                    <rect height={resourceHeight[planner.nodeSize] - 4} width={placeholderWidth - offsetX} />
+                </svg>
             </svg>
         </SVGLayoutNode>
     );

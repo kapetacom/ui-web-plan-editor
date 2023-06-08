@@ -221,7 +221,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const fixedClipPathId = `${clipPathId}_fixed`;
 
     const extension = isExpanded ? 100 : 0;
-    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -10 - extension : 39 + extension);
+    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -5 - extension : 39 + extension);
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const height = resourceHeight[nodeSize];
@@ -327,7 +327,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                         className="container-mask"
                                         width={mouseCatcherWidth}
                                         height={height}
-                                        x={isConsumer ? -mouseCatcherWidth - 1 : blockInstance.dimensions!.width + 1}
+                                        x={isConsumer ? -mouseCatcherWidth + 5 : blockInstance.dimensions!.width + 1}
                                         y={0}
                                     />
                                 </clipPath>
@@ -335,7 +335,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                 <svg
                                     className={containerClass}
                                     clipPath={`url(#${fixedClipPathId})`}
-                                    x={0}
+                                    x={isConsumer ? 0 : -151}
                                     y={0}
                                     onMouseEnter={() => {
                                         if (props.onMouseEnter) {

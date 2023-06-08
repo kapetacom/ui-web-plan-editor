@@ -1,7 +1,7 @@
 import React, { ForwardedRef, forwardRef, useContext } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
-import { ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
+import { BlockLayout, ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
 
 import { Planner2 } from '../src/planner2/Planner2';
 
@@ -26,7 +26,6 @@ import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { PlannerOutlet, plannerRenderer } from '../src/planner2/renderers/plannerRenderer';
 import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
-import { BlockOutletProvider } from '../src/planner2/components/PlannerBlockNode';
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -51,6 +50,12 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
     const blockType = BlockTypeProvider.get(props.block.data!.kind);
     const Shape = blockType.shapeComponent || BlockNode;
 
+    const instance = {
+        id: 'temp-block',
+        name: props.name,
+        block: { ref: props.block.ref },
+        dimensions: { height: 0, width: 0, top: 0, left: 0 },
+    };
     return (
         <svg
             className="plan-item-dragged block"
@@ -63,22 +68,9 @@ const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
                 transform: `scale(${props.planner.zoom})`,
             }}
         >
-            <BlockOutletProvider>
-                <Shape
-                    block={props.block.data}
-                    instance={{
-                        id: 'temp-block',
-                        name: props.name,
-                        block: { ref: props.block.ref },
-                        dimensions: { height: 0, width: 0, top: 0, left: 0 },
-                    }}
-                    valid
-                    readOnly
-                    status={InstanceStatus.STOPPED}
-                    height={BLOCK_SIZE}
-                    width={BLOCK_SIZE}
-                />
-            </BlockOutletProvider>
+            <BlockLayout definition={props.block.data} instance={instance}>
+                <Shape block={props.block.data} instance={instance} height={BLOCK_SIZE} width={BLOCK_SIZE} />
+            </BlockLayout>
         </svg>
     );
 };

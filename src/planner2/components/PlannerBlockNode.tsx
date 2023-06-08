@@ -18,9 +18,7 @@ import { copyResourceToBlock } from '../utils/blockUtils';
 import { createConnection } from '../utils/connectionUtils';
 import { useBlockValidation } from '../hooks/block-validation';
 import { BlockTypeProvider } from '@kapeta/ui-web-context';
-import { BlockOutlet, blockRenderer } from '../renderers/blockRenderer';
-import { SVGAutoSizeText } from '@kapeta/ui-web-components';
-import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { BlockLayout } from '@kapeta/ui-web-components';
 
 import './PlannerBlockNode.less';
 import { withErrorBoundary } from 'react-error-boundary';
@@ -34,91 +32,6 @@ interface Props {
     onResourceMouseEnter?: (context: ActionContext) => void;
     onResourceMouseLeave?: (context: ActionContext) => void;
 }
-
-export const BlockOutletProvider = (props) => {
-    const planner = useContext(PlannerContext);
-
-    const outlets = useMemo(() => {
-        return {
-            [BlockOutlet.BlockStatus]: (ctx) =>
-                ctx.status ? <circle className={`instance_${ctx.status}`} r={4} cx={10} cy={40} /> : <></>,
-            [BlockOutlet.BlockInstanceName]: (ctx) => (
-                <SVGAutoSizeText
-                    className="block-body-text instance-name"
-                    y={0}
-                    x={0}
-                    lineHeight={24}
-                    maxHeight={36}
-                    maxWidth={150}
-                    maxChars={15}
-                    maxLines={2}
-                    onChange={
-                        ctx.readOnly
-                            ? undefined
-                            : (name) =>
-                                  planner.updateBlockInstance.call(null, ctx.instance.id, (bx) => {
-                                      return {
-                                          ...bx,
-                                          name,
-                                      };
-                                  })
-                    }
-                    value={ctx.instance.name}
-                />
-            ),
-            [BlockOutlet.BlockName]: (ctx) => {
-                const kindUri = parseKapetaUri(ctx.block.kind);
-                return (
-                    <SVGAutoSizeText
-                        className="block-body-text block-name"
-                        y={0}
-                        x={0}
-                        lineHeight={12}
-                        maxHeight={20}
-                        maxChars={25}
-                        maxLines={1}
-                        maxWidth={150}
-                        value={kindUri.name}
-                    />
-                );
-            },
-            [BlockOutlet.BlockHandle]: (ctx) => {
-                const kindUri = parseKapetaUri(ctx.block.kind);
-                return (
-                    <SVGAutoSizeText
-                        className="block-body-text block-handle"
-                        y={0}
-                        x={0}
-                        lineHeight={12}
-                        maxHeight={20}
-                        maxChars={25}
-                        maxLines={1}
-                        maxWidth={150}
-                        value={kindUri.handle}
-                    />
-                );
-            },
-            [BlockOutlet.BlockVersion]: (ctx) => {
-                const kindUri = parseKapetaUri(ctx.instance.block.ref);
-                return (
-                    <SVGAutoSizeText
-                        className="block-body-text block-version"
-                        y={0}
-                        x={0}
-                        lineHeight={12}
-                        maxHeight={20}
-                        maxChars={25}
-                        maxLines={1}
-                        maxWidth={150}
-                        value={kindUri.version}
-                    />
-                );
-            },
-        };
-    }, [planner.updateBlockInstance]);
-
-    return <blockRenderer.Provider outlets={outlets}>{props.children}</blockRenderer.Provider>;
-};
 
 const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     const planner = useContext(PlannerContext);
@@ -221,7 +134,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                 return (
                                     draggable.type === 'resource' &&
                                     // don't connect to self
-                                    draggable.data.block.id !== blockContext.blockInstance.id
+                                    draggable.data.instance.id !== blockContext.blockInstance.id
                                 );
                             }}
                             onDrop={(draggable: ResourcePayload | ResourceTypePayload) => {
@@ -332,6 +245,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                         data-node-type="block"
                                         className={blockClassNames}
                                     >
+                                        {/* TODO: fix offsets based on block size */}
                                         <PlannerBlockResourceList
                                             role={ResourceRole.CONSUMES}
                                             actions={props.actions?.resource || []}
@@ -347,20 +261,33 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
 
                                         <g {...evt.componentProps} ref={onRef}>
                                             {blockContext.blockDefinition ? (
-                                                <BlockOutletProvider>
+                                                <BlockLayout
+                                                    definition={blockContext.blockDefinition}
+                                                    instance={blockContext.blockInstance}
+                                                    readOnly={!canEditInstance}
+                                                    status={blockContext.instanceStatus}
+                                                    onInstanceNameChange={(name) => {
+                                                        planner.updateBlockInstance(
+                                                            blockContext.blockInstance.id,
+                                                            (block) => ({
+                                                                ...block,
+                                                                name,
+                                                            })
+                                                        );
+                                                    }}
+                                                >
                                                     <NodeComponent
                                                         block={blockContext.blockDefinition}
                                                         instance={blockContext.blockInstance}
                                                         readOnly={!canEditInstance}
-                                                        status={blockContext.instanceStatus}
-                                                        width={blockContext.blockInstance.dimensions!.width}
+                                                        width={blockContext.instanceBlockWidth}
                                                         height={blockContext.instanceBlockHeight}
                                                         valid={isValid}
                                                     />
-                                                </BlockOutletProvider>
+                                                </BlockLayout>
                                             ) : (
                                                 <foreignObject
-                                                    width={blockContext.blockInstance.dimensions!.width}
+                                                    width={blockContext.instanceBlockWidth}
                                                     height={blockContext.instanceBlockHeight}
                                                     style={{ textAlign: 'center' }}
                                                 >
@@ -369,22 +296,12 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                     <code>{blockContext.blockInstance.block.ref}</code>
                                                 </foreignObject>
                                             )}
-                                            {/* name={blockContext.blockInstance.name}
-                                                instanceName={blockContext.blockInstance.name}
-                                                onInstanceNameChange={
-                                                readOnly={!canEditInstance}
-                                                height={blockContext.instanceBlockHeight}
-                                                width={blockContext.blockInstance.dimensions!.width}
-                                                typeName={blockContext.blockDefinition?.metadata.name}
-                                                version={blockContext.blockReference.version}
-                                                valid={isValid}
-                                            /> */}
                                         </g>
                                     </g>
                                     <g>
                                         {/* TODO: Render block actions w/ the wheel/staggered transitions */}
                                         <ActionButtons
-                                            x={75}
+                                            x={blockContext.instanceBlockWidth / 2}
                                             y={blockContext.instanceBlockHeight + 25}
                                             show
                                             actions={props.actions?.block || []}

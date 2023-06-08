@@ -1,5 +1,5 @@
 import { PlannerNodeSize } from '../../types';
-import { Asset, ResourceRole, Size } from '@kapeta/ui-web-types';
+import { Asset, IBlockTypeProvider, ResourceRole, Size } from '@kapeta/ui-web-types';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 export const BLOCK_SIZE = 150;
@@ -37,7 +37,7 @@ export const calculateCanvasSize = (
             if (!blockKind) {
                 return;
             }
-            const bottom = dimensions.top + calculateBlockHeight(blockKind.data, size);
+            const bottom = dimensions.top + getReservedBlockHeight(blockKind.data, size);
             const right = dimensions.left + dimensions.width + canvasPadding;
             const y = dimensions.top;
             const x = dimensions.left;
@@ -64,18 +64,23 @@ export const calculateCanvasSize = (
     };
 };
 
-export function calculateBlockHeight(block: BlockDefinition, size: PlannerNodeSize) {
+/**
+ * Estimate the block height for high level layout operations such as canvas size calculation
+ * Will not be accurate for blocks with custom heights, but should be good enough for most cases
+ */
+export function getReservedBlockHeight(block: BlockDefinition, size: PlannerNodeSize) {
     // get connections for block?
     const providesCount = block.spec.providers?.length || 0;
     const consumesCount = block.spec.consumers?.length || 0;
 
     const resourceCount = Math.max(consumesCount, providesCount);
+    const blockResourceHeight = resourceHeight[size] * resourceCount;
 
-    return getBlockHeightByResourceCount(resourceCount, size);
+    return getDefaultBlockHeight(blockResourceHeight) + 20;
 }
 
-export function getBlockHeightByResourceCount(resourceCount: number, size: PlannerNodeSize) {
-    return Math.max(BLOCK_SIZE, 70 + resourceCount * resourceHeight[size]);
+export function getDefaultBlockHeight(blockResourceHeight: number) {
+    return Math.max(BLOCK_SIZE, 70 + blockResourceHeight);
 }
 
 export function getResourceId(blockId: string, resourceName: string, resourceRole: ResourceRole) {
