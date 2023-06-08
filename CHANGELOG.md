@@ -1,3 +1,17 @@
+# [0.3.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.2.1...v0.3.0) (2023-06-08)
+
+
+### Bug Fixes
+
+* change resource offset calculations to support variable sizes ([3b6cbec](https://github.com/kapetacom/ui-web-plan-editor/commit/3b6cbecf89521b44e68183aa94e4b3d72258ba71))
+* use new BlockLayout from ui-web-components for block shapes ([3b978a3](https://github.com/kapetacom/ui-web-plan-editor/commit/3b978a34e61a11a49feac96e4e835c832f57bf39))
+
+
+### Features
+
+* hovered connections bubble to top ([b216d9f](https://github.com/kapetacom/ui-web-plan-editor/commit/b216d9f24fbb66d507c5c14fb4bcc2bb3d1cad18))
+* new shape width + height calculations ([194232a](https://github.com/kapetacom/ui-web-plan-editor/commit/194232a5e1be50fd78d10622758b7655f238d1b6))
+
 ## [0.2.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.2.0...v0.2.1) (2023-06-05)
 
 
