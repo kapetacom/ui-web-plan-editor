@@ -3,7 +3,7 @@ import { ResourceRole } from '@kapeta/ui-web-types';
 
 import {
     PlannerBlockModelWrapper,
-    PlannerBlockResourceListItem,
+    // PlannerBlockResourceListItem,
     PlannerModelWrapper,
     PlannerNodeSize,
     PlannerResourceModelWrapper,

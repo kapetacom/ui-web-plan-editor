@@ -245,6 +245,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                         data-node-type="block"
                                         className={blockClassNames}
                                     >
+                                        {/* TODO: fix offsets based on block size */}
                                         <PlannerBlockResourceList
                                             role={ResourceRole.CONSUMES}
                                             actions={props.actions?.resource || []}
@@ -279,14 +280,14 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                         block={blockContext.blockDefinition}
                                                         instance={blockContext.blockInstance}
                                                         readOnly={!canEditInstance}
-                                                        width={blockContext.blockInstance.dimensions!.width}
+                                                        width={blockContext.instanceBlockWidth}
                                                         height={blockContext.instanceBlockHeight}
                                                         valid={isValid}
                                                     />
                                                 </BlockLayout>
                                             ) : (
                                                 <foreignObject
-                                                    width={blockContext.blockInstance.dimensions!.width}
+                                                    width={blockContext.instanceBlockWidth}
                                                     height={blockContext.instanceBlockHeight}
                                                     style={{ textAlign: 'center' }}
                                                 >
@@ -295,22 +296,12 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                     <code>{blockContext.blockInstance.block.ref}</code>
                                                 </foreignObject>
                                             )}
-                                            {/* name={blockContext.blockInstance.name}
-                                                instanceName={blockContext.blockInstance.name}
-                                                onInstanceNameChange={
-                                                readOnly={!canEditInstance}
-                                                height={blockContext.instanceBlockHeight}
-                                                width={blockContext.blockInstance.dimensions!.width}
-                                                typeName={blockContext.blockDefinition?.metadata.name}
-                                                version={blockContext.blockReference.version}
-                                                valid={isValid}
-                                            /> */}
                                         </g>
                                     </g>
                                     <g>
                                         {/* TODO: Render block actions w/ the wheel/staggered transitions */}
                                         <ActionButtons
-                                            x={75}
+                                            x={blockContext.instanceBlockWidth / 2}
                                             y={blockContext.instanceBlockHeight + 25}
                                             show
                                             actions={props.actions?.block || []}

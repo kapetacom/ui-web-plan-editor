@@ -202,8 +202,8 @@ BlockTypeProvider.register({
 
         return errors;
     },
-    shapeWidth: 200,
-    getShapeHeight: (resourceHeight: number) => Math.max(120, resourceHeight + 40),
+    shapeWidth: 150,
+    getShapeHeight: (resourceHeight: number) => Math.max(140, resourceHeight + 50),
     shapeComponent: function ShapeComponent(props) {
         // Scaling the topbar svg to fit the block
         const block = useBlock();
@@ -254,18 +254,18 @@ BlockTypeProvider.register({
                     />
                 </svg>
 
-                <svg fill="none" x={130} y={-30}>
+                <svg fill="none" x={props.width - 20} y={-30}>
                     <BlockStatus />
                 </svg>
                 {/* Offset if block has error */}
-                <svg fill="none" x={props.width / 2} y={40} width={props.width - 20} viewBox={`0 0 ${props.width} 150`}>
+                <svg fill="none" x={props.width / 2} y={35} width={props.width - 20} viewBox="0 0 150 150">
                     <BlockInstanceName />
                 </svg>
-                <svg fill="none" x={props.width / 2} y={90}>
+                <svg fill="none" x={props.width / 2} y={75}>
                     <BlockName />
                 </svg>
 
-                <svg y={105} x={props.width / 2}>
+                <svg x={props.width / 2} y={95}>
                     <BlockHandle />
                 </svg>
 
@@ -294,6 +294,8 @@ BlockTypeProvider.register({
 
         return errors;
     },
+    shapeWidth: 120,
+    getShapeHeight: (resourceHeight: number) => Math.max(160, resourceHeight + 60),
     shapeComponent: function ShapeComponent(props) {
         const block = useBlock();
         // Make the mobile block a bit smaller
@@ -333,18 +335,18 @@ BlockTypeProvider.register({
                         fill="white"
                     />
                 </svg>
-                <g transform="translate(130, -30)">
+                <g transform={`translate(${props.width - 20}, -30)`}>
                     <BlockStatus />
                 </g>
                 {/* TODO: add y-offset if block has error */}
-                <svg fill="none" x={props.width / 2} y={40} width={props.width - 20} viewBox={`0 0 ${props.width} 150`}>
+                <svg fill="none" x={props.width / 2} y={10} width={props.width - 20} viewBox={`0 0 150 150`}>
                     <BlockInstanceName />
                 </svg>
                 {/* Name + handle */}
-                <svg fill="none" x={props.width / 2} y={90}>
+                <svg fill="none" x={props.width / 2} y={70}>
                     <BlockName />
                 </svg>
-                <svg y={105} x={props.width / 2}>
+                <svg x={props.width / 2} y={90}>
                     <BlockHandle />
                 </svg>
                 <svg y={props.height - 20} x={props.width / 2}>

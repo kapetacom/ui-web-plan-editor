@@ -15,6 +15,8 @@ export interface PlannerBlockContextData {
     providers: Resource[];
     instanceStatus: InstanceStatus;
     instanceBlockHeight: number;
+    instanceBlockWidth: number;
+    instanceResourceHeight: number;
 
     blockMode: BlockMode;
     setBlockMode: (mode: BlockMode) => void;
@@ -30,6 +32,8 @@ const defaultValue: PlannerBlockContextData = {
     providers: [],
     instanceStatus: InstanceStatus.STOPPED,
     instanceBlockHeight: 0,
+    instanceBlockWidth: 150,
+    instanceResourceHeight: 0,
     blockMode: BlockMode.HIDDEN,
     setBlockMode(mode: BlockMode) {
         this.blockMode = mode;
@@ -80,6 +84,7 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
             instanceStatus,
             instanceBlockHeight,
             instanceBlockWidth: blockType?.shapeWidth || 150,
+            instanceResourceHeight: blockResourceHeight,
             blockMode: focusedMode ?? overrideMode ?? blockMode,
             setBlockMode,
             isBlockInstanceReadOnly: !planner.canEditBlocks,
