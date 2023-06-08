@@ -1,4 +1,4 @@
-import React, { ReactNode, useContext } from 'react';
+import React, { ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { PlannerActionConfig, PlannerContext } from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';
@@ -49,11 +49,28 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
     ) : null;
 };
 
+const emptyList = [];
 export const Planner2 = (props: Props) => {
     const { nodeSize = PlannerNodeSize.MEDIUM, plan } = useContext(PlannerContext);
 
-    const instances = plan?.spec.blocks ?? [];
-    const connections = plan?.spec.connections ?? [];
+    const instances = plan?.spec.blocks ?? emptyList;
+    const connections = plan?.spec.connections ?? emptyList;
+
+    // Manage connection render order to ensure that connections are rendered on top when hovered
+    const [connectionDisplayOrder, setDisplayOrder] = useState(Object.keys(connections));
+    useEffect(() => {
+        setDisplayOrder(Object.keys(connections));
+    }, [connections]);
+
+    const onConnectionMouseEnter = useCallback(
+        (connectionId) =>
+            (...args) => {
+                // Put the hovered connection on top by rendering last
+                setDisplayOrder((order) => order.filter((id) => id !== connectionId).concat([connectionId]));
+                props.onConnectionMouseEnter?.call(null, ...args);
+            },
+        [props.onConnectionMouseEnter]
+    );
 
     const focusInfo = useFocusInfo();
     const focusModeEnabled = !!focusInfo;
@@ -97,26 +114,28 @@ export const Planner2 = (props: Props) => {
                     );
                 })}
 
-                {connections.map((connection) => {
-                    // Hide connections that are not connected to the focused block
-                    const className = toClass({
-                        'connection-hidden': !!(
-                            focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
-                        ),
-                    });
+                {connectionDisplayOrder
+                    .map((id) => [id, connections[id]])
+                    .map(([id, connection]) => {
+                        // Hide connections that are not connected to the focused block
+                        const className = toClass({
+                            'connection-hidden': !!(
+                                focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
+                            ),
+                        });
 
-                    return (
-                        <PlannerConnection
-                            size={nodeSize}
-                            key={getConnectionId(connection)}
-                            className={className}
-                            connection={connection}
-                            actions={props.actions?.connection || []}
-                            onMouseEnter={props.onConnectionMouseEnter}
-                            onMouseLeave={props.onConnectionMouseLeave}
-                        />
-                    );
-                })}
+                        return (
+                            <PlannerConnection
+                                size={nodeSize}
+                                key={getConnectionId(connection)}
+                                className={className}
+                                connection={connection}
+                                actions={props.actions?.connection || []}
+                                onMouseEnter={onConnectionMouseEnter(id)}
+                                onMouseLeave={props.onConnectionMouseLeave}
+                            />
+                        );
+                    })}
 
                 {/* Render temp connections to dragged resources */}
                 <DnDContext.Consumer>{renderTempResources}</DnDContext.Consumer>
