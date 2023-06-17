@@ -3,12 +3,12 @@
 
 @kapeta-text-primary: #000000de;
 @kapeta-block-bg: #ffffff;
-@kapeta-block-outline: rgba(0,0,0, 0.12);
-@kapeta-primary-states-focus: #2196F31E;
-@kapeta-states-outlinedBorder: #2196F380;
+@kapeta-block-outline: rgba(0, 0, 0, 0.12);
+@kapeta-primary-states-focus: #2196f31e;
+@kapeta-states-outlinedBorder: #2196f380;
 
-@kapeta-error-states-focusVisible: #D32F2F1E;
-@kapeta-error-states-outlinedBorder: #D32F2F80;
+@kapeta-error-states-focusVisible: #d32f2f1e;
+@kapeta-error-states-outlinedBorder: #d32f2f80;
 
 @icon-size: 36px;
 
@@ -49,14 +49,16 @@
     }
 
     &.primary .container {
-        &:hover, &:active {
+        &:hover,
+        &:active {
             background: @kapeta-primary-states-focus;
             border-color: @kapeta-states-outlinedBorder;
         }
     }
 
     &.danger .container {
-        &:hover, &:active {
+        &:hover,
+        &:active {
             background: @kapeta-error-states-focusVisible;
             border-color: @kapeta-error-states-outlinedBorder;
         }
