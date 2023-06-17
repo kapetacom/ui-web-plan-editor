@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.3.0...v0.4.0) (2023-06-17)
+
+
+### Features
+
+* Add support for validation of Instance and InstanceProvider ([#46](https://github.com/kapetacom/ui-web-plan-editor/issues/46)) ([8e2261d](https://github.com/kapetacom/ui-web-plan-editor/commit/8e2261deca509dde657757e381db284221c3992c))
+
 # [0.3.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.2.1...v0.3.0) (2023-06-08)
 
 ### Bug Fixes
