@@ -6,14 +6,16 @@ import {
     Resource,
     validateEntities,
     validateSchema,
-    stripUndefinedProps, EntityType, Entity,
+    stripUndefinedProps,
+    EntityType,
+    Entity,
 } from '@kapeta/schemas';
 import { ValidationIssue } from '../types';
 
 /**
  * These configuration value types are built into the system and should not be defined in the block
  */
-const BUILT_IN_CONFIGURATION_TYPES:Entity[] = [
+const BUILT_IN_CONFIGURATION_TYPES: Entity[] = [
     {
         name: 'Instance',
         type: EntityType.Native,
@@ -22,9 +24,9 @@ const BUILT_IN_CONFIGURATION_TYPES:Entity[] = [
             id: {
                 type: 'string',
                 required: true,
-                description: 'The ID of the block instance'
-            }
-        }
+                description: 'The ID of the block instance',
+            },
+        },
     },
     {
         name: 'InstanceProvider',
@@ -34,21 +36,21 @@ const BUILT_IN_CONFIGURATION_TYPES:Entity[] = [
             id: {
                 type: 'string',
                 required: true,
-                description: 'The ID of the block instance'
+                description: 'The ID of the block instance',
             },
             portType: {
                 type: 'string',
                 required: true,
-                description: 'The port type of the provider resource'
+                description: 'The port type of the provider resource',
             },
             resourceName: {
                 type: 'string',
                 required: true,
-                description: 'The name of the provider resource'
-            }
-        }
-    }
-]
+                description: 'The name of the provider resource',
+            },
+        },
+    },
+];
 
 export class BlockValidator {
     private readonly block: BlockDefinition;
@@ -92,12 +94,8 @@ export class BlockValidator {
         const errors: string[] = [];
         try {
             const blockType = BlockTypeProvider.get(this.block.kind);
-            if (this.block.spec?.configuration?.types &&
-                this.block.spec?.configuration?.types?.length > 0) {
-                const typeList = [
-                        ...BUILT_IN_CONFIGURATION_TYPES,
-                    ...this.block.spec.configuration?.types
-                ];
+            if (this.block.spec?.configuration?.types && this.block.spec?.configuration?.types?.length > 0) {
+                const typeList = [...BUILT_IN_CONFIGURATION_TYPES, ...this.block.spec.configuration?.types];
 
                 if (typeList?.length > 0) {
                     errors.push(...validateEntities(typeList, config));
