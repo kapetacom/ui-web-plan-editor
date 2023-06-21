@@ -1,7 +1,8 @@
 {
     "kind": "core/block-type",
     "metadata": {
-        "name": "kapeta/block-type-service"
+        "name": "kapeta/block-type-service",
+        "title": "Block Type Service"
     },
     "spec": {}
 }

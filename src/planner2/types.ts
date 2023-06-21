@@ -66,12 +66,33 @@ export interface PlannerAction<P extends unknown> {
     onClick(planner: PlannerContextData, context: ActionContext): void | Promise<void>;
 }
 
-export interface EditableItemInterface2 {
-    type: ItemType;
-    ref?: string;
-    item: SchemaKind | Connection;
+export interface BlockInfo {
+    instance: BlockInstance;
+    block: BlockDefinition;
+}
+
+export interface EditBlockInfo {
+    type: ItemType.BLOCK;
+    item: BlockInfo;
     creating: boolean;
 }
+
+export interface EditResourceInfo {
+    type: ItemType.RESOURCE;
+    item: {
+        ref: string;
+        resource: Resource;
+        block: BlockDefinition;
+    };
+    creating: boolean;
+}
+export interface EditConnectionInfo {
+    type: ItemType.CONNECTION;
+    item: Connection;
+    creating: boolean;
+}
+
+export type EditItemInfo = EditBlockInfo | EditResourceInfo | EditConnectionInfo;
 
 export interface BlockInfo {
     block: BlockDefinition;
