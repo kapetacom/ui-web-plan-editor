@@ -117,6 +117,10 @@ export const Planner2 = (props: Props) => {
                 {connectionDisplayOrder
                     .map((id) => [id, connections[id]])
                     .map(([id, connection]) => {
+                        // Handle deleted connections that are still in the ordering list
+                        if (!connection) {
+                            return null;
+                        }
                         // Hide connections that are not connected to the focused block
                         const className = toClass({
                             'connection-hidden': !!(
