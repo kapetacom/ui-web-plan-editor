@@ -16,13 +16,13 @@
         "entities": [],
         "consumers": [
             {
-                "kind": "kapeta/resource-type-mongodb",
+                "kind": "kapeta/resource-type-mongodb:1.2.3",
                 "metadata": {
                     "name": "tasks"
                 }
             },
             {
-                "kind": "kapeta/resource-type-rest-client",
+                "kind": "kapeta/resource-type-rest-client:1.2.3",
                 "metadata": {
                     "name": "users"
                 },
