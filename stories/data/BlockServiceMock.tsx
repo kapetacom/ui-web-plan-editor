@@ -10,10 +10,19 @@ import {
     BlockName,
     BlockStatus,
     BlockVersion,
+    FormField,
     useBlock,
 } from '@kapeta/ui-web-components';
 
 export const BlockServiceMock = BlockService;
+
+const EditorComponent = () => {
+    return (
+        <div className="resource-editor">
+            <FormField name="metadata.name" label="Name" validation={['required']} help="Name the resource" />
+        </div>
+    );
+};
 
 const blocks = [
     require('./blocks/kapeta-user.json'),
@@ -83,6 +92,7 @@ blocks.push(
         type: ResourceProviderType.OPERATOR,
         role: ResourceRole.CONSUMES,
         definition: resource,
+        editorComponent: EditorComponent,
     });
 });
 
@@ -98,6 +108,7 @@ blocks.push(
             return 2;
         },
         definition: resource,
+        editorComponent: EditorComponent,
     });
 });
 
@@ -127,6 +138,7 @@ blocks.push(
             return 3;
         },
         definition: resource,
+        editorComponent: EditorComponent,
     });
 });
 
@@ -339,7 +351,7 @@ BlockTypeProvider.register({
                     <BlockStatus />
                 </g>
                 {/* TODO: add y-offset if block has error */}
-                <svg fill="none" x={props.width / 2} y={10} width={props.width - 20} viewBox={`0 0 150 150`}>
+                <svg fill="none" x={props.width / 2} y={10} width={props.width - 20} viewBox="0 0 150 150">
                     <BlockInstanceName />
                 </svg>
                 {/* Name + handle */}

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
     AssetNameInput,
     Button,
@@ -23,7 +23,7 @@ import { ItemType, ResourceRole } from '@kapeta/ui-web-types';
 import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useAsync } from 'react-use';
-import { EditableItemInterface2 } from '../types';
+import { EditItemInfo } from '../types';
 import { cloneDeep } from 'lodash';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { BlockDefinition, Connection, Entity, Resource } from '@kapeta/schemas';
@@ -87,7 +87,7 @@ function renderBlockFields(data: SchemaKind) {
     );
 }
 
-function renderEditableItemForm(planner: PlannerContextData, editableItem: EditableItemInterface2): any {
+function renderEditableItemForm(planner: PlannerContextData, editableItem: EditItemInfo): any {
     if (editableItem.type === ItemType.CONNECTION) {
         const connection = editableItem.item as Connection;
 
@@ -132,16 +132,16 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
     }
 
     if (editableItem.type === ItemType.BLOCK) {
-        const data = editableItem.item as BlockDefinition;
+        const data = editableItem.item.block;
 
         const BlockTypeConfig = BlockTypeProvider.get(data.kind);
 
         if (!BlockTypeConfig.editorComponent) {
-            return <div key={editableItem.ref}>{renderBlockFields(data)}</div>;
+            return <div>{renderBlockFields(data)}</div>;
         }
 
         return (
-            <div key={editableItem.ref}>
+            <div>
                 {this.renderBlockFields(data)}
                 <ErrorBoundary
                     fallbackRender={(props) => (
@@ -159,8 +159,8 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
 
     // TODO: Implement resource editing
     // @ts-ignore
-    if (editableItem.type === 'resource') {
-        const data = editableItem.item as Resource;
+    if (editableItem.type === ItemType.RESOURCE) {
+        const data = editableItem.item.resource as Resource;
         const resourceType = ResourceTypeProvider.get(data.kind);
 
         if (!resourceType.editorComponent) {
@@ -197,7 +197,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
                     )}
                 >
                     <resourceType.editorComponent
-                        key={editableItem.ref}
+                        key={editableItem.item.ref}
                         // TODO: make resource editorComponent accept Resource/Schemakind
                         // @ts-ignore
                         block={data}
@@ -212,7 +212,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: Edita
 }
 
 interface Props {
-    editableItem?: EditableItemInterface2;
+    editableItem?: EditItemInfo;
     open: boolean;
     onSubmit: (data: SchemaKind) => void;
     onClose: () => void;
@@ -229,10 +229,17 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
         props.onClose();
     };
 
-    const [initialValue, setInitialValue] = useState<any>({});
+    const initialValue = useMemo(() => {
+        switch (props.editableItem?.type) {
+            case ItemType.CONNECTION:
+                return cloneDeep(props.editableItem.item);
+            case ItemType.BLOCK:
+                return cloneDeep(props.editableItem.item.block);
+            case ItemType.RESOURCE:
+                return cloneDeep(props.editableItem.item.resource);
+        }
 
-    useEffect(() => {
-        if (props.editableItem) setInitialValue(cloneDeep(props.editableItem?.item));
+        return {};
     }, [props.editableItem]);
 
     const panelHeader = () => {

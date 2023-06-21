@@ -16,14 +16,13 @@ import { useAsync } from 'react-use';
 import { Asset, ItemType, Point, ResourceRole, IResourceTypeProvider, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
-import { EditableItemInterface2 } from '../src/planner2/types';
-import { BlockNode, BlockResource, PlannerMode } from '../src';
+import { BlockNode, BlockResource, EditItemInfo, PlannerMode } from '../src';
 import { DragAndDrop } from '../src/planner2/utils/dndUtils';
 import './styles.less';
 import { BlockTypeProvider, InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockServiceMock } from './data/BlockServiceMock';
 import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
-import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 import { PlannerOutlet, plannerRenderer } from '../src/planner2/renderers/plannerRenderer';
 import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
 
@@ -111,7 +110,7 @@ const DraggableResource = (props: DraggableResourceProps & { point: Point }) => 
 
 const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const planner = useContext(PlannerContext);
-    const [editItem, setEditItem] = React.useState<EditableItemInterface2 | undefined>();
+    const [editItem, setEditItem] = React.useState<EditItemInfo | undefined>();
     const [inspectItem, setInspectItem] = React.useState<BlockInstance | null>(null);
     const [configureItem, setConfigureItem] = React.useState<SchemaKind<any, any> | null>(null);
     const [draggableItem, setDraggableItem] = React.useState<DraggableItem | null>(null);
@@ -163,8 +162,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 onClick(context, { blockInstance, block }) {
                     setEditItem({
                         type: ItemType.BLOCK,
-                        item: block!,
-                        ref: blockInstance!.block.ref,
+                        item: { block: block!, instance: blockInstance! },
                         creating: false,
                     });
                 },
@@ -193,10 +191,14 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                         parseKapetaUri(blockInstance.block.ref).version === 'local'
                     );
                 },
-                onClick(p, { resource }) {
+                onClick(p, { resource, block, blockInstance }) {
                     setEditItem({
                         type: ItemType.RESOURCE,
-                        item: resource!,
+                        item: {
+                            resource: resource!,
+                            block: block!,
+                            ref: blockInstance!.block.ref,
+                        },
                         creating: false,
                     });
                 },
@@ -289,16 +291,20 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                             // TODO: Save path/ref??
                             // planner.addBlockDefinition(item);
                         } else {
-                            planner.updateBlockDefinition(editItem.ref!, item as BlockDefinition);
+                            planner.updateBlockDefinition(editItem.item.instance.block.ref, item as BlockDefinition);
                         }
                     }
 
                     if (editItem?.type === ItemType.RESOURCE) {
+                        const resource = editItem.item.resource as Resource;
+                        const role = editItem.item.block?.spec?.consumers?.includes(resource)
+                            ? ResourceRole.CONSUMES
+                            : ResourceRole.PROVIDES;
                         if (editItem.creating) {
                             //     ???
                         } else {
                             // update mapping?
-                            // planner.updateResourceDefinition(); //
+                            planner.updateResource(editItem.item.ref!, resource.metadata.name, role, item as Resource);
                         }
                     }
                 }}
