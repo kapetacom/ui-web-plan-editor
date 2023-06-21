@@ -1,3 +1,11 @@
+## [0.4.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.4.0...v0.4.1) (2023-06-21)
+
+
+### Bug Fixes
+
+* handle deleted connections still in the ordering list [KAP-704] ([4a6d3b4](https://github.com/kapetacom/ui-web-plan-editor/commit/4a6d3b40c34e7235115e6d96b0bd4da671571197))
+* tweak x-offset for dragged providers [KAP-705] ([e88c98e](https://github.com/kapetacom/ui-web-plan-editor/commit/e88c98e84ebc3aef36660e71cded83dcd2bd6556))
+
 # [0.4.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.3.0...v0.4.0) (2023-06-17)
 
 
