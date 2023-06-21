@@ -67,12 +67,12 @@ const TempResource = ({ resource, nodeSize, x, y, actionContext }) => {
     const clipPathId = 'temp-resource-clip';
 
     return (
-        <SVGLayoutNode x={x + 150} y={y}>
+        <SVGLayoutNode x={x} y={y}>
             {/* Clip the hexagon to create a straight edge */}
             <clipPath id={clipPathId}>{renderClipPath(height, ResourceRole.CONSUMES, true)}</clipPath>
 
             <g height={heightInner}>
-                <LayoutNode x={-10} y={height / 2}>
+                <LayoutNode x={140} y={height / 2}>
                     <PlannerConnectionPoint
                         pointId={getResourceId('temp-block', 'temp-resource', ResourceRole.CONSUMES)}
                     />
