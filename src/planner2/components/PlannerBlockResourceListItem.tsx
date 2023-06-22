@@ -374,6 +374,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                         />
 
                                         <ActionButtons
+                                            transition="slide"
                                             pointType={isConsumer ? 'right' : 'left'}
                                             x={buttonX}
                                             y={buttonY}
