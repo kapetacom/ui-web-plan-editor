@@ -63,8 +63,16 @@ export const ActionButtons = (props: ActionButtonProps) => {
     const buttonWidth = width / renderedActions.length;
     const transitionFn = {
         fade(buttonIx) {
+            // staggered fade in from the middle
+            const delay = 0.05;
+            const middleIndex = Math.floor(renderedActions.length / 2);
+
+            // Calculate the distance from the middle index to the current element
+            const distanceFromMiddle = Math.abs(buttonIx - middleIndex);
+            const baseDelay = renderedActions.length % 2 === 0 ? delay : 0;
+            const staggeredDelay = distanceFromMiddle * delay + baseDelay;
             return {
-                transition: `all 0.15s linear ${buttonIx * 0.05}s`,
+                transition: `opacity 0.15s linear ${staggeredDelay}s`,
                 opacity: props.show ? 1 : 0,
             };
         },
