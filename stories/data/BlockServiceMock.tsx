@@ -142,6 +142,18 @@ blocks.push(
     });
 });
 
+[require('./blocks/kapeta-resource-type-web-page.json')].forEach((resource) => {
+    ResourceTypeProvider.register({
+        kind: resource.metadata.name,
+        version: '1.2.3',
+        title: resource.metadata.title,
+        type: ResourceProviderType.INTERNAL,
+        role: ResourceRole.PROVIDES,
+        // consumableKind: 'kapeta/resource-type-rest-client',
+        definition: resource,
+    });
+});
+
 ['kapeta/language-target-java-spring-boot', 'kapeta/language-target-test'].forEach((targetKind) => {
     BlockTargetProvider.register({
         kind: targetKind,

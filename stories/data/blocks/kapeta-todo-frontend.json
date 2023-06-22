@@ -7,6 +7,19 @@
     "spec": {
         "entities": [],
         "consumers": [],
-        "providers": []
+        "providers": [
+            {
+                "kind": "kapeta/resource-type-web-page:1.2.3",
+                "metadata": {
+                    "name": "Todo UI"
+                },
+                "spec": {
+                    "port": {
+                        "type": "web"
+                    },
+                    "path": "/"
+                }
+            }
+        ]
     }
 }
