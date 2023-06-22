@@ -153,6 +153,8 @@
         user-select: none;
         transition: all 200ms;
         opacity: 0;
+        // Prevent blocking visible content w/ invisible blocks
+        pointer-events: none;
     }
 
     .linked-block {
