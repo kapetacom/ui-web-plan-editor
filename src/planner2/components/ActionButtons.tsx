@@ -6,8 +6,8 @@ const CircleButton = (props) => {
     return (
         <button
             onClick={props.onClick}
-            className={`svg-circle-button ${props.style}`}
-            style={{ padding: 0, border: 0, background: 'none' }}
+            className={`svg-circle-button ${props.className}`}
+            style={{ padding: 0, border: 0, background: 'none', ...(props.style || {}) }}
             title={props.label}
         >
             <div className="container">
@@ -61,16 +61,7 @@ export const ActionButtons = (props: ActionButtonProps) => {
 
     return (
         <svg x={xCoord} y={props.y - height / 2} width={width || 150} height={height || 150}>
-            <foreignObject
-                x={0}
-                y={0}
-                height={height || 150}
-                width={width || 150}
-                style={{
-                    transition: 'all 0.2s',
-                    opacity: props.show ? 1 : 0,
-                }}
-            >
+            <foreignObject x={0} y={0} height={height || 150} width={width || 150}>
                 {/* inline element to get exact width and height */}
                 <span
                     ref={ref}
@@ -82,12 +73,18 @@ export const ActionButtons = (props: ActionButtonProps) => {
                 >
                     {props.actions.map((action: PlannerAction<any>, ix) => {
                         if (action.enabled(planner, props.actionContext)) {
+                            const delay = `${ix * 0.05}s`;
                             return (
                                 <CircleButton
                                     key={ix}
                                     label={action.label}
                                     icon={action.icon}
-                                    style={action.buttonStyle}
+                                    className={action.buttonStyle}
+                                    style={{
+                                        transition: `all 0.2s linear ${delay}`,
+                                        opacity: props.show ? 1 : 0,
+                                        pointerEvents: props.show ? 'auto' : 'none',
+                                    }}
                                     onClick={() => action.onClick(planner, props.actionContext)}
                                 />
                             );
