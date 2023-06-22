@@ -19,6 +19,7 @@ const CircleButton = (props) => {
 
 interface ActionButtonProps {
     pointType?: 'left' | 'right' | 'center';
+    transition?: 'fade' | 'slide';
     x: number;
     y: number;
     show: boolean;
@@ -58,6 +59,27 @@ export const ActionButtons = (props: ActionButtonProps) => {
         left: props.x,
         right: props.x - width,
     }[props.pointType || 'center'];
+    const renderedActions = props.actions.filter((action) => action.enabled(planner, props.actionContext));
+    const buttonWidth = width / renderedActions.length;
+    const transitionFn = {
+        fade(buttonIx) {
+            return {
+                transition: `all 0.15s linear ${buttonIx * 0.05}s`,
+                opacity: props.show ? 1 : 0,
+            };
+        },
+        slide(buttonIx) {
+            // start at the edge of the button and slide in from a common point
+            return {
+                transition: `all 0.3s`,
+                transform: props.show
+                    ? 'translateX(0px)'
+                    : `translateX(${
+                          props.pointType === 'left' ? -buttonWidth * (buttonIx + 1) : width - buttonWidth * buttonIx
+                      }px)`,
+            };
+        },
+    }[props.transition || 'fade'];
 
     return (
         <svg x={xCoord} y={props.y - height / 2} width={width || 150} height={height || 150}>
@@ -71,25 +93,20 @@ export const ActionButtons = (props: ActionButtonProps) => {
                         gap: '2px',
                     }}
                 >
-                    {props.actions.map((action: PlannerAction<any>, ix) => {
-                        if (action.enabled(planner, props.actionContext)) {
-                            const delay = `${ix * 0.05}s`;
-                            return (
-                                <CircleButton
-                                    key={ix}
-                                    label={action.label}
-                                    icon={action.icon}
-                                    className={action.buttonStyle}
-                                    style={{
-                                        transition: `all 0.2s linear ${delay}`,
-                                        opacity: props.show ? 1 : 0,
-                                        pointerEvents: props.show ? 'auto' : 'none',
-                                    }}
-                                    onClick={() => action.onClick(planner, props.actionContext)}
-                                />
-                            );
-                        }
-                        return null;
+                    {renderedActions.map((action: PlannerAction<any>, ix) => {
+                        return (
+                            <CircleButton
+                                key={ix}
+                                label={action.label}
+                                icon={action.icon}
+                                className={action.buttonStyle}
+                                style={{
+                                    pointerEvents: props.show ? 'auto' : 'none',
+                                    ...transitionFn(ix),
+                                }}
+                                onClick={() => action.onClick(planner, props.actionContext)}
+                            />
+                        );
                     })}
                 </span>
             </foreignObject>
