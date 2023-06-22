@@ -1,10 +1,13 @@
 @import '~@kapeta/ui-web-components/styles/values';
 @import '~@kapeta/ui-web-components/styles/functions';
 
+@kapeta-text-primary: #000000de;
+
 .planner-block-node {
     .transition(d 100ms);
     .transition(transform 150ms);
     overflow: visible;
+    color: @kapeta-text-primary;
 
     &.block-dragging {
         .transition(transform 0ms);
@@ -106,6 +109,7 @@
                 input {
                     background-color: rgba(0, 0, 0, 0.05) !important;
                     color: inherit;
+                    font-weight: 500;
                 }
             }
         }
