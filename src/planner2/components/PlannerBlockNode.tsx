@@ -39,6 +39,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     const blockType = blockContext.blockDefinition?.kind
         ? BlockTypeProvider.get(blockContext.blockDefinition?.kind)
         : null;
+    const [isHovered, setIsHovered] = React.useState(false);
 
     if (!blockContext.blockInstance) {
         throw new Error('PlannerBlockNode requires a BlockDefinition context');
@@ -49,6 +50,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     }
 
     const focusInfo = useFocusInfo();
+    const isPrimaryFocus = focusInfo?.focus.instance.id === blockContext.blockInstance.id;
 
     const data: PlannerPayload = useMemo(
         () => ({ type: 'block', data: blockContext.blockInstance }),
@@ -224,11 +226,13 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                     className={`${className} ${evt.isDragging ? 'dragging' : ''}`}
                                     onDoubleClick={() => planner.setFocusedBlock(blockContext.blockInstance)}
                                     onMouseEnter={() => {
+                                        setIsHovered(true);
                                         if (props.onMouseEnter) {
                                             props.onMouseEnter(actionContext);
                                         }
                                     }}
                                     onMouseLeave={() => {
+                                        setIsHovered(false);
                                         if (props.onMouseLeave) {
                                             props.onMouseLeave(actionContext);
                                         }
@@ -303,7 +307,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                         <ActionButtons
                                             x={blockContext.instanceBlockWidth / 2}
                                             y={blockContext.instanceBlockHeight + 25}
-                                            show
+                                            show={isHovered || isPrimaryFocus}
                                             actions={props.actions?.block || []}
                                             actionContext={actionContext}
                                         />
