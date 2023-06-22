@@ -1,3 +1,19 @@
+# [0.5.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.4.1...v0.5.0) (2023-06-22)
+
+
+### Bug Fixes
+
+* reenable block actions on hover + focus fix ([8e325fb](https://github.com/kapetacom/ui-web-plan-editor/commit/8e325fb193b28048f0cb5f6b31d8866e2a95f219))
+* set explicit block text color to avoid style bleed [KAP-670] ([46a78cf](https://github.com/kapetacom/ui-web-plan-editor/commit/46a78cf9016683f0c858243bef3538bfdee0344e))
+* tweak resource action offset for resources w/o counter ([8578d21](https://github.com/kapetacom/ui-web-plan-editor/commit/8578d2198cafada10bd98a79a8e7cb2240e13c37))
+
+
+### Features
+
+* add staggered fade-in transition to actionButtons ([a8b0253](https://github.com/kapetacom/ui-web-plan-editor/commit/a8b0253cafb9acfe8d4121657e1a82fbdd6dbc81))
+* change button fade to middle-out ([4b9559f](https://github.com/kapetacom/ui-web-plan-editor/commit/4b9559faec4ea901e411a7e4576936b5b88ef69d))
+* fold-out animation for resource buttons [KAP-663] ([268fcb0](https://github.com/kapetacom/ui-web-plan-editor/commit/268fcb084a1116698a10205da1a8d0b6d1aee44d))
+
 ## [0.4.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.4.0...v0.4.1) (2023-06-21)
 
 
