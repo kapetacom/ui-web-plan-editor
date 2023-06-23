@@ -1,3 +1,10 @@
+## [0.5.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.0...v0.5.1) (2023-06-23)
+
+
+### Bug Fixes
+
+* fix resource text in safari and simplify clipping ([9e530ac](https://github.com/kapetacom/ui-web-plan-editor/commit/9e530acfb25d4b4919b5e693ccdc69a077eeb7a4))
+
 # [0.5.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.4.1...v0.5.0) (2023-06-22)
 
 
