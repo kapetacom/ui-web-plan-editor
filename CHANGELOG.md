@@ -1,3 +1,10 @@
+## [0.5.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.1...v0.5.2) (2023-06-23)
+
+
+### Bug Fixes
+
+* fade transition improvement ([9ba07ba](https://github.com/kapetacom/ui-web-plan-editor/commit/9ba07ba284a83be4943165e79d2d717e41891b75))
+
 ## [0.5.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.0...v0.5.1) (2023-06-23)
 
 
