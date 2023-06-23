@@ -41,8 +41,6 @@
         "guid-typescript": "*",
         "less": ">=4",
         "lodash": ">=4",
-        "mobx": ">=6",
-        "mobx-react": ">=7",
         "react": ">=18",
         "react-dom": ">=18",
         "react-tabs": ">=6",

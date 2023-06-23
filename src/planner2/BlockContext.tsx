@@ -2,7 +2,7 @@ import React, { useContext, useMemo, useState } from 'react';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerContext } from './PlannerContext';
 import { getDefaultBlockHeight, resourceHeight } from './utils/planUtils';
-import { BlockMode } from '../wrappers/wrapperHelpers';
+import { BlockMode } from '../utils/enums';
 import { BlockTypeProvider, InstanceStatus } from '@kapeta/ui-web-context';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 

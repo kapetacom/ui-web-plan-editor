@@ -6,7 +6,7 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { PlannerBlockResourceListItem } from './PlannerBlockResourceListItem';
 import { PlannerContext } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
-import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
+import { BlockMode, ResourceMode } from '../../utils/enums';
 import { resourceHeight } from '../utils/planUtils';
 import { SVGLayoutNode } from '../LayoutContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';

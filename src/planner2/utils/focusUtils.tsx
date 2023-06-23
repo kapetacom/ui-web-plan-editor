@@ -4,7 +4,6 @@ import { FocusPositioningData, PlannerNodeSize } from '../../types';
 import { BlockInfo, FocusBlockInfo, FocusBlockInfoShallow, ZOOM_STEP_SIZE, ZoomLevels } from '../types';
 
 import { getBlockInstance, getReservedBlockHeight } from './planUtils';
-import { PlannerConnectionModelWrapper } from '../../wrappers/PlannerConnectionModelWrapper';
 import { getConnectionsFor } from './connectionUtils';
 import { useContext, useEffect, useMemo } from 'react';
 import { PlannerContext } from '../PlannerContext';
@@ -177,14 +176,12 @@ export function getFocusBlockInfo(plan: Plan, focus: BlockInfo): FocusBlockInfoS
     const consumerBlocks: BlockInstance[] = []; // blocks to the right
 
     focus.block.spec.consumers?.forEach((consumerResource) => {
-        getConnectionsFor(plan, focus.instance.id, consumerResource.metadata.name).forEach(
-            (connection: PlannerConnectionModelWrapper) => {
-                const instance = getBlockInstance(plan, connection.provider.blockId);
-                if (instance) {
-                    providerBlocks.push(instance);
-                }
+        getConnectionsFor(plan, focus.instance.id, consumerResource.metadata.name).forEach((connection) => {
+            const instance = getBlockInstance(plan, connection.provider.blockId);
+            if (instance) {
+                providerBlocks.push(instance);
             }
-        );
+        });
     });
 
     focus.block.spec.providers?.forEach((providerResource) => {

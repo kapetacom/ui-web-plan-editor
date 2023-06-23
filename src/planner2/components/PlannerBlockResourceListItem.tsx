@@ -4,7 +4,6 @@ import { IResourceTypeProvider, ResourceProviderType, ResourceRole } from '@kape
 
 import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
-import { ResourceMode } from '../../wrappers/wrapperHelpers';
 import { getResourceId, resourceHeight } from '../utils/planUtils';
 import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
 import { PlannerConnectionPoint } from './PlannerConnectionPoint';
@@ -19,7 +18,7 @@ import { ActionButtons } from './ActionButtons';
 import { ActionContext, PlannerAction, PlannerPayload, ResourcePayload } from '../types';
 import { Resource } from '@kapeta/schemas';
 import { createConnection } from '../utils/connectionUtils';
-import { PlannerMode } from '../../wrappers/PlannerModelWrapper';
+import { PlannerMode, ResourceMode } from '../../utils/enums';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources

@@ -5,7 +5,7 @@ import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { useFocusInfo } from '../utils/focusUtils';
 import { BlockInfo } from '../types';
 import { PlannerContext } from '../PlannerContext';
-import { BlockMode, ResourceMode } from '../../wrappers/wrapperHelpers';
+import { BlockMode, ResourceMode } from '../../utils/enums';
 import { BlockInstance, Resource } from '@kapeta/schemas';
 
 export interface Props {

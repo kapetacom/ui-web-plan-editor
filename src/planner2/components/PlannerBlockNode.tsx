@@ -7,7 +7,7 @@ import { PlannerActionConfig, PlannerContext } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
 import { PlannerBlockResourceList } from './PlannerBlockResourceList';
 import { Point, ResourceRole } from '@kapeta/ui-web-types';
-import { BlockMode } from '../../wrappers/wrapperHelpers';
+import { BlockMode } from '../../utils/enums';
 import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
 import { ActionContext, BlockInfo, PlannerPayload, ResourcePayload, ResourceTypePayload } from '../types';

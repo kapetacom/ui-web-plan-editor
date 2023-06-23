@@ -23,3 +23,9 @@ export enum BlockMode {
 export function createResourceId(blockId: string, role: ResourceRole, ix: number) {
     return `${blockId}_${role}_${ix}`;
 }
+
+export enum PlannerMode {
+    VIEW,
+    CONFIGURATION,
+    EDIT,
+}

@@ -1,4 +1,3 @@
-import { PlannerBlockModelWrapper } from './wrappers/PlannerBlockModelWrapper';
 import { Point } from '@kapeta/ui-web-types';
 
 export enum PlannerNodeSize {
@@ -17,19 +16,10 @@ export interface FocusPositioningData {
     plannerWidth: number;
 }
 
-export interface ResourceLinkedBlocks {
-    [resource: string]: PlannerBlockModelWrapper[];
-}
-
 export interface BlockPositionCache {
     [key: string]: Point;
 }
 
 export interface ZoomAreaMap {
     [key: number]: Point;
-}
-export interface NeighboringBlocks {
-    consumingBlocks: PlannerBlockModelWrapper[];
-    providingBlocks: PlannerBlockModelWrapper[];
-    all: PlannerBlockModelWrapper[];
 }
