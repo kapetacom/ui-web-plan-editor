@@ -43,10 +43,11 @@ const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) =
     let width = 250;
     let left = 0;
 
+    const iconWidth = 0;
     if (role === ResourceRole.CONSUMES) {
-        width = expanded ? 109.5 : 9.5;
+        width = expanded ? 109.5 : 9.5 + iconWidth;
     } else {
-        left = expanded ? 12 : 112;
+        left = expanded ? 12 + iconWidth : 112;
     }
 
     return <rect className="resource-mask" width={width} height={height} x={left} y={top} />;
@@ -218,7 +219,6 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const clipPathId = `${resourceId}_clippath`;
 
     const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name, props.role);
-    const fixedClipPathId = `${clipPathId}_fixed`;
 
     const extension = isExpanded ? 100 : 0;
     const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -5 - extension : 39 + extension);
@@ -323,19 +323,9 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                     >
                         {(evt) => (
                             <>
-                                <clipPath id={fixedClipPathId}>
-                                    <rect
-                                        className="container-mask"
-                                        width={mouseCatcherWidth}
-                                        height={height}
-                                        x={isConsumer ? -mouseCatcherWidth + 5 : blockInstance.dimensions!.width + 1}
-                                        y={0}
-                                    />
-                                </clipPath>
-
                                 <svg
                                     className={containerClass}
-                                    clipPath={`url(#${fixedClipPathId})`}
+                                    // clipPath={`url(#${fixedClipPathId})`}
                                     x={isConsumer ? 0 : -151}
                                     y={0}
                                     onMouseEnter={() => {
@@ -353,11 +343,6 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                     // Only register the drag handler if the resource should be draggable (Providers only atm)
                                     {...(props.role === ResourceRole.PROVIDES ? evt.componentProps : {})}
                                 >
-                                    {/* Clip the hexagon to create a straight edge */}
-                                    <clipPath id={clipPathId}>
-                                        {renderClipPath(height, props.role, isExpanded)}
-                                    </clipPath>
-
                                     <g
                                         className={bodyClass}
                                         transform={`translate(${getXPosition()},0)`}
@@ -399,7 +384,6 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                         </LayoutNode>
 
                                         <svg
-                                            clipPath={`url(#${clipPathId})`}
                                             style={{
                                                 cursor: isConsumer ? '' : 'grab',
                                             }}

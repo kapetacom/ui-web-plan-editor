@@ -2,6 +2,7 @@ import React, { useContext, useLayoutEffect, useRef, useState } from 'react';
 import { ActionContext, PlannerAction } from '../types';
 import { PlannerContext } from '../PlannerContext';
 import { staggeredFade } from '../utils/transitionUtils';
+import './ActionButtons.less';
 
 const CircleButton = (props) => {
     return (
@@ -33,7 +34,7 @@ interface ActionButtonProps {
 export const ActionButtons = (props: ActionButtonProps) => {
     const planner = useContext(PlannerContext);
 
-    const ref = useRef<HTMLSpanElement>(null);
+    const ref = useRef<HTMLDivElement>(null);
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
 
@@ -83,14 +84,7 @@ export const ActionButtons = (props: ActionButtonProps) => {
         <svg x={xCoord} y={props.y - height / 2} width={width || 150} height={height || 150}>
             <foreignObject x={0} y={0} height={height || 150} width={width || 150}>
                 {/* inline element to get exact width and height */}
-                <span
-                    ref={ref}
-                    style={{
-                        display: 'inline-flex',
-                        justifyContent: 'center',
-                        gap: '2px',
-                    }}
-                >
+                <div ref={ref} className="action-buttons-container">
                     {renderedActions.map((action: PlannerAction<any>, ix) => {
                         return (
                             <CircleButton
@@ -106,7 +100,7 @@ export const ActionButtons = (props: ActionButtonProps) => {
                             />
                         );
                     })}
-                </span>
+                </div>
             </foreignObject>
         </svg>
     );
