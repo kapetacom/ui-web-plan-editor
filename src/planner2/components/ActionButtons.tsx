@@ -70,7 +70,7 @@ export const ActionButtons = (props: ActionButtonProps) => {
         slide(buttonIx) {
             // start at the edge of the button and slide in from a common point
             return {
-                transition: `all 0.3s`,
+                transition: `transform 0.3s`,
                 transform: props.show
                     ? 'translateX(0px)'
                     : `translateX(${
@@ -80,9 +80,18 @@ export const ActionButtons = (props: ActionButtonProps) => {
         },
     }[props.transition || 'fade'];
 
+    const aHeight = height || 150;
+    const aWidth = width || 150;
+
     return (
-        <svg x={xCoord} y={props.y - height / 2} width={width || 150} height={height || 150}>
-            <foreignObject x={0} y={0} height={height || 150} width={width || 150}>
+        <svg x={xCoord} y={props.y - height / 2} height={aHeight} width={aWidth} viewBox={`0 0 ${aWidth} ${aHeight}`}>
+            <foreignObject
+                x={0}
+                y={0}
+                height={aHeight}
+                width={aWidth}
+                style={{ position: 'relative', top: 0, left: 0 }}
+            >
                 {/* inline element to get exact width and height */}
                 <div ref={ref} className="action-buttons-container">
                     {renderedActions.map((action: PlannerAction<any>, ix) => {
