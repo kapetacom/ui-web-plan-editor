@@ -1,3 +1,10 @@
+## [0.5.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.2...v0.5.3) (2023-06-26)
+
+
+### Bug Fixes
+
+* removes deprecated planner code and mobx dependencies ([#51](https://github.com/kapetacom/ui-web-plan-editor/issues/51)) ([e778992](https://github.com/kapetacom/ui-web-plan-editor/commit/e7789924ebf990c6b0c692bea233ae0dc817b286))
+
 ## [0.5.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.1...v0.5.2) (2023-06-23)
 
 
