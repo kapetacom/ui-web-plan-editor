@@ -83,6 +83,9 @@ export const ActionButtons = (props: ActionButtonProps) => {
     const aHeight = height || 150;
     const aWidth = width || 150;
 
+    if (renderedActions.length === 0) {
+        return null;
+    }
     return (
         <svg x={xCoord} y={props.y - height / 2} height={aHeight} width={aWidth} viewBox={`0 0 ${aWidth} ${aHeight}`}>
             <foreignObject
