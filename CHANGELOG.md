@@ -1,3 +1,10 @@
+## [0.5.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.4...v0.5.5) (2023-06-26)
+
+
+### Bug Fixes
+
+* Prevent duplicate connections ([#52](https://github.com/kapetacom/ui-web-plan-editor/issues/52)) ([3ec4524](https://github.com/kapetacom/ui-web-plan-editor/commit/3ec4524b8c10b938aaf6e437acefe5c97b1d71a2))
+
 ## [0.5.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.3...v0.5.4) (2023-06-26)
 
 
