@@ -3,7 +3,7 @@ import { Meta, StoryObj } from '@storybook/react';
 
 import { BlockLayout, ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
 
-import { Planner2 } from '../src/planner2/Planner2';
+import { Planner } from '../src/planner/Planner';
 
 import { readPlanV2 } from './data/planReader';
 import {
@@ -11,19 +11,19 @@ import {
     PlannerContext,
     PlannerContextData,
     withPlannerContext,
-} from '../src/planner2/PlannerContext';
+} from '../src/planner/PlannerContext';
 import { useAsync } from 'react-use';
 import { Asset, ItemType, Point, ResourceRole, IResourceTypeProvider, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
-import { ItemEditorPanel } from '../src/planner2/components/ItemEditorPanel';
+import { ItemEditorPanel } from '../src/planner/components/ItemEditorPanel';
 import { BlockNode, BlockResource, EditItemInfo, PlannerMode } from '../src';
-import { DragAndDrop } from '../src/planner2/utils/dndUtils';
+import { DragAndDrop } from '../src/planner/utils/dndUtils';
 import './styles.less';
 import { BlockTypeProvider, InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockServiceMock } from './data/BlockServiceMock';
-import { BLOCK_SIZE } from '../src/planner2/utils/planUtils';
+import { BLOCK_SIZE } from '../src/planner/utils/planUtils';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
-import { PlannerOutlet, plannerRenderer } from '../src/planner2/renderers/plannerRenderer';
+import { PlannerOutlet, plannerRenderer } from '../src/planner/renderers/plannerRenderer';
 import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
 
 interface DraggableResourceItem {
@@ -279,7 +279,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
             {draggableItem && draggableItemPosition && draggableItem.type === ItemType.BLOCK && (
                 <DraggableBlock {...draggableItem.data} point={draggableItemPosition} />
             )}
-            <Planner2 systemId="system?" actions={actionConfig} />
+            <Planner systemId="system?" actions={actionConfig} />
 
             <ItemEditorPanel
                 open={!!editItem}
@@ -449,7 +449,7 @@ const PlannerLoader = (props) => {
 };
 
 const meta: Meta<typeof PlannerLoader> = {
-    title: 'Planner2',
+    title: 'Planner',
     parameters: {
         layout: 'fullscreen',
     },

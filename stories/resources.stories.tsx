@@ -3,8 +3,8 @@ import { ResourceRole } from '@kapeta/ui-web-types';
 
 import { BlockValidator, PlannerNodeSize, ResourceMode } from '../src';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
-import { PlannerBlockResourceListItem } from '../src/planner2/components/PlannerBlockResourceListItem';
-import { BlockContext, PlannerBlockContextData } from '../src/planner2/BlockContext';
+import { PlannerBlockResourceListItem } from '../src/planner/components/PlannerBlockResourceListItem';
+import { BlockContext, PlannerBlockContextData } from '../src/planner/BlockContext';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 const ValidInstance: BlockInstance = {

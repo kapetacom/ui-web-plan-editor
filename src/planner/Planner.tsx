@@ -12,7 +12,7 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import './Planner2.less';
+import './Planner.less';
 
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
@@ -50,7 +50,7 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
 };
 
 const emptyList = [];
-export const Planner2 = (props: Props) => {
+export const Planner = (props: Props) => {
     const { nodeSize = PlannerNodeSize.MEDIUM, plan } = useContext(PlannerContext);
 
     const instances = plan?.spec.blocks ?? emptyList;

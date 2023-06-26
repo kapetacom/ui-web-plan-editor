@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { DragAndDrop } from '../src/planner2/DragAndDrop';
+import { DragAndDrop } from '../src/planner/DragAndDrop';
 
 export default {
     title: 'Drag and drop',
