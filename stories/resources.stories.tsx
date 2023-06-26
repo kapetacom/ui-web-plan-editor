@@ -1,18 +1,10 @@
 import React from 'react';
 import { ResourceRole } from '@kapeta/ui-web-types';
 
-import {
-    BlockValidator,
-    PlannerBlockModelWrapper,
-    // PlannerBlockResourceListItem,
-    PlannerModelWrapper,
-    PlannerNodeSize,
-    PlannerResourceModelWrapper,
-    ResourceMode,
-} from '../src';
+import { BlockValidator, PlannerNodeSize, ResourceMode } from '../src';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 import { PlannerBlockResourceListItem } from '../src/planner2/components/PlannerBlockResourceListItem';
-import { BlockContext, BlockContextProvider, PlannerBlockContextData } from '../src/planner2/BlockContext';
+import { BlockContext, PlannerBlockContextData } from '../src/planner2/BlockContext';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 const ValidInstance: BlockInstance = {

@@ -8,7 +8,7 @@ import { Point } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
 
 import { ZOOM_STEP_SIZE } from './types';
-import { PlannerMode } from '../wrappers/PlannerModelWrapper';
+import { PlannerMode } from '../utils/enums';
 import { FocusTopbar } from './components/FocusTopbar';
 import { PlannerFocusSideBar } from './components/PlannerFocusSideBar';
 import { BlockInstance } from '@kapeta/schemas';

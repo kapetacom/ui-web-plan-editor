@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { PlannerContext } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
 import { ResourceRole } from '@kapeta/ui-web-types';
@@ -18,6 +18,8 @@ import {
     replaceJoinsWithArcs,
 } from '../utils/connectionUtils/src/path';
 import { DnDContext } from '../DragAndDrop/DnDContext';
+
+import './PlannerConnection.less';
 
 const empty = [];
 

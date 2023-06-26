@@ -1,5 +1,4 @@
 import { BlockInstance } from '@kapeta/schemas';
-import { action } from 'mobx';
 import React from 'react';
 
 export function FocusTopbar(props: { focusedBlock?: BlockInstance; setFocusBlock: (block: BlockInstance) => void }) {
@@ -8,11 +7,11 @@ export function FocusTopbar(props: { focusedBlock?: BlockInstance; setFocusBlock
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
             <div
                 className="focus-toolbox-back"
-                onClick={action(() => {
+                onClick={() => {
                     if (props.focusedBlock) {
                         props.setFocusBlock(props.focusedBlock);
                     }
-                })}
+                }}
             >
                 <svg width="10" height="10" viewBox="0 0 8 13" fill="none">
                     <path d="M6.5351 11.6896L1.31038 6.46523" stroke="#544B49" strokeLinecap="round" />

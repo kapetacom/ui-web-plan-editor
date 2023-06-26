@@ -16,9 +16,8 @@ import { cloneDeep } from 'lodash';
 import { PlannerNodeSize } from '../types';
 import { PlannerAction, Rectangle } from './types';
 
-import { PlannerMode } from '../wrappers/PlannerModelWrapper';
+import { PlannerMode, BlockMode, ResourceMode } from '../utils/enums';
 import { getResourceId } from './utils/planUtils';
-import { BlockMode, ResourceMode } from '../wrappers/wrapperHelpers';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
 
 type BlockUpdater = (block: BlockInstance) => BlockInstance;
