@@ -1,3 +1,10 @@
+## [0.5.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.3...v0.5.4) (2023-06-26)
+
+
+### Bug Fixes
+
+* dont render actionButton empty container (fixes hover flicker) ([1962f19](https://github.com/kapetacom/ui-web-plan-editor/commit/1962f1988e811c860d5d04c6e04671e5b615736b))
+
 ## [0.5.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.2...v0.5.3) (2023-06-26)
 
 
