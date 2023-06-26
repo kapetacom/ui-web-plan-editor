@@ -19,6 +19,7 @@ import { PlannerAction, Rectangle } from './types';
 import { PlannerMode, BlockMode, ResourceMode } from '../utils/enums';
 import { getResourceId } from './utils/planUtils';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
+import {connectionEquals} from "./utils/connectionUtils";
 
 type BlockUpdater = (block: BlockInstance) => BlockInstance;
 type Callback = () => void;
@@ -102,6 +103,8 @@ export interface PlannerContextData {
     canvasSize: Rectangle;
     setCanvasSize(canvasSize: Rectangle): void;
 }
+
+
 
 const defaultValue: PlannerContextData = {
     focusedBlock: undefined,
@@ -595,7 +598,13 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     if (!newPlan.spec.connections) {
                         newPlan.spec.connections = [];
                     }
-                    newPlan.spec.connections.push(connection);
+                    const existIx = newPlan.spec.connections.findIndex((c) => connectionEquals(c, connection));
+                    if (existIx > -1) {
+                        // Connection already exists - replace it
+                        newPlan.spec.connections.splice(existIx, 1, connection);
+                    } else {
+                        newPlan.spec.connections.push(connection);
+                    }
                     return newPlan;
                 });
 
@@ -624,14 +633,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const ix =
-                        newPlan.spec.connections?.findIndex((c) => {
-                            return (
-                                c.provider.blockId === connection.provider.blockId &&
-                                c.provider.resourceName === connection.provider.resourceName &&
-                                c.consumer.blockId === connection.consumer.blockId &&
-                                c.consumer.resourceName === connection.consumer.resourceName
-                            );
-                        }) ?? -1;
+                        newPlan.spec.connections?.findIndex((c) => connectionEquals(c, connection)) ?? -1;
                     if (ix > -1) {
                         newPlan.spec.connections![ix] = { ...connection, mapping: cloneDeep(connection.mapping) };
                     }
@@ -645,11 +647,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
                     const connectionIx = newPlan.spec.connections?.findIndex(
-                        (conn) =>
-                            conn.provider.blockId === connection.provider.blockId &&
-                            conn.provider.resourceName === connection.provider.resourceName &&
-                            conn.consumer.blockId === connection.consumer.blockId &&
-                            conn.consumer.resourceName === connection.consumer.resourceName
+                        (conn) => connectionEquals(conn, connection)
                     );
                     if (connectionIx !== undefined) {
                         newPlan.spec.connections?.splice(connectionIx, 1);

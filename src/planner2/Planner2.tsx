@@ -75,6 +75,8 @@ export const Planner2 = (props: Props) => {
     const focusInfo = useFocusInfo();
     const focusModeEnabled = !!focusInfo;
 
+    const connectionKeys = {};
+
     return (
         <ErrorBoundary
             onError={(error, info) => {
@@ -121,6 +123,15 @@ export const Planner2 = (props: Props) => {
                         if (!connection) {
                             return null;
                         }
+
+                        const key = getConnectionId(connection);
+
+                        if (connectionKeys[key]) {
+                            // Prevent rendering duplicate connections
+                            return null;
+                        }
+                        connectionKeys[key] = true;
+
                         // Hide connections that are not connected to the focused block
                         const className = toClass({
                             'connection-hidden': !!(
@@ -131,7 +142,7 @@ export const Planner2 = (props: Props) => {
                         return (
                             <PlannerConnection
                                 size={nodeSize}
-                                key={getConnectionId(connection)}
+                                key={key}
                                 className={className}
                                 connection={connection}
                                 actions={props.actions?.connection || []}

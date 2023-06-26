@@ -11,6 +11,11 @@ export function getConnectionId(connection: Connection) {
     )}-${getResourceId(connection.consumer?.blockId, connection.consumer?.resourceName, ResourceRole.CONSUMES)}`;
 }
 
+
+export function connectionEquals(a: Connection, b: Connection) {
+    return getConnectionId(a) === getConnectionId(b);
+}
+
 export function getMiddlePoint(list: Point[]) {
     // don't calculate it if the list is empty, to avoid setting the initial value to 0,0
     if (list.length <= 0) {
