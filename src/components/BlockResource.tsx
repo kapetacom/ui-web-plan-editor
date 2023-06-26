@@ -4,9 +4,6 @@ import { toClass, createHexagonPath, Orientation } from '@kapeta/ui-web-utils';
 import { ResourceRole } from '@kapeta/ui-web-types';
 
 import { PlannerNodeSize } from '../types';
-// Duplicate styles from src/planner2/components/BlockResource.less:
-// import './BlockResource.less';
-import { observer } from 'mobx-react';
 
 interface PlannerResourceProps {
     size?: PlannerNodeSize;
@@ -19,7 +16,7 @@ interface PlannerResourceProps {
     readOnly?: boolean;
 }
 
-export const BlockResource = observer((props: PlannerResourceProps) => {
+export const BlockResource = (props: PlannerResourceProps) => {
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const isSmall = nodeSize === PlannerNodeSize.SMALL;
     const consumer = props.role === ResourceRole.CONSUMES;
@@ -55,4 +52,4 @@ export const BlockResource = observer((props: PlannerResourceProps) => {
             </foreignObject>
         </g>
     );
-});
+};
