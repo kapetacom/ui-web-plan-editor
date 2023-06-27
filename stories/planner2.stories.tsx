@@ -16,7 +16,7 @@ import { useAsync } from 'react-use';
 import { Asset, ItemType, Point, ResourceRole, IResourceTypeProvider, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner/components/ItemEditorPanel';
-import { BlockNode, BlockResource, EditItemInfo, PlannerMode } from '../src';
+import { BlockNode, EditItemInfo, PlannerMode } from '../src';
 import { DragAndDrop } from '../src/planner/utils/dndUtils';
 import './styles.less';
 import { BlockTypeProvider, InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
@@ -25,6 +25,7 @@ import { BLOCK_SIZE } from '../src/planner/utils/planUtils';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 import { PlannerOutlet, plannerRenderer } from '../src/planner/renderers/plannerRenderer';
 import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
+import { BlockResource } from '../src/planner/components/BlockResource';
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -101,8 +102,8 @@ const DraggableResource = (props: DraggableResourceProps & { point: Point }) => 
                 name={props.name}
                 type={props.resourceConfig.type}
                 typeName={props.name}
-                width={width}
-                height={height}
+                typeStatusIcon="plus"
+                actionContext={{}}
             />
         </svg>
     );

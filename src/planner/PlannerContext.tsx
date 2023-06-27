@@ -19,7 +19,8 @@ import { PlannerAction, Rectangle } from './types';
 import { PlannerMode, BlockMode, ResourceMode } from '../utils/enums';
 import { getResourceId } from './utils/planUtils';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
-import {connectionEquals} from "./utils/connectionUtils";
+import { connectionEquals } from './utils/connectionUtils';
+import { BlockResouceIconProps } from './components/BlockResourceIcon';
 
 type BlockUpdater = (block: BlockInstance) => BlockInstance;
 type Callback = () => void;
@@ -56,6 +57,17 @@ export interface PlannerContextData {
             resourceName: string,
             role: ResourceRole,
             mode?: ResourceMode
+        ): void;
+        getResourceIcon(
+            blockInstanceId: string,
+            resourceName: string,
+            role: ResourceRole
+        ): BlockResouceIconProps['actionIcon'] | undefined;
+        setResourceIcon(
+            blockInstanceId: string,
+            resourceName: string,
+            role: ResourceRole,
+            icon: BlockResouceIconProps['actionIcon']
         ): void;
         getViewModeForBlock(blockInstanceId: string): BlockMode | undefined;
         setViewModeForBlock(blockInstanceId: string, mode?: BlockMode): void;
@@ -104,8 +116,6 @@ export interface PlannerContextData {
     setCanvasSize(canvasSize: Rectangle): void;
 }
 
-
-
 const defaultValue: PlannerContextData = {
     focusedBlock: undefined,
     mode: PlannerMode.VIEW,
@@ -118,6 +128,10 @@ const defaultValue: PlannerContextData = {
             return undefined;
         },
         setViewModeForBlock() {},
+        getResourceIcon() {
+            return undefined;
+        },
+        setResourceIcon() {},
     },
     instanceStates: {},
     zoom: 1,
@@ -245,6 +259,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     );
 
     const [viewStates, setViewStates] = useState({});
+    const [resourceConfig, setResourceConfig] = useState({});
     const assetState: PlannerContextData['assetState'] = useMemo(
         () => ({
             getViewModeForResource(blockInstanceId, resourceName, role) {
@@ -261,8 +276,16 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             setViewModeForBlock(blockInstanceId, blockMode) {
                 setViewStates((prev) => ({ ...prev, [blockInstanceId]: blockMode }));
             },
+            getResourceIcon(blockInstanceId, resourceName, role) {
+                const id = getResourceId(blockInstanceId, resourceName, role);
+                return resourceConfig[id];
+            },
+            setResourceIcon(blockInstanceId, resourceName, role, icon) {
+                const id = getResourceId(blockInstanceId, resourceName, role);
+                setResourceConfig((cfg) => (cfg[id] !== icon ? { ...cfg, [id]: icon } : cfg));
+            },
         }),
-        [viewStates, setViewStates]
+        [viewStates, setViewStates, resourceConfig, setResourceConfig]
     );
 
     const callbackHandlers = useMemo(() => {
@@ -632,8 +655,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 }
                 updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
-                    const ix =
-                        newPlan.spec.connections?.findIndex((c) => connectionEquals(c, connection)) ?? -1;
+                    const ix = newPlan.spec.connections?.findIndex((c) => connectionEquals(c, connection)) ?? -1;
                     if (ix > -1) {
                         newPlan.spec.connections![ix] = { ...connection, mapping: cloneDeep(connection.mapping) };
                     }
@@ -646,8 +668,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 }
                 updatePlan((prevState) => {
                     const newPlan = cloneDeep(prevState);
-                    const connectionIx = newPlan.spec.connections?.findIndex(
-                        (conn) => connectionEquals(conn, connection)
+                    const connectionIx = newPlan.spec.connections?.findIndex((conn) =>
+                        connectionEquals(conn, connection)
                     );
                     if (connectionIx !== undefined) {
                         newPlan.spec.connections?.splice(connectionIx, 1);
