@@ -1,5 +1,4 @@
 export * from './components/BlockNode';
-export * from './components/BlockResource';
 export * from './components/PlannerBlockWarningTag';
 export * from './logs/LogPanel';
 export * from './utils/SVGDropShadow';
