@@ -1,3 +1,15 @@
+# [0.6.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.5...v0.6.0) (2023-06-28)
+
+
+### Bug Fixes
+
+* compat export for planner ([be23900](https://github.com/kapetacom/ui-web-plan-editor/commit/be239007f49ca5ec0fe24f73a957d6816dcd7623))
+
+
+### Features
+
+* haxy resource icons ([b30b821](https://github.com/kapetacom/ui-web-plan-editor/commit/b30b821d1bafa57dbad768b0a03ea71c64503787))
+
 ## [0.5.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.4...v0.5.5) (2023-06-26)
 
 
