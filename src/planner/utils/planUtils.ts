@@ -1,13 +1,13 @@
 import { PlannerNodeSize } from '../../types';
-import { Asset, IBlockTypeProvider, ResourceRole, Size } from '@kapeta/ui-web-types';
+import { Asset, ResourceRole, Size } from '@kapeta/ui-web-types';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 export const BLOCK_SIZE = 150;
 
 export const resourceHeight = {
     [PlannerNodeSize.SMALL]: 30,
-    [PlannerNodeSize.MEDIUM]: 40,
-    [PlannerNodeSize.FULL]: 50,
+    [PlannerNodeSize.MEDIUM]: 52,
+    [PlannerNodeSize.FULL]: 65,
 };
 
 export const calculateCanvasSize = (

@@ -7,15 +7,16 @@ import { PlannerOutlet, plannerRenderer } from '../renderers/plannerRenderer';
 import { PlannerNodeSize } from '../../types';
 import './BlockResource.less';
 import { ActionContext } from '../types';
+import { BlockResourceIcon } from './BlockResourceIcon';
 
 interface PlannerResourceProps {
     size?: PlannerNodeSize;
     role?: ResourceRole;
     type: string;
     typeName?: string;
+    typeStatusIcon: Parameters<typeof BlockResourceIcon>[0]['actionIcon'];
+    typeStatusColor?: Parameters<typeof BlockResourceIcon>[0]['color'];
     name: string;
-    height: number;
-    width: number;
     readOnly?: boolean;
     actionContext: ActionContext;
 }
@@ -24,8 +25,14 @@ export const BlockResource = (props: PlannerResourceProps) => {
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const isSmall = nodeSize === PlannerNodeSize.SMALL;
     const consumer = props.role === ResourceRole.CONSUMES;
-    const textX = consumer ? 12 : 20;
-    const hexagonPath = createHexagonPath(props.width, props.height, 2, Orientation.HORIZONTAL, 7);
+
+    const textX = consumer ? 40 : 20;
+    const iconX = consumer ? 10 : 110;
+
+    const height = 48;
+    const width = 190;
+
+    const hexagonPath = createHexagonPath(width, height, 2, Orientation.HORIZONTAL, 7);
 
     const resourceClass = toClass({
         'block-resource': true,
@@ -34,10 +41,9 @@ export const BlockResource = (props: PlannerResourceProps) => {
         small: isSmall,
     });
 
-    const maxTextWidth = props.width - 50;
+    const maxTextWidth = width - 95;
 
-    const padding = 2;
-    const heightWithoutPadding = props.height - padding * 2;
+    const padding = 8;
 
     return (
         <g className={resourceClass}>
@@ -48,16 +54,19 @@ export const BlockResource = (props: PlannerResourceProps) => {
                 </plannerRenderer.Outlet>
             </foreignObject>
 
-            <foreignObject
-                width={maxTextWidth}
-                className="block-resource-text sub"
-                y={heightWithoutPadding / 2}
-                x={textX}
-            >
+            <foreignObject width={maxTextWidth} className="block-resource-text sub" y={padding + 15} x={textX}>
                 <plannerRenderer.Outlet id={PlannerOutlet.ResourceSubTitle} context={props.actionContext}>
                     <span>{props.typeName || props.type}</span>
                 </plannerRenderer.Outlet>
             </foreignObject>
+
+            <BlockResourceIcon
+                x={iconX}
+                y={height / 2 - 10}
+                typeIcon={props.type as 'internal' | 'operator'}
+                actionIcon={props.typeStatusIcon || 'arrow'}
+                color={props.typeStatusColor}
+            />
         </g>
     );
 };

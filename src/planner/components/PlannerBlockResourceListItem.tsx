@@ -44,7 +44,7 @@ const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) =
 
     const iconWidth = 0;
     if (role === ResourceRole.CONSUMES) {
-        width = expanded ? 109.5 : 9.5 + iconWidth;
+        width = expanded ? 134 : 9.5 + iconWidth;
     } else {
         left = expanded ? 12 + iconWidth : 112;
     }
@@ -53,7 +53,7 @@ const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) =
 };
 
 const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 }) => {
-    const baseOffset = isConsumer ? -20 : 170;
+    const baseOffset = isConsumer ? -40 : 200;
     const expansionSign = isConsumer ? -1 : 1;
     const expansionWidth = isExpanded ? 100 : 0;
     return baseOffset + (expansionWidth + buttonWidth) * expansionSign;
@@ -62,7 +62,7 @@ const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 })
 const TempResource = ({ resource, nodeSize, x, y, actionContext }) => {
     const height = resourceHeight[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
-    const mouseCatcherWidth = 210;
+    // const mouseCatcherWidth = 210;
 
     const clipPathId = 'temp-resource-clip';
 
@@ -88,10 +88,10 @@ const TempResource = ({ resource, nodeSize, x, y, actionContext }) => {
                         role={ResourceRole.PROVIDES}
                         size={nodeSize}
                         name={resource.name}
-                        type={resource.type}
+                        type={resource.type || ResourceProviderType.INTERNAL.toLowerCase()}
+                        typeStatusIcon="arrow"
+                        typeStatusColor="success"
                         typeName={resource.typeName}
-                        width={mouseCatcherWidth}
-                        height={heightInner}
                         actionContext={actionContext}
                     />
                 </svg>
@@ -133,7 +133,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         }
     }
 
-    const type = resourceConfig?.type?.toString().toLowerCase() ?? ResourceProviderType.INTERNAL;
+    const type = resourceConfig?.type?.toString().toLowerCase() ?? ResourceProviderType.INTERNAL.toLowerCase();
     const title = resourceConfig?.title || resourceConfig?.kind;
     const typeName = title?.toString().toLowerCase() ?? 'unknown';
 
@@ -219,8 +219,8 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
 
     const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name, props.role);
 
-    const extension = isExpanded ? 100 : 0;
-    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -5 - extension : 39 + extension);
+    const extension = isExpanded ? 90 : 0;
+    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -30 - extension : 55 + extension);
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const height = resourceHeight[nodeSize];
@@ -230,7 +230,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const counterVisible = counterValue > 0 && buttonsVisible;
     const mouseCatcherWidth = blockInstance.dimensions!.width + 60;
 
-    const counterX = isConsumer ? -10 : 115;
+    const counterX = isConsumer ? -10 : 133;
     // Different offsets because the counter takes up positive space only
     const counterOffset = isConsumer ? -5 : COUNTER_SIZE * 2 + 5;
     const buttonDistance = isConsumer ? 5 : 10;
@@ -325,7 +325,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                 <svg
                                     className={containerClass}
                                     // clipPath={`url(#${fixedClipPathId})`}
-                                    x={isConsumer ? 0 : -151}
+                                    x={isConsumer ? 0 : -160}
                                     y={0}
                                     onMouseEnter={() => {
                                         if (props.onMouseEnter) {
@@ -393,9 +393,15 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                                 name={props.resource.metadata.name}
                                                 readOnly={props.readOnly}
                                                 type={type}
+                                                typeStatusIcon={
+                                                    planner.assetState.getResourceIcon(
+                                                        blockInstance.id,
+                                                        props.resource.metadata.name,
+                                                        props.role
+                                                    ) || (type === 'internal' ? 'arrow' : 'tick')
+                                                }
+                                                typeStatusColor={valid ? 'success' : 'error'}
                                                 typeName={typeName}
-                                                width={blockInstance.dimensions!.width}
-                                                height={heightInner}
                                                 actionContext={actionContext}
                                             />
                                         </svg>
@@ -434,6 +440,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                         nodeSize={nodeSize}
                                         resource={{
                                             typeName,
+                                            type,
                                             name: props.resource.metadata.name,
                                         }}
                                         actionContext={actionContext}
