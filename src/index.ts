@@ -1,3 +1,4 @@
+import { Planner } from './planner/Planner';
 export * from './components/BlockNode';
 export * from './components/PlannerBlockWarningTag';
 export * from './logs/LogPanel';
@@ -16,6 +17,12 @@ export * from './planner/DragAndDrop/DropZoneManager';
 export * from './planner/utils/planUtils';
 export * from './planner/utils/connectionUtils';
 export * from './planner/Planner';
+
+/**
+ * Compatibility export to avoid breaking change due to rename
+ * @deprecated Use Planner export instead
+ */
+export const Planner2 = Planner;
 export * from './planner/PlannerContext';
 export * from './planner/types';
 export * from './planner/validation/BlockValidator';
