@@ -11,7 +11,6 @@ export function getConnectionId(connection: Connection) {
     )}-${getResourceId(connection.consumer?.blockId, connection.consumer?.resourceName, ResourceRole.CONSUMES)}`;
 }
 
-
 export function connectionEquals(a: Connection, b: Connection) {
     return getConnectionId(a) === getConnectionId(b);
 }

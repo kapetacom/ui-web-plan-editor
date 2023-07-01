@@ -44,8 +44,7 @@ BlockDefinition UI state:
 -   Resource focus?
 -   Show block actions
 
-BlockProvider could attempt to do the loading?
-Resources could too?
+BlockProvider could attempt to do the loading? Resources could too?
 
 ErrorBoundaries + callback to the plannerContext on errors
 
