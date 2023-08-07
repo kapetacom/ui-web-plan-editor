@@ -311,36 +311,33 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     const instanceStates = useMemo(() => props.instanceStates || {}, [props.instanceStates]);
 
-    const updatePlan = useCallback(
-        function updatePlan(changer: (prev: Plan) => Plan, preventChangeEvent?:boolean) {
-            setPlan((prev) => {
-                const newPlan = changer(prev);
+    const updatePlan = useCallback(function updatePlan(changer: (prev: Plan) => Plan, preventChangeEvent?: boolean) {
+        setPlan((prev) => {
+            const newPlan = changer(prev);
 
-                if (!preventChangeEvent && props.onChange && newPlan !== prev) {
-                    props.onChange(newPlan);
-                }
-                return newPlan;
-            });
-        },
-        []
-    );
+            if (!preventChangeEvent && props.onChange && newPlan !== prev) {
+                props.onChange(newPlan);
+            }
+            return newPlan;
+        });
+    }, []);
 
-    const updateBlockAssets = useCallback(
-        function updateBlockAssets(changer: (prev: Asset<BlockDefinition>[]) => Asset<BlockDefinition>[]) {
-            setBlockAssets((prev) => {
-                const newAssets = changer(prev);
-                if (props.onAssetChange) {
-                    newAssets.forEach((newAsset, ix) => {
-                        if (props.onAssetChange && prev.indexOf(newAsset) === -1) {
-                            props.onAssetChange(newAsset);
-                        }
-                    });
-                }
-                return newAssets;
-            });
-        },
-        []
-    );
+    const updateBlockAssets = useCallback(function updateBlockAssets(
+        changer: (prev: Asset<BlockDefinition>[]) => Asset<BlockDefinition>[]
+    ) {
+        setBlockAssets((prev) => {
+            const newAssets = changer(prev);
+            if (props.onAssetChange) {
+                newAssets.forEach((newAsset, ix) => {
+                    if (props.onAssetChange && prev.indexOf(newAsset) === -1) {
+                        props.onAssetChange(newAsset);
+                    }
+                });
+            }
+            return newAssets;
+        });
+    },
+    []);
 
     const viewMode = props.mode;
 
@@ -353,7 +350,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         return isTempInstance(blockInstance);
     }
 
-    function isTempInstance(blockInstance:BlockInstance) {
+    function isTempInstance(blockInstance: BlockInstance) {
         const block = blockAssets.find((asset) => asset.ref === blockInstance.block.ref);
         if (!block) {
             return true;
@@ -463,10 +460,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 }
 
                 updateBlockAssets((state) => {
-                    return [
-                        ...state.filter((block) => block.ref !== asset.ref),
-                        asset
-                    ];
+                    return [...state.filter((block) => block.ref !== asset.ref), asset];
                 });
             },
             updateBlockInstance,
@@ -527,7 +521,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                         throw new Error(`BlockDefinition #${blockRef} not found`);
                     }
 
-                    const block = newAssets[blockIx] = cloneDeep(newAssets[blockIx]);
+                    const block = (newAssets[blockIx] = cloneDeep(newAssets[blockIx]));
                     if (!block.data.spec.providers) {
                         block.data.spec.providers = [];
                     }
@@ -560,7 +554,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                         throw new Error(`Block #${blockRef} not found`);
                     }
 
-                    const block = newAssets[blockIx] = cloneDeep(newAssets[blockIx]);
+                    const block = (newAssets[blockIx] = cloneDeep(newAssets[blockIx]));
 
                     const resources: Resource[] =
                         role === ResourceRole.PROVIDES
@@ -774,7 +768,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         viewMode,
         zoom,
         assetState,
-        callbackHandlers
+        callbackHandlers,
     ]);
 };
 

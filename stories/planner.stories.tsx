@@ -350,7 +350,7 @@ const PlannerLoader = (props) => {
                         path: '',
                         kind: 'kapeta/block-type',
                         exists: true,
-                        data: plan.value.plan
+                        data: plan.value.plan,
                     }}
                     blockAssets={plan.value.blockAssets || []}
                     mode={props.plannerMode}
