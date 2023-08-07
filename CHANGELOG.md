@@ -1,3 +1,10 @@
+## [0.7.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.7.0...v0.7.1) (2023-08-07)
+
+
+### Bug Fixes
+
+* Added missing exports ([ca89e59](https://github.com/kapetacom/ui-web-plan-editor/commit/ca89e5945e143e5907d13450b9ab8bc951cb0aef))
+
 # [0.7.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.6.0...v0.7.0) (2023-08-07)
 
 
