@@ -31,7 +31,7 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
 
     // Can we move layout stuff to its own helpers?
     const offsetX = 1;
-    const placeholderWidth = 4;
+    const placeholderWidth = 8;
     const placeholderX =
         props.role === ResourceRole.PROVIDES ? blockCtx.instanceBlockWidth + offsetX : -placeholderWidth;
 

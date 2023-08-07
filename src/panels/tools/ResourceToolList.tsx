@@ -3,6 +3,7 @@ import {Box, Divider, Portal, Stack, Typography} from "@mui/material";
 import {DragAndDrop} from "../../planner/utils/dndUtils";
 import {ResourceTool} from "./ResourceTool";
 import React, {useState} from "react";
+import {PlannerPayloadType} from "../../planner/types";
 
 interface Props {
     title: string
@@ -56,7 +57,7 @@ export const ResourceToolList = (props: Props) => {
                             key={`resource-${ix}`}
                             disabled={false}
                             data={{
-                                type: 'resource-type',
+                                type: PlannerPayloadType.RESOURCE_TYPE,
                                 data: {
                                     title: resource.title || resource.kind,
                                     kind: resource.kind,

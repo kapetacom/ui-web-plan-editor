@@ -1,31 +1,32 @@
-import React, { ForwardedRef, forwardRef, useContext } from 'react';
-import { Meta, StoryObj } from '@storybook/react';
+import React, {ForwardedRef, forwardRef, useContext} from 'react';
+import {Meta, StoryObj} from '@storybook/react';
 
-import { BlockLayout, ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
+import {BlockLayout, ButtonStyle, DefaultContext, DialogControl} from '@kapeta/ui-web-components';
 
-import { Planner } from '../src/planner/Planner';
+import {Planner} from '../src/planner/Planner';
 
-import { readPlanV2 } from './data/planReader';
+import {readPlanV2} from './data/planReader';
 import {
     PlannerActionConfig,
     PlannerContext,
     PlannerContextData,
     withPlannerContext,
 } from '../src/planner/PlannerContext';
-import { useAsync } from 'react-use';
-import { Asset, ItemType, Point, ResourceRole, IResourceTypeProvider, SchemaKind } from '@kapeta/ui-web-types';
-import { parseKapetaUri } from '@kapeta/nodejs-utils';
-import { ItemEditorPanel } from '../src/planner/components/ItemEditorPanel';
-import { BlockNode, EditItemInfo, PlannerMode } from '../src';
-import { DragAndDrop } from '../src/planner/utils/dndUtils';
+import {useAsync} from 'react-use';
+import {Asset, IResourceTypeProvider, ItemType, Point, ResourceRole, SchemaKind} from '@kapeta/ui-web-types';
+import {parseKapetaUri} from '@kapeta/nodejs-utils';
+import {ItemEditorPanel} from '../src/planner/components/ItemEditorPanel';
+import {BlockNode, EditItemInfo, PlannerMode} from '../src';
+import {BlockTypeProvider, IdentityService, InstanceStatus} from '@kapeta/ui-web-context';
+import {BLOCK_SIZE} from '../src/planner/utils/planUtils';
+import {BlockDefinition, BlockInstance, Resource} from '@kapeta/schemas';
+import {PlannerOutlet, plannerRenderer} from '../src/planner/renderers/plannerRenderer';
+import {BlockInspectorPanel} from '../src/panels/BlockInspectorPanel';
+import {BlockResource} from '../src/planner/components/BlockResource';
+import {PlannerResourceDrawer} from "../src/panels/PlannerResourceDrawer";
+
 import './styles.less';
-import { BlockTypeProvider, InstanceStatus, ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { BlockServiceMock } from './data/BlockServiceMock';
-import { BLOCK_SIZE } from '../src/planner/utils/planUtils';
-import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
-import { PlannerOutlet, plannerRenderer } from '../src/planner/renderers/plannerRenderer';
-import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
-import { BlockResource } from '../src/planner/components/BlockResource';
+
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -114,8 +115,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
     const [editItem, setEditItem] = React.useState<EditItemInfo | undefined>();
     const [inspectItem, setInspectItem] = React.useState<BlockInstance | null>(null);
     const [configureItem, setConfigureItem] = React.useState<SchemaKind<any, any> | null>(null);
-    const [draggableItem, setDraggableItem] = React.useState<DraggableItem | null>(null);
-    const [draggableItemPosition, setDraggableItemPosition] = React.useState<Point | null>(null);
+
     const actionConfig: PlannerActionConfig = {
         block: [
             {
@@ -269,31 +269,43 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
         ],
     };
 
-    const blocks = useAsync(() => BlockServiceMock.list());
-
     return (
         <div ref={forwardedRef} className="plan-container">
-            {draggableItem && draggableItemPosition && draggableItem.type === ItemType.RESOURCE && (
-                <DraggableResource {...draggableItem.data} point={draggableItemPosition} />
-            )}
 
-            {draggableItem && draggableItemPosition && draggableItem.type === ItemType.BLOCK && (
-                <DraggableBlock {...draggableItem.data} point={draggableItemPosition} />
-            )}
-            <Planner systemId="system?" actions={actionConfig} />
+            {planner.mode === PlannerMode.EDIT &&
+                <PlannerResourceDrawer
+                    onShowMoreAssets={() => {}}
+                />
+            }
+
+            <Planner systemId="kapeta/something:local"
+                     actions={actionConfig}
+                     onCreateBlock={(block, instance) => {
+                         setEditItem({
+                             creating: true,
+                             item: { block, instance},
+                             type: ItemType.BLOCK,
+                         })
+                     }}
+            />
 
             <ItemEditorPanel
                 open={!!editItem}
                 editableItem={editItem}
-                onClose={() => setEditItem(undefined)}
+                onClose={() => {
+                    if (editItem?.creating &&
+                        editItem?.type === ItemType.BLOCK) {
+                        planner.removeBlockInstance(editItem.item.instance.id);
+                        planner.removeBlockDefinition(editItem.item.block);
+                        console.log('removing block definition');
+                    }
+
+                    setEditItem(undefined);
+                }}
                 onSubmit={(item) => {
                     if (editItem?.type === ItemType.BLOCK) {
-                        if (editItem.creating) {
-                            // TODO: Save path/ref??
-                            // planner.addBlockDefinition(item);
-                        } else {
-                            planner.updateBlockDefinition(editItem.item.instance.block.ref, item as BlockDefinition);
-                        }
+                        planner.updateBlockDefinition(editItem.item.instance.block.ref, item as BlockDefinition);
+                        setEditItem(undefined);
                     }
 
                     if (editItem?.type === ItemType.RESOURCE) {
@@ -310,6 +322,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                     }
                 }}
             />
+
             <BlockInspectorPanel
                 open={!!inspectItem}
                 configuration={{}}
@@ -317,104 +330,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 onClosed={() => setInspectItem(null)}
             />
 
-            <div className="test-tool-panel">
-                <h2>Resources</h2>
-                <ul className="resources">
-                    {ResourceTypeProvider.list().map((resourceConfig, ix) => {
-                        const name = resourceConfig.title ?? 'Unknown';
 
-                        return (
-                            <DragAndDrop.Draggable
-                                key={`resource-${ix}`}
-                                disabled={false}
-                                data={{
-                                    type: 'resource-type',
-                                    data: {
-                                        title: resourceConfig.title || resourceConfig.kind,
-                                        kind: resourceConfig.kind,
-                                        config: resourceConfig,
-                                    },
-                                }}
-                                onDragStart={(evt) => {
-                                    setDraggableItem({
-                                        type: ItemType.RESOURCE,
-                                        data: {
-                                            resourceConfig,
-                                            name,
-                                            planner,
-                                        },
-                                    });
-                                }}
-                                onDrag={(evt) => {
-                                    setDraggableItemPosition({
-                                        x: evt.zone.end.x,
-                                        y: evt.zone.end.y,
-                                    });
-                                }}
-                                onDrop={(evt) => {
-                                    setDraggableItem(null);
-                                    setDraggableItemPosition(null);
-                                }}
-                            >
-                                {(evt) => {
-                                    return (
-                                        <li {...evt.componentProps}>
-                                            <span className="title">{name}</span>
-                                            <span className="role">{resourceConfig.role.toLowerCase()}</span>
-                                        </li>
-                                    );
-                                }}
-                            </DragAndDrop.Draggable>
-                        );
-                    })}
-                </ul>
-
-                <h2>Blocks</h2>
-                <ul className="blocks">
-                    {blocks?.value?.map((block, ix) => {
-                        const name = block.data.metadata.name;
-                        return (
-                            <DragAndDrop.Draggable
-                                key={`block_${ix}`}
-                                disabled={false}
-                                data={{
-                                    type: 'block-type',
-                                    data: block,
-                                }}
-                                onDragStart={(evt) => {
-                                    setDraggableItem({
-                                        type: ItemType.BLOCK,
-                                        data: {
-                                            block,
-                                            name,
-                                            planner,
-                                        },
-                                    });
-                                }}
-                                onDrag={(evt) => {
-                                    setDraggableItemPosition({
-                                        x: evt.zone.end.x,
-                                        y: evt.zone.end.y,
-                                    });
-                                }}
-                                onDrop={(evt) => {
-                                    setDraggableItem(null);
-                                    setDraggableItemPosition(null);
-                                }}
-                            >
-                                {(evt) => {
-                                    return (
-                                        <li {...evt.componentProps}>
-                                            <span className="title">{name}</span>
-                                            <span className="version">{block.version}</span>
-                                        </li>
-                                    );
-                                }}
-                            </DragAndDrop.Draggable>
-                        );
-                    })}
-                </ul>
-            </div>
         </div>
     );
 });
@@ -434,6 +350,7 @@ const PlannerLoader = (props) => {
             {plan.value ? (
                 <PlanEditor
                     plan={plan.value.plan}
+                    version={'1.2.3'}
                     blockAssets={plan.value.blockAssets || []}
                     mode={props.plannerMode}
                     // eslint-disable-next-line no-console

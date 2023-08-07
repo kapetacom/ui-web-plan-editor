@@ -12,6 +12,7 @@ import {parseKapetaUri} from "@kapeta/nodejs-utils";
 import {DragAndDrop} from "../../planner/DragAndDrop";
 import {Transition} from 'react-transition-group';
 import {useDraggedRotation} from "../../planner/utils/dndUtils";
+import {PlannerPayloadType} from "../../planner/types";
 
 const getTitle = (blockType: IBlockTypeProvider) => {
     return blockType.title ??
@@ -205,7 +206,7 @@ export const BlockTypeTool = (props: Props) => {
             <DragAndDrop.Draggable
                 disabled={false}
                 data={{
-                    type: 'block-type',
+                    type: PlannerPayloadType.BLOCK_TYPE,
                     data: props.blockType,
                 }}
                 onDragStart={(evt) => {

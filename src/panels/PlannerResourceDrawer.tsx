@@ -4,6 +4,7 @@ import {BlockTypeProvider, ResourceTypeProvider} from "@kapeta/ui-web-context";
 import {IResourceTypeProvider, ItemType, ResourceRole} from "@kapeta/ui-web-types";
 import {ResourceToolList} from "./tools/ResourceToolList";
 import {BlockTypeToolList} from "./tools/BlockTypeToolList";
+import {BlockDefinition, BlockInstance} from "@kapeta/schemas";
 
 const HEADER_SIZE = '14px';
 
@@ -63,7 +64,9 @@ export const PlannerResourceDrawer = (props: Props) => {
                     <Typography fontSize={HEADER_SIZE} sx={{pt:1,pb:1}} fontWeight={700}>
                         Blocks
                     </Typography>
-                    <BlockTypeToolList blockTypes={blockTypes} />
+                    <BlockTypeToolList
+                        onCreateBlock={props.onCreateBlock}
+                        blockTypes={blockTypes} />
                 </Box>
                 {props.onShowMoreAssets &&
                     <Box sx={{

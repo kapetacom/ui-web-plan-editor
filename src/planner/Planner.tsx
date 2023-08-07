@@ -13,6 +13,7 @@ import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import './Planner.less';
+import {BlockDefinition, BlockInstance} from "@kapeta/schemas";
 
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
@@ -28,6 +29,8 @@ interface Props {
     onResourceMouseLeave?: (context: ActionContext) => void;
     onConnectionMouseEnter?: (context: ActionContext) => void;
     onConnectionMouseLeave?: (context: ActionContext) => void;
+
+    onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void
 }
 
 const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
@@ -86,7 +89,7 @@ export const Planner = (props: Props) => {
             fallback={<div>Failed to render plan. Please contact support.</div>}
             resetKeys={[props.systemId]}
         >
-            <PlannerCanvas>
+            <PlannerCanvas onCreateBlock={props.onCreateBlock}>
                 {instances.map((instance, index) => {
                     const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
                     const isInFocus = !!(focusInfo && isBlockInFocus(focusInfo, instance.id));

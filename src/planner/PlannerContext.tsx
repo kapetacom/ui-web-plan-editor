@@ -1,6 +1,6 @@
 import React, { ExoticComponent, RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Asset, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
-import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import {KapetaURI, parseKapetaUri} from '@kapeta/nodejs-utils';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 import {
     BlockDefinition,
@@ -21,6 +21,7 @@ import { getResourceId } from './utils/planUtils';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
 import { connectionEquals } from './utils/connectionUtils';
 import { BlockResouceIconProps } from './components/BlockResourceIcon';
+import {getLocalRefForBlockDefinition} from "./utils/blockUtils";
 
 type BlockUpdater = (block: BlockInstance) => BlockInstance;
 type Callback = () => void;
@@ -36,6 +37,7 @@ export interface PlannerActionConfig {
 
 export interface PlannerContextData {
     plan?: Plan;
+    uri?: KapetaURI;
     blockAssets: Asset<BlockDefinition>[];
     setBlockAssets(blockAssets: Asset<BlockDefinition>[]): void;
 
@@ -83,7 +85,10 @@ export interface PlannerContextData {
 
     updatePlanMetadata(metadata: Metadata, configuration: EntityList): void;
 
+    removeBlockDefinition(update: BlockDefinition): void;
     updateBlockDefinition(ref: string, update: BlockDefinition): void;
+    addBlockDefinition(asset: BlockDefinition): void;
+    hasBlockDefinition(ref: string): boolean;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
     removeBlockInstance(blockId: string): void;
     addBlockInstance(blockInstance: BlockInstance): void;
@@ -149,7 +154,12 @@ const defaultValue: PlannerContextData = {
         return undefined;
     },
 
+    removeBlockDefinition() {},
     updateBlockDefinition() {},
+    addBlockDefinition() {},
+    hasBlockDefinition() {
+        return false;
+    },
     updateBlockInstance(blockId, callback) {
         // noop
     },
@@ -194,6 +204,7 @@ const defaultValue: PlannerContextData = {
 export const PlannerContext = React.createContext(defaultValue);
 export type PlannerContextProps = {
     plan: Plan;
+    version: string;
     blockAssets: Asset<BlockDefinition>[];
     mode: PlannerMode;
     onChange?: (plan: Plan) => void;
@@ -356,6 +367,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         const canEditBlocks = viewMode === PlannerMode.EDIT;
         const canEditConnections = viewMode === PlannerMode.EDIT;
 
+        const uri = parseKapetaUri(props.plan.metadata.name + ':' + props.version);
+
         const planner = {
             // view state
             focusedBlock,
@@ -378,6 +391,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             canEditConnections,
             //
             plan: plan,
+            uri: uri,
             blockAssets,
             setBlockAssets(newBlockAssets: Asset<BlockDefinition>[]) {
                 setBlockAssets(newBlockAssets);
@@ -394,13 +408,55 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditBlocks) {
                     return;
                 }
+                const uri = parseKapetaUri(ref);
                 updateBlockAssets((state) =>
                     state.map((block) =>
-                        parseKapetaUri(block.ref).compare(parseKapetaUri(ref)) === 0
-                            ? { ...block, data: update }
+                        parseKapetaUri(block.ref).equals(uri)
+                            ? { ...block,
+                                ref: `kapeta://${update.metadata.name}:local`,
+                                data: update }
                             : block
                     )
                 );
+            },
+            hasBlockDefinition(ref: string): boolean {
+                const newUri = parseKapetaUri(ref);
+                return blockAssets.some((asset) => newUri.equals(parseKapetaUri(asset.ref)))
+            },
+            removeBlockDefinition(asset: BlockDefinition) {
+                if (!canEditBlocks) {
+                    return;
+                }
+
+                const ref = getLocalRefForBlockDefinition(asset);
+
+                updateBlockAssets((state) => {
+                    return state.filter((block) => block.ref !== ref);
+                });
+            },
+            addBlockDefinition(asset: BlockDefinition) {
+                if (!canEditBlocks) {
+                    return;
+                }
+
+                const ref = getLocalRefForBlockDefinition(asset);
+
+                if (this.hasBlockDefinition(ref)) {
+                    return;
+                }
+
+                updateBlockAssets((state) => {
+                    return [...state, {
+                        ref,
+                        data: asset,
+                        exists: false,
+                        kind: asset.kind,
+                        version: 'local',
+                        editable: true,
+                        path: '',
+                        ymlPath: '',
+                    }];
+                });
             },
             updateBlockInstance,
             addBlockInstance(blockInstance: BlockInstance) {

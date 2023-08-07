@@ -3,6 +3,7 @@ import { DropZoneEntity, DropZoneManager } from './DropZoneManager';
 import { DnDPayload } from './types';
 import { DnDCallbacks, DnDContext } from './DnDContext';
 import { Point } from '@kapeta/ui-web-types';
+import {DnDZoneInstance} from "./DnDDropZone";
 
 const defaultState = {
     state: 'IDLE',
@@ -41,6 +42,9 @@ export const DnDContainer = <T extends DnDPayload>(props: Props) => {
                     position: dragEvent.zone.end,
                 });
                 dzManager.handleDragEvent(dragEvent, fromZone, props.root.current);
+            },
+            onDragEnd(dragEvent, fromZone) {
+                setDragState(defaultState);
             },
             onDrop(dragEvent, fromZone, callback) {
                 // Loop all elements to check intersection

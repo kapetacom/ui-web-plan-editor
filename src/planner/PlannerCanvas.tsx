@@ -1,18 +1,20 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, {PropsWithChildren, useContext, useEffect, useMemo} from 'react';
 import { PlannerContext } from './PlannerContext';
 import { DragAndDrop } from './utils/dndUtils';
 import { useBoundingBox } from './hooks/boundingBox';
 import { BLOCK_SIZE, calculateCanvasSize } from './utils/planUtils';
 import { toClass } from '@kapeta/ui-web-utils';
-import { Point } from '@kapeta/ui-web-types';
+import {IBlockTypeProvider, Point} from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
 
-import { ZOOM_STEP_SIZE } from './types';
+import {PlannerPayloadType, ZOOM_STEP_SIZE} from './types';
 import { PlannerMode } from '../utils/enums';
 import { FocusTopbar } from './components/FocusTopbar';
 import { PlannerFocusSideBar } from './components/PlannerFocusSideBar';
-import { BlockInstance } from '@kapeta/schemas';
-import { createBlockInstanceForBlock } from './utils/blockUtils';
+import {BlockDefinition, BlockInstance} from '@kapeta/schemas';
+import { createBlockInstanceForBlock, createBlockInstanceForBlockType } from './utils/blockUtils';
+import {DnDPayload, DragEventInfo} from "./DragAndDrop/types";
+import {parseKapetaUri} from "@kapeta/nodejs-utils";
 
 const PLAN_PADDING = 50;
 
@@ -35,7 +37,11 @@ const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstanc
     };
 };
 
-export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
+interface Props extends PropsWithChildren{
+    onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void
+}
+
+export const PlannerCanvas: React.FC<Props> = (props) => {
     const planner = useContext(PlannerContext);
     const { isDragging } = useContext(DragAndDrop.Context);
 
@@ -51,6 +57,34 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
             width: boundingBox.width,
         });
     }, [planner.plan?.spec.blocks, planner.blockAssets, planner.nodeSize, boundingBox.width, boundingBox.height]);
+
+    function calculateDimensions(dragEvent: DragEventInfo<DnDPayload>) {
+        const center = (BLOCK_SIZE / 2) * planner.zoom; // To account for mouse offset
+        const point = dragEvent.zone.end;
+        point.x -= center;
+        point.y -= center;
+        const blockPoint = toBlockPoint(point, planner.zoom);
+        return {
+            height: -1,
+            width: BLOCK_SIZE,
+            left: blockPoint.x,
+            top: blockPoint.y,
+        };
+    }
+
+    function createLocalRef(block:IBlockTypeProvider) {
+        let ref;
+        let attempt = 0;
+        let postfix = '';
+        const providerUri = parseKapetaUri(block.definition.metadata.name);
+        do {
+            ref = `kapeta://${planner.uri?.handle}/new-${providerUri.name}${postfix}:local`
+            postfix = `-${++attempt}`;
+        } while (planner.hasBlockDefinition(ref));
+
+        return ref;
+    }
+
 
     useEffect(() => {
         planner.setCanvasSize(canvasSize);
@@ -81,14 +115,18 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
 
             <div className="planner-area-position-parent" ref={onRef}>
                 <DragAndDrop.DropZone
-                    data={{ type: 'plan', data: planner.plan! }}
+                    data={{ type: PlannerPayloadType.PLAN, data: planner.plan! }}
                     scale={planner.zoom}
                     accept={(draggable) => {
                         // Filter types
-                        return ['block', 'block-type'].includes(draggable.type);
+                        return [
+                            PlannerPayloadType.BLOCK,
+                            PlannerPayloadType.BLOCK_DEFINITION,
+                            PlannerPayloadType.BLOCK_TYPE
+                        ].includes(draggable.type);
                     }}
                     onDrop={(draggable, dragEvent) => {
-                        if (draggable.type === 'block') {
+                        if (draggable.type === PlannerPayloadType.BLOCK) {
                             planner.updateBlockInstance(
                                 draggable.data.id,
                                 blockPositionUpdater(dragEvent.zone.diff, planner.zoom)
@@ -96,20 +134,25 @@ export const PlannerCanvas: React.FC<React.PropsWithChildren> = (props) => {
                             return;
                         }
 
-                        if (draggable.type === 'block-type') {
+                        if (draggable.type === PlannerPayloadType.BLOCK_DEFINITION) {
                             const blockInstance = createBlockInstanceForBlock(draggable.data);
-                            const center = (BLOCK_SIZE / 2) * planner.zoom; // To account for mouse offset
-                            const point = dragEvent.zone.end;
-                            point.x -= center;
-                            point.y -= center;
-                            const blockPoint = toBlockPoint(point, planner.zoom);
-                            blockInstance.dimensions = {
-                                height: -1,
-                                width: BLOCK_SIZE,
-                                left: blockPoint.x,
-                                top: blockPoint.y,
-                            };
+                            blockInstance.dimensions = calculateDimensions(dragEvent);
                             planner.addBlockInstance(blockInstance);
+                        }
+
+                        if (draggable.type === PlannerPayloadType.BLOCK_TYPE) {
+                            const ref = createLocalRef(draggable.data);
+                            const blockInfo = createBlockInstanceForBlockType(ref, draggable.data);
+                            blockInfo.instance.dimensions = calculateDimensions(dragEvent);
+
+                            // We add block definition and instance immediately to the planner
+                            // so that the block is rendered - even if the user cancels the creation
+                            planner.addBlockDefinition(blockInfo.block);
+                            planner.addBlockInstance(blockInfo.instance);
+
+                            // Callback should handle the creation of the block and remove the block definition
+                            // and instance from the planner if the creation is cancelled
+                            props.onCreateBlock?.(blockInfo.block, blockInfo.instance);
                         }
                     }}
                 >

@@ -184,14 +184,15 @@
     .resource-placeholder {
         rect {
             opacity: 0;
-            fill: @bw-orange;
+            fill: white;
+            stroke: rgba(0, 0, 0, 0.12)
         }
     }
 
     &.show {
         .resource-placeholder {
             rect {
-                animation: planner-block-resource-placeholder 0.4s infinite;
+                animation: planner-block-resource-placeholder 1s infinite;
                 opacity: 1;
             }
         }
@@ -200,15 +201,15 @@
 
 @keyframes planner-block-resource-placeholder {
     0% {
-        fill: @bw-orange;
+        opacity: 0.8
     }
 
     50% {
-        fill: @bw-orange-light;
+        opacity: 0
     }
 
     100% {
-        fill: @bw-orange;
+        opacity: 0.8
     }
 }
 

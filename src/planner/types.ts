@@ -1,18 +1,42 @@
-import { Asset, ItemType, Point, IResourceTypeProvider, ResourceRole, SchemaKind, Size } from '@kapeta/ui-web-types';
+import {
+    Asset,
+    ItemType,
+    Point,
+    IResourceTypeProvider,
+    ResourceRole,
+    SchemaKind,
+    Size,
+    IBlockTypeProvider
+} from '@kapeta/ui-web-types';
 
 import { BlockDefinition, BlockInstance, Connection, Plan, Resource } from '@kapeta/schemas';
 import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
 import { DnDPayload } from './DragAndDrop/types';
 
+
+export enum PlannerPayloadType {
+    BLOCK = 'block',
+    RESOURCE = 'resource',
+    RESOURCE_TYPE = 'resource-type',
+    BLOCK_DEFINITION = 'block-definition',
+    BLOCK_TYPE = 'block-type',
+    PLAN = 'plan'
+}
+
 export interface BlockPayload extends DnDPayload<BlockInstance> {
-    type: 'block';
+    type: PlannerPayloadType.BLOCK;
     data: BlockInstance;
 }
 
-export interface BlockTypePayload extends DnDPayload<Asset<BlockDefinition>> {
-    type: 'block-type';
+export interface BlockDefinitionPayload extends DnDPayload<Asset<BlockDefinition>> {
+    type: PlannerPayloadType.BLOCK_DEFINITION;
     data: Asset<BlockDefinition>;
+}
+
+export interface BlockTypePayload extends DnDPayload<IBlockTypeProvider> {
+    type: PlannerPayloadType.BLOCK_TYPE;
+    data: IBlockTypeProvider;
 }
 
 interface ResourcePayloadData {
@@ -23,7 +47,7 @@ interface ResourcePayloadData {
 }
 
 export interface ResourcePayload extends DnDPayload<ResourcePayloadData> {
-    type: 'resource';
+    type: PlannerPayloadType.RESOURCE;
     data: ResourcePayloadData;
 }
 
@@ -34,16 +58,16 @@ interface ResourceTypePayloadData {
 }
 
 export interface ResourceTypePayload extends DnDPayload<ResourceTypePayloadData> {
-    type: 'resource-type';
+    type: PlannerPayloadType.RESOURCE_TYPE;
     data: ResourceTypePayloadData;
 }
 
 export interface PlanPayload extends DnDPayload<Plan> {
-    type: 'plan';
+    type: PlannerPayloadType.PLAN;
     data: Plan;
 }
 
-export type PlannerPayload = PlanPayload | BlockPayload | ResourcePayload | ResourceTypePayload | BlockTypePayload;
+export type PlannerPayload = PlanPayload | BlockPayload | ResourcePayload | ResourceTypePayload | BlockDefinitionPayload | BlockTypePayload;
 
 export interface ValidationIssue {
     level: string;

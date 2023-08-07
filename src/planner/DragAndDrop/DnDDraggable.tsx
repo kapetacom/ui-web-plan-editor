@@ -250,14 +250,14 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
             if (props.onDragStart) {
                 props.onDragStart(state.dragEvent);
             }
-            ctx.callbacks.onDragStart.call(null, state.dragEvent, parentZone);
+            ctx.callbacks.onDragStart( state.dragEvent, parentZone);
         }
 
         if (!isDragging && prevDragging.current) {
             if (props.onDragEnd) {
                 props.onDragEnd(state.dragEvent);
             }
-            ctx.callbacks.onDragEnd.call(null, state.dragEvent, parentZone);
+            ctx.callbacks.onDragEnd( state.dragEvent, parentZone);
         }
         prevDragging.current = isDragging;
     }, [ctx.callbacks.onDragStart, isDragging, parentZone, state.dragEvent]);

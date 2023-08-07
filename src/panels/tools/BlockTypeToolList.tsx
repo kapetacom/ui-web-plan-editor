@@ -4,9 +4,11 @@ import {DragAndDrop} from "../../planner/utils/dndUtils";
 import {ResourceTool} from "./ResourceTool";
 import React from "react";
 import {BlockTypeTool} from "./BlockTypeTool";
+import {BlockDefinition, BlockInstance} from "@kapeta/schemas";
 
 interface Props {
     blockTypes: IBlockTypeProvider[]
+    onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void
 }
 
 export const BlockTypeToolList = (props: Props) => {
