@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.6.0...v0.7.0) (2023-08-07)
+
+
+### Features
+
+* Implemented planner resource panel design ([#55](https://github.com/kapetacom/ui-web-plan-editor/issues/55)) ([da9f457](https://github.com/kapetacom/ui-web-plan-editor/commit/da9f4574f0efee9c8627f7fd90e698b22dbfd821))
+
 # [0.6.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.5.5...v0.6.0) (2023-06-28)
 
 
