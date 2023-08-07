@@ -2,7 +2,7 @@
     "kind": "core/block-type",
     "metadata": {
         "name": "kapeta/block-type-service",
-        "title": "Block Type Service"
+        "title": "Backend Service"
     },
     "spec": {}
 }
