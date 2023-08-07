@@ -1,6 +1,6 @@
 import React, { ExoticComponent, RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Asset, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
-import {KapetaURI, parseKapetaUri} from '@kapeta/nodejs-utils';
+import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 import {
     BlockDefinition,
@@ -21,7 +21,7 @@ import { getResourceId } from './utils/planUtils';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
 import { connectionEquals } from './utils/connectionUtils';
 import { BlockResouceIconProps } from './components/BlockResourceIcon';
-import {getLocalRefForBlockDefinition} from "./utils/blockUtils";
+import { getLocalRefForBlockDefinition } from './utils/blockUtils';
 
 type BlockUpdater = (block: BlockInstance) => BlockInstance;
 type Callback = () => void;
@@ -412,16 +412,14 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 updateBlockAssets((state) =>
                     state.map((block) =>
                         parseKapetaUri(block.ref).equals(uri)
-                            ? { ...block,
-                                ref: `kapeta://${update.metadata.name}:local`,
-                                data: update }
+                            ? { ...block, ref: `kapeta://${update.metadata.name}:local`, data: update }
                             : block
                     )
                 );
             },
             hasBlockDefinition(ref: string): boolean {
                 const newUri = parseKapetaUri(ref);
-                return blockAssets.some((asset) => newUri.equals(parseKapetaUri(asset.ref)))
+                return blockAssets.some((asset) => newUri.equals(parseKapetaUri(asset.ref)));
             },
             removeBlockDefinition(asset: BlockDefinition) {
                 if (!canEditBlocks) {
@@ -446,16 +444,19 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 }
 
                 updateBlockAssets((state) => {
-                    return [...state, {
-                        ref,
-                        data: asset,
-                        exists: false,
-                        kind: asset.kind,
-                        version: 'local',
-                        editable: true,
-                        path: '',
-                        ymlPath: '',
-                    }];
+                    return [
+                        ...state,
+                        {
+                            ref,
+                            data: asset,
+                            exists: false,
+                            kind: asset.kind,
+                            version: 'local',
+                            editable: true,
+                            path: '',
+                            ymlPath: '',
+                        },
+                    ];
                 });
             },
             updateBlockInstance,

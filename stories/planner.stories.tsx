@@ -1,32 +1,31 @@
-import React, {ForwardedRef, forwardRef, useContext} from 'react';
-import {Meta, StoryObj} from '@storybook/react';
+import React, { ForwardedRef, forwardRef, useContext } from 'react';
+import { Meta, StoryObj } from '@storybook/react';
 
-import {BlockLayout, ButtonStyle, DefaultContext, DialogControl} from '@kapeta/ui-web-components';
+import { BlockLayout, ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
 
-import {Planner} from '../src/planner/Planner';
+import { Planner } from '../src/planner/Planner';
 
-import {readPlanV2} from './data/planReader';
+import { readPlanV2 } from './data/planReader';
 import {
     PlannerActionConfig,
     PlannerContext,
     PlannerContextData,
     withPlannerContext,
 } from '../src/planner/PlannerContext';
-import {useAsync} from 'react-use';
-import {Asset, IResourceTypeProvider, ItemType, Point, ResourceRole, SchemaKind} from '@kapeta/ui-web-types';
-import {parseKapetaUri} from '@kapeta/nodejs-utils';
-import {ItemEditorPanel} from '../src/planner/components/ItemEditorPanel';
-import {BlockNode, EditItemInfo, PlannerMode} from '../src';
-import {BlockTypeProvider, IdentityService, InstanceStatus} from '@kapeta/ui-web-context';
-import {BLOCK_SIZE} from '../src/planner/utils/planUtils';
-import {BlockDefinition, BlockInstance, Resource} from '@kapeta/schemas';
-import {PlannerOutlet, plannerRenderer} from '../src/planner/renderers/plannerRenderer';
-import {BlockInspectorPanel} from '../src/panels/BlockInspectorPanel';
-import {BlockResource} from '../src/planner/components/BlockResource';
-import {PlannerResourceDrawer} from "../src/panels/PlannerResourceDrawer";
+import { useAsync } from 'react-use';
+import { Asset, IResourceTypeProvider, ItemType, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { ItemEditorPanel } from '../src/planner/components/ItemEditorPanel';
+import { BlockNode, EditItemInfo, PlannerMode } from '../src';
+import { BlockTypeProvider, IdentityService, InstanceStatus } from '@kapeta/ui-web-context';
+import { BLOCK_SIZE } from '../src/planner/utils/planUtils';
+import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
+import { PlannerOutlet, plannerRenderer } from '../src/planner/renderers/plannerRenderer';
+import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
+import { BlockResource } from '../src/planner/components/BlockResource';
+import { PlannerResourceDrawer } from '../src/panels/PlannerResourceDrawer';
 
 import './styles.less';
-
 
 interface DraggableResourceItem {
     type: ItemType.RESOURCE;
@@ -271,30 +270,25 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
 
     return (
         <div ref={forwardedRef} className="plan-container">
+            {planner.mode === PlannerMode.EDIT && <PlannerResourceDrawer onShowMoreAssets={() => {}} />}
 
-            {planner.mode === PlannerMode.EDIT &&
-                <PlannerResourceDrawer
-                    onShowMoreAssets={() => {}}
-                />
-            }
-
-            <Planner systemId="kapeta/something:local"
-                     actions={actionConfig}
-                     onCreateBlock={(block, instance) => {
-                         setEditItem({
-                             creating: true,
-                             item: { block, instance},
-                             type: ItemType.BLOCK,
-                         })
-                     }}
+            <Planner
+                systemId="kapeta/something:local"
+                actions={actionConfig}
+                onCreateBlock={(block, instance) => {
+                    setEditItem({
+                        creating: true,
+                        item: { block, instance },
+                        type: ItemType.BLOCK,
+                    });
+                }}
             />
 
             <ItemEditorPanel
                 open={!!editItem}
                 editableItem={editItem}
                 onClose={() => {
-                    if (editItem?.creating &&
-                        editItem?.type === ItemType.BLOCK) {
+                    if (editItem?.creating && editItem?.type === ItemType.BLOCK) {
                         planner.removeBlockInstance(editItem.item.instance.id);
                         planner.removeBlockDefinition(editItem.item.block);
                         console.log('removing block definition');
@@ -329,8 +323,6 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 instance={inspectItem ?? undefined}
                 onClosed={() => setInspectItem(null)}
             />
-
-
         </div>
     );
 });

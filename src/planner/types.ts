@@ -6,7 +6,7 @@ import {
     ResourceRole,
     SchemaKind,
     Size,
-    IBlockTypeProvider
+    IBlockTypeProvider,
 } from '@kapeta/ui-web-types';
 
 import { BlockDefinition, BlockInstance, Connection, Plan, Resource } from '@kapeta/schemas';
@@ -14,14 +14,13 @@ import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
 import { DnDPayload } from './DragAndDrop/types';
 
-
 export enum PlannerPayloadType {
     BLOCK = 'block',
     RESOURCE = 'resource',
     RESOURCE_TYPE = 'resource-type',
     BLOCK_DEFINITION = 'block-definition',
     BLOCK_TYPE = 'block-type',
-    PLAN = 'plan'
+    PLAN = 'plan',
 }
 
 export interface BlockPayload extends DnDPayload<BlockInstance> {
@@ -67,7 +66,13 @@ export interface PlanPayload extends DnDPayload<Plan> {
     data: Plan;
 }
 
-export type PlannerPayload = PlanPayload | BlockPayload | ResourcePayload | ResourceTypePayload | BlockDefinitionPayload | BlockTypePayload;
+export type PlannerPayload =
+    | PlanPayload
+    | BlockPayload
+    | ResourcePayload
+    | ResourceTypePayload
+    | BlockDefinitionPayload
+    | BlockTypePayload;
 
 export interface ValidationIssue {
     level: string;

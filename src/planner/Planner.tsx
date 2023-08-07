@@ -13,7 +13,7 @@ import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import './Planner.less';
-import {BlockDefinition, BlockInstance} from "@kapeta/schemas";
+import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
@@ -30,7 +30,7 @@ interface Props {
     onConnectionMouseEnter?: (context: ActionContext) => void;
     onConnectionMouseLeave?: (context: ActionContext) => void;
 
-    onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void
+    onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void;
 }
 
 const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {

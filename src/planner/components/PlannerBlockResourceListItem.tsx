@@ -15,7 +15,7 @@ import { useBlockContext } from '../BlockContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 import { ActionButtons } from './ActionButtons';
-import {ActionContext, PlannerAction, PlannerPayload, PlannerPayloadType, ResourcePayload} from '../types';
+import { ActionContext, PlannerAction, PlannerPayload, PlannerPayloadType, ResourcePayload } from '../types';
 import { Resource } from '@kapeta/schemas';
 import { createConnection } from '../utils/connectionUtils';
 import { PlannerMode, ResourceMode } from '../../utils/enums';

@@ -1,20 +1,20 @@
-import React, {PropsWithChildren, useContext, useEffect, useMemo} from 'react';
+import React, { PropsWithChildren, useContext, useEffect, useMemo } from 'react';
 import { PlannerContext } from './PlannerContext';
 import { DragAndDrop } from './utils/dndUtils';
 import { useBoundingBox } from './hooks/boundingBox';
 import { BLOCK_SIZE, calculateCanvasSize } from './utils/planUtils';
 import { toClass } from '@kapeta/ui-web-utils';
-import {IBlockTypeProvider, Point} from '@kapeta/ui-web-types';
+import { IBlockTypeProvider, Point } from '@kapeta/ui-web-types';
 import { ZoomButtons } from '../components/ZoomButtons';
 
-import {PlannerPayloadType, ZOOM_STEP_SIZE} from './types';
+import { PlannerPayloadType, ZOOM_STEP_SIZE } from './types';
 import { PlannerMode } from '../utils/enums';
 import { FocusTopbar } from './components/FocusTopbar';
 import { PlannerFocusSideBar } from './components/PlannerFocusSideBar';
-import {BlockDefinition, BlockInstance} from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { createBlockInstanceForBlock, createBlockInstanceForBlockType } from './utils/blockUtils';
-import {DnDPayload, DragEventInfo} from "./DragAndDrop/types";
-import {parseKapetaUri} from "@kapeta/nodejs-utils";
+import { DnDPayload, DragEventInfo } from './DragAndDrop/types';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 const PLAN_PADDING = 50;
 
@@ -37,8 +37,8 @@ const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstanc
     };
 };
 
-interface Props extends PropsWithChildren{
-    onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void
+interface Props extends PropsWithChildren {
+    onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void;
 }
 
 export const PlannerCanvas: React.FC<Props> = (props) => {
@@ -72,19 +72,18 @@ export const PlannerCanvas: React.FC<Props> = (props) => {
         };
     }
 
-    function createLocalRef(block:IBlockTypeProvider) {
+    function createLocalRef(block: IBlockTypeProvider) {
         let ref;
         let attempt = 0;
         let postfix = '';
         const providerUri = parseKapetaUri(block.definition.metadata.name);
         do {
-            ref = `kapeta://${planner.uri?.handle}/new-${providerUri.name}${postfix}:local`
+            ref = `kapeta://${planner.uri?.handle}/new-${providerUri.name}${postfix}:local`;
             postfix = `-${++attempt}`;
         } while (planner.hasBlockDefinition(ref));
 
         return ref;
     }
-
 
     useEffect(() => {
         planner.setCanvasSize(canvasSize);
@@ -122,7 +121,7 @@ export const PlannerCanvas: React.FC<Props> = (props) => {
                         return [
                             PlannerPayloadType.BLOCK,
                             PlannerPayloadType.BLOCK_DEFINITION,
-                            PlannerPayloadType.BLOCK_TYPE
+                            PlannerPayloadType.BLOCK_TYPE,
                         ].includes(draggable.type);
                     }}
                     onDrop={(draggable, dragEvent) => {

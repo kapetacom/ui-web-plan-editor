@@ -3,7 +3,7 @@ import { DropZoneEntity, DropZoneManager } from './DropZoneManager';
 import { DnDPayload } from './types';
 import { DnDCallbacks, DnDContext } from './DnDContext';
 import { Point } from '@kapeta/ui-web-types';
-import {DnDZoneInstance} from "./DnDDropZone";
+import { DnDZoneInstance } from './DnDDropZone';
 
 const defaultState = {
     state: 'IDLE',

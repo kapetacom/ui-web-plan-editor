@@ -3,7 +3,7 @@ import { DnDPayload, DragEventInfo } from './types';
 import { DnDContext } from './DnDContext';
 import { DnDZoneContext, DnDZoneInstance } from './DnDDropZone';
 import { Point } from '@kapeta/ui-web-types';
-import {useTimeoutFn} from "react-use";
+import { useTimeoutFn } from 'react-use';
 
 interface DnDCallbackProps<T extends DnDPayload> extends DragEventInfo<T> {
     isDragging: boolean;
@@ -84,8 +84,6 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
     const ctx = useContext(DnDContext);
     const parentZone = useContext(DnDZoneContext);
 
-
-
     const [state, setState] = useState<{
         dragEvent: DragEventInfo<any>;
         status: DragStatus;
@@ -108,7 +106,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
             let mouseActionTimeout: NodeJS.Timeout | undefined;
             const cancelActionTimeout = () => mouseActionTimeout && clearTimeout(mouseActionTimeout);
 
-             // Consider a mouseDown as a drag if the mouse moves more than 2px or if the mouse is down for more than 200ms
+            // Consider a mouseDown as a drag if the mouse moves more than 2px or if the mouse is down for more than 200ms
             // This is to avoid triggering a drag when the user clicks on a draggable element
             const dragMinTime = 200;
             const startTime = Date.now();
@@ -209,7 +207,6 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                     );
                     setStatusFromEvent(dragEvt);
                 }, 100);
-
             };
             const onMouseUp = (evt: MouseEvent) => {
                 // Remember cleanup in case the drag is cancelled (mouseup)
@@ -250,14 +247,14 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
             if (props.onDragStart) {
                 props.onDragStart(state.dragEvent);
             }
-            ctx.callbacks.onDragStart( state.dragEvent, parentZone);
+            ctx.callbacks.onDragStart(state.dragEvent, parentZone);
         }
 
         if (!isDragging && prevDragging.current) {
             if (props.onDragEnd) {
                 props.onDragEnd(state.dragEvent);
             }
-            ctx.callbacks.onDragEnd( state.dragEvent, parentZone);
+            ctx.callbacks.onDragEnd(state.dragEvent, parentZone);
         }
         prevDragging.current = isDragging;
     }, [ctx.callbacks.onDragStart, isDragging, parentZone, state.dragEvent]);

@@ -7,11 +7,10 @@ const MAX_ROTATION_DEG = 5;
  */
 export const DragAndDrop = createDragAndDrop<PlannerPayload>();
 
-
 /**
  * Calculate the rotation of a dragged element given the distance it's been moved on the X axis.;
  */
-export const useDraggedRotation = (xDistance?:number) => {
+export const useDraggedRotation = (xDistance?: number) => {
     if (xDistance !== undefined && Math.abs(xDistance) > 10) {
         if (xDistance < 0) {
             // Moved left
@@ -23,5 +22,5 @@ export const useDraggedRotation = (xDistance?:number) => {
     }
 
     // Not moved enough
-    return 0
-}
+    return 0;
+};
