@@ -1,3 +1,10 @@
+## [0.7.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.7.3...v0.7.4) (2023-08-07)
+
+
+### Bug Fixes
+
+* bump component lib ([745a393](https://github.com/kapetacom/ui-web-plan-editor/commit/745a393e2870227905935d26bbf3a090788dc69b))
+
 ## [0.7.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.7.2...v0.7.3) (2023-08-07)
 
 
