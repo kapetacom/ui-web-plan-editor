@@ -3,6 +3,7 @@ export * from './components/BlockNode';
 export * from './components/PlannerBlockWarningTag';
 export * from './logs/LogPanel';
 export * from './utils/SVGDropShadow';
+export * from './utils/cryptoUtils';
 export * from './types';
 export { ResourceMode, BlockMode, PlannerMode } from './utils/enums';
 
