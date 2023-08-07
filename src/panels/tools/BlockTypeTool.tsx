@@ -33,8 +33,8 @@ const BlockShape = forwardRef((props: ShapeProps, parentRef) => {
     const title = getTitle(props.blockType);
     const shapeRef = useRef<HTMLDivElement>(null);
 
-    const shapeWidth = props.blockType.shapeWidth ?? 200;
-    const shapeHeight = props.blockType.getShapeHeight ? props.blockType.getShapeHeight(50) : 200;
+    const shapeWidth = props.blockType.shapeWidth ?? 150;
+    const shapeHeight = props.blockType.getShapeHeight ? props.blockType.getShapeHeight(46) : 150;
 
     const fakeInstance = {
         id: 'temp-block',
@@ -224,8 +224,8 @@ export const BlockTypeTool = (props: Props) => {
                 }}
                 onDrag={(evt) => {
                     setDraggingPosition({
-                        x: evt.zone.end.x,
-                        y: evt.zone.end.y,
+                        x: evt.client.end.x,
+                        y: evt.client.end.y,
                     });
                     setDraggedDiff(evt.diff);
                 }}

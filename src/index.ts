@@ -14,6 +14,7 @@ export * from './planner/DragAndDrop/DnDContainer';
 export * from './planner/DragAndDrop/types';
 export * from './planner/DragAndDrop/DnDContext';
 export * from './planner/DragAndDrop/DropZoneManager';
+export * from './planner/utils/blockUtils';
 export * from './planner/utils/planUtils';
 export * from './planner/utils/connectionUtils';
 export * from './planner/Planner';

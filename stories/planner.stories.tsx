@@ -290,7 +290,16 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 onClose={() => {
                     if (editItem?.creating && editItem?.type === ItemType.BLOCK) {
                         planner.removeBlockInstance(editItem.item.instance.id);
-                        planner.removeBlockDefinition(editItem.item.block);
+                        planner.removeBlockDefinition({
+                            ref: editItem.item.instance.block.ref,
+                            data: editItem.item.block,
+                            version: 'local',
+                            ymlPath: '',
+                            kind: editItem.item.block.kind,
+                            exists: false,
+                            path: '',
+                            editable: true,
+                        });
                         console.log('removing block definition');
                     }
 
@@ -342,7 +351,16 @@ const PlannerLoader = (props) => {
             {plan.value ? (
                 <PlanEditor
                     plan={plan.value.plan}
-                    version={'1.2.3'}
+                    asset={{
+                        ref: 'kapeta/something:local',
+                        version: 'local',
+                        ymlPath: '',
+                        editable: true,
+                        path: '',
+                        kind: 'kapeta/block-type',
+                        exists: true,
+                        data: plan.value.plan,
+                    }}
                     blockAssets={plan.value.blockAssets || []}
                     mode={props.plannerMode}
                     // eslint-disable-next-line no-console
