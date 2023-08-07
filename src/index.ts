@@ -29,3 +29,8 @@ export * from './planner/validation/BlockValidator';
 export * from './planner/renderers/plannerRenderer';
 
 export * from './panels/BlockInspectorPanel';
+export * from './panels/PlannerResourceDrawer';
+export * from './panels/tools/BlockTypeToolList';
+export * from './panels/tools/BlockTypeTool';
+export * from './panels/tools/ResourceTool';
+export * from './panels/tools/ResourceToolList';
