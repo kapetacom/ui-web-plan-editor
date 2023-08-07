@@ -10,7 +10,14 @@ import { Point, ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode } from '../../utils/enums';
 import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
-import { ActionContext, BlockInfo, PlannerPayload, ResourcePayload, ResourceTypePayload } from '../types';
+import {
+    ActionContext,
+    BlockInfo,
+    PlannerPayload,
+    PlannerPayloadType,
+    ResourcePayload,
+    ResourceTypePayload,
+} from '../types';
 import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
@@ -53,7 +60,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     const isPrimaryFocus = focusInfo?.focus.instance.id === blockContext.blockInstance.id;
 
     const data: PlannerPayload = useMemo(
-        () => ({ type: 'block', data: blockContext.blockInstance }),
+        () => ({ type: PlannerPayloadType.BLOCK, data: blockContext.blockInstance }),
         [blockContext.blockInstance]
     );
 
@@ -122,7 +129,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                     // Effective layout includes drag status
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
                         <DragAndDrop.DropZone
-                            data={{ type: 'block', data: blockContext.blockInstance }}
+                            data={{ type: PlannerPayloadType.BLOCK, data: blockContext.blockInstance }}
                             accept={(draggable: PlannerPayload) => {
                                 if (blockContext.isBlockDefinitionReadOnly) {
                                     return false;

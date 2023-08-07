@@ -12,6 +12,7 @@ export interface DnDCallbacks<T extends DnDPayload> {
     unregisterDropZone(id: string): void;
 
     onDragStart(dragEvent: DragEventInfo<T>, fromZone: DnDZoneInstance): void;
+    onDragEnd(dragEvent: DragEventInfo<T>, fromZone: DnDZoneInstance): void;
     onDrop(dragEvent: DragEventInfo<T>, fromZone: DnDZoneInstance, cb?: (dragEvent: DragEventInfo<T>) => void): void;
     // While dragging, this fires every n ms
     onDrag(dragEvent: DragEventInfo<T>, fromZone: DnDZoneInstance): void;
@@ -36,6 +37,7 @@ export const DnDContext = React.createContext<DnDContextType<any>>({
         registerDropZone(id, zone) {},
         unregisterDropZone(id) {},
         onDragStart(draggable) {},
+        onDragEnd(draggable) {},
         onDrop(draggable) {},
         onDrag(draggable) {},
     },

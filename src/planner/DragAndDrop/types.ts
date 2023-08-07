@@ -9,6 +9,8 @@ export interface DragEventInfo<T extends DnDPayload> {
     sourceDraggable: T;
     targetZone?: T;
 
+    // Relative to the last drag event
+    diff: Point;
     // Client relative coordinates
     client: {
         start: Point;

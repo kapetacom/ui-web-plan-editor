@@ -7,11 +7,13 @@ import {
     isSchemaEntityCompatible,
     Resource,
 } from '@kapeta/schemas';
-import { ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { Asset, ResourceRole } from '@kapeta/ui-web-types';
+import { BlockService, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { Asset, IBlockTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
 import { randomUUID } from '../../utils/cryptoUtils';
 import { BLOCK_SIZE } from './planUtils';
 import { DSL_LANGUAGE_ID, DSLConverters, DSLWriter } from '@kapeta/ui-web-components';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { BlockInfo } from '../types';
 
 export function createBlockInstanceForBlock(blockAsset: Asset<BlockDefinition>): BlockInstance {
     return {
@@ -27,6 +29,46 @@ export function createBlockInstanceForBlock(blockAsset: Asset<BlockDefinition>):
         id: randomUUID(),
         name: blockAsset.data.metadata.title ?? blockAsset.data.metadata.name,
     };
+}
+
+export function getLocalRefForBlockDefinition(block: BlockDefinition) {
+    return `kapeta://${block.metadata.name}:local`;
+}
+
+export function createBlockInstanceForBlockType(ref: string, provider: IBlockTypeProvider): BlockInfo {
+    const kind = provider.definition.metadata.name + ':' + provider.version;
+    const refUri = parseKapetaUri(ref);
+
+    const block: BlockDefinition = {
+        kind,
+        metadata: {
+            name: refUri.fullName,
+        },
+        spec: {
+            entities: {},
+            target: {
+                kind: '',
+            },
+            providers: [],
+            consumers: [],
+        },
+    };
+
+    const instance: BlockInstance = {
+        block: {
+            ref,
+        },
+        dimensions: {
+            width: BLOCK_SIZE,
+            height: -1,
+            top: 0,
+            left: 0,
+        },
+        id: randomUUID(),
+        name: '',
+    };
+
+    return { block, instance };
 }
 
 export function hasResource(toBlock: BlockDefinition, name: string, role: ResourceRole) {

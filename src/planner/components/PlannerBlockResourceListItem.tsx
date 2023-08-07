@@ -15,7 +15,7 @@ import { useBlockContext } from '../BlockContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 import { ActionButtons } from './ActionButtons';
-import { ActionContext, PlannerAction, PlannerPayload, ResourcePayload } from '../types';
+import { ActionContext, PlannerAction, PlannerPayload, PlannerPayloadType, ResourcePayload } from '../types';
 import { Resource } from '@kapeta/schemas';
 import { createConnection } from '../utils/connectionUtils';
 import { PlannerMode, ResourceMode } from '../../utils/enums';
@@ -309,7 +309,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                 {({ onRef }) => (
                     <DragAndDrop.Draggable
                         data={{
-                            type: 'resource',
+                            type: PlannerPayloadType.RESOURCE,
                             data: {
                                 resource: props.resource,
                                 instance: blockInstance,
