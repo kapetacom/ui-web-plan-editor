@@ -290,7 +290,16 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 onClose={() => {
                     if (editItem?.creating && editItem?.type === ItemType.BLOCK) {
                         planner.removeBlockInstance(editItem.item.instance.id);
-                        planner.removeBlockDefinition(editItem.item.block);
+                        planner.removeBlockDefinition({
+                            ref: editItem.item.instance.block.ref,
+                            data: editItem.item.block,
+                            version: 'local',
+                            ymlPath: '',
+                            kind: editItem.item.block.kind,
+                            exists: false,
+                            path: '',
+                            editable: true,
+                        });
                         console.log('removing block definition');
                     }
 
