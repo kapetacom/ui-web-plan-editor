@@ -342,7 +342,16 @@ const PlannerLoader = (props) => {
             {plan.value ? (
                 <PlanEditor
                     plan={plan.value.plan}
-                    version={'1.2.3'}
+                    asset={{
+                        ref: 'kapeta/something:local',
+                        version: 'local',
+                        ymlPath: '',
+                        editable: true,
+                        path: '',
+                        kind: 'kapeta/block-type',
+                        exists: true,
+                        data: plan.value.plan
+                    }}
                     blockAssets={plan.value.blockAssets || []}
                     mode={props.plannerMode}
                     // eslint-disable-next-line no-console

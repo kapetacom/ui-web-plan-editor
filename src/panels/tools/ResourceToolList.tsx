@@ -82,8 +82,8 @@ export const ResourceToolList = (props: Props) => {
                                 }}
                                 onDrag={(evt) => {
                                     setDraggingPosition({
-                                        x: evt.zone.end.x,
-                                        y: evt.zone.end.y,
+                                        x: evt.client.end.x,
+                                        y: evt.client.end.y,
                                     });
                                     setDraggedDiff(evt.diff);
                                 }}

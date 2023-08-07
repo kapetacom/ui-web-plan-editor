@@ -144,11 +144,6 @@ export const PlannerCanvas: React.FC<Props> = (props) => {
                             const blockInfo = createBlockInstanceForBlockType(ref, draggable.data);
                             blockInfo.instance.dimensions = calculateDimensions(dragEvent);
 
-                            // We add block definition and instance immediately to the planner
-                            // so that the block is rendered - even if the user cancels the creation
-                            planner.addBlockDefinition(blockInfo.block);
-                            planner.addBlockInstance(blockInfo.instance);
-
                             // Callback should handle the creation of the block and remove the block definition
                             // and instance from the planner if the creation is cancelled
                             props.onCreateBlock?.(blockInfo.block, blockInfo.instance);

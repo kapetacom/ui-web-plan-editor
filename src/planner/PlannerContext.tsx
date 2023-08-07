@@ -37,6 +37,7 @@ export interface PlannerActionConfig {
 
 export interface PlannerContextData {
     plan?: Plan;
+    asset?: Asset<Plan>;
     uri?: KapetaURI;
     blockAssets: Asset<BlockDefinition>[];
     setBlockAssets(blockAssets: Asset<BlockDefinition>[]): void;
@@ -78,6 +79,7 @@ export interface PlannerContextData {
 
     mode?: PlannerMode;
     zoom: number;
+
     setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
     nodeSize: PlannerNodeSize;
     getBlockByRef(ref: string): BlockDefinition | undefined;
@@ -85,9 +87,9 @@ export interface PlannerContextData {
 
     updatePlanMetadata(metadata: Metadata, configuration: EntityList): void;
 
-    removeBlockDefinition(update: BlockDefinition): void;
+    removeBlockDefinition(update: Asset<BlockDefinition>): void;
     updateBlockDefinition(ref: string, update: BlockDefinition): void;
-    addBlockDefinition(asset: BlockDefinition): void;
+    addBlockDefinition(asset: Asset<BlockDefinition>): void;
     hasBlockDefinition(ref: string): boolean;
     updateBlockInstance(blockId: string, updater: BlockUpdater): void;
     removeBlockInstance(blockId: string): void;
@@ -204,7 +206,7 @@ const defaultValue: PlannerContextData = {
 export const PlannerContext = React.createContext(defaultValue);
 export type PlannerContextProps = {
     plan: Plan;
-    version: string;
+    asset: Asset<Plan>;
     blockAssets: Asset<BlockDefinition>[];
     mode: PlannerMode;
     onChange?: (plan: Plan) => void;
@@ -308,41 +310,64 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     }, []);
 
     const instanceStates = useMemo(() => props.instanceStates || {}, [props.instanceStates]);
-    const onPlanChange = props.onChange;
+
     const updatePlan = useCallback(
-        function updatePlan(changer: (prev: Plan) => Plan) {
+        function updatePlan(changer: (prev: Plan) => Plan, preventChangeEvent?:boolean) {
             setPlan((prev) => {
                 const newPlan = changer(prev);
-                if (onPlanChange && newPlan !== prev) {
-                    onPlanChange(newPlan);
+
+                if (!preventChangeEvent && props.onChange && newPlan !== prev) {
+                    props.onChange(newPlan);
                 }
                 return newPlan;
             });
         },
-        [onPlanChange]
+        []
     );
-    const onAssetChange = props.onAssetChange;
+
     const updateBlockAssets = useCallback(
         function updateBlockAssets(changer: (prev: Asset<BlockDefinition>[]) => Asset<BlockDefinition>[]) {
             setBlockAssets((prev) => {
                 const newAssets = changer(prev);
-                if (onAssetChange) {
+                if (props.onAssetChange) {
                     newAssets.forEach((newAsset, ix) => {
-                        if (prev.indexOf(newAsset) === -1) {
-                            onAssetChange(newAsset);
+                        if (props.onAssetChange && prev.indexOf(newAsset) === -1) {
+                            props.onAssetChange(newAsset);
                         }
                     });
                 }
                 return newAssets;
             });
         },
-        [onAssetChange]
+        []
     );
 
     const viewMode = props.mode;
 
+    function isTempInstanceId(instanceId: string) {
+        const blockInstance = plan.spec.blocks.find((block) => block.id === instanceId);
+        if (!blockInstance) {
+            return false;
+        }
+
+        return isTempInstance(blockInstance);
+    }
+
+    function isTempInstance(blockInstance:BlockInstance) {
+        const block = blockAssets.find((asset) => asset.ref === blockInstance.block.ref);
+        if (!block) {
+            return true;
+        }
+
+        if (!block.exists) {
+            return true;
+        }
+
+        return false;
+    }
+
     const updateBlockInstance = useCallback(
-        (blockId: string, updater) => {
+        (instanceId: string, updater) => {
             const canEditBlocks = viewMode === PlannerMode.EDIT;
             if (!canEditBlocks) {
                 return;
@@ -350,15 +375,15 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             // Use state callback to reference the previous state (avoid stale ref)
             updatePlan((prevState) => {
                 const newPlan = cloneDeep(prevState);
-                const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
+                const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === instanceId) ?? -1;
                 if (blockIx === -1) {
-                    throw new Error(`BlockDefinition #${blockId} not found`);
+                    throw new Error(`Block instance #${instanceId} not found`);
                 }
 
                 const blocks = (newPlan.spec.blocks = newPlan.spec.blocks || []);
                 blocks[blockIx] = updater(blocks[blockIx]);
                 return newPlan;
-            });
+            }, isTempInstanceId(instanceId));
         },
         [updatePlan, viewMode]
     );
@@ -367,7 +392,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         const canEditBlocks = viewMode === PlannerMode.EDIT;
         const canEditConnections = viewMode === PlannerMode.EDIT;
 
-        const uri = parseKapetaUri(props.plan.metadata.name + ':' + props.version);
+        const uri = parseKapetaUri(props.asset.ref);
 
         const planner = {
             // view state
@@ -375,6 +400,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             setFocusedBlock: toggleFocusBlock,
             assetState,
             //
+
             instanceStates,
 
             zoom,
@@ -391,6 +417,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             canEditConnections,
             //
             plan: plan,
+            asset: props.asset,
             uri: uri,
             blockAssets,
             setBlockAssets(newBlockAssets: Asset<BlockDefinition>[]) {
@@ -421,41 +448,24 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 const newUri = parseKapetaUri(ref);
                 return blockAssets.some((asset) => newUri.equals(parseKapetaUri(asset.ref)));
             },
-            removeBlockDefinition(asset: BlockDefinition) {
+            removeBlockDefinition(asset: Asset<BlockDefinition>) {
                 if (!canEditBlocks) {
                     return;
                 }
-
-                const ref = getLocalRefForBlockDefinition(asset);
 
                 updateBlockAssets((state) => {
-                    return state.filter((block) => block.ref !== ref);
+                    return state.filter((block) => block.ref !== asset.ref);
                 });
             },
-            addBlockDefinition(asset: BlockDefinition) {
+            addBlockDefinition(asset: Asset<BlockDefinition>) {
                 if (!canEditBlocks) {
-                    return;
-                }
-
-                const ref = getLocalRefForBlockDefinition(asset);
-
-                if (this.hasBlockDefinition(ref)) {
                     return;
                 }
 
                 updateBlockAssets((state) => {
                     return [
-                        ...state,
-                        {
-                            ref,
-                            data: asset,
-                            exists: false,
-                            kind: asset.kind,
-                            version: 'local',
-                            editable: true,
-                            path: '',
-                            ymlPath: '',
-                        },
+                        ...state.filter((block) => block.ref !== asset.ref),
+                        asset
                     ];
                 });
             },
@@ -471,7 +481,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     }
                     newPlan.spec.blocks.push(blockInstance);
                     return newPlan;
-                });
+                }, isTempInstance(blockInstance));
                 callbackHandlers.onBlockInstanceAdded.forEach((cb) => cb(blockInstance));
             },
             onBlockInstanceAdded(callback: InstanceAddedCallback) {
@@ -490,8 +500,10 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     const newPlan = cloneDeep(prevState);
                     const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
                     if (blockIx === -1) {
-                        throw new Error(`BlockDefinition #${blockId} not found`);
+                        // Not found - no change
+                        return prevState;
                     }
+
                     newPlan.spec.blocks?.splice(blockIx, 1);
 
                     // Remove any connections that reference this block
@@ -499,7 +511,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                         (conn) => conn.consumer.blockId !== blockId && conn.provider.blockId !== blockId
                     );
                     return newPlan;
-                });
+                }, isTempInstanceId(blockId));
             },
             // resources
             addResource(blockRef: string, resource: Resource, role: ResourceRole) {
@@ -508,14 +520,14 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 }
                 const blockUri = parseKapetaUri(blockRef);
                 updateBlockAssets((prevState) => {
-                    const newAssets = cloneDeep(prevState);
+                    const newAssets = [...prevState];
                     const blockIx = newAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ?? -1;
 
                     if (blockIx === -1) {
                         throw new Error(`BlockDefinition #${blockRef} not found`);
                     }
 
-                    const block = newAssets[blockIx];
+                    const block = newAssets[blockIx] = cloneDeep(newAssets[blockIx]);
                     if (!block.data.spec.providers) {
                         block.data.spec.providers = [];
                     }
@@ -536,17 +548,19 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (!canEditBlocks) {
                     return;
                 }
+
+                console.log('updateResource', blockRef, resourceName);
                 const blockUri = parseKapetaUri(blockRef);
 
                 updateBlockAssets((prevState) => {
-                    const newAssets = cloneDeep(prevState);
+                    const newAssets = [...prevState];
                     const blockIx = newAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ?? -1;
 
                     if (blockIx === -1) {
                         throw new Error(`Block #${blockRef} not found`);
                     }
 
-                    const block = cloneDeep(newAssets[blockIx]);
+                    const block = newAssets[blockIx] = cloneDeep(newAssets[blockIx]);
 
                     const resources: Resource[] =
                         role === ResourceRole.PROVIDES
@@ -590,7 +604,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                             });
 
                             return newPlan;
-                        });
+                        }, !block.exists);
                     }
 
                     resources[existingResourceIx] = resource;
@@ -599,7 +613,6 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     } else {
                         block.data.spec.consumers = resources;
                     }
-                    newAssets.splice(blockIx, 1, block);
 
                     return newAssets;
                 });
@@ -761,7 +774,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         viewMode,
         zoom,
         assetState,
-        callbackHandlers,
+        callbackHandlers
     ]);
 };
 
