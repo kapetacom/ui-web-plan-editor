@@ -1,3 +1,10 @@
+## [0.7.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.7.1...v0.7.2) (2023-08-07)
+
+
+### Bug Fixes
+
+* Avoid updating mid-creation  ([f54a582](https://github.com/kapetacom/ui-web-plan-editor/commit/f54a582562b2bdb7eee718d7aec4be4ab9dc3f62))
+
 ## [0.7.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.7.0...v0.7.1) (2023-08-07)
 
 
