@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.7.4...v0.8.0) (2023-08-10)
+
+
+### Features
+
+* Implemented previews for most asset types including plans ([#57](https://github.com/kapetacom/ui-web-plan-editor/issues/57)) ([f29c4db](https://github.com/kapetacom/ui-web-plan-editor/commit/f29c4db7eb548ecba7c2c9f9e9eda291910da5f2))
+
 ## [0.7.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.7.3...v0.7.4) (2023-08-07)
 
 
