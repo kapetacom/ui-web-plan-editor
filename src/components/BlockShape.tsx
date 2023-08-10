@@ -1,17 +1,17 @@
-import {IBlockTypeProvider, Point, ResourceRole} from "@kapeta/ui-web-types";
-import {parseKapetaUri} from "@kapeta/nodejs-utils";
-import {BlockDefinition} from "@kapeta/schemas";
-import React, {forwardRef, useRef} from "react";
-import {BlockNode} from "./BlockNode";
-import {useDraggedRotation} from "../planner/utils/dndUtils";
-import {Box} from "@mui/material";
-import {Transition} from "react-transition-group";
-import {BlockLayout} from "@kapeta/ui-web-components";
-import {PlannerBlockResourceList} from "../planner/components/PlannerBlockResourceList";
-import {PlannerNodeSize} from "../types";
-import {BlockContext, calculateBlockHeights} from "../planner/BlockContext";
-import {BlockMode} from "../utils/enums";
-import {InstanceStatus} from "@kapeta/ui-web-context";
+import { IBlockTypeProvider, Point, ResourceRole } from '@kapeta/ui-web-types';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { BlockDefinition } from '@kapeta/schemas';
+import React, { forwardRef, useRef } from 'react';
+import { BlockNode } from './BlockNode';
+import { useDraggedRotation } from '../planner/utils/dndUtils';
+import { Box } from '@mui/material';
+import { Transition } from 'react-transition-group';
+import { BlockLayout } from '@kapeta/ui-web-components';
+import { PlannerBlockResourceList } from '../planner/components/PlannerBlockResourceList';
+import { PlannerNodeSize } from '../types';
+import { BlockContext, calculateBlockHeights } from '../planner/BlockContext';
+import { BlockMode } from '../utils/enums';
+import { InstanceStatus } from '@kapeta/ui-web-context';
 
 export const getBlockTypeTitle = (blockType: IBlockTypeProvider) => {
     return (
@@ -58,7 +58,7 @@ export const BlockShape = forwardRef((props: ShapeProps, parentRef) => {
     if (fakeData.metadata.title) {
         title = fakeData.metadata.title;
     } else if (fakeData.metadata.name) {
-        title = parseKapetaUri(fakeData.metadata.name).name
+        title = parseKapetaUri(fakeData.metadata.name).name;
     }
 
     const fakeInstance = {
@@ -70,16 +70,12 @@ export const BlockShape = forwardRef((props: ShapeProps, parentRef) => {
         dimensions: { height: 0, width: 0, top: 0, left: 0 },
     };
 
-    const {
-        instanceBlockHeight,
-        instanceResourceHeight,
-    } = calculateBlockHeights({
+    const { instanceBlockHeight, instanceResourceHeight } = calculateBlockHeights({
         nodeSize: PlannerNodeSize.MEDIUM,
         blockType: props.blockType,
         blockDefinition: props.block,
         blockMode: BlockMode.SHOW_RESOURCES,
     });
-
 
     const width = props.width ?? 64;
     const height = props.height ?? 64;
@@ -167,15 +163,15 @@ export const BlockShape = forwardRef((props: ShapeProps, parentRef) => {
                         transition: `all 100ms ease-in-out`,
                         text: {
                             transition: 'all 0.2s ease-in-out',
-                            opacity: (props.showText || props.dragging) ? 1 : 0,
+                            opacity: props.showText || props.dragging ? 1 : 0,
                         },
                         path: {
                             transition: 'all 0.2s ease-in-out',
-                            stroke: (props.showText || props.dragging) ? undefined : 'rgba(0, 0, 0, 0.23)',
+                            stroke: props.showText || props.dragging ? undefined : 'rgba(0, 0, 0, 0.23)',
                         },
                         svg: {
-                            overflow: 'visible'
-                        }
+                            overflow: 'visible',
+                        },
                     },
                 },
             }}
@@ -199,21 +195,23 @@ export const BlockShape = forwardRef((props: ShapeProps, parentRef) => {
                             }}
                             ref={shapeRef}
                         >
-                            <BlockContext.Provider value={{
-                                blockDefinition: fakeData,
-                                blockInstance: fakeInstance,
-                                blockMode: BlockMode.SHOW,
-                                providers: fakeData.spec.providers || [],
-                                consumers: fakeData.spec.consumers || [],
-                                instanceStatus: InstanceStatus.STOPPED,
-                                isBlockDefinitionReadOnly: true,
-                                isBlockInstanceReadOnly: true,
-                                setBlockMode: () => {},
-                                blockReference: parseKapetaUri(ref),
-                                instanceBlockWidth: shapeWidth,
-                                instanceBlockHeight,
-                                instanceResourceHeight,
-                            }}>
+                            <BlockContext.Provider
+                                value={{
+                                    blockDefinition: fakeData,
+                                    blockInstance: fakeInstance,
+                                    blockMode: BlockMode.SHOW,
+                                    providers: fakeData.spec.providers || [],
+                                    consumers: fakeData.spec.consumers || [],
+                                    instanceStatus: InstanceStatus.STOPPED,
+                                    isBlockDefinitionReadOnly: true,
+                                    isBlockInstanceReadOnly: true,
+                                    setBlockMode: () => {},
+                                    blockReference: parseKapetaUri(ref),
+                                    instanceBlockWidth: shapeWidth,
+                                    instanceBlockHeight,
+                                    instanceResourceHeight,
+                                }}
+                            >
                                 <svg
                                     className={'shape'}
                                     style={{
@@ -224,20 +222,21 @@ export const BlockShape = forwardRef((props: ShapeProps, parentRef) => {
                                     viewBox={viewBox}
                                 >
                                     <svg y={0} x={props.showResources ? 150 : 0} overflow={'visible'}>
-
-                                        {props.showResources &&
+                                        {props.showResources && (
                                             <PlannerBlockResourceList
                                                 nodeSize={PlannerNodeSize.MEDIUM}
                                                 role={ResourceRole.PROVIDES}
                                                 actions={[]}
-                                            />}
+                                            />
+                                        )}
 
-                                        {props.showResources &&
+                                        {props.showResources && (
                                             <PlannerBlockResourceList
                                                 nodeSize={PlannerNodeSize.MEDIUM}
                                                 role={ResourceRole.CONSUMES}
                                                 actions={[]}
-                                            />}
+                                            />
+                                        )}
 
                                         <BlockLayout definition={fakeData} instance={fakeInstance}>
                                             <Shape

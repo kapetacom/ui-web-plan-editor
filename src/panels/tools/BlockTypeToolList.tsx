@@ -1,5 +1,5 @@
 import { IBlockTypeProvider } from '@kapeta/ui-web-types';
-import { Box,  Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import React from 'react';
 import { BlockTypeTool } from './BlockTypeTool';
 

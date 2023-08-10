@@ -11,9 +11,7 @@ import { Transition } from 'react-transition-group';
 import { useDraggedRotation } from '../../planner/utils/dndUtils';
 import { PlannerPayloadType } from '../../planner/types';
 import { BlockDefinition } from '@kapeta/schemas';
-import {BlockShape, getBlockTypeTitle} from "../../components/BlockShape";
-
-
+import { BlockShape, getBlockTypeTitle } from '../../components/BlockShape';
 
 interface Props {
     blockType: IBlockTypeProvider;

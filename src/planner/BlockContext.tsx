@@ -1,12 +1,12 @@
-import React, {useContext, useMemo, useState} from 'react';
-import {KapetaURI, parseKapetaUri} from '@kapeta/nodejs-utils';
-import {PlannerContext} from './PlannerContext';
-import {getDefaultBlockHeight, RESOURCE_HEIGHTS} from './utils/planUtils';
-import {BlockMode} from '../utils/enums';
-import {BlockTypeProvider, InstanceStatus} from '@kapeta/ui-web-context';
-import {BlockDefinition, BlockInstance, Resource} from '@kapeta/schemas';
-import {IBlockTypeProvider} from "@kapeta/ui-web-types";
-import {PlannerNodeSize} from "../types";
+import React, { useContext, useMemo, useState } from 'react';
+import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
+import { PlannerContext } from './PlannerContext';
+import { getDefaultBlockHeight, RESOURCE_HEIGHTS } from './utils/planUtils';
+import { BlockMode } from '../utils/enums';
+import { BlockTypeProvider, InstanceStatus } from '@kapeta/ui-web-context';
+import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
+import { IBlockTypeProvider } from '@kapeta/ui-web-types';
+import { PlannerNodeSize } from '../types';
 
 export interface PlannerBlockContextData {
     blockInstance: BlockInstance | null;
@@ -54,7 +54,7 @@ interface BlockProviderProps extends React.PropsWithChildren {
 interface BlockSizeProps {
     nodeSize: PlannerNodeSize;
     blockType?: IBlockTypeProvider;
-    blockMode?: BlockMode
+    blockMode?: BlockMode;
     blockDefinition?: BlockDefinition;
 }
 
@@ -72,9 +72,9 @@ export const calculateBlockHeights = (props: BlockSizeProps) => {
 
     return {
         instanceBlockHeight,
-        instanceResourceHeight
-    }
-}
+        instanceResourceHeight,
+    };
+};
 export const BlockContextProvider = (props: BlockProviderProps) => {
     const planner = useContext(PlannerContext);
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
@@ -92,14 +92,11 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
         const consumers = blockDefinition?.spec.consumers || [];
         const providers = blockDefinition?.spec.providers || [];
 
-        const {
-            instanceResourceHeight,
-            instanceBlockHeight
-        } = calculateBlockHeights({
+        const { instanceResourceHeight, instanceBlockHeight } = calculateBlockHeights({
             nodeSize: planner.nodeSize,
             blockType,
             blockMode,
-            blockDefinition
+            blockDefinition,
         });
 
         const blockReference = blockInstance && parseKapetaUri(blockInstance?.block.ref);

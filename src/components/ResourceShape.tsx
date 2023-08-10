@@ -7,7 +7,6 @@ import { Add } from '@mui/icons-material';
 import { AssetKindIcon } from '@kapeta/ui-web-components';
 import { useDraggedRotation } from '../planner/utils/dndUtils';
 
-
 const OperatorResourceBG = (
     <svg width="114" height="48" viewBox="0 0 114 48" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path

@@ -304,10 +304,11 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                     height={blockContext.instanceBlockHeight}
                                                     style={{ textAlign: 'center' }}
                                                 >
-                                                    <BlockNode height={blockContext.instanceBlockHeight}
-                                                               width={blockContext.instanceBlockWidth}
-                                                               readOnly={!canEditInstance}
-                                                               valid={isValid}
+                                                    <BlockNode
+                                                        height={blockContext.instanceBlockHeight}
+                                                        width={blockContext.instanceBlockWidth}
+                                                        readOnly={!canEditInstance}
+                                                        valid={isValid}
                                                     />
                                                     <p>Failed to load</p>
                                                     <pre>{blockContext.blockInstance.name}</pre>

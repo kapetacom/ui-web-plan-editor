@@ -11,12 +11,12 @@ import { RESOURCE_HEIGHTS } from '../utils/planUtils';
 import { SVGLayoutNode } from '../LayoutContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { ActionContext, PlannerAction, PlannerPayload } from '../types';
-import {PlannerNodeSize} from "../../types";
+import { PlannerNodeSize } from '../../types';
 
 export interface PlannerBlockResourceListProps {
     role: ResourceRole;
     actions: PlannerAction<any>[];
-    nodeSize:PlannerNodeSize;
+    nodeSize: PlannerNodeSize;
     onResourceMouseEnter?: (context: ActionContext) => void;
     onResourceMouseLeave?: (context: ActionContext) => void;
 }
