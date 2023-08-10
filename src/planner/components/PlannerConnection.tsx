@@ -222,7 +222,7 @@ export const PlannerConnection: React.FC<{
     };
 
     return (
-        <svg style={{ position: 'absolute', zIndex: -1 }}>
+        <svg style={{ position: 'absolute', zIndex: -1, top:0, left:0 }}>
             <g
                 className={className.trim()}
                 onMouseEnter={() => {
