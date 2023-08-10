@@ -1,9 +1,10 @@
 import { IResourceTypeProvider, ItemType, Point } from '@kapeta/ui-web-types';
 import { Box, Divider, Portal, Stack, Typography } from '@mui/material';
 import { DragAndDrop } from '../../planner/utils/dndUtils';
-import { ResourceTool } from './ResourceTool';
+
 import React, { useState } from 'react';
 import { PlannerPayloadType } from '../../planner/types';
+import { ResourceShape } from '../../components/ResourceShape';
 
 interface Props {
     title: string;
@@ -90,7 +91,7 @@ export const ResourceToolList = (props: Props) => {
                                 onDrop={(evt) => {}}
                             >
                                 {(evt) => {
-                                    return <ResourceTool {...evt.componentProps} resource={resource} />;
+                                    return <ResourceShape {...evt.componentProps} resource={resource} />;
                                 }}
                             </DragAndDrop.Draggable>
                         );
@@ -99,7 +100,7 @@ export const ResourceToolList = (props: Props) => {
             </Stack>
             {dragging && draggingPosition && (
                 <Portal>
-                    <ResourceTool
+                    <ResourceShape
                         resource={dragging}
                         dragging={true}
                         dragged={draggedDiff}

@@ -5,7 +5,7 @@ import { Box, useTheme } from '@mui/material';
 
 import { Add } from '@mui/icons-material';
 import { AssetKindIcon } from '@kapeta/ui-web-components';
-import { useDraggedRotation } from '../../planner/utils/dndUtils';
+import { useDraggedRotation } from '../planner/utils/dndUtils';
 
 const OperatorResourceBG = (
     <svg width="114" height="48" viewBox="0 0 114 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -60,7 +60,7 @@ interface Props {
     onMouseDown?: MouseEventHandler<HTMLDivElement> | undefined;
 }
 
-export const ResourceTool = (props: Props) => {
+export const ResourceShape = (props: Props) => {
     const theme = useTheme();
 
     let infoOffset = 3;

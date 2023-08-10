@@ -1,10 +1,12 @@
 import React, { useContext, useMemo, useState } from 'react';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { PlannerContext } from './PlannerContext';
-import { getDefaultBlockHeight, resourceHeight } from './utils/planUtils';
+import { getDefaultBlockHeight, RESOURCE_HEIGHTS } from './utils/planUtils';
 import { BlockMode } from '../utils/enums';
 import { BlockTypeProvider, InstanceStatus } from '@kapeta/ui-web-context';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
+import { IBlockTypeProvider } from '@kapeta/ui-web-types';
+import { PlannerNodeSize } from '../types';
 
 export interface PlannerBlockContextData {
     blockInstance: BlockInstance | null;
@@ -48,6 +50,31 @@ interface BlockProviderProps extends React.PropsWithChildren {
     blockId: string;
     configuration?: any;
 }
+
+interface BlockSizeProps {
+    nodeSize: PlannerNodeSize;
+    blockType?: IBlockTypeProvider;
+    blockMode?: BlockMode;
+    blockDefinition?: BlockDefinition;
+}
+
+export const calculateBlockHeights = (props: BlockSizeProps) => {
+    const consumers = props.blockDefinition?.spec.consumers || [];
+    const providers = props.blockDefinition?.spec.providers || [];
+
+    const pendingConsumers = props.blockMode === BlockMode.HOVER_DROP_CONSUMER ? 1 : 0;
+    const pendingProviders = props.blockMode === BlockMode.HOVER_DROP_PROVIDER ? 1 : 0;
+    const resourceCount = Math.max(consumers.length + pendingConsumers, providers.length + pendingProviders);
+    const instanceResourceHeight = RESOURCE_HEIGHTS[props.nodeSize] * resourceCount;
+    const instanceBlockHeight = props.blockType?.getShapeHeight
+        ? props.blockType.getShapeHeight(instanceResourceHeight)
+        : getDefaultBlockHeight(instanceResourceHeight);
+
+    return {
+        instanceBlockHeight,
+        instanceResourceHeight,
+    };
+};
 export const BlockContextProvider = (props: BlockProviderProps) => {
     const planner = useContext(PlannerContext);
     const [blockMode, setBlockMode] = useState(BlockMode.HIDDEN);
@@ -65,13 +92,13 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
         const consumers = blockDefinition?.spec.consumers || [];
         const providers = blockDefinition?.spec.providers || [];
 
-        const pendingConsumers = blockMode === BlockMode.HOVER_DROP_CONSUMER ? 1 : 0;
-        const pendingProviders = blockMode === BlockMode.HOVER_DROP_PROVIDER ? 1 : 0;
-        const resourceCount = Math.max(consumers.length + pendingConsumers, providers.length + pendingProviders);
-        const blockResourceHeight = resourceHeight[planner.nodeSize] * resourceCount;
-        const instanceBlockHeight = blockType?.getShapeHeight
-            ? blockType.getShapeHeight(blockResourceHeight)
-            : getDefaultBlockHeight(blockResourceHeight);
+        const { instanceResourceHeight, instanceBlockHeight } = calculateBlockHeights({
+            nodeSize: planner.nodeSize,
+            blockType,
+            blockMode,
+            blockDefinition,
+        });
+
         const blockReference = blockInstance && parseKapetaUri(blockInstance?.block.ref);
 
         return {
@@ -84,7 +111,7 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
             instanceStatus,
             instanceBlockHeight,
             instanceBlockWidth: blockType?.shapeWidth || 150,
-            instanceResourceHeight: blockResourceHeight,
+            instanceResourceHeight,
             blockMode: focusedMode ?? overrideMode ?? blockMode,
             setBlockMode,
             isBlockInstanceReadOnly: !planner.canEditBlocks,

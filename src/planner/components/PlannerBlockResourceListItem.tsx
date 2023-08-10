@@ -4,7 +4,7 @@ import { IResourceTypeProvider, ResourceProviderType, ResourceRole } from '@kape
 
 import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
-import { getResourceId, resourceHeight } from '../utils/planUtils';
+import { getResourceId, RESOURCE_HEIGHTS } from '../utils/planUtils';
 import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
 import { PlannerConnectionPoint } from './PlannerConnectionPoint';
 import { BlockResource } from './BlockResource';
@@ -60,7 +60,7 @@ const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 })
 };
 
 const TempResource = ({ resource, nodeSize, x, y, actionContext }) => {
-    const height = resourceHeight[nodeSize];
+    const height = RESOURCE_HEIGHTS[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     // const mouseCatcherWidth = 210;
 
@@ -223,7 +223,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -30 - extension : 55 + extension);
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
-    const height = resourceHeight[nodeSize];
+    const height = RESOURCE_HEIGHTS[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     const yOffset = height * props.index;
 

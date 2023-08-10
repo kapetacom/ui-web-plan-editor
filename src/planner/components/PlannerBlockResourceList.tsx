@@ -7,20 +7,21 @@ import { PlannerBlockResourceListItem } from './PlannerBlockResourceListItem';
 import { PlannerContext } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
 import { BlockMode, ResourceMode } from '../../utils/enums';
-import { resourceHeight } from '../utils/planUtils';
+import { RESOURCE_HEIGHTS } from '../utils/planUtils';
 import { SVGLayoutNode } from '../LayoutContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { ActionContext, PlannerAction, PlannerPayload } from '../types';
+import { PlannerNodeSize } from '../../types';
 
 export interface PlannerBlockResourceListProps {
     role: ResourceRole;
     actions: PlannerAction<any>[];
+    nodeSize: PlannerNodeSize;
     onResourceMouseEnter?: (context: ActionContext) => void;
     onResourceMouseLeave?: (context: ActionContext) => void;
 }
 
 export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> = (props) => {
-    const planner = useContext(PlannerContext);
     const blockCtx = useBlockContext();
     const { draggable } = useContext(DnDContext);
 
@@ -64,9 +65,9 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
 
     // Offset for the top of the hexagon, plus centering if there is only 1
     const placeholderCount = showPlaceholder() ? 1 : 0;
-    const listHeight = list.length * resourceHeight[planner.nodeSize];
+    const listHeight = list.length * RESOURCE_HEIGHTS[props.nodeSize];
     const yPosition =
-        (blockCtx.instanceBlockHeight - listHeight - placeholderCount * resourceHeight[planner.nodeSize]) / 2;
+        (blockCtx.instanceBlockHeight - listHeight - placeholderCount * RESOURCE_HEIGHTS[props.nodeSize]) / 2;
 
     return (
         <SVGLayoutNode className={plannerResourceListClass} overflow="visible" x={0} y={yPosition}>
@@ -74,7 +75,7 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
                 {list.map((resource, index: number) => {
                     return (
                         <PlannerBlockResourceListItem
-                            size={planner.nodeSize}
+                            size={props.nodeSize}
                             key={`${blockCtx.blockInstance.id}_${resource.metadata.name}_${index}`}
                             index={index}
                             resource={resource}
@@ -94,7 +95,7 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
 
                 {/* Blinking "ghost" target when we're about to create a new connection */}
                 <svg className="resource-placeholder" x={0} y={listHeight}>
-                    <rect height={resourceHeight[planner.nodeSize] - 4} width={placeholderWidth - offsetX} />
+                    <rect height={RESOURCE_HEIGHTS[props.nodeSize] - 4} width={placeholderWidth - offsetX} />
                 </svg>
             </svg>
         </SVGLayoutNode>
