@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.8.0...v0.8.1) (2023-08-10)
+
+
+### Bug Fixes
+
+* Make sure connections are tied to top left ([4babf5e](https://github.com/kapetacom/ui-web-plan-editor/commit/4babf5ea2012411710318ef8dc1cb0b2ebc9cde3))
+
 # [0.8.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.7.4...v0.8.0) (2023-08-10)
 
 
