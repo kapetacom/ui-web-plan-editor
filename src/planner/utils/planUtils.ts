@@ -4,7 +4,7 @@ import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 export const BLOCK_SIZE = 150;
 
-export const resourceHeight = {
+export const RESOURCE_HEIGHTS = {
     [PlannerNodeSize.SMALL]: 30,
     [PlannerNodeSize.MEDIUM]: 52,
     [PlannerNodeSize.FULL]: 65,
@@ -74,7 +74,7 @@ export function getReservedBlockHeight(block: BlockDefinition, size: PlannerNode
     const consumesCount = block.spec.consumers?.length || 0;
 
     const resourceCount = Math.max(consumesCount, providesCount);
-    const blockResourceHeight = resourceHeight[size] * resourceCount;
+    const blockResourceHeight = RESOURCE_HEIGHTS[size] * resourceCount;
 
     return getDefaultBlockHeight(blockResourceHeight) + 20;
 }

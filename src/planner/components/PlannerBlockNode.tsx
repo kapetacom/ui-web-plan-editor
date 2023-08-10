@@ -258,12 +258,14 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                     >
                                         {/* TODO: fix offsets based on block size */}
                                         <PlannerBlockResourceList
+                                            nodeSize={planner.nodeSize}
                                             role={ResourceRole.CONSUMES}
                                             actions={props.actions?.resource || []}
                                             onResourceMouseEnter={props.onResourceMouseEnter}
                                             onResourceMouseLeave={props.onResourceMouseLeave}
                                         />
                                         <PlannerBlockResourceList
+                                            nodeSize={planner.nodeSize}
                                             role={ResourceRole.PROVIDES}
                                             actions={props.actions?.resource || []}
                                             onResourceMouseEnter={props.onResourceMouseEnter}
@@ -302,6 +304,11 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                     height={blockContext.instanceBlockHeight}
                                                     style={{ textAlign: 'center' }}
                                                 >
+                                                    <BlockNode height={blockContext.instanceBlockHeight}
+                                                               width={blockContext.instanceBlockWidth}
+                                                               readOnly={!canEditInstance}
+                                                               valid={isValid}
+                                                    />
                                                     <p>Failed to load</p>
                                                     <pre>{blockContext.blockInstance.name}</pre>
                                                     <code>{blockContext.blockInstance.block.ref}</code>

@@ -1,10 +1,7 @@
-import { IBlockTypeProvider, IResourceTypeProvider } from '@kapeta/ui-web-types';
-import { Box, Divider, Stack, Typography } from '@mui/material';
-import { DragAndDrop } from '../../planner/utils/dndUtils';
-import { ResourceTool } from './ResourceTool';
+import { IBlockTypeProvider } from '@kapeta/ui-web-types';
+import { Box,  Stack } from '@mui/material';
 import React from 'react';
 import { BlockTypeTool } from './BlockTypeTool';
-import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 interface Props {
     blockTypes: IBlockTypeProvider[];

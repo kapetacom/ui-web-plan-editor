@@ -18,7 +18,7 @@ import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
     systemId: string;
-
+    zoomToFit?: { width: number; height: number };
     // Should we instead augment the
     actions?: PlannerActionConfig;
     configurations?: { [key: string]: any };
