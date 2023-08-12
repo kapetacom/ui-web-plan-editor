@@ -1,3 +1,10 @@
+## [0.8.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.8.1...v0.8.2) (2023-08-12)
+
+
+### Bug Fixes
+
+* Avoid inconsistent state in planner context ([6c732a2](https://github.com/kapetacom/ui-web-plan-editor/commit/6c732a202c446b0a8b4a1a66ad01e00c3b709666))
+
 ## [0.8.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.8.0...v0.8.1) (2023-08-10)
 
 
