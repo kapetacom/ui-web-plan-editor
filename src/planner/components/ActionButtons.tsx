@@ -1,8 +1,9 @@
-import React, { useContext, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ActionContext, PlannerAction } from '../types';
 import { PlannerContext } from '../PlannerContext';
 import { staggeredFade } from '../utils/transitionUtils';
 import './ActionButtons.less';
+import { usePrevious } from 'react-use';
 
 const CircleButton = (props) => {
     return (
@@ -38,7 +39,7 @@ export const ActionButtons = (props: ActionButtonProps) => {
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
 
-    useLayoutEffect(() => {
+    const recalculateSize = useCallback(() => {
         const span = ref.current;
         if (span) {
             const { width: w, height: h } = span.getBoundingClientRect();
@@ -47,8 +48,22 @@ export const ActionButtons = (props: ActionButtonProps) => {
         }
     }, [ref]);
 
-    const { onSizeChange } = props;
     useLayoutEffect(() => {
+        recalculateSize();
+    }, [recalculateSize]);
+
+    // Recalculate the size when the buttons change
+    const renderedActions = props.actions.filter((action) => action.enabled(planner, props.actionContext));
+    const noOfActions = renderedActions.length;
+    const prevNoOfActions = usePrevious(renderedActions.length);
+    useEffect(() => {
+        if (prevNoOfActions !== noOfActions) {
+            recalculateSize();
+        }
+    }, [noOfActions, prevNoOfActions, recalculateSize]);
+
+    const { onSizeChange } = props;
+    useEffect(() => {
         if (onSizeChange) {
             onSizeChange(width, height);
         }
@@ -61,7 +76,6 @@ export const ActionButtons = (props: ActionButtonProps) => {
         left: props.x,
         right: props.x - width,
     }[props.pointType || 'center'];
-    const renderedActions = props.actions.filter((action) => action.enabled(planner, props.actionContext));
     const buttonWidth = width / renderedActions.length;
     const transitionFn = {
         fade(buttonIx) {
