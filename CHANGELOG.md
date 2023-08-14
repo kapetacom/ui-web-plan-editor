@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.8.2...v0.9.0) (2023-08-14)
+
+
+### Features
+
+* Enable picking label/icon/button based on planner and action context ([748591e](https://github.com/kapetacom/ui-web-plan-editor/commit/748591e1defdd004c748aafd906c134346ebcd2c))
+
 ## [0.8.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.8.1...v0.8.2) (2023-08-12)
 
 
