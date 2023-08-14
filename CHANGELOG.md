@@ -1,3 +1,10 @@
+# [0.10.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.9.0...v0.10.0) (2023-08-14)
+
+
+### Features
+
+* Recalculate actions position when they change ([53f38bf](https://github.com/kapetacom/ui-web-plan-editor/commit/53f38bfcd27affb46a8eb3bdbb6c5f268c64a5ee))
+
 # [0.9.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.8.2...v0.9.0) (2023-08-14)
 
 
