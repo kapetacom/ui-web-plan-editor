@@ -4,7 +4,6 @@ import {
     Point,
     IResourceTypeProvider,
     ResourceRole,
-    SchemaKind,
     Size,
     IBlockTypeProvider,
 } from '@kapeta/ui-web-types';
@@ -89,9 +88,9 @@ export interface ActionContext {
 }
 export interface PlannerAction<P extends unknown> {
     enabled(planner: PlannerContextData, info: ActionContext): boolean;
-    buttonStyle: ButtonStyle;
-    icon: string;
-    label: string;
+    buttonStyle: ButtonStyle | ((planner: PlannerContextData, info: ActionContext) => ButtonStyle);
+    icon: string | ((planner: PlannerContextData, info: ActionContext) => string);
+    label: string | ((planner: PlannerContextData, info: ActionContext) => string);
     onClick(planner: PlannerContextData, context: ActionContext): void | Promise<void>;
 }
 

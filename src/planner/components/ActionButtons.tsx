@@ -98,12 +98,25 @@ export const ActionButtons = (props: ActionButtonProps) => {
                 {/* inline element to get exact width and height */}
                 <div ref={ref} className="action-buttons-container">
                     {renderedActions.map((action: PlannerAction<any>, ix) => {
+                        const label =
+                            typeof action.label === 'function'
+                                ? action.label(planner, props.actionContext)
+                                : action.label;
+
+                        const icon =
+                            typeof action.icon === 'function' ? action.icon(planner, props.actionContext) : action.icon;
+
+                        const buttonStyle =
+                            typeof action.buttonStyle === 'function'
+                                ? action.buttonStyle(planner, props.actionContext)
+                                : action.buttonStyle;
+
                         return (
                             <CircleButton
                                 key={ix}
-                                label={action.label}
-                                icon={action.icon}
-                                className={action.buttonStyle}
+                                label={label}
+                                icon={icon}
+                                className={buttonStyle}
                                 style={{
                                     pointerEvents: props.show ? 'auto' : 'none',
                                     ...transitionFn(ix),
