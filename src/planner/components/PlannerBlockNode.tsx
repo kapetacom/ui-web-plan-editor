@@ -7,7 +7,7 @@ import { PlannerActionConfig, PlannerContext } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
 import { PlannerBlockResourceList } from './PlannerBlockResourceList';
 import { Point, ResourceRole } from '@kapeta/ui-web-types';
-import { BlockMode } from '../../utils/enums';
+import { BlockMode, PlannerMode } from '../../utils/enums';
 import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
 import {
@@ -64,7 +64,10 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
         [blockContext.blockInstance]
     );
 
-    const errors = useBlockValidation(blockContext);
+    const errors = useBlockValidation(
+        blockContext,
+        planner.mode === PlannerMode.VIEW // Do not validate configuration in view mode
+    );
 
     const isValid = errors.length === 0;
 

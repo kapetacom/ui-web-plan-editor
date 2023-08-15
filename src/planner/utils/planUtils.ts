@@ -1,6 +1,7 @@
 import { PlannerNodeSize } from '../../types';
 import { Asset, ResourceRole, Size } from '@kapeta/ui-web-types';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 export const BLOCK_SIZE = 150;
 
@@ -24,20 +25,21 @@ export const calculateCanvasSize = (
     let minY = 0;
 
     if (blocks && blocks.length > 0) {
-        blocks.forEach((block) => {
-            const dimensions = block.dimensions ?? {
+        blocks.forEach((instance) => {
+            const dimensions = instance.dimensions ?? {
                 left: 0,
                 top: 0,
                 height: 0,
                 width: 0,
             };
 
-            // TODO: Normalize refs
-            const blockKind = blockAssets.find((blockAsset) => blockAsset.ref === block.block.ref);
-            if (!blockKind) {
+            const blockUri = parseKapetaUri(instance.block.ref);
+            const blockDefinition = blockAssets.find((blockAsset) => parseKapetaUri(blockAsset.ref).equals(blockUri));
+            if (!blockDefinition) {
+                console.warn('Could not find block for instance when calculating canvas size', instance);
                 return;
             }
-            const bottom = dimensions.top + getReservedBlockHeight(blockKind.data, size);
+            const bottom = dimensions.top + getReservedBlockHeight(blockDefinition.data, size);
             const right = dimensions.left + dimensions.width + canvasPadding;
             const y = dimensions.top;
             const x = dimensions.left;
