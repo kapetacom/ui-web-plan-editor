@@ -35,12 +35,18 @@ const useUniqueBlockNameValidation = (instance?: BlockInstance | null) => {
     return errors;
 };
 
-export const useBlockValidation = (props: Props) => {
+export const useBlockValidation = (props: Props, ignoreConfiguration: boolean = false) => {
     const errors = useMemo(() => {
         if (!props.blockDefinition || !props.blockInstance) {
             return [];
         }
         const validator = new BlockValidator(props.blockDefinition, props.blockInstance);
+
+        if (ignoreConfiguration) {
+            // This is used for the block editor, where we don't want to validate the configuration
+            return validator.validate();
+        }
+
         return [...validator.validate(), ...validator.validateBlockConfiguration(props.configuration)];
     }, [props.blockDefinition, props.blockInstance, props.configuration]);
 
