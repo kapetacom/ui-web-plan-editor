@@ -1,3 +1,10 @@
+## [0.10.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.10.0...v0.10.1) (2023-08-15)
+
+
+### Bug Fixes
+
+* Disable config validation in "view only" mode ([#60](https://github.com/kapetacom/ui-web-plan-editor/issues/60)) ([41a5841](https://github.com/kapetacom/ui-web-plan-editor/commit/41a58418b405d195b2d31217a873d2833c65338a))
+
 # [0.10.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.9.0...v0.10.0) (2023-08-14)
 
 
