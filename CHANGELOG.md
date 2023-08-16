@@ -1,3 +1,13 @@
+# [1.0.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.10.1...v1.0.0) (2023-08-16)
+
+
+* feat!: Added AssetThumbnail component (#61) ([d2ab9a2](https://github.com/kapetacom/ui-web-plan-editor/commit/d2ab9a20c14c8413a82eb23b77d871cc46425aab)), closes [#61](https://github.com/kapetacom/ui-web-plan-editor/issues/61)
+
+
+### BREAKING CHANGES
+
+* Migrated all "Asset" objects to a simpler "AssetInfo" object
+
 ## [0.10.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.10.0...v0.10.1) (2023-08-15)
 
 
