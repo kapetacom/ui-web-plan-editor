@@ -1,17 +1,10 @@
-import {
-    Asset,
-    ItemType,
-    Point,
-    IResourceTypeProvider,
-    ResourceRole,
-    Size,
-    IBlockTypeProvider,
-} from '@kapeta/ui-web-types';
+import { ItemType, Point, IResourceTypeProvider, ResourceRole, Size, IBlockTypeProvider } from '@kapeta/ui-web-types';
 
 import { BlockDefinition, BlockInstance, Connection, Plan, Resource } from '@kapeta/schemas';
 import { ButtonStyle } from '@kapeta/ui-web-components';
 import { PlannerContextData } from './PlannerContext';
 import { DnDPayload } from './DragAndDrop/types';
+import { AssetInfo } from '../types';
 
 export enum PlannerPayloadType {
     BLOCK = 'block',
@@ -27,9 +20,9 @@ export interface BlockPayload extends DnDPayload<BlockInstance> {
     data: BlockInstance;
 }
 
-export interface BlockDefinitionPayload extends DnDPayload<Asset<BlockDefinition>> {
+export interface BlockDefinitionPayload extends DnDPayload<AssetInfo<BlockDefinition>> {
     type: PlannerPayloadType.BLOCK_DEFINITION;
-    data: Asset<BlockDefinition>;
+    data: AssetInfo<BlockDefinition>;
 }
 
 export interface BlockTypePayload extends DnDPayload<IBlockTypeProvider> {

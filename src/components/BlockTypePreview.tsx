@@ -1,9 +1,8 @@
 import React from 'react';
-import { Asset, IBlockTypeProvider } from '@kapeta/ui-web-types';
+import { IBlockTypeProvider } from '@kapeta/ui-web-types';
 import { BlockDefinition, BlockType, BlockTypeOperator } from '@kapeta/schemas';
 import { Box } from '@mui/material';
 import { BlockShape } from './BlockShape';
-import { PlannerBlockNode } from '../planner/components/PlannerBlockNode';
 
 interface BlockTypeProps {
     width: number;

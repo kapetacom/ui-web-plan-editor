@@ -6,6 +6,7 @@ export * from './components/ResourceShape';
 export * from './components/ResourceTypePreview';
 export * from './components/BlockTypePreview';
 export * from './components/PlanPreview';
+export * from './components/AssetThumbnail';
 
 export * from './logs/LogPanel';
 export * from './utils/SVGDropShadow';

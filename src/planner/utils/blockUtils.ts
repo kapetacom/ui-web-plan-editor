@@ -7,15 +7,16 @@ import {
     isSchemaEntityCompatible,
     Resource,
 } from '@kapeta/schemas';
-import { BlockService, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { Asset, IBlockTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
+import { ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { IBlockTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
 import { randomUUID } from '../../utils/cryptoUtils';
 import { BLOCK_SIZE } from './planUtils';
 import { DSL_LANGUAGE_ID, DSLConverters, DSLWriter } from '@kapeta/ui-web-components';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockInfo } from '../types';
+import { AssetInfo } from '../../types';
 
-export function createBlockInstanceForBlock(blockAsset: Asset<BlockDefinition>): BlockInstance {
+export function createBlockInstanceForBlock(blockAsset: AssetInfo<BlockDefinition>): BlockInstance {
     return {
         block: {
             ref: blockAsset.ref,
@@ -27,7 +28,7 @@ export function createBlockInstanceForBlock(blockAsset: Asset<BlockDefinition>):
             left: 0,
         },
         id: randomUUID(),
-        name: blockAsset.data.metadata.title ?? blockAsset.data.metadata.name,
+        name: blockAsset.content.metadata.title ?? blockAsset.content.metadata.name,
     };
 }
 
