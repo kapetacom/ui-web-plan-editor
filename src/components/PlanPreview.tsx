@@ -2,10 +2,11 @@ import { Box } from '@mui/material';
 import React, { forwardRef, useContext } from 'react';
 
 import { BlockDefinition, Plan } from '@kapeta/schemas';
-import { Asset, Size } from '@kapeta/ui-web-types';
+import { Size } from '@kapeta/ui-web-types';
 import { PlannerMode } from '../utils/enums';
 import { PlannerContext, PlannerContextProps, withPlannerContext } from '../planner/PlannerContext';
 import { Planner } from '../planner/Planner';
+import { AssetInfo } from '../types';
 
 interface InnerProps extends PlannerContextProps {
     width: number;
@@ -65,8 +66,8 @@ const PlanPreviewInner = withPlannerContext<InnerProps>(
 interface Props {
     width: number;
     height: number;
-    asset: Asset<Plan>;
-    blocks: Asset<BlockDefinition>[];
+    asset: AssetInfo<Plan>;
+    blocks: AssetInfo<BlockDefinition>[];
 }
 
 export const PlanPreview = (props: Props) => {
@@ -74,7 +75,7 @@ export const PlanPreview = (props: Props) => {
         <PlanPreviewInner
             width={props.width}
             height={props.height}
-            plan={props.asset.data}
+            plan={props.asset.content}
             asset={props.asset}
             blockAssets={props.blocks}
             mode={PlannerMode.VIEW}

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Asset, IBlockTypeProvider, IResourceTypeProvider, Size } from '@kapeta/ui-web-types';
-import { BlockDefinition, BlockType, BlockTypeOperator } from '@kapeta/schemas';
+import { IResourceTypeProvider, Size } from '@kapeta/ui-web-types';
 import { Box } from '@mui/material';
 import { ResourceShape } from './ResourceShape';
 

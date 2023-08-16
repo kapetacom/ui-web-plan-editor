@@ -292,13 +292,10 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                         planner.removeBlockInstance(editItem.item.instance.id);
                         planner.removeBlockDefinition({
                             ref: editItem.item.instance.block.ref,
-                            data: editItem.item.block,
+                            content: editItem.item.block,
                             version: 'local',
-                            ymlPath: '',
-                            kind: editItem.item.block.kind,
                             exists: false,
-                            path: '',
-                            editable: true,
+                            lastModified: -1,
                         });
                         console.log('removing block definition');
                     }
@@ -354,12 +351,9 @@ const PlannerLoader = (props) => {
                     asset={{
                         ref: 'kapeta/something:local',
                         version: 'local',
-                        ymlPath: '',
-                        editable: true,
-                        path: '',
-                        kind: 'kapeta/block-type',
                         exists: true,
-                        data: plan.value.plan,
+                        content: plan.value.plan,
+                        lastModified: -1,
                     }}
                     blockAssets={plan.value.blockAssets || []}
                     mode={props.plannerMode}

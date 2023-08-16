@@ -45,12 +45,9 @@ export const Plan = () => {
                     asset={{
                         ref: 'kapeta/something:local',
                         version: 'local',
-                        ymlPath: '',
                         editable: true,
-                        path: '',
-                        kind: 'kapeta/block-type',
                         exists: true,
-                        data: plan.value.plan,
+                        content: plan.value.plan,
                     }}
                 />
             ) : (

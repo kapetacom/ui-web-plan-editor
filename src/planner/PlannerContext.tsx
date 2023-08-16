@@ -1,5 +1,5 @@
 import React, { ExoticComponent, RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Asset, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
+import { Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 import {
@@ -13,7 +13,7 @@ import {
     Resource,
 } from '@kapeta/schemas';
 import { cloneDeep } from 'lodash';
-import { PlannerNodeSize } from '../types';
+import { AssetInfo, PlannerNodeSize } from '../types';
 import { PlannerAction, Rectangle } from './types';
 
 import { PlannerMode, BlockMode, ResourceMode } from '../utils/enums';
@@ -36,11 +36,11 @@ export interface PlannerActionConfig {
 
 export interface PlannerContextData {
     plan?: Plan;
-    asset?: Asset<Plan>;
+    asset?: AssetInfo<Plan>;
     uri?: KapetaURI;
-    blockAssets: Asset<BlockDefinition>[];
+    blockAssets: AssetInfo<BlockDefinition>[];
 
-    setBlockAssets(blockAssets: Asset<BlockDefinition>[]): void;
+    setBlockAssets(blockAssets: AssetInfo<BlockDefinition>[]): void;
 
     focusedBlock?: BlockInstance;
 
@@ -90,11 +90,11 @@ export interface PlannerContextData {
 
     updatePlanMetadata(metadata: Metadata, configuration: EntityList): void;
 
-    removeBlockDefinition(update: Asset<BlockDefinition>): void;
+    removeBlockDefinition(update: AssetInfo<BlockDefinition>): void;
 
     updateBlockDefinition(ref: string, update: BlockDefinition): void;
 
-    addBlockDefinition(asset: Asset<BlockDefinition>): void;
+    addBlockDefinition(asset: AssetInfo<BlockDefinition>): void;
 
     hasBlockDefinition(ref: string): boolean;
 
@@ -168,7 +168,7 @@ const defaultValue: PlannerContextData = {
 
     nodeSize: PlannerNodeSize.MEDIUM,
     blockAssets: [],
-    setBlockAssets(blockAssets: Asset<BlockDefinition>[]) {},
+    setBlockAssets(blockAssets: AssetInfo<BlockDefinition>[]) {},
     getBlockByRef(_ref: string) {
         return undefined;
     },
@@ -226,11 +226,11 @@ const defaultValue: PlannerContextData = {
 export const PlannerContext = React.createContext(defaultValue);
 export type PlannerContextProps = {
     plan: Plan;
-    asset: Asset<Plan>;
-    blockAssets: Asset<BlockDefinition>[];
+    asset: AssetInfo<Plan>;
+    blockAssets: AssetInfo<BlockDefinition>[];
     mode: PlannerMode;
     onChange?: (plan: Plan) => void;
-    onAssetChange?: (asset: Asset<SchemaKind>) => void;
+    onAssetChange?: (asset: AssetInfo<SchemaKind>) => void;
     instanceStates?: { [id: string]: InstanceStatus };
 };
 
@@ -338,7 +338,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         });
     };
 
-    const updateBlockAssets = (changer: (prev: Asset<BlockDefinition>[]) => Asset<BlockDefinition>[]) => {
+    const updateBlockAssets = (changer: (prev: AssetInfo<BlockDefinition>[]) => AssetInfo<BlockDefinition>[]) => {
         setBlockAssets((prev) => {
             const newAssets = changer(prev);
             if (props.onAssetChange) {
@@ -424,12 +424,12 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         asset: props.asset,
         uri: uri,
         blockAssets,
-        setBlockAssets(newBlockAssets: Asset<BlockDefinition>[]) {
+        setBlockAssets(newBlockAssets: AssetInfo<BlockDefinition>[]) {
             setBlockAssets(newBlockAssets);
         },
         getBlockByRef(ref: string) {
             const blockAsset = blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(parseKapetaUri(ref)));
-            return blockAsset?.data;
+            return blockAsset?.content;
         },
         getBlockById(blockId: string) {
             const block = plan.spec.blocks?.find((bx) => bx.id === blockId);
@@ -452,7 +452,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             const newUri = parseKapetaUri(ref);
             return blockAssets.some((asset) => newUri.equals(parseKapetaUri(asset.ref)));
         },
-        removeBlockDefinition(asset: Asset<BlockDefinition>) {
+        removeBlockDefinition(asset: AssetInfo<BlockDefinition>) {
             if (!canEditBlocks) {
                 return;
             }
@@ -461,7 +461,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 return state.filter((block) => block.ref !== asset.ref);
             });
         },
-        addBlockDefinition(asset: Asset<BlockDefinition>) {
+        addBlockDefinition(asset: AssetInfo<BlockDefinition>) {
             if (!canEditBlocks) {
                 return;
             }
@@ -529,18 +529,19 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 }
 
                 const block = (newAssets[blockIx] = cloneDeep(newAssets[blockIx]));
-                if (!block.data.spec.providers) {
-                    block.data.spec.providers = [];
+                if (!block.content.spec.providers) {
+                    block.content.spec.providers = [];
                 }
 
-                if (!block.data.spec.consumers) {
-                    block.data.spec.consumers = [];
+                if (!block.content.spec.consumers) {
+                    block.content.spec.consumers = [];
                 }
 
-                const list = role === ResourceRole.PROVIDES ? block.data.spec.providers : block.data.spec.consumers;
+                const list =
+                    role === ResourceRole.PROVIDES ? block.content.spec.providers : block.content.spec.consumers;
                 list.push(resource);
 
-                callbackHandlers.onResourceAdded.forEach((cb) => cb(blockRef, block.data, resource));
+                callbackHandlers.onResourceAdded.forEach((cb) => cb(blockRef, block.content, resource));
 
                 return newAssets;
             });
@@ -563,7 +564,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 const block = (newAssets[blockIx] = cloneDeep(newAssets[blockIx]));
 
                 const resources: Resource[] =
-                    role === ResourceRole.PROVIDES ? block.data.spec.providers ?? [] : block.data.spec.consumers ?? [];
+                    role === ResourceRole.PROVIDES
+                        ? block.content.spec.providers ?? []
+                        : block.content.spec.consumers ?? [];
 
                 const existingResourceIx = resources.findIndex((r: Resource) => r.metadata.name === resourceName);
                 if (existingResourceIx === -1) {
@@ -607,9 +610,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
                 resources[existingResourceIx] = resource;
                 if (role === ResourceRole.PROVIDES) {
-                    block.data.spec.providers = resources;
+                    block.content.spec.providers = resources;
                 } else {
-                    block.data.spec.consumers = resources;
+                    block.content.spec.consumers = resources;
                 }
 
                 return newAssets;
@@ -636,7 +639,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
                 const block = cloneDeep(newAssets[blockIx]);
                 const list =
-                    resourceRole === ResourceRole.PROVIDES ? block.data.spec.providers : block.data.spec.consumers;
+                    resourceRole === ResourceRole.PROVIDES
+                        ? block.content.spec.providers
+                        : block.content.spec.consumers;
                 const resourceIx = list?.findIndex((resource) => resource.metadata.name === resourceName) ?? -1;
                 if (resourceIx === -1) {
                     throw new Error(`Resource ${resourceName} not found in block #${blockRef}`);
