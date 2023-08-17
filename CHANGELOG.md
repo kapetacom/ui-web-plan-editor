@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.0.0...v1.0.1) (2023-08-17)
+
+
+### Bug Fixes
+
+* restore updateBlockDefinition in planner ([#62](https://github.com/kapetacom/ui-web-plan-editor/issues/62)) ([3a7ffa4](https://github.com/kapetacom/ui-web-plan-editor/commit/3a7ffa49d8151d90572330d7ceab76e906583c82))
+
 # [1.0.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v0.10.1...v1.0.0) (2023-08-16)
 
 
