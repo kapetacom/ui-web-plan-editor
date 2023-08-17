@@ -443,7 +443,11 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             updateBlockAssets((state) =>
                 state.map((block) =>
                     parseKapetaUri(block.ref).equals(uri)
-                        ? { ...block, ref: `kapeta://${update.metadata.name}:local`, content: update }
+                        ? ({
+                              ...block,
+                              ref: `kapeta://${update.metadata.name}:local`,
+                              content: update,
+                          } satisfies AssetInfo<BlockDefinition>)
                         : block
                 )
             );
