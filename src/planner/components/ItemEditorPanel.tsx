@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 import {
     AssetNameInput,
     Button,
@@ -26,7 +26,7 @@ import { useAsync } from 'react-use';
 import { EditItemInfo } from '../types';
 import { cloneDeep } from 'lodash';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
-import { BlockDefinition, Connection, Entity, Resource } from '@kapeta/schemas';
+import { Connection, Entity, Resource } from '@kapeta/schemas';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {
@@ -237,9 +237,9 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
                 return cloneDeep(props.editableItem.item.block);
             case ItemType.RESOURCE:
                 return cloneDeep(props.editableItem.item.resource);
+            default:
+                return {};
         }
-
-        return {};
     }, [props.editableItem]);
 
     const panelHeader = () => {
@@ -249,12 +249,33 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
         return `Edit ${props.editableItem.type}`;
     };
 
+    const existingNames = useMemo(() => {
+        if (props.editableItem && props.editableItem.type === ItemType.RESOURCE) {
+            const propResource = props.editableItem.item.resource;
+            const resources =
+                ResourceTypeProvider.get(propResource.kind).role === ResourceRole.PROVIDES
+                    ? props.editableItem.item.block.spec.providers
+                    : props.editableItem.item.block.spec.consumers;
+            // Remove one instance of current name, not all in order to allow correcting existing duplicate entries
+            const index = resources?.findIndex((resource) => resource.metadata.name === propResource.metadata.name);
+            return resources?.filter((_x, i) => i !== index).map((resource) => resource.metadata.name) || [];
+        }
+        return [];
+    }, [props.editableItem]);
+
     return (
         <SidePanel title={panelHeader()} size={PanelSize.large} open={!!props.open} onClose={props.onClose}>
             {initialValue && props.editableItem && (
                 <div className="item-editor-panel">
                     <FormContainer
                         // Do we need editableItem state?
+                        validators={[
+                            (name, value) => {
+                                if (name === 'metadata.name' && existingNames.includes(value)) {
+                                    throw new Error('Resource name already exists');
+                                }
+                            },
+                        ]}
                         initialValue={initialValue}
                         onSubmitData={(data) => saveAndClose(data as SchemaKind)}
                     >

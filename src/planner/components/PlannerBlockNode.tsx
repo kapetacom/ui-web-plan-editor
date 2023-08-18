@@ -29,6 +29,7 @@ import { BlockLayout } from '@kapeta/ui-web-components';
 
 import './PlannerBlockNode.less';
 import { withErrorBoundary } from 'react-error-boundary';
+import { Resource } from '@kapeta/schemas';
 
 interface Props {
     size: PlannerNodeSize;
@@ -162,19 +163,33 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                     const port = config.definition.spec.ports[0];
 
                                     const ref = `${config.kind}:${config.version}`;
+
+                                    const existingResources =
+                                        config.role === ResourceRole.CONSUMES
+                                            ? blockContext.consumers
+                                            : blockContext.providers;
                                     // default the name to resource type name w/o special chars, e.g.
                                     // resource-type-mongodb => mongodb
-                                    const name = config.kind
+                                    const baseName = config.kind
                                         .split('/')[1]
                                         .toLowerCase()
                                         .replace('resource-type', '')
                                         .replace(/[^a-z]/g, '');
+
+                                    let resourceName = baseName;
+                                    let counter = 1;
+                                    const filter = (r: Resource) => r.metadata.name === resourceName;
+                                    while (existingResources.some(filter)) {
+                                        resourceName = `${baseName}_${counter}`;
+                                        counter++;
+                                    }
+
                                     planner.addResource(
                                         blockContext.blockReference?.id,
                                         {
                                             kind: ref,
                                             metadata: {
-                                                name,
+                                                name: resourceName,
                                             },
                                             spec: {
                                                 port,
