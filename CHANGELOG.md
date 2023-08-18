@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.0.1...v1.1.0) (2023-08-18)
+
+
+### Bug Fixes
+
+* auto increment initial resource names on dnd [KAP-712] ([6045c6e](https://github.com/kapetacom/ui-web-plan-editor/commit/6045c6e81831ad22c5a0df3d62905a84c940dcc3))
+
+
+### Features
+
+* validate resource names for duplication [KAP-712] ([bee7317](https://github.com/kapetacom/ui-web-plan-editor/commit/bee7317d88e72e7c0afb7dd3d22712bfc0a4dbb8))
+
 ## [1.0.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.0.0...v1.0.1) (2023-08-17)
 
 
