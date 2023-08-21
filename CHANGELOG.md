@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.1.0...v1.2.0) (2023-08-21)
+
+
+### Features
+
+* Adjust to new MUI based form elements ([#64](https://github.com/kapetacom/ui-web-plan-editor/issues/64)) ([8fdf675](https://github.com/kapetacom/ui-web-plan-editor/commit/8fdf675e72b640dc22befe44883471d4cdd98a29))
+
 # [1.1.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.0.1...v1.1.0) (2023-08-18)
 
 
