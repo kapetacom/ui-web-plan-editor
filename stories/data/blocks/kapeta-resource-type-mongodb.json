@@ -5,6 +5,10 @@
         "title": "MongoDB"
     },
     "spec": {
-        "ports": [{ "type": "mongodb" }]
+        "ports": [{ "type": "mongodb" }],
+        "icon": {
+            "type": "url",
+            "value": "https://smyl.es/wurdp/assets/mongodb-150x150.png"
+        }
     }
 }

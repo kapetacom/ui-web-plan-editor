@@ -19,6 +19,7 @@ interface PlannerResourceProps {
     name: string;
     readOnly?: boolean;
     actionContext: ActionContext;
+    icon?: React.ReactNode;
 }
 
 export const BlockResource = (props: PlannerResourceProps) => {
@@ -65,14 +66,19 @@ export const BlockResource = (props: PlannerResourceProps) => {
                 </plannerRenderer.Outlet>
             </foreignObject>
 
-            <BlockResourceIcon
-                x={iconX}
-                y={height / 2 - 10}
-                // TODO: Icons for providers should be implemented (use asset icon component)
-                typeIcon={props.type as 'internal' | 'operator'}
-                actionIcon={props.typeStatusIcon || 'arrow'}
-                color={props.typeStatusColor}
-            />
+            {props.icon ? (
+                <foreignObject x={iconX} y={height / 2 - 10} width={20} height={20}>
+                    {props.icon}
+                </foreignObject>
+            ) : (
+                <BlockResourceIcon
+                    x={iconX}
+                    y={height / 2 - 10}
+                    typeIcon={props.type as 'internal' | 'operator'}
+                    actionIcon={props.typeStatusIcon || 'arrow'}
+                    color={props.typeStatusColor}
+                />
+            )}
         </g>
     );
 };

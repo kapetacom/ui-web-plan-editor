@@ -20,6 +20,7 @@ import { Resource } from '@kapeta/schemas';
 import { createConnection } from '../utils/connectionUtils';
 import { PlannerMode, ResourceMode } from '../../utils/enums';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { AssetKindIcon } from '@kapeta/ui-web-components';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const COUNTER_SIZE = 8;
@@ -59,7 +60,7 @@ const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 })
     return baseOffset + (expansionWidth + buttonWidth) * expansionSign;
 };
 
-const TempResource = ({ resource, nodeSize, x, y, actionContext }) => {
+const TempResource = ({ resource, nodeSize, x, y, actionContext, icon }) => {
     const height = RESOURCE_HEIGHTS[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     // const mouseCatcherWidth = 210;
@@ -93,6 +94,7 @@ const TempResource = ({ resource, nodeSize, x, y, actionContext }) => {
                         typeStatusColor="success"
                         typeName={resource.typeName}
                         actionContext={actionContext}
+                        icon={icon}
                     />
                 </svg>
             </g>
@@ -136,6 +138,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const type = resourceConfig?.type?.toString().toLowerCase() ?? ResourceProviderType.INTERNAL.toLowerCase();
     const title = resourceConfig?.title || resourceConfig?.kind;
     const typeName = title?.toString().toLowerCase() ?? 'unknown';
+    const resourceIcon = resourceConfig ? <AssetKindIcon asset={resourceConfig.definition} size={20} /> : '';
 
     const counterValue = resourceConfig?.getCounterValue ? resourceConfig!.getCounterValue(props.resource) : 0;
     const valid = errors.length === 0 && true; // TODO props.resource.isValid();
@@ -403,6 +406,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                                 typeStatusColor={valid ? 'success' : 'error'}
                                                 typeName={typeName}
                                                 actionContext={actionContext}
+                                                icon={resourceIcon}
                                             />
                                         </svg>
 
@@ -444,6 +448,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                             name: props.resource.metadata.name,
                                         }}
                                         actionContext={actionContext}
+                                        icon={resourceIcon}
                                     />
                                 ) : null}
                             </>
