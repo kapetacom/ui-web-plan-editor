@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.2.0...v1.2.1) (2023-08-21)
+
+
+### Bug Fixes
+
+* Export planner sidebar ([a631d60](https://github.com/kapetacom/ui-web-plan-editor/commit/a631d60530e05aec5319d033d71308494395e3e3))
+
 # [1.2.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.1.0...v1.2.0) (2023-08-21)
 
 
