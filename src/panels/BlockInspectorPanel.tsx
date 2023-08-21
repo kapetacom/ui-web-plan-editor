@@ -1,11 +1,12 @@
 import React, { useContext, useMemo } from 'react';
-import { PanelSize, SidePanel, TabContainer, TabPage } from '@kapeta/ui-web-components';
+import { TabContainer, TabPage } from '@kapeta/ui-web-components';
 
 import './BlockInspectorPanel.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
 import { PlannerContext } from '../planner/PlannerContext';
 import { useBlockValidationIssues } from '../planner/hooks/block-validation';
+import { PlannerSidebar } from '../planner/components/PlannerSidebar';
 
 interface BlockInspectorPanelProps {
     instance?: BlockInstance;
@@ -37,7 +38,7 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
     }, [props.instance]);
 
     return (
-        <SidePanel title={title} size={PanelSize.large} open={props.open} onClose={props.onClosed}>
+        <PlannerSidebar title={title} open={props.open} onClose={props.onClosed}>
             {props.instance && (
                 <div className="item-inspector-panel">
                     <TabContainer>
@@ -75,6 +76,6 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
                     </TabContainer>
                 </div>
             )}
-        </SidePanel>
+        </PlannerSidebar>
     );
 };

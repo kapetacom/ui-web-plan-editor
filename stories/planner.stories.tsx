@@ -1,119 +1,34 @@
 import React, { ForwardedRef, forwardRef, useContext } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 
-import { BlockLayout, ButtonStyle, DefaultContext, DialogControl } from '@kapeta/ui-web-components';
+import { ButtonStyle, DefaultContext } from '@kapeta/ui-web-components';
 
 import { Planner } from '../src/planner/Planner';
 
 import { readPlanV2 } from './data/planReader';
-import {
-    PlannerActionConfig,
-    PlannerContext,
-    PlannerContextData,
-    withPlannerContext,
-} from '../src/planner/PlannerContext';
+import { PlannerActionConfig, PlannerContext, withPlannerContext } from '../src/planner/PlannerContext';
 import { useAsync } from 'react-use';
-import { Asset, IResourceTypeProvider, ItemType, Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
+import { ItemType, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from '../src/planner/components/ItemEditorPanel';
-import { BlockNode, EditItemInfo, PlannerMode } from '../src';
-import { BlockTypeProvider, IdentityService, InstanceStatus } from '@kapeta/ui-web-context';
-import { BLOCK_SIZE } from '../src/planner/utils/planUtils';
+import { EditItemInfo, PlannerMode } from '../src';
+import { InstanceStatus } from '@kapeta/ui-web-context';
+
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 import { PlannerOutlet, plannerRenderer } from '../src/planner/renderers/plannerRenderer';
 import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
-import { BlockResource } from '../src/planner/components/BlockResource';
 import { PlannerResourceDrawer } from '../src/panels/PlannerResourceDrawer';
 
 import './styles.less';
-
-interface DraggableResourceItem {
-    type: ItemType.RESOURCE;
-    data: DraggableResourceProps;
-}
-
-interface DraggableBlockItem {
-    type: ItemType.BLOCK;
-    data: DraggableBlockProps;
-}
-
-type DraggableItem = DraggableResourceItem | DraggableBlockItem;
-
-interface DraggableBlockProps {
-    name: string;
-    block: Asset<BlockDefinition>;
-    planner: PlannerContextData;
-}
-
-const DraggableBlock = (props: DraggableBlockProps & { point: Point }) => {
-    const center = BLOCK_SIZE / 2;
-    const blockType = BlockTypeProvider.get(props.block.data!.kind);
-    const Shape = blockType.shapeComponent || BlockNode;
-
-    const instance = {
-        id: 'temp-block',
-        name: props.name,
-        block: { ref: props.block.ref },
-        dimensions: { height: 0, width: 0, top: 0, left: 0 },
-    };
-    return (
-        <svg
-            className="plan-item-dragged block"
-            style={{
-                left: props.point.x - center,
-                top: props.point.y - center,
-                width: BLOCK_SIZE,
-                height: BLOCK_SIZE,
-                transformOrigin: `center`,
-                transform: `scale(${props.planner.zoom})`,
-            }}
-        >
-            <BlockLayout definition={props.block.data} instance={instance}>
-                <Shape block={props.block.data} instance={instance} height={BLOCK_SIZE} width={BLOCK_SIZE} />
-            </BlockLayout>
-        </svg>
-    );
-};
-
-interface DraggableResourceProps {
-    name: string;
-    resourceConfig: IResourceTypeProvider;
-    planner: PlannerContextData;
-}
-
-const DraggableResource = (props: DraggableResourceProps & { point: Point }) => {
-    const width = 120;
-    const height = 40;
-    return (
-        <svg
-            className="plan-item-dragged resource"
-            style={{
-                left: props.point.x - width / 2,
-                top: props.point.y - height / 2,
-                width,
-                height,
-                transformOrigin: `center`,
-                transform: `scale(${props.planner.zoom})`,
-            }}
-        >
-            <BlockResource
-                role={props.resourceConfig.role}
-                size={props.planner.nodeSize}
-                name={props.name}
-                type={props.resourceConfig.type}
-                typeName={props.name}
-                typeStatusIcon="plus"
-                actionContext={{}}
-            />
-        </svg>
-    );
-};
+import { useConfirmDelete } from '@kapeta/ui-web-components';
 
 const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const planner = useContext(PlannerContext);
     const [editItem, setEditItem] = React.useState<EditItemInfo | undefined>();
     const [inspectItem, setInspectItem] = React.useState<BlockInstance | null>(null);
     const [configureItem, setConfigureItem] = React.useState<SchemaKind<any, any> | null>(null);
+
+    const confirmDelete = useConfirmDelete();
 
     const actionConfig: PlannerActionConfig = {
         block: [
@@ -136,16 +51,14 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                         parseKapetaUri(blockInstance.block.ref).version === 'local'
                     );
                 },
-                onClick(context, { blockInstance }) {
-                    DialogControl.delete(
+                async onClick(context, { blockInstance }) {
+                    const ok = await confirmDelete(
                         `Delete Block Instance`,
-                        `Are you sure you want to delete ${blockInstance?.name || 'this block'}?`,
-                        (confirm) => {
-                            if (confirm) {
-                                planner.removeBlockInstance(blockInstance!.id);
-                            }
-                        }
+                        `Are you sure you want to delete ${blockInstance?.name || 'this block'}?`
                     );
+                    if (ok) {
+                        planner.removeBlockInstance(blockInstance!.id);
+                    }
                 },
                 buttonStyle: ButtonStyle.DANGER,
                 icon: 'fa fa-trash',
@@ -214,20 +127,14 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                         parseKapetaUri(blockInstance.block.ref).version === 'local'
                     );
                 },
-                onClick(context, { blockInstance, resource, resourceRole }) {
-                    DialogControl.delete(
+                async onClick(context, { blockInstance, resource, resourceRole }) {
+                    const ok = await confirmDelete(
                         `Delete Resource`,
-                        `Are you sure you want to delete ${resource?.metadata.name || 'this resource'}?`,
-                        (confirm) => {
-                            if (confirm) {
-                                context.removeResource(
-                                    blockInstance!.block.ref,
-                                    resource!.metadata.name,
-                                    resourceRole!
-                                );
-                            }
-                        }
+                        `Are you sure you want to delete ${resource?.metadata.name || 'this resource'}?`
                     );
+                    if (ok) {
+                        context.removeResource(blockInstance!.block.ref, resource!.metadata.name, resourceRole!);
+                    }
                 },
                 buttonStyle: ButtonStyle.DANGER,
                 icon: 'fa fa-trash',
@@ -239,7 +146,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 enabled(context): boolean {
                     return planner.mode === PlannerMode.EDIT;
                 },
-                onClick(context, { connection }) {
+                async onClick(context, { connection }) {
                     const provider = planner.getResourceByBlockIdAndName(
                         connection!.provider.blockId,
                         connection!.provider.resourceName,
@@ -251,15 +158,14 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                         ResourceRole.CONSUMES
                     );
 
-                    DialogControl.delete(
+                    const ok = await confirmDelete(
                         `Delete Connection?`,
-                        `from ${provider?.metadata.name} to ${consumer?.metadata.name}?`,
-                        (confirm) => {
-                            if (confirm) {
-                                planner.removeConnection(connection!);
-                            }
-                        }
+                        `from ${provider?.metadata.name} to ${consumer?.metadata.name}?`
                     );
+
+                    if (ok) {
+                        planner.removeConnection(connection!);
+                    }
                 },
                 buttonStyle: ButtonStyle.DANGER,
                 icon: 'fa fa-trash',
