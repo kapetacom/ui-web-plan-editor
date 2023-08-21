@@ -6,7 +6,7 @@ import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
 import { PlannerContext } from '../planner/PlannerContext';
 import { useBlockValidationIssues } from '../planner/hooks/block-validation';
-import { PlannerSidebar } from '../planner/components/PlannerSidebar';
+import { PlannerSidebar } from './PlannerSidebar';
 
 interface BlockInspectorPanelProps {
     instance?: BlockInstance;

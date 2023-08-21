@@ -22,8 +22,9 @@ import { EditItemInfo } from '../types';
 import { cloneDeep } from 'lodash';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { Connection, Entity, Resource } from '@kapeta/schemas';
-import { PlannerSidebar } from './PlannerSidebar';
+
 import { Button } from '@mui/material';
+import { PlannerSidebar } from '../../panels/PlannerSidebar';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {

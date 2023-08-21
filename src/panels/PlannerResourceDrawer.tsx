@@ -4,7 +4,6 @@ import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context'
 import { IResourceTypeProvider, ItemType, ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceToolList } from './tools/ResourceToolList';
 import { BlockTypeToolList } from './tools/BlockTypeToolList';
-import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 
 const HEADER_SIZE = '14px';
 
