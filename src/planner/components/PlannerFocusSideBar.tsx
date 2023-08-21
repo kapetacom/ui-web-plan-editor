@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { SidePanel, PanelAlignment, PanelSize, SidePanelHeader } from '@kapeta/ui-web-components';
-
 import { BlockTree } from './BlockTree';
 
 import './PlannerFocusSideBar.less';
 import { BlockInstance } from '@kapeta/schemas';
+import { Drawer, Icon, Stack, Typography } from '@mui/material';
+import { ChevronLeft } from '@mui/icons-material';
 
 interface Props {
     block?: BlockInstance;
@@ -16,27 +16,38 @@ interface Props {
 
 export const PlannerFocusSideBar = (props: Props) => {
     return (
-        <SidePanel
-            title="Blocks in view"
-            closable={false}
+        <Drawer
+            anchor={'right'}
             className="focus-side-panel-2"
+            sx={{
+                pointerEvents: 'none',
+                '& .MuiDrawer-paper': {
+                    pointerEvents: 'all',
+                    bgcolor: '#1E1E1E',
+                    width: '160px',
+                    p: 4,
+                    color: '#F5F1EE',
+                },
+            }}
+            hideBackdrop={true}
+            variant={'temporary'}
             open={!!props.block}
-            side={PanelAlignment.right}
-            size={PanelSize.small}
             onClose={props.onClose}
-            header={
-                <SidePanelHeader
-                    title="Blocks in use"
-                    onIconPress={props.blurFocus}
-                    icon={
-                        <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
-                            <path d="M6.05054 11L0.999978 5.94974" stroke="#F5F1EE" strokeLinecap="round" />
-                            <path d="M1 5.94971L6.05025 0.999976" stroke="#F5F1EE" strokeLinecap="round" />
-                        </svg>
-                    }
-                />
-            }
         >
+            <Stack direction={'row'}>
+                <Icon
+                    sx={{
+                        fontSize: '22px',
+                        cursor: 'pointer',
+                    }}
+                    onClick={props.blurFocus}
+                >
+                    <ChevronLeft />
+                </Icon>
+                <Typography fontSize={'22px'} variant={'h3'}>
+                    Blocks in use
+                </Typography>
+            </Stack>
             {props.block && (
                 <BlockTree
                     onBlockClicked={(block) => {
@@ -45,6 +56,6 @@ export const PlannerFocusSideBar = (props: Props) => {
                     block={props.block}
                 />
             )}
-        </SidePanel>
+        </Drawer>
     );
 };

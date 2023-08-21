@@ -48,6 +48,7 @@ export const PlannerCanvas: React.FC<Props> = (props) => {
     const classNames = toClass({
         'read-only': planner.mode === PlannerMode.VIEW,
         dragging: isDragging,
+        focused: !!planner.focusedBlock,
     });
 
     const { value: boundingBox, onRef } = useBoundingBox();

@@ -1,15 +1,10 @@
 import React, { useContext, useMemo } from 'react';
 import {
     AssetNameInput,
-    Button,
-    ButtonStyle,
-    ButtonType,
     FormButtons,
     FormContainer,
     FormField,
     FormFieldType,
-    PanelSize,
-    SidePanel,
     SimpleLoader,
 } from '@kapeta/ui-web-components';
 
@@ -27,6 +22,8 @@ import { EditItemInfo } from '../types';
 import { cloneDeep } from 'lodash';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { Connection, Entity, Resource } from '@kapeta/schemas';
+import { PlannerSidebar } from './PlannerSidebar';
+import { Button } from '@mui/material';
 
 // Higher-order-component to allow us to use hooks for data loading (not possible in class components)
 const withNamespaces = (ChildComponent) => {
@@ -264,7 +261,7 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
     }, [props.editableItem]);
 
     return (
-        <SidePanel title={panelHeader()} size={PanelSize.large} open={!!props.open} onClose={props.onClose}>
+        <PlannerSidebar title={panelHeader()} anchor={'right'} open={!!props.open} onClose={props.onClose}>
             {initialValue && props.editableItem && (
                 <div className="item-editor-panel">
                     <FormContainer
@@ -281,19 +278,17 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
                     >
                         <div className="item-form">{renderEditableItemForm(planner, props.editableItem)}</div>
                         <FormButtons>
-                            <Button
-                                width={70}
-                                type={ButtonType.BUTTON}
-                                style={ButtonStyle.DANGER}
-                                onClick={onPanelCancel}
-                                text="Cancel"
-                            />
-                            <Button width={70} type={ButtonType.SUBMIT} style={ButtonStyle.PRIMARY} text="Save" />
+                            <Button variant={'contained'} color={'error'} onClick={onPanelCancel}>
+                                Cancel
+                            </Button>
+                            <Button variant={'contained'} type={'submit'} color={'primary'}>
+                                Save
+                            </Button>
                         </FormButtons>
                     </FormContainer>
                 </div>
             )}
             {!props.editableItem && <div>No item selected</div>}
-        </SidePanel>
+        </PlannerSidebar>
     );
 };
