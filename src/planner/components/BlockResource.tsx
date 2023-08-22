@@ -31,9 +31,8 @@ export const BlockResource = (props: PlannerResourceProps) => {
     const iconX = consumer ? 12 : 120;
 
     const height = 48;
-    const width = 190;
+    const width = 150;
 
-    // TODO: Fix hexagon path, the path does not have the specified dimensions (width, height)
     const hexagonPath = createHexagonPath(width, height, 2, Orientation.HORIZONTAL, 7);
 
     const resourceClass = toClass({
@@ -43,14 +42,14 @@ export const BlockResource = (props: PlannerResourceProps) => {
         small: isSmall,
     });
 
-    const maxTextWidth = width - 95;
+    const maxTextWidth = width - 70;
 
     const padding = 8;
 
     return (
         <g className={resourceClass}>
             {props.type === 'operator' ? (
-                <rect className="block-resource-body" width={width - 10} height={height} rx="3" ry="3" x="3" />
+                <rect className="block-resource-body" width={width} height={height} rx="3" ry="3" x="3" />
             ) : (
                 <path className="block-resource-body" d={hexagonPath} strokeLinejoin="round" rx="3" ry="3" />
             )}
