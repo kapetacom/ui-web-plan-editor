@@ -33,7 +33,7 @@
         "@kapeta/ui-web-components": "<2",
         "@kapeta/ui-web-context": "<2",
         "@kapeta/ui-web-types": "<2",
-        "@kapeta/ui-web-utils": "<2",
+        "@kapeta/ui-web-utils": ">=0.0.29 <2",
         "@mui/icons-material": "^5",
         "@mui/material": "^5",
         "guid-typescript": "*",
