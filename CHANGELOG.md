@@ -1,3 +1,18 @@
+# [1.3.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.2.1...v1.3.0) (2023-08-22)
+
+
+### Bug Fixes
+
+* cleaner actionButton opacity handling ([7d81f54](https://github.com/kapetacom/ui-web-plan-editor/commit/7d81f549cba5dd3f92000f2184b0d709a00f9b3d))
+* make operators square rel design [KAP-951] ([a6f42b5](https://github.com/kapetacom/ui-web-plan-editor/commit/a6f42b530b45d4beea7275863e69e0144f229651))
+* tweak resource dimensions ([bd0d3d3](https://github.com/kapetacom/ui-web-plan-editor/commit/bd0d3d3b76e6573816a8cd252e4632bde83bd435))
+* use red/green resource counter instead of orange ([42658e6](https://github.com/kapetacom/ui-web-plan-editor/commit/42658e6326973ce2daa4ef5d0b44e5c5895f3679))
+
+
+### Features
+
+* support assetKindIcons on resources ([e24a515](https://github.com/kapetacom/ui-web-plan-editor/commit/e24a51530f7f3d86059271e5e97b345e7d634aaf))
+
 ## [1.2.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.2.0...v1.2.1) (2023-08-21)
 
 
