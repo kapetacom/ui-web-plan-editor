@@ -3,6 +3,9 @@
 
 @action-transition: transform 300ms;
 @action-delay: 200ms;
+@kapeta-green: #2e7d32;
+@kapeta-red: #d32f2f;
+@kapeta-purple: #651fff;
 
 .planner-block-resource-list-item {
     .resource-mask,
@@ -47,7 +50,7 @@
         fill: none;
 
         .background {
-            fill: @bw-orange;
+            fill: @kapeta-green;
             stroke: @bw-planner-background;
             stroke-width: 2;
         }
@@ -91,7 +94,7 @@
 
         &.highlight {
             .block-resource-body {
-                fill: @bw-orange-light;
+                stroke: @kapeta-purple;
             }
 
             &.operator {
@@ -111,6 +114,11 @@
             .block-resource-body {
                 fill: #fbeaea;
                 stroke: #d32f2f80;
+            }
+            .resource-counter {
+                .background {
+                    fill: @kapeta-red;
+                }
             }
         }
     }
