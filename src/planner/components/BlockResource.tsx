@@ -19,6 +19,7 @@ interface PlannerResourceProps {
     name: string;
     readOnly?: boolean;
     actionContext: ActionContext;
+    icon?: React.ReactNode;
 }
 
 export const BlockResource = (props: PlannerResourceProps) => {
@@ -26,12 +27,13 @@ export const BlockResource = (props: PlannerResourceProps) => {
     const isSmall = nodeSize === PlannerNodeSize.SMALL;
     const consumer = props.role === ResourceRole.CONSUMES;
 
-    const textX = consumer ? 40 : 20;
-    const iconX = consumer ? 10 : 110;
+    const textX = consumer ? 40 : 35;
+    const iconX = consumer ? 12 : 120;
 
     const height = 48;
     const width = 190;
 
+    // TODO: Fix hexagon path, the path does not have the specified dimensions (width, height)
     const hexagonPath = createHexagonPath(width, height, 2, Orientation.HORIZONTAL, 7);
 
     const resourceClass = toClass({
@@ -47,7 +49,11 @@ export const BlockResource = (props: PlannerResourceProps) => {
 
     return (
         <g className={resourceClass}>
-            <path className="block-resource-body" d={hexagonPath} />
+            {props.type === 'operator' ? (
+                <rect className="block-resource-body" width={width - 10} height={height} rx="3" ry="3" x="3" />
+            ) : (
+                <path className="block-resource-body" d={hexagonPath} strokeLinejoin="round" rx="3" ry="3" />
+            )}
             <foreignObject width={maxTextWidth} className="block-resource-text resource-name" y={padding} x={textX}>
                 <plannerRenderer.Outlet id={PlannerOutlet.ResourceTitle} context={props.actionContext}>
                     <span>{props.name}</span>
@@ -60,13 +66,19 @@ export const BlockResource = (props: PlannerResourceProps) => {
                 </plannerRenderer.Outlet>
             </foreignObject>
 
-            <BlockResourceIcon
-                x={iconX}
-                y={height / 2 - 10}
-                typeIcon={props.type as 'internal' | 'operator'}
-                actionIcon={props.typeStatusIcon || 'arrow'}
-                color={props.typeStatusColor}
-            />
+            {props.icon ? (
+                <foreignObject x={iconX} y={height / 2 - 10} width={20} height={20}>
+                    {props.icon}
+                </foreignObject>
+            ) : (
+                <BlockResourceIcon
+                    x={iconX}
+                    y={height / 2 - 10}
+                    typeIcon={props.type as 'internal' | 'operator'}
+                    actionIcon={props.typeStatusIcon || 'arrow'}
+                    color={props.typeStatusColor}
+                />
+            )}
         </g>
     );
 };

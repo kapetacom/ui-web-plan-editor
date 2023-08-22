@@ -25,10 +25,18 @@
     height: @icon-size;
     cursor: pointer;
 
-    .container {
-        color: @kapeta-text-primary;
+    // White background to help w/ opacity
+    .bg-container {
+        background: @kapeta-block-bg;
         .transition();
         border-radius: (@icon-size / 2);
+    }
+
+    .container {
+        border-radius: (@icon-size / 2);
+        .transition();
+
+        color: @kapeta-text-primary;
         width: @icon-size;
         height: @icon-size;
         line-height: @icon-size;
