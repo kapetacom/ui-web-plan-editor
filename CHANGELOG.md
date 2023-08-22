@@ -1,3 +1,12 @@
+## [1.3.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.3.0...v1.3.1) (2023-08-22)
+
+
+### Bug Fixes
+
+* bump web-utils w/ hexagon fix ([158e7a5](https://github.com/kapetacom/ui-web-plan-editor/commit/158e7a57a37c8d24c90ff2dba4e0756a4ad1a486))
+* fix resource text width ([3add8c8](https://github.com/kapetacom/ui-web-plan-editor/commit/3add8c88424c12c9701ad9d70761163fd80784e8))
+* proper cropping of drag resources ([2e07086](https://github.com/kapetacom/ui-web-plan-editor/commit/2e07086a5c423406dbc9361fbfa2eaa5f069fff7))
+
 # [1.3.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.2.1...v1.3.0) (2023-08-22)
 
 
