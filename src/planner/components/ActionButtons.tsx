@@ -13,8 +13,11 @@ const CircleButton = (props) => {
             style={{ padding: 0, border: 0, background: 'none', ...(props.style || {}) }}
             title={props.label}
         >
-            <div className="container">
-                <i className={props.icon} />
+            {/* White opaque background to avoid opacity in colors looking weird on top of connections */}
+            <div className="bg-container">
+                <div className="container">
+                    <i className={props.icon} />
+                </div>
             </div>
         </button>
     );
