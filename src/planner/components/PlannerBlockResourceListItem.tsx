@@ -40,12 +40,12 @@ interface PlannerBlockResourceListItemProps {
 
 const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) => {
     const top = 0;
-    let width = 250;
+    let width = 150;
     let left = 0;
 
     const iconWidth = 0;
     if (role === ResourceRole.CONSUMES) {
-        width = expanded ? 134 : 9.5 + iconWidth;
+        width = expanded ? 140 : 9.5 + iconWidth;
     } else {
         left = expanded ? 12 + iconWidth : 112;
     }
