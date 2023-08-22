@@ -223,7 +223,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name, props.role);
 
     const extension = isExpanded ? 90 : 0;
-    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -30 - extension : 55 + extension);
+    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -30 - extension : 45 + extension);
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const height = RESOURCE_HEIGHTS[nodeSize];
@@ -233,7 +233,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const counterVisible = counterValue > 0 && buttonsVisible;
     const mouseCatcherWidth = blockInstance.dimensions!.width + 60;
 
-    const counterX = isConsumer ? -10 : 133;
+    const counterX = isConsumer ? -10 : 145;
     // Different offsets because the counter takes up positive space only
     const counterOffset = isConsumer ? -5 : COUNTER_SIZE * 2 + 5;
     const buttonDistance = isConsumer ? 5 : 10;

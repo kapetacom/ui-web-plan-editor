@@ -27,8 +27,8 @@ export const BlockResource = (props: PlannerResourceProps) => {
     const isSmall = nodeSize === PlannerNodeSize.SMALL;
     const consumer = props.role === ResourceRole.CONSUMES;
 
-    const textX = consumer ? 40 : 20;
-    const iconX = consumer ? 10 : 110;
+    const textX = consumer ? 40 : 35;
+    const iconX = consumer ? 12 : 120;
 
     const height = 48;
     const width = 190;
