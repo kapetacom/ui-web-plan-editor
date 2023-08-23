@@ -54,7 +54,7 @@ const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) =
 };
 
 const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 }) => {
-    const baseOffset = isConsumer ? -40 : 200;
+    const baseOffset = isConsumer ? -45 : 195;
     const expansionSign = isConsumer ? -1 : 1;
     const expansionWidth = isExpanded ? 100 : 0;
     return baseOffset + (expansionWidth + buttonWidth) * expansionSign;
