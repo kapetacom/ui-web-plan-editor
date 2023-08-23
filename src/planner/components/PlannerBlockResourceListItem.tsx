@@ -67,10 +67,9 @@ interface TempResourceProps {
     y: number;
     actionContext: ActionContext;
     icon?: React.ReactNode;
-    role: ResourceRole;
 }
 
-const TempResource = ({ resource, nodeSize, x, y, actionContext, icon, role }: TempResourceProps) => {
+const TempResource = ({ resource, nodeSize, x, y, actionContext, icon }: TempResourceProps) => {
     const height = RESOURCE_HEIGHTS[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     // const mouseCatcherWidth = 210;
@@ -107,7 +106,7 @@ const TempResource = ({ resource, nodeSize, x, y, actionContext, icon, role }: T
                     }}
                 >
                     <BlockResource
-                        role={role}
+                        role={ResourceRole.CONSUMES}
                         size={nodeSize}
                         name={resource.metadata.name}
                         type={type}
@@ -117,6 +116,7 @@ const TempResource = ({ resource, nodeSize, x, y, actionContext, icon, role }: T
                         actionContext={actionContext}
                         icon={icon}
                     />
+                    <rect x={137} y={0} width={3} height={heightInner} className="indicator" fill="#651fff" />
                 </svg>
             </g>
         </SVGLayoutNode>
@@ -241,14 +241,14 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name, props.role);
 
     const extension = isExpanded ? 90 : 0;
-    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -30 - extension : 45 + extension);
+    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -35 - extension : 45 + extension);
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const height = RESOURCE_HEIGHTS[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     const yOffset = height * props.index;
 
-    const counterVisible = counterValue > 0 && buttonsVisible;
+    const counterVisible = counterValue > 0 && isExpanded;
     const mouseCatcherWidth = blockInstance.dimensions!.width + 60;
 
     const counterX = isConsumer ? -10 : 145;
@@ -469,7 +469,6 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                         y={evt.zone.diff.y / planner.zoom}
                                         nodeSize={nodeSize}
                                         resource={consumable}
-                                        role={ResourceRole.CONSUMES}
                                         actionContext={actionContext}
                                         icon={resourceIcon}
                                     />

@@ -31,10 +31,9 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
     }[props.role];
 
     // Can we move layout stuff to its own helpers?
-    const offsetX = 1;
-    const placeholderWidth = 8;
-    const placeholderX =
-        props.role === ResourceRole.PROVIDES ? blockCtx.instanceBlockWidth + offsetX : -placeholderWidth;
+    const listOffset = props.role === ResourceRole.PROVIDES ? blockCtx.instanceBlockWidth : 0;
+    const placeholderWidth = 3;
+    const placeholderOffset = props.role === ResourceRole.PROVIDES ? listOffset : -placeholderWidth;
 
     // Enable SHOW mode if the whole block is in SHOW mode
     const mode =
@@ -71,7 +70,7 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
 
     return (
         <SVGLayoutNode className={plannerResourceListClass} overflow="visible" x={0} y={yPosition}>
-            <svg x={placeholderX}>
+            <svg x={listOffset}>
                 {list.map((resource, index: number) => {
                     return (
                         <PlannerBlockResourceListItem
@@ -92,11 +91,15 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
                         />
                     );
                 })}
+            </svg>
 
-                {/* Blinking "ghost" target when we're about to create a new connection */}
-                <svg className="resource-placeholder" x={0} y={listHeight}>
-                    <rect height={RESOURCE_HEIGHTS[props.nodeSize] - 4} width={placeholderWidth - offsetX} />
-                </svg>
+            {/* "ghost" target when we're about to create a new resource in the list */}
+            <svg x={placeholderOffset} y={listHeight}>
+                <rect
+                    className="resource-placeholder"
+                    height={RESOURCE_HEIGHTS[props.nodeSize] - 4}
+                    width={placeholderWidth}
+                />
             </svg>
         </SVGLayoutNode>
     );

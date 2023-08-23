@@ -68,7 +68,9 @@
         &.compatible {
             opacity: 1;
             &.hover {
-                animation: planner-block-resource-compatible-hover 0.4s infinite;
+                .block-resource-body {
+                    stroke: @kapeta-purple;
+                }
             }
         }
 
@@ -190,34 +192,14 @@
 
 .planner-resource-list {
     .resource-placeholder {
-        rect {
-            opacity: 0;
-            fill: white;
-            stroke: rgba(0, 0, 0, 0.12);
-        }
+        opacity: 0;
+        fill: @kapeta-purple;
     }
 
     &.show {
         .resource-placeholder {
-            rect {
-                animation: planner-block-resource-placeholder 1s infinite;
-                opacity: 1;
-            }
+            opacity: 1;
         }
-    }
-}
-
-@keyframes planner-block-resource-placeholder {
-    0% {
-        opacity: 0.8;
-    }
-
-    50% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 0.8;
     }
 }
 
