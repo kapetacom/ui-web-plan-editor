@@ -60,15 +60,36 @@ const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 })
     return baseOffset + (expansionWidth + buttonWidth) * expansionSign;
 };
 
-const TempResource = ({ resource, nodeSize, x, y, actionContext, icon }) => {
+interface TempResourceProps {
+    resource: Resource;
+    nodeSize: PlannerNodeSize;
+    x: number;
+    y: number;
+    actionContext: ActionContext;
+    icon?: React.ReactNode;
+    role: ResourceRole;
+}
+
+const TempResource = ({ resource, nodeSize, x, y, actionContext, icon, role }: TempResourceProps) => {
     const height = RESOURCE_HEIGHTS[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     // const mouseCatcherWidth = 210;
 
     const clipPathId = 'temp-resource-clip';
 
+    let resourceConfig: IResourceTypeProvider | null = null;
+    try {
+        resourceConfig = ResourceTypeProvider.get(resource.kind);
+    } catch (e) {
+        //
+    }
+
+    const type = resourceConfig?.type?.toString().toLowerCase() ?? ResourceProviderType.INTERNAL.toLowerCase();
+    const title = resourceConfig?.title || resourceConfig?.kind;
+    const typeName = title?.toString().toLowerCase() ?? 'unknown';
+
     return (
-        <SVGLayoutNode x={x} y={y}>
+        <SVGLayoutNode x={x - 7} y={y}>
             {/* Clip the hexagon to create a straight edge */}
             <clipPath id={clipPathId}>{renderClipPath(height, ResourceRole.CONSUMES, true)}</clipPath>
 
@@ -86,13 +107,13 @@ const TempResource = ({ resource, nodeSize, x, y, actionContext, icon }) => {
                     }}
                 >
                     <BlockResource
-                        role={ResourceRole.PROVIDES}
+                        role={role || ResourceRole.CONSUMES}
                         size={nodeSize}
-                        name={resource.name}
-                        type={resource.type || ResourceProviderType.INTERNAL.toLowerCase()}
+                        name={resource.metadata.name}
+                        type={type}
                         typeStatusIcon="arrow"
                         typeStatusColor="success"
-                        typeName={resource.typeName}
+                        typeName={typeName}
                         actionContext={actionContext}
                         icon={icon}
                     />
@@ -271,6 +292,8 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         resourceRole: props.role,
     };
 
+    const consumable = ResourceTypeProvider.convertToConsumable(props.resource);
+
     return (
         <SVGLayoutNode x={0} y={yOffset}>
             <DragAndDrop.DropZone
@@ -442,11 +465,8 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                         x={evt.zone.diff.x / planner.zoom}
                                         y={evt.zone.diff.y / planner.zoom}
                                         nodeSize={nodeSize}
-                                        resource={{
-                                            typeName,
-                                            type,
-                                            name: props.resource.metadata.name,
-                                        }}
+                                        resource={consumable}
+                                        role={ResourceRole.CONSUMES}
                                         actionContext={actionContext}
                                         icon={resourceIcon}
                                     />
