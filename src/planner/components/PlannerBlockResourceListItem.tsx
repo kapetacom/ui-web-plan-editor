@@ -107,7 +107,7 @@ const TempResource = ({ resource, nodeSize, x, y, actionContext, icon, role }: T
                     }}
                 >
                     <BlockResource
-                        role={role || ResourceRole.CONSUMES}
+                        role={role}
                         size={nodeSize}
                         name={resource.metadata.name}
                         type={type}
@@ -236,10 +236,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     // Change to inclusion list if necessary
     const isForceDisabled = overrideMode === ResourceMode.HIDDEN;
     const isExpanded = !isForceDisabled && (mode !== ResourceMode.HIDDEN || dragIsCompatible);
-    const buttonsVisible = mode === ResourceMode.SHOW_OPTIONS;
-
-    const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
-    const clipPathId = `${resourceId}_clippath`;
+    const buttonsVisible = !draggable && mode === ResourceMode.SHOW_OPTIONS;
 
     const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name, props.role);
 
@@ -292,7 +289,13 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         resourceRole: props.role,
     };
 
-    const consumable = ResourceTypeProvider.convertToConsumable(props.resource);
+    const consumable = useMemo(() => {
+        try {
+            return ResourceTypeProvider.convertToConsumable(props.resource);
+        } catch (e) {
+            return props.resource;
+        }
+    }, [props.resource]);
 
     return (
         <SVGLayoutNode x={0} y={yOffset}>
