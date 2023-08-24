@@ -33,6 +33,7 @@ export const PlannerConnection: React.FC<{
     actions?: PlannerAction<any>[];
     onMouseEnter?: (context: ActionContext) => void;
     onMouseLeave?: (context: ActionContext) => void;
+    style?: React.CSSProperties;
 }> = (props) => {
     const { draggable } = useContext(DnDContext);
     const planner = useContext(PlannerContext);
@@ -222,7 +223,7 @@ export const PlannerConnection: React.FC<{
     };
 
     return (
-        <svg style={{ position: 'absolute', zIndex: -1, top: 0, left: 0 }}>
+        <svg style={{ position: 'absolute', zIndex: -1, top: 0, left: 0, ...props.style }}>
             <g
                 className={className.trim()}
                 onMouseEnter={() => {
