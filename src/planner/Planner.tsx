@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { PlannerActionConfig, PlannerContext } from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';
@@ -54,25 +54,81 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
 
 const emptyList = [];
 export const Planner = (props: Props) => {
+    const { isDragging } = useContext(DnDContext);
     const { nodeSize = PlannerNodeSize.MEDIUM, plan } = useContext(PlannerContext);
 
     const instances = plan?.spec.blocks ?? emptyList;
     const connections = plan?.spec.connections ?? emptyList;
 
     // Manage connection render order to ensure that connections are rendered on top when hovered
-    const [connectionDisplayOrder, setDisplayOrder] = useState(Object.keys(connections));
-    useEffect(() => {
-        setDisplayOrder(Object.keys(connections));
-    }, [connections]);
+    const [topConnection, setTopConnection] = useState(null);
 
     const onConnectionMouseEnter = useCallback(
         (connectionId) =>
             (...args) => {
-                // Put the hovered connection on top by rendering last
-                setDisplayOrder((order) => order.filter((id) => id !== connectionId).concat([connectionId]));
+                setTopConnection(connectionId);
                 props.onConnectionMouseEnter?.call(null, ...args);
             },
         [props.onConnectionMouseEnter]
+    );
+    const onConnectionMouseLeave = useCallback(
+        (...args) => {
+            setTopConnection(null);
+            props.onConnectionMouseEnter?.call(null, ...args);
+        },
+        [props.onConnectionMouseEnter]
+    );
+
+    const [topBlock, setTopBlockState] = useState<string | null>(null);
+    // Only allow setting the top block when not dragging - to avoid flickering
+    const setTopBlock = useCallback(
+        (blockId: string | null) => {
+            if (!isDragging) {
+                setTopBlockState(blockId);
+            }
+        },
+        [isDragging]
+    );
+
+    const onEnter = useCallback(
+        (cb) => (context: ActionContext) => {
+            if (context.blockInstance) {
+                setTopBlock(context.blockInstance.id);
+            }
+            cb(context);
+        },
+        [setTopBlock]
+    );
+
+    const onLeave = useCallback(
+        (cb) => (context: ActionContext) => {
+            if (context.blockInstance?.id === topBlock) {
+                setTopBlock(null);
+            }
+            cb(context);
+        },
+        [topBlock, setTopBlock]
+    );
+
+    const callbacks = useMemo(
+        () => ({
+            onBlockMouseEnter: onEnter(props.onBlockMouseEnter),
+            onBlockMouseLeave: onLeave(props.onBlockMouseLeave),
+            onResourceMouseEnter: onEnter(props.onResourceMouseEnter),
+            onResourceMouseLeave: onLeave(props.onResourceMouseLeave),
+            onConnectionMouseEnter: onEnter(props.onConnectionMouseEnter),
+            onConnectionMouseLeave: onLeave(props.onConnectionMouseLeave),
+        }),
+        [
+            onEnter,
+            onLeave,
+            props.onBlockMouseEnter,
+            props.onBlockMouseLeave,
+            props.onResourceMouseEnter,
+            props.onResourceMouseLeave,
+            props.onConnectionMouseEnter,
+            props.onConnectionMouseLeave,
+        ]
     );
 
     const focusInfo = useFocusInfo();
@@ -107,53 +163,53 @@ export const Planner = (props: Props) => {
                             configuration={props.configurations?.[instance.id]}
                         >
                             <PlannerBlockNode
+                                style={{ zIndex: instance.id === topBlock ? 100 : index }}
                                 size={nodeSize}
                                 actions={props.actions || {}}
                                 className={className}
-                                onMouseEnter={props.onBlockMouseEnter}
-                                onMouseLeave={props.onBlockMouseLeave}
-                                onResourceMouseEnter={props.onResourceMouseEnter}
-                                onResourceMouseLeave={props.onResourceMouseLeave}
+                                onMouseEnter={callbacks.onBlockMouseEnter}
+                                onMouseLeave={callbacks.onBlockMouseLeave}
+                                onResourceMouseEnter={callbacks.onResourceMouseEnter}
+                                onResourceMouseLeave={callbacks.onResourceMouseLeave}
                             />
                         </BlockContextProvider>
                     );
                 })}
 
-                {connectionDisplayOrder
-                    .map((id) => [id, connections[id]])
-                    .map(([id, connection]) => {
-                        // Handle deleted connections that are still in the ordering list
-                        if (!connection) {
-                            return null;
-                        }
+                {connections.map((connection, id) => {
+                    // Handle deleted connections that are still in the ordering list
+                    if (!connection) {
+                        return null;
+                    }
 
-                        const key = getConnectionId(connection);
+                    const key = getConnectionId(connection);
 
-                        if (connectionKeys[key]) {
-                            // Prevent rendering duplicate connections
-                            return null;
-                        }
-                        connectionKeys[key] = true;
+                    if (connectionKeys[key]) {
+                        // Prevent rendering duplicate connections
+                        return null;
+                    }
+                    connectionKeys[key] = true;
 
-                        // Hide connections that are not connected to the focused block
-                        const className = toClass({
-                            'connection-hidden': !!(
-                                focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
-                            ),
-                        });
+                    // Hide connections that are not connected to the focused block
+                    const className = toClass({
+                        'connection-hidden': !!(
+                            focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
+                        ),
+                    });
 
-                        return (
-                            <PlannerConnection
-                                size={nodeSize}
-                                key={key}
-                                className={className}
-                                connection={connection}
-                                actions={props.actions?.connection || []}
-                                onMouseEnter={onConnectionMouseEnter(id)}
-                                onMouseLeave={props.onConnectionMouseLeave}
-                            />
-                        );
-                    })}
+                    return (
+                        <PlannerConnection
+                            style={{ zIndex: id === topConnection ? 100 : -1 }}
+                            size={nodeSize}
+                            key={key}
+                            className={className}
+                            connection={connection}
+                            actions={props.actions?.connection || []}
+                            onMouseEnter={onConnectionMouseEnter(id)}
+                            onMouseLeave={onConnectionMouseLeave}
+                        />
+                    );
+                })}
 
                 {/* Render temp connections to dragged resources */}
                 <DnDContext.Consumer>{renderTempResources}</DnDContext.Consumer>
