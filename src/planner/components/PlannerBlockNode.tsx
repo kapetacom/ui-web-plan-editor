@@ -132,164 +132,164 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                 return (
                     // Effective layout includes drag status
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
-                        <DragAndDrop.DropZone
-                            data={{ type: PlannerPayloadType.BLOCK, data: blockContext.blockInstance }}
-                            accept={(draggable: PlannerPayload) => {
-                                if (blockContext.isBlockDefinitionReadOnly) {
-                                    return false;
-                                }
-
-                                if (draggable.type === 'resource-type') {
-                                    // New resource being added
-                                    return true;
-                                }
-
-                                return (
-                                    draggable.type === 'resource' &&
-                                    // don't connect to self
-                                    draggable.data.instance.id !== blockContext.blockInstance.id
-                                );
-                            }}
-                            onDrop={(draggable: ResourcePayload | ResourceTypePayload) => {
-                                if (blockContext.isBlockDefinitionReadOnly) {
-                                    return;
-                                }
-
-                                blockContext.setBlockMode(BlockMode.HIDDEN);
-
-                                if (draggable.type === 'resource-type') {
-                                    const config = draggable.data.config;
-
-                                    const port = config.definition.spec.ports[0];
-
-                                    const ref = `${config.kind}:${config.version}`;
-
-                                    const existingResources =
-                                        config.role === ResourceRole.CONSUMES
-                                            ? blockContext.consumers
-                                            : blockContext.providers;
-                                    // default the name to resource type name w/o special chars, e.g.
-                                    // resource-type-mongodb => mongodb
-                                    const baseName = config.kind
-                                        .split('/')[1]
-                                        .toLowerCase()
-                                        .replace('resource-type', '')
-                                        .replace(/[^a-z]/g, '');
-
-                                    let resourceName = baseName;
-                                    let counter = 1;
-                                    const filter = (r: Resource) => r.metadata.name === resourceName;
-                                    while (existingResources.some(filter)) {
-                                        resourceName = `${baseName}_${counter}`;
-                                        counter++;
-                                    }
-
-                                    planner.addResource(
-                                        blockContext.blockReference?.id,
-                                        {
-                                            kind: ref,
-                                            metadata: {
-                                                name: resourceName,
-                                            },
-                                            spec: {
-                                                port,
-                                            },
-                                        },
-                                        config.role
-                                    );
-                                    return;
-                                }
-
-                                const newResource = copyResourceToBlock(blockContext.blockDefinition!, {
-                                    block: draggable.data.block,
-                                    resource: draggable.data.resource,
-                                });
-
-                                if (!newResource) {
-                                    return;
-                                }
-
-                                // Create new consumer on block and save definition
-                                const newBlock = _.cloneDeep(blockContext.blockDefinition!);
-                                newBlock.spec.consumers = newBlock.spec.consumers || [];
-                                newBlock.spec.consumers.push(newResource);
-
-                                planner.updateBlockDefinition(blockContext.blockInstance.block.ref, newBlock);
-
-                                const newConnection = createConnection(draggable.data, {
-                                    block: newBlock,
-                                    instance: blockContext.blockInstance,
-                                    resource: newResource,
-                                });
-
-                                // Add connection to new consumer
-                                planner.addConnection(newConnection);
-                            }}
-                            onDragEnter={(draggable: ResourcePayload | ResourceTypePayload) => {
-                                if (blockContext.isBlockDefinitionReadOnly) {
-                                    return;
-                                }
-                                const role =
-                                    draggable.type === 'resource-type'
-                                        ? draggable.data.config.role
-                                        : draggable.data.role;
-                                if (role === ResourceRole.CONSUMES) {
-                                    blockContext.setBlockMode(BlockMode.HOVER_DROP_CONSUMER);
-                                } else {
-                                    blockContext.setBlockMode(BlockMode.HOVER_DROP_PROVIDER);
+                        <svg
+                            className={`${className} ${evt.isDragging ? 'dragging' : ''}`}
+                            onDoubleClick={() => planner.setFocusedBlock(blockContext.blockInstance)}
+                            onMouseEnter={() => {
+                                setIsHovered(true);
+                                if (props.onMouseEnter) {
+                                    props.onMouseEnter(actionContext);
                                 }
                             }}
-                            onDragLeave={() => {
-                                if (blockContext.isBlockDefinitionReadOnly) {
-                                    return;
+                            onMouseLeave={() => {
+                                setIsHovered(false);
+                                if (props.onMouseLeave) {
+                                    props.onMouseLeave(actionContext);
                                 }
-                                blockContext.setBlockMode(BlockMode.HIDDEN);
                             }}
+                            style={{
+                                left: `${point.x}px`,
+                                top: `${point.y}px`,
+                            }}
+                            x={blockContext.blockInstance.dimensions!.left}
+                            y={blockContext.blockInstance.dimensions!.top}
                         >
-                            {({ onRef }) => (
-                                <svg
-                                    className={`${className} ${evt.isDragging ? 'dragging' : ''}`}
-                                    onDoubleClick={() => planner.setFocusedBlock(blockContext.blockInstance)}
-                                    onMouseEnter={() => {
-                                        setIsHovered(true);
-                                        if (props.onMouseEnter) {
-                                            props.onMouseEnter(actionContext);
-                                        }
-                                    }}
-                                    onMouseLeave={() => {
-                                        setIsHovered(false);
-                                        if (props.onMouseLeave) {
-                                            props.onMouseLeave(actionContext);
-                                        }
-                                    }}
-                                    style={{
-                                        left: `${point.x}px`,
-                                        top: `${point.y}px`,
-                                    }}
-                                    x={blockContext.blockInstance.dimensions!.left}
-                                    y={blockContext.blockInstance.dimensions!.top}
-                                >
-                                    <g
-                                        data-node-id={blockContext.blockInstance.id}
-                                        data-node-type="block"
-                                        className={blockClassNames}
-                                    >
-                                        {/* TODO: fix offsets based on block size */}
-                                        <PlannerBlockResourceList
-                                            nodeSize={planner.nodeSize}
-                                            role={ResourceRole.CONSUMES}
-                                            actions={props.actions?.resource || []}
-                                            onResourceMouseEnter={props.onResourceMouseEnter}
-                                            onResourceMouseLeave={props.onResourceMouseLeave}
-                                        />
-                                        <PlannerBlockResourceList
-                                            nodeSize={planner.nodeSize}
-                                            role={ResourceRole.PROVIDES}
-                                            actions={props.actions?.resource || []}
-                                            onResourceMouseEnter={props.onResourceMouseEnter}
-                                            onResourceMouseLeave={props.onResourceMouseLeave}
-                                        />
+                            <g
+                                data-node-id={blockContext.blockInstance.id}
+                                data-node-type="block"
+                                className={blockClassNames}
+                            >
+                                {/* TODO: fix offsets based on block size */}
+                                <PlannerBlockResourceList
+                                    nodeSize={planner.nodeSize}
+                                    role={ResourceRole.CONSUMES}
+                                    actions={props.actions?.resource || []}
+                                    onResourceMouseEnter={props.onResourceMouseEnter}
+                                    onResourceMouseLeave={props.onResourceMouseLeave}
+                                />
+                                <PlannerBlockResourceList
+                                    nodeSize={planner.nodeSize}
+                                    role={ResourceRole.PROVIDES}
+                                    actions={props.actions?.resource || []}
+                                    onResourceMouseEnter={props.onResourceMouseEnter}
+                                    onResourceMouseLeave={props.onResourceMouseLeave}
+                                />
 
+                                <DragAndDrop.DropZone
+                                    data={{ type: PlannerPayloadType.BLOCK, data: blockContext.blockInstance }}
+                                    accept={(draggable: PlannerPayload) => {
+                                        if (blockContext.isBlockDefinitionReadOnly) {
+                                            return false;
+                                        }
+
+                                        if (draggable.type === 'resource-type') {
+                                            // New resource being added
+                                            return true;
+                                        }
+
+                                        return (
+                                            draggable.type === 'resource' &&
+                                            // don't connect to self
+                                            draggable.data.instance.id !== blockContext.blockInstance.id
+                                        );
+                                    }}
+                                    onDrop={(draggable: ResourcePayload | ResourceTypePayload) => {
+                                        if (blockContext.isBlockDefinitionReadOnly) {
+                                            return;
+                                        }
+
+                                        blockContext.setBlockMode(BlockMode.HIDDEN);
+
+                                        if (draggable.type === 'resource-type') {
+                                            const config = draggable.data.config;
+
+                                            const port = config.definition.spec.ports[0];
+
+                                            const ref = `${config.kind}:${config.version}`;
+
+                                            const existingResources =
+                                                config.role === ResourceRole.CONSUMES
+                                                    ? blockContext.consumers
+                                                    : blockContext.providers;
+                                            // default the name to resource type name w/o special chars, e.g.
+                                            // resource-type-mongodb => mongodb
+                                            const baseName = config.kind
+                                                .split('/')[1]
+                                                .toLowerCase()
+                                                .replace('resource-type', '')
+                                                .replace(/[^a-z]/g, '');
+
+                                            let resourceName = baseName;
+                                            let counter = 1;
+                                            const filter = (r: Resource) => r.metadata.name === resourceName;
+                                            while (existingResources.some(filter)) {
+                                                resourceName = `${baseName}_${counter}`;
+                                                counter++;
+                                            }
+
+                                            planner.addResource(
+                                                blockContext.blockReference?.id,
+                                                {
+                                                    kind: ref,
+                                                    metadata: {
+                                                        name: resourceName,
+                                                    },
+                                                    spec: {
+                                                        port,
+                                                    },
+                                                },
+                                                config.role
+                                            );
+                                            return;
+                                        }
+
+                                        const newResource = copyResourceToBlock(blockContext.blockDefinition!, {
+                                            block: draggable.data.block,
+                                            resource: draggable.data.resource,
+                                        });
+
+                                        if (!newResource) {
+                                            return;
+                                        }
+
+                                        // Create new consumer on block and save definition
+                                        const newBlock = _.cloneDeep(blockContext.blockDefinition!);
+                                        newBlock.spec.consumers = newBlock.spec.consumers || [];
+                                        newBlock.spec.consumers.push(newResource);
+
+                                        planner.updateBlockDefinition(blockContext.blockInstance.block.ref, newBlock);
+
+                                        const newConnection = createConnection(draggable.data, {
+                                            block: newBlock,
+                                            instance: blockContext.blockInstance,
+                                            resource: newResource,
+                                        });
+
+                                        // Add connection to new consumer
+                                        planner.addConnection(newConnection);
+                                    }}
+                                    onDragEnter={(draggable: ResourcePayload | ResourceTypePayload) => {
+                                        if (blockContext.isBlockDefinitionReadOnly) {
+                                            return;
+                                        }
+                                        const role =
+                                            draggable.type === 'resource-type'
+                                                ? draggable.data.config.role
+                                                : draggable.data.role;
+                                        if (role === ResourceRole.CONSUMES) {
+                                            blockContext.setBlockMode(BlockMode.HOVER_DROP_CONSUMER);
+                                        } else {
+                                            blockContext.setBlockMode(BlockMode.HOVER_DROP_PROVIDER);
+                                        }
+                                    }}
+                                    onDragLeave={() => {
+                                        if (blockContext.isBlockDefinitionReadOnly) {
+                                            return;
+                                        }
+                                        blockContext.setBlockMode(BlockMode.HIDDEN);
+                                    }}
+                                >
+                                    {({ onRef }) => (
                                         <g {...evt.componentProps} ref={onRef}>
                                             {blockContext.blockDefinition ? (
                                                 <BlockLayout
@@ -334,20 +334,20 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                 </foreignObject>
                                             )}
                                         </g>
-                                    </g>
-                                    <g>
-                                        {/* TODO: Render block actions w/ the wheel/staggered transitions */}
-                                        <ActionButtons
-                                            x={blockContext.instanceBlockWidth / 2}
-                                            y={blockContext.instanceBlockHeight + 25}
-                                            show={isHovered || isPrimaryFocus}
-                                            actions={props.actions?.block || []}
-                                            actionContext={actionContext}
-                                        />
-                                    </g>
-                                </svg>
-                            )}
-                        </DragAndDrop.DropZone>
+                                    )}
+                                </DragAndDrop.DropZone>
+                            </g>
+                            <g>
+                                {/* TODO: Render block actions w/ the wheel/staggered transitions */}
+                                <ActionButtons
+                                    x={blockContext.instanceBlockWidth / 2}
+                                    y={blockContext.instanceBlockHeight + 25}
+                                    show={isHovered || isPrimaryFocus}
+                                    actions={props.actions?.block || []}
+                                    actionContext={actionContext}
+                                />
+                            </g>
+                        </svg>
                     </LayoutNode>
                 );
             }}

@@ -54,21 +54,41 @@ const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) =
 };
 
 const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 }) => {
-    const baseOffset = isConsumer ? -40 : 200;
+    const baseOffset = isConsumer ? -45 : 195;
     const expansionSign = isConsumer ? -1 : 1;
     const expansionWidth = isExpanded ? 100 : 0;
     return baseOffset + (expansionWidth + buttonWidth) * expansionSign;
 };
 
-const TempResource = ({ resource, nodeSize, x, y, actionContext, icon }) => {
+interface TempResourceProps {
+    resource: Resource;
+    nodeSize: PlannerNodeSize;
+    x: number;
+    y: number;
+    actionContext: ActionContext;
+    icon?: React.ReactNode;
+}
+
+const TempResource = ({ resource, nodeSize, x, y, actionContext, icon }: TempResourceProps) => {
     const height = RESOURCE_HEIGHTS[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     // const mouseCatcherWidth = 210;
 
     const clipPathId = 'temp-resource-clip';
 
+    let resourceConfig: IResourceTypeProvider | null = null;
+    try {
+        resourceConfig = ResourceTypeProvider.get(resource.kind);
+    } catch (e) {
+        //
+    }
+
+    const type = resourceConfig?.type?.toString().toLowerCase() ?? ResourceProviderType.INTERNAL.toLowerCase();
+    const title = resourceConfig?.title || resourceConfig?.kind;
+    const typeName = title?.toString().toLowerCase() ?? 'unknown';
+
     return (
-        <SVGLayoutNode x={x} y={y}>
+        <SVGLayoutNode x={x - 7} y={y}>
             {/* Clip the hexagon to create a straight edge */}
             <clipPath id={clipPathId}>{renderClipPath(height, ResourceRole.CONSUMES, true)}</clipPath>
 
@@ -86,16 +106,17 @@ const TempResource = ({ resource, nodeSize, x, y, actionContext, icon }) => {
                     }}
                 >
                     <BlockResource
-                        role={ResourceRole.PROVIDES}
+                        role={ResourceRole.CONSUMES}
                         size={nodeSize}
-                        name={resource.name}
-                        type={resource.type || ResourceProviderType.INTERNAL.toLowerCase()}
+                        name={resource.metadata.name}
+                        type={type}
                         typeStatusIcon="arrow"
                         typeStatusColor="success"
-                        typeName={resource.typeName}
+                        typeName={typeName}
                         actionContext={actionContext}
                         icon={icon}
                     />
+                    <rect x={137} y={0} width={3} height={heightInner} className="indicator" fill="#651fff" />
                 </svg>
             </g>
         </SVGLayoutNode>
@@ -215,22 +236,19 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     // Change to inclusion list if necessary
     const isForceDisabled = overrideMode === ResourceMode.HIDDEN;
     const isExpanded = !isForceDisabled && (mode !== ResourceMode.HIDDEN || dragIsCompatible);
-    const buttonsVisible = mode === ResourceMode.SHOW_OPTIONS;
-
-    const resourceId = `${blockInstance.id}_${props.role}_${props.index}`;
-    const clipPathId = `${resourceId}_clippath`;
+    const buttonsVisible = !draggable && mode === ResourceMode.SHOW_OPTIONS;
 
     const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name, props.role);
 
     const extension = isExpanded ? 90 : 0;
-    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -30 - extension : 45 + extension);
+    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -35 - extension : 45 + extension);
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const height = RESOURCE_HEIGHTS[nodeSize];
     const heightInner = height - RESOURCE_SPACE;
     const yOffset = height * props.index;
 
-    const counterVisible = counterValue > 0 && buttonsVisible;
+    const counterVisible = counterValue > 0 && isExpanded;
     const mouseCatcherWidth = blockInstance.dimensions!.width + 60;
 
     const counterX = isConsumer ? -10 : 145;
@@ -271,85 +289,89 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         resourceRole: props.role,
     };
 
+    const consumable = useMemo(() => {
+        try {
+            return ResourceTypeProvider.convertToConsumable(props.resource);
+        } catch (e) {
+            return props.resource;
+        }
+    }, [props.resource]);
+
     return (
         <SVGLayoutNode x={0} y={yOffset}>
-            <DragAndDrop.DropZone
-                data={
-                    {
-                        type: 'resource',
-                        data: {
-                            resource: props.resource,
-                            instance: blockInstance,
-                            block: blockDefinition,
-                            role: ResourceRole.CONSUMES,
-                        },
-                    } as PlannerPayload
-                }
-                onDragEnter={() => setDragOver(true)}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(payload: ResourcePayload) => {
-                    setDragOver(false);
-                    if (payload.type !== 'resource') {
-                        return;
-                    }
-                    const connection = createConnection(
-                        {
-                            instance: payload.data.instance,
-                            block: payload.data.block,
-                            resource: payload.data.resource,
-                        },
-                        {
-                            instance: blockInstance!,
-                            block: blockDefinition!,
-                            resource: props.resource,
-                        }
-                    );
-                    planner.addConnection(connection);
+            <DragAndDrop.Draggable
+                data={{
+                    type: PlannerPayloadType.RESOURCE,
+                    data: {
+                        resource: props.resource,
+                        instance: blockInstance,
+                        block: blockDefinition!,
+                        role: ResourceRole.CONSUMES,
+                    },
                 }}
-                // TODO: flip this around, pass down to children
-                accept={() => !isForceDisabled && dragIsCompatible}
+                // Only allow creating new connections in edit mode
+                disabled={!planner.canEditConnections}
             >
-                {({ onRef }) => (
-                    <DragAndDrop.Draggable
-                        data={{
-                            type: PlannerPayloadType.RESOURCE,
-                            data: {
-                                resource: props.resource,
-                                instance: blockInstance,
-                                block: blockDefinition!,
-                                role: ResourceRole.CONSUMES,
-                            },
-                        }}
-                        // Only allow creating new connections in edit mode
-                        disabled={!planner.canEditConnections}
-                    >
-                        {(evt) => (
-                            <>
-                                <svg
-                                    className={containerClass}
-                                    // clipPath={`url(#${fixedClipPathId})`}
-                                    x={isConsumer ? 0 : -160}
-                                    y={0}
-                                    onMouseEnter={() => {
-                                        if (props.onMouseEnter) {
-                                            props.onMouseEnter(actionContext);
+                {(draggableOpts) => (
+                    <>
+                        <svg
+                            className={containerClass}
+                            // clipPath={`url(#${fixedClipPathId})`}
+                            x={isConsumer ? 0 : -160}
+                            y={0}
+                            onMouseEnter={() => {
+                                if (props.onMouseEnter) {
+                                    props.onMouseEnter(actionContext);
+                                }
+                            }}
+                            onMouseLeave={() => {
+                                setHoverState(false);
+                                if (props.onMouseLeave) {
+                                    props.onMouseLeave(actionContext);
+                                }
+                            }}
+                            onMouseMove={() => setHoverState(true)}
+                            // Only register the drag handler if the resource should be draggable (Providers only atm)
+                            {...(props.role === ResourceRole.PROVIDES ? draggableOpts.componentProps : {})}
+                        >
+                            <g className={bodyClass} transform={`translate(${getXPosition()},0)`} height={heightInner}>
+                                <DragAndDrop.DropZone
+                                    data={
+                                        {
+                                            type: 'resource',
+                                            data: {
+                                                resource: props.resource,
+                                                instance: blockInstance,
+                                                block: blockDefinition,
+                                                role: ResourceRole.CONSUMES,
+                                            },
+                                        } as PlannerPayload
+                                    }
+                                    onDragEnter={() => setDragOver(true)}
+                                    onDragLeave={() => setDragOver(false)}
+                                    onDrop={(payload: ResourcePayload) => {
+                                        setDragOver(false);
+                                        if (payload.type !== 'resource') {
+                                            return;
                                         }
+                                        const connection = createConnection(
+                                            {
+                                                instance: payload.data.instance,
+                                                block: payload.data.block,
+                                                resource: payload.data.resource,
+                                            },
+                                            {
+                                                instance: blockInstance!,
+                                                block: blockDefinition!,
+                                                resource: props.resource,
+                                            }
+                                        );
+                                        planner.addConnection(connection);
                                     }}
-                                    onMouseLeave={() => {
-                                        setHoverState(false);
-                                        if (props.onMouseLeave) {
-                                            props.onMouseLeave(actionContext);
-                                        }
-                                    }}
-                                    onMouseMove={() => setHoverState(true)}
-                                    // Only register the drag handler if the resource should be draggable (Providers only atm)
-                                    {...(props.role === ResourceRole.PROVIDES ? evt.componentProps : {})}
+                                    // TODO: flip this around, pass down to children
+                                    accept={() => !isForceDisabled && dragIsCompatible}
                                 >
-                                    <g
-                                        className={bodyClass}
-                                        transform={`translate(${getXPosition()},0)`}
-                                        height={heightInner}
-                                    >
+                                    {({ onRef }) => (
                                         <rect
                                             className="mouse-catcher"
                                             opacity="0"
@@ -359,103 +381,94 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                             y={0}
                                             ref={onRef}
                                         />
+                                    )}
+                                </DragAndDrop.DropZone>
 
-                                        <ActionButtons
-                                            transition="slide"
-                                            pointType={isConsumer ? 'right' : 'left'}
-                                            x={buttonX}
-                                            y={buttonY}
-                                            show={buttonsVisible}
-                                            actions={props.actions || []}
-                                            actionContext={actionContext}
-                                            onSizeChange={(width) => {
-                                                setActionButtonsWidth(width);
-                                            }}
-                                        />
+                                <ActionButtons
+                                    transition="slide"
+                                    pointType={isConsumer ? 'right' : 'left'}
+                                    x={buttonX}
+                                    y={buttonY}
+                                    show={buttonsVisible}
+                                    actions={props.actions || []}
+                                    actionContext={actionContext}
+                                    onSizeChange={(width) => {
+                                        setActionButtonsWidth(width);
+                                    }}
+                                />
 
-                                        {/* TODO: To avoid shifting, maybe remove this */}
-                                        <LayoutNode
-                                            x={getResourceConnectionPoint({
-                                                isConsumer,
-                                                isExpanded,
-                                                buttonWidth: buttonsVisible ? actionButtonsWidth : 0,
-                                            })}
-                                            y={buttonY}
-                                        >
-                                            <PlannerConnectionPoint pointId={connectionResourceId} />
-                                        </LayoutNode>
+                                {/* TODO: To avoid shifting, maybe remove this */}
+                                <LayoutNode
+                                    x={getResourceConnectionPoint({
+                                        isConsumer,
+                                        isExpanded,
+                                        buttonWidth: buttonsVisible ? actionButtonsWidth : 0,
+                                    })}
+                                    y={buttonY}
+                                >
+                                    <PlannerConnectionPoint pointId={connectionResourceId} />
+                                </LayoutNode>
 
-                                        <svg
-                                            style={{
-                                                cursor: isConsumer ? '' : 'grab',
-                                            }}
-                                        >
-                                            <BlockResource
-                                                role={props.role}
-                                                size={nodeSize}
-                                                name={props.resource.metadata.name}
-                                                readOnly={props.readOnly}
-                                                type={type}
-                                                typeStatusIcon={
-                                                    planner.assetState.getResourceIcon(
-                                                        blockInstance.id,
-                                                        props.resource.metadata.name,
-                                                        props.role
-                                                    ) || (type === 'internal' ? 'arrow' : 'tick')
-                                                }
-                                                typeStatusColor={valid ? 'success' : 'error'}
-                                                typeName={typeName}
-                                                actionContext={actionContext}
-                                                icon={resourceIcon}
-                                            />
-                                        </svg>
-
-                                        <svg
-                                            width={COUNTER_SIZE * 2}
-                                            height={COUNTER_SIZE * 2}
-                                            x={counterPoint.x}
-                                            y={counterPoint.y}
-                                        >
-                                            <g className="resource-counter">
-                                                <circle
-                                                    cx={COUNTER_SIZE}
-                                                    cy={COUNTER_SIZE}
-                                                    r={COUNTER_SIZE}
-                                                    className="background"
-                                                />
-                                                <text
-                                                    textAnchor="middle"
-                                                    className="foreground"
-                                                    y={12}
-                                                    x={COUNTER_SIZE}
-                                                >
-                                                    {counterValue}
-                                                </text>
-                                            </g>
-                                        </svg>
-                                    </g>
-                                </svg>
-
-                                {/* Temp draggable resource */}
-                                {evt.isDragging ? (
-                                    <TempResource
-                                        x={evt.zone.diff.x / planner.zoom}
-                                        y={evt.zone.diff.y / planner.zoom}
-                                        nodeSize={nodeSize}
-                                        resource={{
-                                            typeName,
-                                            type,
-                                            name: props.resource.metadata.name,
-                                        }}
+                                <svg
+                                    style={{
+                                        cursor: isConsumer ? '' : 'grab',
+                                    }}
+                                >
+                                    <BlockResource
+                                        role={props.role}
+                                        size={nodeSize}
+                                        name={props.resource.metadata.name}
+                                        readOnly={props.readOnly}
+                                        type={type}
+                                        typeStatusIcon={
+                                            planner.assetState.getResourceIcon(
+                                                blockInstance.id,
+                                                props.resource.metadata.name,
+                                                props.role
+                                            ) || (type === 'internal' ? 'arrow' : 'tick')
+                                        }
+                                        typeStatusColor={valid ? 'success' : 'error'}
+                                        typeName={typeName}
                                         actionContext={actionContext}
                                         icon={resourceIcon}
                                     />
-                                ) : null}
-                            </>
-                        )}
-                    </DragAndDrop.Draggable>
+                                </svg>
+
+                                <svg
+                                    width={COUNTER_SIZE * 2}
+                                    height={COUNTER_SIZE * 2}
+                                    x={counterPoint.x}
+                                    y={counterPoint.y}
+                                >
+                                    <g className="resource-counter">
+                                        <circle
+                                            cx={COUNTER_SIZE}
+                                            cy={COUNTER_SIZE}
+                                            r={COUNTER_SIZE}
+                                            className="background"
+                                        />
+                                        <text textAnchor="middle" className="foreground" y={12} x={COUNTER_SIZE}>
+                                            {counterValue}
+                                        </text>
+                                    </g>
+                                </svg>
+                            </g>
+                        </svg>
+
+                        {/* Temp draggable resource */}
+                        {draggableOpts.isDragging ? (
+                            <TempResource
+                                x={draggableOpts.zone.diff.x / planner.zoom}
+                                y={draggableOpts.zone.diff.y / planner.zoom}
+                                nodeSize={nodeSize}
+                                resource={consumable}
+                                actionContext={actionContext}
+                                icon={resourceIcon}
+                            />
+                        ) : null}
+                    </>
                 )}
-            </DragAndDrop.DropZone>
+            </DragAndDrop.Draggable>
         </SVGLayoutNode>
     );
 };
