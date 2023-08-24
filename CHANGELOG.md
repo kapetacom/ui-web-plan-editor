@@ -1,3 +1,12 @@
+## [1.4.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.2...v1.4.3) (2023-08-24)
+
+
+### Bug Fixes
+
+* Bug in story ([2550435](https://github.com/kapetacom/ui-web-plan-editor/commit/255043593d338ed27186f4baa9bda751bd050047))
+* Ensure delete button is correctly positioned in thumbnail ([#70](https://github.com/kapetacom/ui-web-plan-editor/issues/70)) ([16d9151](https://github.com/kapetacom/ui-web-plan-editor/commit/16d91513249ddba3b975bd261e9c31a643376366))
+* Set fixed size for chip label ([f4b898e](https://github.com/kapetacom/ui-web-plan-editor/commit/f4b898ebb7e48b95f80dca1447dfd85b29d800de))
+
 ## [1.4.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.1...v1.4.2) (2023-08-24)
 
 
