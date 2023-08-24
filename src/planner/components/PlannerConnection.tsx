@@ -32,6 +32,7 @@ export const PlannerConnection: React.FC<{
     viewOnly?: boolean;
     actions?: PlannerAction<any>[];
     onMouseEnter?: (context: ActionContext) => void;
+    onMouseOver?: (context: ActionContext) => void;
     onMouseLeave?: (context: ActionContext) => void;
     style?: React.CSSProperties;
 }> = (props) => {
@@ -231,7 +232,12 @@ export const PlannerConnection: React.FC<{
                         props.onMouseEnter(actionContext);
                     }
                 }}
-                onMouseOver={() => setHasFocus(true)}
+                onMouseOver={() => {
+                    if (props.onMouseOver) {
+                        props.onMouseOver(actionContext);
+                    }
+                    setHasFocus(true);
+                }}
                 onMouseOut={() => {
                     setHasFocus(false);
                     if (props.onMouseLeave) {
@@ -239,6 +245,7 @@ export const PlannerConnection: React.FC<{
                     }
                 }}
             >
+                <path className="mouse-catcher" d={path} />
                 <path className="background" d={path} />
                 <path className="line" d={path} />
 

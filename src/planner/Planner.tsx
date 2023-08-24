@@ -63,13 +63,12 @@ export const Planner = (props: Props) => {
     // Manage connection render order to ensure that connections are rendered on top when hovered
     const [topConnection, setTopConnection] = useState(null);
 
-    const onConnectionMouseEnter = useCallback(
+    const onConnectionMouseOver = useCallback(
         (connectionId) =>
             (...args) => {
                 setTopConnection(connectionId);
-                props.onConnectionMouseEnter?.call(null, ...args);
             },
-        [props.onConnectionMouseEnter]
+        [setTopConnection]
     );
     const onConnectionMouseLeave = useCallback(
         (...args) => {
@@ -95,7 +94,9 @@ export const Planner = (props: Props) => {
             if (context.blockInstance) {
                 setTopBlock(context.blockInstance.id);
             }
-            cb(context);
+            if (cb) {
+                cb(context);
+            }
         },
         [setTopBlock]
     );
@@ -105,7 +106,9 @@ export const Planner = (props: Props) => {
             if (context.blockInstance?.id === topBlock) {
                 setTopBlock(null);
             }
-            cb(context);
+            if (cb) {
+                cb(context);
+            }
         },
         [topBlock, setTopBlock]
     );
@@ -163,7 +166,7 @@ export const Planner = (props: Props) => {
                             configuration={props.configurations?.[instance.id]}
                         >
                             <PlannerBlockNode
-                                style={{ zIndex: instance.id === topBlock ? 100 : index }}
+                                style={{ zIndex: instance.id === topBlock ? 100 : index + 1 }}
                                 size={nodeSize}
                                 actions={props.actions || {}}
                                 className={className}
@@ -199,13 +202,14 @@ export const Planner = (props: Props) => {
 
                     return (
                         <PlannerConnection
-                            style={{ zIndex: id === topConnection ? 100 : -1 }}
+                            style={{ zIndex: id === topConnection ? -1 : -50 }}
                             size={nodeSize}
                             key={key}
                             className={className}
                             connection={connection}
                             actions={props.actions?.connection || []}
-                            onMouseEnter={onConnectionMouseEnter(id)}
+                            onMouseEnter={props.onConnectionMouseEnter}
+                            onMouseOver={onConnectionMouseOver(id)}
                             onMouseLeave={onConnectionMouseLeave}
                         />
                     );
