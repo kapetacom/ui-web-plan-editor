@@ -54,6 +54,7 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
 
 const emptyList = [];
 export const Planner = (props: Props) => {
+    const { isDragging } = useContext(DnDContext);
     const { nodeSize = PlannerNodeSize.MEDIUM, plan } = useContext(PlannerContext);
 
     const instances = plan?.spec.blocks ?? emptyList;
@@ -78,7 +79,16 @@ export const Planner = (props: Props) => {
         [props.onConnectionMouseEnter]
     );
 
-    const [topBlock, setTopBlock] = useState<string | null>(null);
+    const [topBlock, setTopBlockState] = useState<string | null>(null);
+    // Only allow setting the top block when not dragging - to avoid flickering
+    const setTopBlock = useCallback(
+        (blockId: string | null) => {
+            if (!isDragging) {
+                setTopBlockState(blockId);
+            }
+        },
+        [isDragging]
+    );
 
     const onEnter = useCallback(
         (cb) => (context: ActionContext) => {
@@ -189,7 +199,7 @@ export const Planner = (props: Props) => {
 
                     return (
                         <PlannerConnection
-                            style={{ zIndex: id === topConnection ? 100 : id }}
+                            style={{ zIndex: id === topConnection ? 100 : -1 }}
                             size={nodeSize}
                             key={key}
                             className={className}
