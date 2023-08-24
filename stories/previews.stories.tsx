@@ -9,6 +9,7 @@ import { ResourceTypePreview } from '../src/components/ResourceTypePreview';
 import { readPlanV2 } from './data/planReader';
 import { AssetThumbnail, fromAsset } from '../src';
 import { DefaultContext } from '@kapeta/ui-web-components';
+import { Asset } from '@kapeta/ui-web-types';
 
 export default {
     title: 'Previews',
@@ -170,7 +171,7 @@ export const ThumbnailPlan = () => {
                 installerService={{
                     uninstall: () => Promise.resolve(),
                     install: () => Promise.resolve(),
-                    get: () => Promise.resolve(data.value!.block!),
+                    get: () => Promise.resolve({} as Asset<any>),
                 }}
                 loadPlanContext={() => {
                     return {
