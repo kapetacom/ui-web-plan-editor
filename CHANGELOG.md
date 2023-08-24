@@ -1,3 +1,12 @@
+## [1.4.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.0...v1.4.1) (2023-08-24)
+
+
+### Bug Fixes
+
+* dont swap order while dragging ([d01f77e](https://github.com/kapetacom/ui-web-plan-editor/commit/d01f77e108581ab0db99ea0831be036c6967686c))
+* make hovered block and resources render on top ([36839c1](https://github.com/kapetacom/ui-web-plan-editor/commit/36839c1d6e75d889255f302f774b1b47090276f6))
+* use zIndex for connection swap to restore animations ([9a55ba2](https://github.com/kapetacom/ui-web-plan-editor/commit/9a55ba27892dc84a181c324ad47169cde41ace67))
+
 # [1.4.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.3.1...v1.4.0) (2023-08-24)
 
 
