@@ -35,6 +35,7 @@ interface Props {
     size: PlannerNodeSize;
     actions?: PlannerActionConfig;
     className?: string;
+    style?: React.CSSProperties;
     onMouseEnter?: (context: ActionContext) => void;
     onMouseLeave?: (context: ActionContext) => void;
     onResourceMouseEnter?: (context: ActionContext) => void;
@@ -148,6 +149,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                 }
                             }}
                             style={{
+                                ...props.style,
                                 left: `${point.x}px`,
                                 top: `${point.y}px`,
                             }}

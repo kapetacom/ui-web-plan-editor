@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { PlannerActionConfig, PlannerContext } from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';
@@ -75,6 +75,49 @@ export const Planner = (props: Props) => {
         [props.onConnectionMouseEnter]
     );
 
+    const [topBlock, setTopBlock] = useState<string | null>(null);
+
+    const onEnter = useCallback(
+        (cb) => (context: ActionContext) => {
+            if (context.blockInstance) {
+                setTopBlock(context.blockInstance.id);
+            }
+            cb(context);
+        },
+        [setTopBlock]
+    );
+
+    const onLeave = useCallback(
+        (cb) => (context: ActionContext) => {
+            if (context.blockInstance?.id === topBlock) {
+                setTopBlock(null);
+            }
+            cb(context);
+        },
+        [topBlock, setTopBlock]
+    );
+
+    const callbacks = useMemo(
+        () => ({
+            onBlockMouseEnter: onEnter(props.onBlockMouseEnter),
+            onBlockMouseLeave: onLeave(props.onBlockMouseLeave),
+            onResourceMouseEnter: onEnter(props.onResourceMouseEnter),
+            onResourceMouseLeave: onLeave(props.onResourceMouseLeave),
+            onConnectionMouseEnter: onEnter(props.onConnectionMouseEnter),
+            onConnectionMouseLeave: onLeave(props.onConnectionMouseLeave),
+        }),
+        [
+            onEnter,
+            onLeave,
+            props.onBlockMouseEnter,
+            props.onBlockMouseLeave,
+            props.onResourceMouseEnter,
+            props.onResourceMouseLeave,
+            props.onConnectionMouseEnter,
+            props.onConnectionMouseLeave,
+        ]
+    );
+
     const focusInfo = useFocusInfo();
     const focusModeEnabled = !!focusInfo;
 
@@ -107,13 +150,14 @@ export const Planner = (props: Props) => {
                             configuration={props.configurations?.[instance.id]}
                         >
                             <PlannerBlockNode
+                                style={{ zIndex: instance.id === topBlock ? 100 : index }}
                                 size={nodeSize}
                                 actions={props.actions || {}}
                                 className={className}
-                                onMouseEnter={props.onBlockMouseEnter}
-                                onMouseLeave={props.onBlockMouseLeave}
-                                onResourceMouseEnter={props.onResourceMouseEnter}
-                                onResourceMouseLeave={props.onResourceMouseLeave}
+                                onMouseEnter={callbacks.onBlockMouseEnter}
+                                onMouseLeave={callbacks.onBlockMouseLeave}
+                                onResourceMouseEnter={callbacks.onResourceMouseEnter}
+                                onResourceMouseLeave={callbacks.onResourceMouseLeave}
                             />
                         </BlockContextProvider>
                     );
