@@ -109,6 +109,8 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                             color: '#263238',
                             '& > .MuiChip-label': {
                                 p: '0 4px',
+                                width: '24px',
+                                height: '24px',
                             },
                             '&:hover': {
                                 boxShadow: 2,
