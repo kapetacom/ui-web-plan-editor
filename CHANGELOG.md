@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.1...v1.4.2) (2023-08-24)
+
+
+### Bug Fixes
+
+* improved mouseover handling for connections ([1b8ed9d](https://github.com/kapetacom/ui-web-plan-editor/commit/1b8ed9d6a4f14fe788754cd58da2337ba143154a))
+
 ## [1.4.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.0...v1.4.1) (2023-08-24)
 
 
