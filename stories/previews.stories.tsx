@@ -7,6 +7,8 @@ import { BlockService, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/u
 import { BlockPreview, BlockTypePreview } from '../src/components/BlockTypePreview';
 import { ResourceTypePreview } from '../src/components/ResourceTypePreview';
 import { readPlanV2 } from './data/planReader';
+import { AssetThumbnail, fromAsset } from '../src';
+import { DefaultContext } from '@kapeta/ui-web-components';
 
 export default {
     title: 'Previews',
@@ -142,5 +144,79 @@ export const ResourceType = () => {
                 <div>Loading...</div>
             )}
         </TempPreviewContainer>
+    );
+};
+
+export const ThumbnailPlan = () => {
+    const plan = useAsync(() => readPlanV2());
+
+    if (!plan.value) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <DefaultContext>
+            <AssetThumbnail
+                asset={{
+                    content: plan.value.plan,
+                    ref: 'kapeta/something:local',
+                    version: 'local',
+                    editable: true,
+                    exists: true,
+                }}
+                width={400}
+                height={400}
+                onClick={() => {}}
+                installerService={{
+                    uninstall: () => Promise.resolve(),
+                    install: () => Promise.resolve(),
+                    get: () => Promise.resolve(data.value!.block!),
+                }}
+                loadPlanContext={() => {
+                    return {
+                        loading: false,
+                        blocks: plan.value?.blockAssets || [],
+                    };
+                }}
+            />
+        </DefaultContext>
+    );
+};
+
+export const ThumbnailBlock = () => {
+    const data = useAsync(async () => {
+        const block = await BlockService.get('kapeta/user:local');
+        const blockType = BlockTypeProvider.get(block.data.kind);
+
+        return {
+            block,
+            blockType,
+        };
+    });
+
+    if (!data.value) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <DefaultContext>
+            <AssetThumbnail
+                asset={fromAsset(data.value.block)}
+                width={400}
+                height={400}
+                onClick={() => {}}
+                installerService={{
+                    uninstall: () => Promise.resolve(),
+                    install: () => Promise.resolve(),
+                    get: () => Promise.resolve(data.value!.block!),
+                }}
+                loadPlanContext={() => {
+                    return {
+                        loading: false,
+                        blocks: [],
+                    };
+                }}
+            />
+        </DefaultContext>
     );
 };
