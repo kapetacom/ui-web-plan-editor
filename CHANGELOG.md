@@ -1,3 +1,18 @@
+# [1.4.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.3.1...v1.4.0) (2023-08-24)
+
+
+### Bug Fixes
+
+* consistent spacing for connectionPoints ([2283ff5](https://github.com/kapetacom/ui-web-plan-editor/commit/2283ff57efcc45894bd621f935b09a81a059c51e))
+* handle resource dnd scroll offsets (avoid drift) ([20988bd](https://github.com/kapetacom/ui-web-plan-editor/commit/20988bd7c4a9e0457758ae8b55635d47a884773e))
+* hide action buttons while a drag is in progress ([3d808ae](https://github.com/kapetacom/ui-web-plan-editor/commit/3d808aec9a151a1874d8a2521e4ea5ab7ad11589))
+
+
+### Features
+
+* convert dragged resources to consumable ([dbe8317](https://github.com/kapetacom/ui-web-plan-editor/commit/dbe83175f343674a669714a0263b4ccb4c730d4b))
+* new purple indicator for drag and drop resources ([3704c07](https://github.com/kapetacom/ui-web-plan-editor/commit/3704c079b6aec81bdd28538cf80d5c97041f0663))
+
 ## [1.3.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.3.0...v1.3.1) (2023-08-22)
 
 
