@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.3...v1.4.4) (2023-08-24)
+
+
+### Bug Fixes
+
+* Show if button is active ([#71](https://github.com/kapetacom/ui-web-plan-editor/issues/71)) ([2da22cb](https://github.com/kapetacom/ui-web-plan-editor/commit/2da22cb70ad3cc2ee1fb93b7d48e45e757ec4c1f))
+
 ## [1.4.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.2...v1.4.3) (2023-08-24)
 
 
