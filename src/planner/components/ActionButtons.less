@@ -78,4 +78,15 @@
             border-color: @kapeta-error-states-outlinedBorder;
         }
     }
+
+    &.processing .container {
+        cursor: default;
+        background-color: @kapeta-block-outline;
+        border: 1px solid @kapeta-block-outline;
+        &:hover,
+        &:active {
+            background-color: @kapeta-block-outline;
+            border: 1px solid @kapeta-block-outline;
+        }
+    }
 }

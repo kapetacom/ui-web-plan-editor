@@ -44,6 +44,17 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 label: 'Inspect',
             },
             {
+                enabled(): boolean {
+                    return true; // planner.mode !== PlannerMode.VIEW;
+                },
+                async onClick(context, action) {
+                    await new Promise((resolve) => setTimeout(resolve, 10000));
+                },
+                buttonStyle: ButtonStyle.PRIMARY,
+                icon: 'fa fa-play',
+                label: 'Test',
+            },
+            {
                 enabled(context, { blockInstance }): boolean {
                     return (
                         planner.mode !== PlannerMode.VIEW &&

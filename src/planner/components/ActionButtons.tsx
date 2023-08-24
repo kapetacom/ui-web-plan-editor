@@ -1,9 +1,11 @@
 import React, { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ActionContext, PlannerAction } from '../types';
-import { PlannerContext } from '../PlannerContext';
+import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { staggeredFade } from '../utils/transitionUtils';
 import './ActionButtons.less';
 import { usePrevious } from 'react-use';
+import { IconButton } from '@mui/material';
+import { toClass } from '@kapeta/ui-web-utils';
 
 const CircleButton = (props) => {
     return (
@@ -23,7 +25,7 @@ const CircleButton = (props) => {
     );
 };
 
-interface ActionButtonProps {
+interface ActionButtonListProps {
     pointType?: 'left' | 'right' | 'center';
     transition?: 'fade' | 'slide';
     x: number;
@@ -35,7 +37,7 @@ interface ActionButtonProps {
 }
 
 // Automatically compensate for the width of the connection buttons
-export const ActionButtons = (props: ActionButtonProps) => {
+export const ActionButtons = (props: ActionButtonListProps) => {
     const planner = useContext(PlannerContext);
 
     const ref = useRef<HTMLDivElement>(null);
@@ -115,35 +117,82 @@ export const ActionButtons = (props: ActionButtonProps) => {
                 {/* inline element to get exact width and height */}
                 <div ref={ref} className="action-buttons-container">
                     {renderedActions.map((action: PlannerAction<any>, ix) => {
-                        const label =
-                            typeof action.label === 'function'
-                                ? action.label(planner, props.actionContext)
-                                : action.label;
-
-                        const icon =
-                            typeof action.icon === 'function' ? action.icon(planner, props.actionContext) : action.icon;
-
-                        const buttonStyle =
-                            typeof action.buttonStyle === 'function'
-                                ? action.buttonStyle(planner, props.actionContext)
-                                : action.buttonStyle;
-
                         return (
-                            <CircleButton
+                            <ActionButton
                                 key={ix}
-                                label={label}
-                                icon={icon}
-                                className={buttonStyle}
-                                style={{
-                                    pointerEvents: props.show ? 'auto' : 'none',
-                                    ...transitionFn(ix),
-                                }}
-                                onClick={() => action.onClick(planner, props.actionContext)}
+                                action={action}
+                                show={props.show}
+                                transitionFn={() => transitionFn(ix)}
+                                planner={planner}
+                                actionContext={props.actionContext}
                             />
                         );
                     })}
                 </div>
             </foreignObject>
         </svg>
+    );
+};
+
+interface ActionButtonProps {
+    action: PlannerAction<any>;
+    planner: PlannerContextData;
+    actionContext: ActionContext;
+    show: boolean;
+    transitionFn: () => any;
+}
+
+const ActionButton = (props: ActionButtonProps) => {
+    const [processing, setProcessing] = useState(false);
+    const label =
+        typeof props.action.label === 'function'
+            ? props.action.label(props.planner, props.actionContext)
+            : props.action.label;
+
+    let icon =
+        typeof props.action.icon === 'function'
+            ? props.action.icon(props.planner, props.actionContext)
+            : props.action.icon;
+
+    const buttonStyle =
+        typeof props.action.buttonStyle === 'function'
+            ? props.action.buttonStyle(props.planner, props.actionContext)
+            : props.action.buttonStyle;
+
+    if (processing) {
+        icon = 'fa fa-cog fa-spin';
+    }
+
+    const containerClass = toClass({
+        [buttonStyle]: true,
+        processing,
+    });
+
+    return (
+        <CircleButton
+            label={label}
+            icon={icon}
+            className={containerClass}
+            style={{
+                pointerEvents: props.show ? 'auto' : 'none',
+                ...props.transitionFn(),
+            }}
+            onClick={async () => {
+                if (processing) {
+                    return;
+                }
+                const out = props.action.onClick(props.planner, props.actionContext);
+                if (out instanceof Promise) {
+                    setProcessing(true);
+                    try {
+                        await out;
+                    } catch (e) {
+                        console.warn('Error while processing action', e);
+                    } finally {
+                        setProcessing(false);
+                    }
+                }
+            }}
+        />
     );
 };
