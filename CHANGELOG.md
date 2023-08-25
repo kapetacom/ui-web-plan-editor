@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.4...v1.4.5) (2023-08-25)
+
+
+### Bug Fixes
+
+* Use boolean from useConfirm instead of resolve/reject ([367839d](https://github.com/kapetacom/ui-web-plan-editor/commit/367839df91f1529b50f9970c4ff2047e20dd7ae9))
+
 ## [1.4.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.3...v1.4.4) (2023-08-24)
 
 
