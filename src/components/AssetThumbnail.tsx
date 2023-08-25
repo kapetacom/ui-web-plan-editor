@@ -82,7 +82,7 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                             if (!props.installerService?.uninstall) {
                                 return;
                             }
-                            try {
+                            if (
                                 await confirm({
                                     title: 'Uninstall asset',
                                     content: `
@@ -90,14 +90,16 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                                     This will not delete anything from your disk.
                                     `,
                                     confirmationText: 'Uninstall',
-                                });
-
-                                setDeleting(true);
-                                await props.installerService.uninstall(props.asset.ref);
-                            } catch (e) {
-                                // Ignore
-                            } finally {
-                                setDeleting(false);
+                                })
+                            ) {
+                                try {
+                                    setDeleting(true);
+                                    await props.installerService.uninstall(props.asset.ref);
+                                } catch (e) {
+                                    // Ignore
+                                } finally {
+                                    setDeleting(false);
+                                }
                             }
                         }}
                         sx={{
