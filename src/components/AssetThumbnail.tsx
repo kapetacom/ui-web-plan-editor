@@ -1,7 +1,7 @@
 import React, { forwardRef, PropsWithChildren, useState } from 'react';
 import { Badge, Box, Chip, CircularProgress, Stack, Typography } from '@mui/material';
 import { SchemaKind } from '@kapeta/ui-web-types';
-import { DateDisplay, InstallerService } from '@kapeta/ui-web-components';
+import { DateDisplay, getNameForKind, InstallerService } from '@kapeta/ui-web-components';
 import { AssetKindIcon, CoreTypes, SimpleLoader, useConfirm } from '@kapeta/ui-web-components';
 
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
@@ -42,6 +42,8 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
 
     const [deleting, setDeleting] = useState(false);
     const confirm = useConfirm();
+
+    const kindNameLC = getNameForKind(props.asset.content.kind).toLowerCase();
 
     return (
         <Stack
@@ -84,7 +86,7 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                             }
                             if (
                                 await confirm({
-                                    title: 'Uninstall asset',
+                                    title: `Uninstall ${kindNameLC}`,
                                     content: `
                                     Are you sure you want to uninstall ${title}?
                                     This will not delete anything from your disk.
