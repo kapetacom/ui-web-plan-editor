@@ -1,3 +1,11 @@
+## [1.4.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.5...v1.4.6) (2023-08-31)
+
+
+### Bug Fixes
+
+* Missed changed interface ([0dffe4a](https://github.com/kapetacom/ui-web-plan-editor/commit/0dffe4ad757d6cd7dd59efb92986017a8adb91c0))
+* Use asset kind name when possible ([#73](https://github.com/kapetacom/ui-web-plan-editor/issues/73)) ([aea2a14](https://github.com/kapetacom/ui-web-plan-editor/commit/aea2a1441feed30e6f9cc63d8a95499389cc43d6))
+
 ## [1.4.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.4...v1.4.5) (2023-08-25)
 
 
