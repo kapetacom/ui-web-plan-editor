@@ -171,7 +171,7 @@ export const ThumbnailPlan = () => {
                 installerService={{
                     uninstall: () => Promise.resolve(),
                     install: () => Promise.resolve(),
-                    get: () => Promise.resolve({} as Asset<any>),
+                    get: () => Promise.resolve(true),
                 }}
                 loadPlanContext={() => {
                     return {
@@ -209,7 +209,7 @@ export const ThumbnailBlock = () => {
                 installerService={{
                     uninstall: () => Promise.resolve(),
                     install: () => Promise.resolve(),
-                    get: () => Promise.resolve(data.value!.block!),
+                    get: () => Promise.resolve(true),
                 }}
                 loadPlanContext={() => {
                     return {
