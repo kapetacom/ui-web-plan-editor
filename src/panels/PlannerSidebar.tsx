@@ -4,20 +4,32 @@ import { CloseRounded } from '@mui/icons-material';
 
 interface Props extends PropsWithChildren, Omit<DrawerProps, 'children'> {
     title: string;
+    size?: 'small' | 'medium' | 'large';
 }
 
 export const PlannerSidebar = (props: Props) => {
+    const title = props.title;
+    const propsCopy: any = { ...props };
+    delete propsCopy.title;
+    let width = '680px';
+    switch (props.size) {
+        case 'large':
+            width = 'calc(100% - 530px)';
+            break;
+        case 'medium':
+            width = 'calc(100% - 730px)';
+    }
     return (
         <Drawer
             anchor={'right'}
             sx={{
                 '& .MuiDrawer-paper': {
-                    width: '680px',
+                    width: width,
                     p: 4,
                     boxSizing: 'border-box',
                 },
             }}
-            {...props}
+            {...propsCopy}
         >
             <Box mb={2}>
                 <Stack

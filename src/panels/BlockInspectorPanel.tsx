@@ -7,6 +7,7 @@ import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
 import { PlannerContext } from '../planner/PlannerContext';
 import { useBlockValidationIssues } from '../planner/hooks/block-validation';
 import { PlannerSidebar } from './PlannerSidebar';
+import { Box } from '@mui/material';
 
 interface BlockInspectorPanelProps {
     instance?: BlockInstance;
@@ -38,17 +39,20 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
     }, [props.instance]);
 
     return (
-        <PlannerSidebar title={title} open={props.open} onClose={props.onClosed}>
+        <PlannerSidebar title={title} open={props.open} size={'large'} onClose={props.onClosed}>
             {props.instance && (
                 <div className="item-inspector-panel">
                     <TabContainer>
                         {props.emitter && (
                             <TabPage id="logs" title="Logs">
-                                <LogPanel
-                                    key={`${props.instance.block.ref}_logs`}
-                                    logs={props.logs}
-                                    emitter={props.emitter}
-                                />
+                                <Box
+                                    sx={{
+                                        mt: 2,
+                                        height: 'calc(100% - 16px)',
+                                    }}
+                                >
+                                    <LogPanel logs={props.logs} emitter={props.emitter} />
+                                </Box>
                             </TabPage>
                         )}
                         <TabPage id="issues" title="Issues">

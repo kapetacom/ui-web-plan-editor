@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react';
-import { useList } from 'react-use';
-import { toClass } from '@kapeta/ui-web-utils';
+import React, { useEffect, useMemo } from 'react';
 
-import './LogPanel.less';
+import { XTerm, escapeSequence, toDateText, KapDateTime } from '@kapeta/ui-web-components';
+import { EventEmitter } from 'events';
 
 export interface LogEmitter {
-    onLog(listener: (entry: LogEntry) => void): void;
+    onLog(listener: (entry: LogEntry) => void): () => void;
 }
 
 export enum LogLevel {
@@ -29,63 +28,69 @@ export interface LogEntry {
     source?: LogSource;
 }
 
+function asLogString(entry: LogEntry) {
+    const dateString = entry.time
+        ? toDateText({
+              format: KapDateTime.TIME_24_WITH_SECONDS,
+              date: entry.time,
+              allowRelative: false,
+          })
+        : 'unknown';
+
+    // See: https://en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit
+    const prefix = `${escapeSequence('3;100;232m')}${dateString}:${escapeSequence('0m')}`;
+    return `${prefix} ${entry.message.trim()}`;
+}
+
 export interface LogPanelProps {
     logs?: LogEntry[];
     emitter?: LogEmitter;
-    reverse?: boolean;
-    maxEntries?: number;
 }
 
-const DEFAULT_MAX_ENTRIES = 200;
+const terminalOptions = {
+    disableStdin: true,
+    convertEol: true,
+};
 
 export const LogPanel = (props: LogPanelProps) => {
-    const maxEntries = props.maxEntries || DEFAULT_MAX_ENTRIES;
-    const [logs, logListHandler] = useList(props.logs || []);
+    const stream = useMemo(() => {
+        const eventEmitter = new EventEmitter();
 
-    if (props.emitter) {
-        const logListener = (entry: LogEntry) => {
-            while (logs.length >= maxEntries) {
-                if (props.reverse) {
-                    logs.pop();
-                } else {
-                    logs.shift();
-                }
-            }
-
-            if (props.reverse) {
-                logs.unshift(entry);
-            } else {
-                logs.push(entry);
-            }
-            logListHandler.set(logs);
+        return {
+            write: (data: string) => {
+                eventEmitter.emit('data', data);
+            },
+            on: (listener: (line: string) => void) => {
+                eventEmitter.on('data', listener);
+                return () => {
+                    eventEmitter.off('data', listener);
+                };
+            },
         };
-        props.emitter.onLog(logListener);
-    }
+    }, []);
 
     useEffect(() => {
-        logListHandler.clear();
-    }, [props.emitter, logListHandler]);
+        if (!props.emitter) {
+            return;
+        }
 
-    useEffect(() => {
-        logListHandler.set(props.logs ? props.logs : []);
-    }, [props.logs, logListHandler]);
+        return props.emitter!.onLog((entry: LogEntry) => {
+            stream.write(asLogString(entry) + '\n');
+        });
+    }, [props.emitter, stream]);
+
+    const lines = useMemo(() => {
+        return props.logs ? props.logs.map(asLogString) : [];
+    }, [props.logs]);
 
     return (
-        <div className="log-panel">
-            {logs.map((logEntry, ix) => {
-                const className = toClass({
-                    'log-entry': true,
-                    [`status-${logEntry.level.toLowerCase()}`]: true,
-                });
-
-                return (
-                    <div className={className} key={`log_entry_${ix}`}>
-                        <div className="date">{new Date(logEntry.time).toISOString()}</div>
-                        <div className="type">{logEntry.level}</div>
-                        <div className="message">{logEntry.message.trim()}</div>
-                    </div>
-                );
-            })}
-        </div>
+        <XTerm
+            terminalOptions={{
+                disableStdin: true,
+                convertEol: true,
+            }}
+            lines={lines}
+            stream={stream}
+        />
     );
 };
