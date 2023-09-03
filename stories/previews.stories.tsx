@@ -2,14 +2,13 @@ import React from 'react';
 
 import { useAsync } from 'react-use';
 import { PlanPreview } from '../src/components/PlanPreview';
-import './data/BlockServiceMock';
-import { BlockService, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { BlockService } from './data/BlockServiceMock';
+import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockPreview, BlockTypePreview } from '../src/components/BlockTypePreview';
 import { ResourceTypePreview } from '../src/components/ResourceTypePreview';
 import { readPlanV2 } from './data/planReader';
 import { AssetThumbnail, fromAsset } from '../src';
 import { DefaultContext } from '@kapeta/ui-web-components';
-import { Asset } from '@kapeta/ui-web-types';
 
 export default {
     title: 'Previews',

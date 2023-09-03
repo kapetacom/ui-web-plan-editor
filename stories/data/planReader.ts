@@ -1,4 +1,4 @@
-import { BlockServiceMock } from './BlockServiceMock';
+import { BlockService } from './BlockServiceMock';
 import { PlannerData } from './PlannerData';
 import { Asset } from '@kapeta/ui-web-types';
 import { BlockDefinition, Plan } from '@kapeta/schemas';
@@ -10,10 +10,10 @@ export async function readPlanV2(): Promise<{
     blockAssets: AssetInfo<BlockDefinition>[];
 }> {
     for (const block of PlannerData.spec.blocks || []) {
-        await BlockServiceMock.get(block.block.ref);
+        await BlockService.get(block.block.ref);
     }
 
-    const blocks = await BlockServiceMock.list();
+    const blocks = await BlockService.list();
 
     return {
         plan: _.cloneDeep(PlannerData),
