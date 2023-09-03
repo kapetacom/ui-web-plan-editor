@@ -10,7 +10,7 @@ import { PlannerActionConfig, PlannerContext, withPlannerContext } from '../src/
 import { useAsync } from 'react-use';
 import { ItemType, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
-import { ItemEditorPanel } from '../src/planner/components/ItemEditorPanel';
+import { ItemEditorPanel } from './helpers/ItemEditorPanel';
 import { EditItemInfo, PlannerMode } from '../src';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 

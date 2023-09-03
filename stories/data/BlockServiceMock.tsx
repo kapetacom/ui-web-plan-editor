@@ -1,5 +1,5 @@
-import { BlockService, BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { ResourceRole, ResourceProviderType } from '@kapeta/ui-web-types';
+import { BlockStore, BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { ResourceRole, ResourceProviderType, Asset } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { cloneDeep } from 'lodash';
 import React from 'react';
@@ -13,8 +13,7 @@ import {
     FormField,
     useBlock,
 } from '@kapeta/ui-web-components';
-
-export const BlockServiceMock = BlockService;
+import { BlockDefinition } from '@kapeta/schemas';
 
 const EditorComponent = () => {
     return (
@@ -382,21 +381,20 @@ BlockTypeProvider.register({
     definition: mobileBlock,
 });
 
-// Mock getter
-BlockServiceMock.list = async () => {
-    return [...blocks];
-};
-
-// @ts-ignore
-BlockServiceMock.get = async (ref) => {
-    const uri = parseKapetaUri(ref);
-    const out = blocks.find((a) => {
-        const aUri = parseKapetaUri(a.ref);
-        return uri.fullName === aUri.fullName;
-    });
-    if (!out) {
-        // eslint-disable-next-line no-console
-        console.error('Could not find ref: ', ref);
-    }
-    return out;
+export const BlockService: BlockStore = {
+    async list(): Promise<Asset<BlockDefinition>[]> {
+        return [...blocks];
+    },
+    async get(ref: string): Promise<Asset<BlockDefinition>> {
+        const uri = parseKapetaUri(ref);
+        const out = blocks.find((a) => {
+            const aUri = parseKapetaUri(a.ref);
+            return uri.fullName === aUri.fullName;
+        });
+        if (!out) {
+            // eslint-disable-next-line no-console
+            console.error('Could not find ref: ', ref);
+        }
+        return out as Asset<BlockDefinition>;
+    },
 };

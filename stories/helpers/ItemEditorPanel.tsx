@@ -1,47 +1,18 @@
 import React, { useContext, useMemo } from 'react';
-import {
-    AssetNameInput,
-    FormButtons,
-    FormContainer,
-    FormField,
-    FormFieldType,
-    SimpleLoader,
-} from '@kapeta/ui-web-components';
+import { AssetNameInput, FormButtons, FormContainer, FormField, FormFieldType } from '@kapeta/ui-web-components';
 
-import { BlockTypeProvider, IdentityService, ResourceTypeProvider } from '@kapeta/ui-web-context';
-
+import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
-
 import type { SchemaKind } from '@kapeta/ui-web-types';
 import { ItemType, ResourceRole } from '@kapeta/ui-web-types';
-
 import './ItemEditorPanel.less';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useAsync } from 'react-use';
-import { EditItemInfo } from '../types';
-import { cloneDeep } from 'lodash';
-import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { Connection, Entity, Resource } from '@kapeta/schemas';
-
 import { Button } from '@mui/material';
-import { PlannerSidebar } from '../../panels/PlannerSidebar';
-
-// Higher-order-component to allow us to use hooks for data loading (not possible in class components)
-const withNamespaces = (ChildComponent) => {
-    return (props) => {
-        const { value: namespaces, loading } = useAsync(async () => {
-            const identity = await IdentityService.getCurrent();
-            const memberships = await IdentityService.getMemberships(identity.id);
-            return [identity.handle, ...memberships.map((membership) => membership.identity.handle)];
-        });
-        return (
-            <SimpleLoader loading={loading}>
-                <ChildComponent {...props} namespaces={namespaces || []} />
-            </SimpleLoader>
-        );
-    };
-};
-const AutoLoadAssetNameInput = withNamespaces(AssetNameInput);
+import { PlannerContext, PlannerContextData } from '../../src/planner/PlannerContext';
+import { EditItemInfo } from '../../src/planner/types';
+import { cloneDeep } from 'lodash';
+import { PlannerSidebar } from '../../src/panels/PlannerSidebar';
 
 interface BlockConnectionEditData {
     connection: Connection;
@@ -74,9 +45,10 @@ function renderBlockFields(data: SchemaKind) {
                 options={options}
             />
 
-            <AutoLoadAssetNameInput
+            <AssetNameInput
                 name="metadata.name"
                 label="Name"
+                namespaces={['kapeta', 'local']}
                 help={'The name of this block - e.g. "myhandle/my-block"'}
             />
 
