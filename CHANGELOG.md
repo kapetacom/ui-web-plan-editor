@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.6...v1.5.0) (2023-09-03)
+
+
+### Features
+
+* Avoid using desktop-specific things ([#74](https://github.com/kapetacom/ui-web-plan-editor/issues/74)) ([3874843](https://github.com/kapetacom/ui-web-plan-editor/commit/3874843ca0e29071cc730c315a11a4f53604cae2))
+
 ## [1.4.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.5...v1.4.6) (2023-08-31)
 
 
