@@ -1,3 +1,15 @@
+# [1.6.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.5.0...v1.6.0) (2023-09-03)
+
+
+### Bug Fixes
+
+* Bump to fix build issue with FormButtons ([74f72e2](https://github.com/kapetacom/ui-web-plan-editor/commit/74f72e2406cf2171ca36e70cf60c582cd324e844))
+
+
+### Features
+
+* Improves inspection panel ([#75](https://github.com/kapetacom/ui-web-plan-editor/issues/75)) ([32b1793](https://github.com/kapetacom/ui-web-plan-editor/commit/32b1793ab2f9aa2768878ad36cd7e4d4109d7212))
+
 # [1.5.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.4.6...v1.5.0) (2023-09-03)
 
 
