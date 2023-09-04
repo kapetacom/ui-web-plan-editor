@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.0...v1.6.1) (2023-09-04)
+
+
+### Bug Fixes
+
+* Very strange UI glitch when using <button> for action buttons ([#76](https://github.com/kapetacom/ui-web-plan-editor/issues/76)) ([4262bfe](https://github.com/kapetacom/ui-web-plan-editor/commit/4262bfe090366e99f6cb119453c74f01aadda404))
+
 # [1.6.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.5.0...v1.6.0) (2023-09-03)
 
 
