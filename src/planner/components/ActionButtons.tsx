@@ -4,12 +4,13 @@ import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { staggeredFade } from '../utils/transitionUtils';
 import './ActionButtons.less';
 import { usePrevious } from 'react-use';
-import { IconButton } from '@mui/material';
 import { toClass } from '@kapeta/ui-web-utils';
 
 const CircleButton = (props) => {
+    // NOTE: A bit strange - but this has to be a div to not experience a UI glitch where the button
+    // receives some sort of focus and is moved into view when closing the sidepanel it opens
     return (
-        <button
+        <div
             onClick={props.onClick}
             className={`svg-circle-button ${props.className}`}
             style={{ padding: 0, border: 0, background: 'none', ...(props.style || {}) }}
@@ -21,7 +22,7 @@ const CircleButton = (props) => {
                     <i className={props.icon} />
                 </div>
             </div>
-        </button>
+        </div>
     );
 };
 
