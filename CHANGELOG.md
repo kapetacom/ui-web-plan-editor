@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.1...v1.6.2) (2023-09-07)
+
+
+### Bug Fixes
+
+* Target should not be included always ([#77](https://github.com/kapetacom/ui-web-plan-editor/issues/77)) ([28b2c4b](https://github.com/kapetacom/ui-web-plan-editor/commit/28b2c4b03ef09469d44b66484349643ea101cfb5))
+
 ## [1.6.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.0...v1.6.1) (2023-09-04)
 
 
