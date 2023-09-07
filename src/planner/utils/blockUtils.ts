@@ -47,9 +47,6 @@ export function createBlockInstanceForBlockType(ref: string, provider: IBlockTyp
         },
         spec: {
             entities: {},
-            target: {
-                kind: '',
-            },
             providers: [],
             consumers: [],
         },
