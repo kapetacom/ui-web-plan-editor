@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.3...v1.6.4) (2023-09-08)
+
+
+### Bug Fixes
+
+* Add line breaks before new entity ([#79](https://github.com/kapetacom/ui-web-plan-editor/issues/79)) ([3bbad9a](https://github.com/kapetacom/ui-web-plan-editor/commit/3bbad9abcab42c8da04392a85f4ebfe9e7b84465))
+
 ## [1.6.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.2...v1.6.3) (2023-09-08)
 
 
