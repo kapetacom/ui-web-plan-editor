@@ -1,3 +1,10 @@
+## [1.6.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.4...v1.6.5) (2023-09-08)
+
+
+### Bug Fixes
+
+* Add colours for missing statuses from local cluster service ([#80](https://github.com/kapetacom/ui-web-plan-editor/issues/80)) ([e952a14](https://github.com/kapetacom/ui-web-plan-editor/commit/e952a1410e9748aa4081ee973c85a683ad6e540b))
+
 ## [1.6.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.3...v1.6.4) (2023-09-08)
 
 
