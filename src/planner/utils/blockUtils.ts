@@ -213,7 +213,8 @@ function addEntity(entity: Entity, target?: EntityList) {
     }
 
     const code = DSLWriter.write([DSLConverters.fromSchemaEntity(entity)]);
-    targets.source.value += code;
+    targets.source.value += '\n\n' + code;
+    targets.source.value = targets.source.value.trim();
     targets.types = [...targets.types, entity];
 
     return { ...target };
