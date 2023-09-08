@@ -11,12 +11,21 @@
         overflow: visible;
     }
 
-    .instance_exited {
+    .instance_failed {
         fill: @red;
+    }
+
+    .instance_busy {
+        fill: @yellow-xlight;
     }
 
     .instance_stopped {
         fill: #ccc;
+    }
+
+    .instance_stopping {
+        fill: #ccc;
+        animation: blinker 1s linear infinite;
     }
 
     .instance_ready {
