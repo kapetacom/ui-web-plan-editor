@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.5...v1.7.0) (2023-09-10)
+
+
+### Features
+
+* Add support for default config ([#81](https://github.com/kapetacom/ui-web-plan-editor/issues/81)) ([12b396a](https://github.com/kapetacom/ui-web-plan-editor/commit/12b396aba66e141f664126d46abf1e711fd7a9b1))
+
 ## [1.6.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.4...v1.6.5) (2023-09-08)
 
 
