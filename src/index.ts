@@ -25,7 +25,7 @@ export * from './planner/DragAndDrop/DropZoneManager';
 export * from './planner/utils/blockUtils';
 export * from './planner/utils/planUtils';
 export * from './planner/utils/connectionUtils';
-
+export * from './planner/helpers';
 export * from './planner/Planner';
 
 /**
