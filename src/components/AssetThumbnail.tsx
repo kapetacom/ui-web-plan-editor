@@ -14,6 +14,7 @@ import { BlockPreview, BlockTypePreview } from './BlockTypePreview';
 import { ResourceTypePreview } from './ResourceTypePreview';
 import { AssetInfo } from '../types';
 import { BadgeTypeMap } from '@mui/material/Badge/Badge';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 const CONTAINER_CLASS = 'asset-thumbnail';
 const META_HEIGHT_INNER = 68;
@@ -39,6 +40,8 @@ interface InnerProps {
 
 export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & PropsWithChildren>((props, ref) => {
     const title = props.asset.content.metadata.title ?? props.asset.content.metadata.name;
+
+    const uri = parseKapetaUri(props.asset.content.metadata.name);
 
     const [deleting, setDeleting] = useState(false);
     const confirm = useConfirm();
@@ -147,7 +150,7 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                         {title}
                     </Typography>
                     <Typography color={'#eeeeee'} fontSize={12} fontWeight={400} variant={'caption'}>
-                        {props.asset.version}
+                        {props.asset.version} by {uri.handle}
                     </Typography>
                     {props.asset.lastModified && props.asset.lastModified > 0 && (
                         <Typography

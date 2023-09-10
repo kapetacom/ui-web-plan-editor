@@ -88,7 +88,11 @@ export interface PlannerContextData {
 
     getBlockById(blockId: string): BlockDefinition | undefined;
 
-    updatePlanMetadata(metadata: Metadata, configuration: EntityList): void;
+    updatePlanMetadata(
+        metadata: Metadata,
+        configuration: EntityList,
+        defaultConfiguration?: { [key: string]: any }
+    ): void;
 
     removeBlockDefinition(update: AssetInfo<BlockDefinition>): void;
 
@@ -204,7 +208,7 @@ const defaultValue: PlannerContextData = {
     addConnection(connection: Connection) {},
     updateConnectionMapping(connection: Connection) {},
     removeConnection(connection: Connection) {},
-    updatePlanMetadata(metadata: Metadata, configuration: EntityList) {},
+    updatePlanMetadata(metadata: Metadata, configuration: EntityList, defaultConfiguration?: { [key: string]: any }) {},
     onConnectionAdded() {
         return () => {};
     },
@@ -709,11 +713,16 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
             callbackHandlers.onConnectionAdded.forEach((cb) => cb(connection));
         },
-        updatePlanMetadata(metadata: Metadata, configuration: EntityList) {
+        updatePlanMetadata(
+            metadata: Metadata,
+            configuration: EntityList,
+            defaultConfiguration?: { [key: string]: any }
+        ) {
             updatePlan((prevState) => {
                 const newPlan = cloneDeep(prevState);
                 newPlan.metadata = metadata;
                 newPlan.spec.configuration = configuration;
+                newPlan.spec.defaultConfiguration = defaultConfiguration;
                 return newPlan;
             });
         },
