@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.0...v1.7.1) (2023-09-12)
+
+
+### Bug Fixes
+
+* add path props to AssetInfo ([7292513](https://github.com/kapetacom/ui-web-plan-editor/commit/72925134c16d9c698373ae25449e5301ec617655))
+
 # [1.7.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.6.5...v1.7.0) (2023-09-10)
 
 
