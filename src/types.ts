@@ -15,6 +15,8 @@ export interface AssetInfo<T> {
     lastModified?: number;
     exists?: boolean;
     editable?: boolean;
+    path?: string;
+    ymlPath?: string;
 }
 
 export function fromAsset<T>(asset: Asset<T>): AssetInfo<T> {
@@ -24,6 +26,8 @@ export function fromAsset<T>(asset: Asset<T>): AssetInfo<T> {
         ref: asset.ref,
         content: asset.data,
         exists: asset.exists,
+        path: asset.path,
+        ymlPath: asset.ymlPath,
     };
 }
 
