@@ -275,14 +275,50 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     const [zoom, setZoomLevel] = useState(1);
 
     // Allow internal changes, but load from props in case props change
-    const [plan, setPlan] = useState(props.plan);
+    type ContextData = {
+        plan: Plan;
+        blockAssets: AssetInfo<BlockDefinition>[];
+    };
+    const [{ plan, blockAssets }, setAssets] = useState<ContextData>({
+        plan: props.plan,
+        blockAssets: props.blockAssets,
+    });
+    const setPlan = useCallback(
+        function setPlan(updater: React.SetStateAction<Plan>) {
+            setAssets((prev) => {
+                const newPlan = typeof updater === 'function' ? updater(prev.plan) : updater;
+                if (prev.plan === newPlan) {
+                    return prev;
+                }
+                return {
+                    plan: newPlan,
+                    blockAssets: prev.blockAssets,
+                };
+            });
+        },
+        [setAssets]
+    );
 
+    const setBlockAssets = useCallback(
+        function setBlockAssets(updater: React.SetStateAction<AssetInfo<BlockDefinition>[]>) {
+            setAssets((prev) => {
+                const newAssets = typeof updater === 'function' ? updater(prev.blockAssets) : updater;
+                if (prev.blockAssets === newAssets) {
+                    return prev;
+                }
+                return {
+                    plan: prev.plan,
+                    blockAssets: newAssets,
+                };
+            });
+        },
+        [setAssets]
+    );
+
+    // Allow internal changes, but load from props in case props change
     useEffect(() => {
         setPlan(props.plan);
     }, [props.plan]);
-
-    // Allow internal changes, but load from props in case props change
-    const [blockAssets, setBlockAssets] = useState(props.blockAssets);
 
     useEffect(() => {
         setBlockAssets(props.blockAssets);
@@ -332,13 +368,19 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     const instanceStates = useMemo(() => props.instanceStates || {}, [props.instanceStates]);
 
-    const updatePlan = (changer: (prev: Plan) => Plan, preventChangeEvent?: boolean) => {
-        setPlan((prev) => {
-            const newPlan = changer(prev);
-            if (!preventChangeEvent && props.onChange && newPlan !== prev) {
-                props.onChange(newPlan);
+    const updatePlan = (changer: (prev: Plan) => Plan, preventChangeEvent?: (state: ContextData) => boolean) => {
+        setAssets((prev) => {
+            const newPlan = changer(prev.plan);
+            if (newPlan !== prev.plan) {
+                if (!(preventChangeEvent && preventChangeEvent(prev)) && props.onChange) {
+                    props.onChange(newPlan);
+                }
+                return {
+                    plan: newPlan,
+                    blockAssets: prev.blockAssets,
+                };
             }
-            return newPlan;
+            return prev;
         });
     };
 
@@ -358,8 +400,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     const viewMode = props.mode;
 
-    const isTempInstance = (blockInstance: BlockInstance) => {
-        const block = blockAssets.find((asset) => asset.ref === blockInstance.block.ref);
+    const isTempInstance = (assetState: ContextData, blockInstance: BlockInstance) => {
+        const block = assetState.blockAssets.find((asset) => asset.ref === blockInstance.block.ref);
         if (!block) {
             return true;
         }
@@ -371,13 +413,13 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         return false;
     };
 
-    const isTempInstanceId = (instanceId: string) => {
-        const blockInstance = plan.spec.blocks.find((block) => block.id === instanceId);
+    const isTempInstanceId = (assetState: ContextData, instanceId: string) => {
+        const blockInstance = assetState.plan.spec.blocks.find((block) => block.id === instanceId);
         if (!blockInstance) {
             return false;
         }
 
-        return isTempInstance(blockInstance);
+        return isTempInstance(assetState, blockInstance);
     };
 
     const updateBlockInstance = (instanceId: string, updater) => {
@@ -386,17 +428,20 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             return;
         }
         // Use state callback to reference the previous state (avoid stale ref)
-        updatePlan((prevState) => {
-            const newPlan = cloneDeep(prevState);
-            const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === instanceId) ?? -1;
-            if (blockIx === -1) {
-                throw new Error(`Block instance #${instanceId} not found`);
-            }
+        updatePlan(
+            (prevState) => {
+                const newPlan = cloneDeep(prevState);
+                const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === instanceId) ?? -1;
+                if (blockIx === -1) {
+                    throw new Error(`Block instance #${instanceId} not found`);
+                }
 
-            const blocks = (newPlan.spec.blocks = newPlan.spec.blocks || []);
-            blocks[blockIx] = updater(blocks[blockIx]);
-            return newPlan;
-        }, isTempInstanceId(instanceId));
+                const blocks = (newPlan.spec.blocks = newPlan.spec.blocks || []);
+                blocks[blockIx] = updater(blocks[blockIx]);
+                return newPlan;
+            },
+            (state) => isTempInstanceId(state, instanceId)
+        );
     };
     const canEditBlocks = viewMode === PlannerMode.EDIT;
     const canEditConnections = viewMode === PlannerMode.EDIT;
@@ -483,14 +528,17 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             if (!canEditBlocks) {
                 return;
             }
-            updatePlan((prevState) => {
-                const newPlan = cloneDeep(prevState);
-                if (!newPlan.spec.blocks) {
-                    newPlan.spec.blocks = [];
-                }
-                newPlan.spec.blocks.push(blockInstance);
-                return newPlan;
-            }, isTempInstance(blockInstance));
+            updatePlan(
+                (prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    if (!newPlan.spec.blocks) {
+                        newPlan.spec.blocks = [];
+                    }
+                    newPlan.spec.blocks.push(blockInstance);
+                    return newPlan;
+                },
+                (state) => isTempInstance(state, blockInstance)
+            );
             callbackHandlers.onBlockInstanceAdded.forEach((cb) => cb(blockInstance));
         },
         onBlockInstanceAdded(callback: InstanceAddedCallback) {
@@ -505,22 +553,25 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             if (!canEditBlocks) {
                 return;
             }
-            updatePlan((prevState) => {
-                const newPlan = cloneDeep(prevState);
-                const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
-                if (blockIx === -1) {
-                    // Not found - no change
-                    return prevState;
-                }
+            updatePlan(
+                (prevState) => {
+                    const newPlan = cloneDeep(prevState);
+                    const blockIx = newPlan.spec.blocks?.findIndex((pblock) => pblock.id === blockId) ?? -1;
+                    if (blockIx === -1) {
+                        // Not found - no change
+                        return prevState;
+                    }
 
-                newPlan.spec.blocks?.splice(blockIx, 1);
+                    newPlan.spec.blocks?.splice(blockIx, 1);
 
-                // Remove any connections that reference this block
-                newPlan.spec.connections = newPlan.spec.connections?.filter(
-                    (conn) => conn.consumer.blockId !== blockId && conn.provider.blockId !== blockId
-                );
-                return newPlan;
-            }, isTempInstanceId(blockId));
+                    // Remove any connections that reference this block
+                    newPlan.spec.connections = newPlan.spec.connections?.filter(
+                        (conn) => conn.consumer.blockId !== blockId && conn.provider.blockId !== blockId
+                    );
+                    return newPlan;
+                },
+                (state) => isTempInstanceId(state, blockId)
+            );
         },
         // resources
         addResource(blockRef: string, resource: Resource, role: ResourceRole) {
@@ -586,34 +637,37 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                 if (existingResource.metadata.name !== resource.metadata.name) {
                     // We changed the name of the resource.
                     // We need to update all connections that reference this resource
-                    updatePlan((prevPlanState) => {
-                        const newPlan = cloneDeep(prevPlanState);
-                        const affectedInstances = newPlan.spec.blocks.filter((instance) =>
-                            parseKapetaUri(instance.block.ref).equals(blockUri)
-                        );
+                    updatePlan(
+                        (prevPlanState) => {
+                            const newPlan = cloneDeep(prevPlanState);
+                            const affectedInstances = newPlan.spec.blocks.filter((instance) =>
+                                parseKapetaUri(instance.block.ref).equals(blockUri)
+                            );
 
-                        affectedInstances.forEach((instance) => {
-                            newPlan.spec.connections?.filter((conn) => {
-                                if (
-                                    role === ResourceRole.CONSUMES &&
-                                    conn.consumer.blockId === instance.id &&
-                                    conn.consumer.resourceName === resourceName
-                                ) {
-                                    conn.consumer.resourceName = resource.metadata.name;
-                                }
+                            affectedInstances.forEach((instance) => {
+                                newPlan.spec.connections?.filter((conn) => {
+                                    if (
+                                        role === ResourceRole.CONSUMES &&
+                                        conn.consumer.blockId === instance.id &&
+                                        conn.consumer.resourceName === resourceName
+                                    ) {
+                                        conn.consumer.resourceName = resource.metadata.name;
+                                    }
 
-                                if (
-                                    role === ResourceRole.PROVIDES &&
-                                    conn.provider.blockId === instance.id &&
-                                    conn.provider.resourceName === resourceName
-                                ) {
-                                    conn.provider.resourceName = resource.metadata.name;
-                                }
+                                    if (
+                                        role === ResourceRole.PROVIDES &&
+                                        conn.provider.blockId === instance.id &&
+                                        conn.provider.resourceName === resourceName
+                                    ) {
+                                        conn.provider.resourceName = resource.metadata.name;
+                                    }
+                                });
                             });
-                        });
 
-                        return newPlan;
-                    }, !block.exists);
+                            return newPlan;
+                        },
+                        () => !block.exists
+                    );
                 }
 
                 resources[existingResourceIx] = resource;
