@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.1...v1.7.2) (2023-09-13)
+
+
+### Bug Fixes
+
+* unify blockAssets and plan state to fix create-and-add flow ([#83](https://github.com/kapetacom/ui-web-plan-editor/issues/83)) ([e1d3b4d](https://github.com/kapetacom/ui-web-plan-editor/commit/e1d3b4d791bdfb3bb9b045c61d515350066e1d9f))
+
 ## [1.7.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.0...v1.7.1) (2023-09-12)
 
 
