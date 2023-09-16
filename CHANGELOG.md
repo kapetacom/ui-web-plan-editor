@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.2...v1.7.3) (2023-09-16)
+
+
+### Bug Fixes
+
+* Add class name to make styling easier from outside ([#84](https://github.com/kapetacom/ui-web-plan-editor/issues/84)) ([6a35514](https://github.com/kapetacom/ui-web-plan-editor/commit/6a35514d72801795fb9f62d564c7dd6f5750859b))
+
 ## [1.7.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.1...v1.7.2) (2023-09-13)
 
 
