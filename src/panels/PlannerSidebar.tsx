@@ -21,6 +21,7 @@ export const PlannerSidebar = (props: Props) => {
     }
     return (
         <Drawer
+            className={'kap-planner-sidebar'}
             anchor={'right'}
             sx={{
                 '& .MuiDrawer-paper': {
