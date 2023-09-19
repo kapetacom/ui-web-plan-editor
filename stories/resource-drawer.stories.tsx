@@ -3,7 +3,7 @@ import { PlannerResourceDrawer } from '../src/panels/PlannerResourceDrawer';
 
 import './styles.less';
 import { createTheme, ThemeProvider } from '@mui/material';
-import { kapetaDark } from '@kapeta/style';
+import { darkTheme } from '@kapeta/style';
 
 export default {
     title: 'Resource Drawer',
@@ -14,7 +14,7 @@ export default {
 
 export const Empty = () => {
     return (
-        <ThemeProvider theme={createTheme(kapetaDark)}>
+        <ThemeProvider theme={createTheme(darkTheme)}>
             <div style={{ backgroundColor: 'gray' }}>
                 <PlannerResourceDrawer />
             </div>
@@ -24,7 +24,7 @@ export const Empty = () => {
 
 export const MockData = () => {
     return (
-        <ThemeProvider theme={createTheme(kapetaDark)}>
+        <ThemeProvider theme={createTheme(darkTheme)}>
             <div style={{ backgroundColor: 'gray' }}>
                 <PlannerResourceDrawer
                     onShowMoreAssets={() => {
