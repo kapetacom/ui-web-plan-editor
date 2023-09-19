@@ -1,3 +1,10 @@
+## [1.7.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.3...v1.7.4) (2023-09-19)
+
+
+### Bug Fixes
+
+* Get rid of unused less file ([b5f4099](https://github.com/kapetacom/ui-web-plan-editor/commit/b5f4099a79582dbc910acea855d1b2dbbb046f67))
+
 ## [1.7.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.2...v1.7.3) (2023-09-16)
 
 
