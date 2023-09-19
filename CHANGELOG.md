@@ -1,3 +1,11 @@
+## [1.7.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.4...v1.7.5) (2023-09-19)
+
+
+### Bug Fixes
+
+* build ([ae7d677](https://github.com/kapetacom/ui-web-plan-editor/commit/ae7d6774c0978cd40106d41b1e6162dedbc2a952))
+* Bump styles to use montserrat font ([2aa80dc](https://github.com/kapetacom/ui-web-plan-editor/commit/2aa80dc0f6260b77584e2bd3c38a566d21bd6e7e))
+
 ## [1.7.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.3...v1.7.4) (2023-09-19)
 
 
