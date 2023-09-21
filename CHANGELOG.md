@@ -1,3 +1,10 @@
+## [1.7.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.5...v1.7.6) (2023-09-21)
+
+
+### Bug Fixes
+
+* better ref comparison & use new state to check for changes instead of previous ([#85](https://github.com/kapetacom/ui-web-plan-editor/issues/85)) ([e2b88f4](https://github.com/kapetacom/ui-web-plan-editor/commit/e2b88f4e13c0333966acd7b20ce1e2b5aeb33783))
+
 ## [1.7.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.4...v1.7.5) (2023-09-19)
 
 
