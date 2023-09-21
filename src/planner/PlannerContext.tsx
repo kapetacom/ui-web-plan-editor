@@ -372,13 +372,14 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         setAssets((prev) => {
             const newPlan = changer(prev.plan);
             if (newPlan !== prev.plan) {
-                if (!(preventChangeEvent && preventChangeEvent(prev)) && props.onChange) {
-                    props.onChange(newPlan);
-                }
-                return {
+                const newState = {
                     plan: newPlan,
                     blockAssets: prev.blockAssets,
                 };
+                if (!(preventChangeEvent && preventChangeEvent(newState)) && props.onChange) {
+                    props.onChange(newPlan);
+                }
+                return newState;
             }
             return prev;
         });
@@ -401,7 +402,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     const viewMode = props.mode;
 
     const isTempInstance = (assetState: ContextData, blockInstance: BlockInstance) => {
-        const block = assetState.blockAssets.find((asset) => asset.ref === blockInstance.block.ref);
+        const instanceBlockUri = parseKapetaUri(blockInstance.block.ref);
+        const block = assetState.blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(instanceBlockUri));
         if (!block) {
             return true;
         }
