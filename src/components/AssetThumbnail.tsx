@@ -73,6 +73,9 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                     position: 'relative',
                     overflow: 'hidden',
                 },
+                '*': {
+                    boxSizing: 'content-box',
+                },
             }}
         >
             <Box className={'preview'} flex={1}>

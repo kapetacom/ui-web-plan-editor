@@ -9,6 +9,7 @@ import { ResourceTypePreview } from '../src/components/ResourceTypePreview';
 import { readPlanV2 } from './data/planReader';
 import { AssetThumbnail, fromAsset } from '../src';
 import { DefaultContext } from '@kapeta/ui-web-components';
+import './styles.less';
 
 export default {
     title: 'Previews',
