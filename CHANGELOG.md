@@ -1,3 +1,11 @@
+## [1.7.7](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.6...v1.7.7) (2023-10-03)
+
+
+### Bug Fixes
+
+* Apply box-sizing border-box to all elements under body ([690a234](https://github.com/kapetacom/ui-web-plan-editor/commit/690a23471238d2f6841ccdea92878dc856108dcd))
+* Make AssetThumbnail use content-box regardless ([880de5e](https://github.com/kapetacom/ui-web-plan-editor/commit/880de5e30359cd45dbcb2c8afe3ad44eada0684b))
+
 ## [1.7.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.5...v1.7.6) (2023-09-21)
 
 
