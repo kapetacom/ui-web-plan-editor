@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.8.0...v1.8.1) (2023-10-04)
+
+
+### Bug Fixes
+
+* Several UI adjustments ([#88](https://github.com/kapetacom/ui-web-plan-editor/issues/88)) ([4945341](https://github.com/kapetacom/ui-web-plan-editor/commit/4945341d8681cc70c7c8a3bf1ca17da25e40c5f1))
+
 # [1.8.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.7...v1.8.0) (2023-10-04)
 
 
