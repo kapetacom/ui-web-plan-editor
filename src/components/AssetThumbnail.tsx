@@ -191,7 +191,7 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnail
                                     variant="body2"
                                     display="flex"
                                     alignItems="center"
-                                    sx={{ fontSize: '12px' }}
+                                    sx={{ fontSize: '12px', fontVariantNumeric: 'tabular-nums' }}
                                 >
                                     <PieChartIcon
                                         value={stat.progress ?? 100}
