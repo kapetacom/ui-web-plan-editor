@@ -1,7 +1,14 @@
-import React, { forwardRef, PropsWithChildren, useState } from 'react';
-import { Badge, Box, Chip, CircularProgress, Stack, Typography } from '@mui/material';
+import React, { forwardRef, useState } from 'react';
+import { Box, Chip, CircularProgress, Stack, SvgIconProps, Typography } from '@mui/material';
 import { SchemaKind } from '@kapeta/ui-web-types';
-import { DateDisplay, getNameForKind, InstallerService } from '@kapeta/ui-web-components';
+import {
+    DateDisplay,
+    getNameForKind,
+    InstallerService,
+    PieChartIcon,
+    Tooltip,
+    TooltipProps,
+} from '@kapeta/ui-web-components';
 import { AssetKindIcon, CoreTypes, SimpleLoader, useConfirm } from '@kapeta/ui-web-components';
 
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
@@ -13,7 +20,6 @@ import { PlanPreview } from './PlanPreview';
 import { BlockPreview, BlockTypePreview } from './BlockTypePreview';
 import { ResourceTypePreview } from './ResourceTypePreview';
 import { AssetInfo } from '../types';
-import { BadgeTypeMap } from '@mui/material/Badge/Badge';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 const CONTAINER_CLASS = 'asset-thumbnail';
@@ -23,22 +29,29 @@ const META_HEIGHT = META_HEIGHT_INNER + META_HEIGHT_PADDING * 2;
 
 export type PlanContextLoader = (plan: AssetInfo<Plan>) => { loading: boolean; blocks: AssetInfo<BlockDefinition>[] };
 
-export type AssetMetaStatInfo = {
+export type AssetMetaStat = {
     label: string;
-    color: BadgeTypeMap['props']['color'];
+    color: SvgIconProps['color'];
+    progress?: number;
+    pulsate?: boolean;
+    tooltip?: Omit<TooltipProps, 'children'>;
 };
 
-interface InnerProps {
+interface AssetThumbnailInnerPreviewProps {
     asset: AssetInfo<SchemaKind>;
     width: number;
     height: number;
     installerService?: InstallerService;
     loadPlanContext: PlanContextLoader;
-    stats?: AssetMetaStatInfo[];
+    stats?: AssetMetaStat[];
     onClick?: (asset: AssetInfo<SchemaKind>) => void;
 }
 
-export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & PropsWithChildren>((props, ref) => {
+interface AssetThumbnailContainerProps extends AssetThumbnailInnerPreviewProps {
+    children: React.ReactNode;
+}
+
+export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnailContainerProps>((props, ref) => {
     const title = props.asset.content.metadata.title ?? props.asset.content.metadata.name;
 
     const uri = parseKapetaUri(props.asset.content.metadata.name);
@@ -53,7 +66,7 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
             ref={ref}
             className={CONTAINER_CLASS}
             onClick={() => props.onClick?.(props.asset)}
-            direction={'column'}
+            direction="column"
             gap={0}
             sx={{
                 transition: (theme) =>
@@ -78,12 +91,12 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                 },
             }}
         >
-            <Box className={'preview'} flex={1}>
+            <Box className="preview" flex={1}>
                 {props.installerService?.uninstall && (
                     <Chip
                         label={deleting ? <CircularProgress size={24} /> : <Delete />}
-                        variant={'filled'}
-                        color={'default'}
+                        variant="filled"
+                        color="default"
                         onClick={async (evt) => {
                             evt.preventDefault();
                             evt.stopPropagation();
@@ -133,8 +146,8 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                 {props.children}
             </Box>
             <Stack
-                className={'metadata'}
-                direction={'row'}
+                className="metadata"
+                direction="row"
                 p={`${META_HEIGHT_PADDING}px`}
                 gap={1}
                 sx={{
@@ -149,18 +162,18 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
             >
                 <AssetKindIcon asset={props.asset.content} size={24} />
                 <Box flex={1}>
-                    <Typography mb={'4px'} fontSize={'16px'} fontWeight={700} lineHeight={'24px'} variant={'h6'}>
+                    <Typography mb="4px" fontSize="16px" fontWeight={700} lineHeight="24px" variant="h6">
                         {title}
                     </Typography>
-                    <Typography color={'#eeeeee'} fontSize={12} fontWeight={400} variant={'caption'}>
+                    <Typography color="#eeeeee" fontSize={12} fontWeight={400} variant="caption">
                         {props.asset.version} by {uri.handle}
                     </Typography>
                     {props.asset.lastModified && props.asset.lastModified > 0 && (
                         <Typography
-                            color={'#eeeeee'}
+                            color="#eeeeee"
                             fontSize={12}
                             fontWeight={400}
-                            variant={'caption'}
+                            variant="caption"
                             sx={{
                                 display: 'block',
                             }}
@@ -172,25 +185,30 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
                 {props.stats?.length && (
                     <Box>
                         {props.stats.map((stat, index) => {
-                            return (
+                            const renderedStat = (
                                 <Typography
-                                    key={index}
-                                    fontSize={'12px'}
-                                    lineHeight={'20px'}
-                                    sx={(theme) => ({
-                                        '& > .dot': {
-                                            backgroundColor: theme.palette[stat.color ?? 'primary'].main,
-                                            borderRadius: '50%',
-                                            width: '8px',
-                                            height: '8px',
-                                            display: 'inline-block',
-                                            mr: '4px',
-                                        },
-                                    })}
+                                    key={stat.label}
+                                    variant="body2"
+                                    display="flex"
+                                    alignItems="center"
+                                    sx={{ fontSize: '12px' }}
                                 >
-                                    <span className={'dot'} />
+                                    <PieChartIcon
+                                        value={stat.progress ?? 100}
+                                        color={stat.color}
+                                        sx={{ fontSize: '10px', mr: 1 }}
+                                        pulsate={stat.pulsate}
+                                    />
                                     {stat.label}
                                 </Typography>
+                            );
+
+                            return stat.tooltip ? (
+                                <Tooltip key={stat.label} {...stat.tooltip}>
+                                    {renderedStat}
+                                </Tooltip>
+                            ) : (
+                                renderedStat
                             );
                         })}
                     </Box>
@@ -200,11 +218,11 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, InnerProps & P
     );
 });
 
-const InnerPreview = (props: InnerProps) => {
+const AssetThumbnailInnerPreview = (props: AssetThumbnailInnerPreviewProps) => {
     const kind = props.asset.content.kind;
     try {
         switch (kind) {
-            case CoreTypes.PLAN:
+            case CoreTypes.PLAN: {
                 const context = props.loadPlanContext(props.asset as AssetInfo<Plan>);
                 return (
                     <SimpleLoader loading={context.loading}>
@@ -218,6 +236,7 @@ const InnerPreview = (props: InnerProps) => {
                         )}
                     </SimpleLoader>
                 );
+            }
             case CoreTypes.BLOCK_TYPE:
             case CoreTypes.BLOCK_TYPE_OPERATOR:
                 return (
@@ -246,23 +265,24 @@ const InnerPreview = (props: InnerProps) => {
                     <BlockPreview
                         width={props.width}
                         height={props.height}
-                        resources={true}
+                        showResources
                         block={props.asset.content}
                         blockType={BlockTypeProvider.get(props.asset.content.kind)}
                     />
                 );
         }
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.warn('Failed to render preview', e);
         return <AssetKindIcon size={Math.min(props.width, props.height)} asset={props.asset.content} />;
     }
 };
 
-interface Props extends InnerProps {
+interface AssetThumbnailProps extends AssetThumbnailInnerPreviewProps {
     hideMetadata?: boolean;
 }
 
-export const AssetThumbnail = forwardRef<HTMLDivElement, Props>((props, ref) => {
+export const AssetThumbnail = forwardRef<HTMLDivElement, AssetThumbnailProps>((props, ref) => {
     if (props.hideMetadata) {
         return (
             <Box
@@ -273,13 +293,13 @@ export const AssetThumbnail = forwardRef<HTMLDivElement, Props>((props, ref) => 
                     textAlign: 'center',
                 }}
             >
-                <InnerPreview {...props} height={props.height} />
+                <AssetThumbnailInnerPreview {...props} height={props.height} />
             </Box>
         );
     }
     return (
         <AssetThumbnailContainer ref={ref} {...props}>
-            <InnerPreview {...props} height={props.height - META_HEIGHT} />
+            <AssetThumbnailInnerPreview {...props} height={props.height - META_HEIGHT} />
         </AssetThumbnailContainer>
     );
 });

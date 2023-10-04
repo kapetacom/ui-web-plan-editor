@@ -10,6 +10,7 @@ import { readPlanV2 } from './data/planReader';
 import { AssetThumbnail, fromAsset } from '../src';
 import { DefaultContext } from '@kapeta/ui-web-components';
 import './styles.less';
+import { Typography } from '@mui/material';
 
 export default {
     title: 'Previews',
@@ -93,7 +94,7 @@ export const Block = () => {
                 <BlockPreview
                     block={data.value.block.data}
                     blockType={data.value.blockType}
-                    resources={true}
+                    showResources
                     width={WIDTH - 20}
                     height={HEIGHT - 20}
                 />
@@ -121,7 +122,7 @@ export const BlockNoResources = () => {
                 <BlockPreview
                     block={data.value.block.data}
                     blockType={data.value.blockType}
-                    resources={false}
+                    showResources={false}
                     width={WIDTH - 20}
                     height={HEIGHT - 20}
                 />
@@ -217,6 +218,32 @@ export const ThumbnailBlock = () => {
                         blocks: [],
                     };
                 }}
+                stats={[
+                    {
+                        label: '1 pending',
+                        color: 'primary',
+                    },
+                    {
+                        label: '1 deployed',
+                        color: 'success',
+                    },
+                    {
+                        label: '1 failed',
+                        color: 'error',
+                    },
+                    {
+                        label: '1 expiring',
+                        color: 'warning',
+                        progress: 80,
+                        pulsate: true,
+                        tooltip: {
+                            title: <Typography variant="body2">Some text about the expiring environment</Typography>,
+                            placement: 'right',
+                            arrow: true,
+                            maxWidth: 500,
+                        },
+                    },
+                ]}
             />
         </DefaultContext>
     );
