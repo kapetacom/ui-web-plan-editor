@@ -1,3 +1,10 @@
+## [1.8.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.8.2...v1.8.3) (2023-10-04)
+
+
+### Bug Fixes
+
+* Avoid 0 rendered as text ([fdcc00a](https://github.com/kapetacom/ui-web-plan-editor/commit/fdcc00ab2a54c756acfccac4d710fb1cfdc95d80))
+
 ## [1.8.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.8.1...v1.8.2) (2023-10-04)
 
 
