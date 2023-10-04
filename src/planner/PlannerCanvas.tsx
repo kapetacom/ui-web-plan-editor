@@ -15,6 +15,7 @@ import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { createBlockInstanceForBlock, createBlockInstanceForBlockType } from './utils/blockUtils';
 import { DnDPayload, DragEventInfo } from './DragAndDrop/types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { adjustBlockEdges } from './components/PlannerBlockNode';
 
 const PLAN_PADDING = 50;
 
@@ -27,12 +28,16 @@ const toBlockPoint = (mousePoint: Point, zoom: number): Point => {
 
 const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstance) => {
     const point = toBlockPoint(diff, zoom);
+    point.x += block.dimensions!.left;
+    point.y += block.dimensions!.top;
+    adjustBlockEdges(point);
+
     return {
         ...block,
         dimensions: {
             ...block.dimensions!,
-            top: block.dimensions!.top + point.y,
-            left: block.dimensions!.left + point.x,
+            top: point.y,
+            left: point.x,
         },
     };
 };

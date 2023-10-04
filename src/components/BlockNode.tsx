@@ -3,7 +3,7 @@ import { createHexagonPath, Orientation, toClass } from '@kapeta/ui-web-utils';
 
 import './BlockNode.less';
 import { PlannerBlockWarningTag } from './PlannerBlockWarningTag';
-import { BlockStatus, useBlock } from '@kapeta/ui-web-components';
+import { BlockStatus, Tooltip, useBlock } from '@kapeta/ui-web-components';
 import { BlockInstanceName } from '@kapeta/ui-web-components';
 import { BlockName } from '@kapeta/ui-web-components';
 import { BlockHandle } from '@kapeta/ui-web-components';
@@ -14,8 +14,10 @@ interface BlockNodeProps {
     width: number;
     pointSize?: number;
     valid?: boolean;
+    errors?: string[];
     variant?: string;
     readOnly?: boolean;
+    onWarningClick?: () => void;
 }
 
 export const BlockNode = (props: BlockNodeProps) => {
@@ -38,7 +40,9 @@ export const BlockNode = (props: BlockNodeProps) => {
 
                 <PlannerBlockWarningTag
                     show={props.valid === false}
+                    errors={props.errors}
                     blockName={block.definition?.metadata.name || 'block'}
+                    onClick={props.onWarningClick}
                 />
 
                 <g transform={`translate(${props.width - 20}, 0)`}>

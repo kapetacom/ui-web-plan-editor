@@ -46,11 +46,11 @@ export const ActionButtons = (props: ActionButtonListProps) => {
     const [height, setHeight] = useState(0);
 
     const recalculateSize = useCallback(() => {
-        const span = ref.current;
-        if (span) {
-            const { width: w, height: h } = span.getBoundingClientRect();
-            setWidth(w);
-            setHeight(h);
+        const divContainer = ref.current;
+        if (divContainer) {
+            const { width: w, height: h } = divContainer.getBoundingClientRect();
+            setWidth(w / planner.zoom);
+            setHeight(h / planner.zoom);
         }
     }, [ref]);
 

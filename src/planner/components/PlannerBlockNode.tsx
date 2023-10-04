@@ -31,6 +31,18 @@ import './PlannerBlockNode.less';
 import { withErrorBoundary } from 'react-error-boundary';
 import { Resource } from '@kapeta/schemas';
 
+export function adjustBlockEdges(point: Point) {
+    if (point.x < 220) {
+        point.x = 220;
+    }
+
+    if (point.y < 5) {
+        point.y = 5;
+    }
+
+    return point;
+}
+
 interface Props {
     size: PlannerNodeSize;
     actions?: PlannerActionConfig;
@@ -112,10 +124,10 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
             }}
         >
             {(evt) => {
-                let point: Point = {
+                let point: Point = adjustBlockEdges({
                     x: blockContext.blockInstance.dimensions!.left + evt.zone.diff.x / planner.zoom,
                     y: blockContext.blockInstance.dimensions!.top + evt.zone.diff.y / planner.zoom,
-                };
+                });
 
                 if (focusInfo) {
                     const blockInfo: BlockInfo = {
@@ -129,6 +141,14 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                 }
 
                 const NodeComponent = blockType?.shapeComponent || BlockNode;
+
+                const onWarningClick = () => {
+                    const warningAction = props.actions?.block?.find((a) => a.warningInspector);
+
+                    if (warningAction && warningAction.enabled(planner, actionContext)) {
+                        warningAction.onClick(planner, actionContext);
+                    }
+                };
 
                 return (
                     // Effective layout includes drag status
@@ -316,6 +336,8 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                         width={blockContext.instanceBlockWidth}
                                                         height={blockContext.instanceBlockHeight}
                                                         valid={isValid}
+                                                        errors={errors}
+                                                        onWarningClick={onWarningClick}
                                                     />
                                                 </BlockLayout>
                                             ) : (
@@ -328,7 +350,9 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                         height={blockContext.instanceBlockHeight}
                                                         width={blockContext.instanceBlockWidth}
                                                         readOnly={!canEditInstance}
+                                                        errors={errors}
                                                         valid={isValid}
+                                                        onWarningClick={onWarningClick}
                                                     />
                                                     <p>Failed to load</p>
                                                     <pre>{blockContext.blockInstance.name}</pre>

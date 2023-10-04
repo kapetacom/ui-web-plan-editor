@@ -42,6 +42,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 buttonStyle: ButtonStyle.PRIMARY,
                 icon: 'fa fa-search',
                 label: 'Inspect',
+                warningInspector: true,
             },
             {
                 enabled(): boolean {

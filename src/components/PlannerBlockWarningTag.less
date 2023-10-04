@@ -1,14 +1,17 @@
 @import '~@kapeta/ui-web-components/styles/values';
 
-.warning-tag {
-    filter: 'url(#dropshadow)';
-    fill: @yellow-alert;
-    ~ svg {
-        :first-child {
-            fill: @bw-gray;
-        }
-        :nth-child(2) {
-            fill: @yellow-alert;
+.warning-tag-container {
+    cursor: pointer;
+    .warning-tag {
+        filter: 'url(#dropshadow)';
+        fill: @yellow-alert;
+        ~ svg {
+            :first-child {
+                fill: @bw-gray;
+            }
+            :nth-child(2) {
+                fill: @yellow-alert;
+            }
         }
     }
 }
