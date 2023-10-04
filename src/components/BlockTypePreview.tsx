@@ -1,6 +1,6 @@
 import React from 'react';
 import { IBlockTypeProvider } from '@kapeta/ui-web-types';
-import { BlockDefinition, BlockType, BlockTypeOperator } from '@kapeta/schemas';
+import { BlockDefinition } from '@kapeta/schemas';
 import { Box } from '@mui/material';
 import { BlockShape } from './BlockShape';
 
@@ -20,14 +20,14 @@ export const BlockTypePreview = (props: BlockTypeProps) => {
                 pointerEvents: 'none',
             }}
         >
-            <BlockShape blockType={props.blockType} showText={true} width={props.width} height={props.height} />
+            <BlockShape blockType={props.blockType} showText width={props.width} height={props.height} />
         </Box>
     );
 };
 
 interface BlockProps extends BlockTypeProps {
     block: BlockDefinition;
-    resources?: boolean;
+    showResources?: boolean;
 }
 
 export const BlockPreview = (props: BlockProps) => {
@@ -43,8 +43,8 @@ export const BlockPreview = (props: BlockProps) => {
             <BlockShape
                 blockType={props.blockType}
                 block={props.block}
-                showText={true}
-                showResources={props.resources}
+                showText
+                showResources={props.showResources}
                 width={props.width}
                 height={props.height}
             />
