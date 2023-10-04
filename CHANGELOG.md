@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.8.1...v1.8.2) (2023-10-04)
+
+
+### Bug Fixes
+
+* Set tabular-nums ([cdb4ff0](https://github.com/kapetacom/ui-web-plan-editor/commit/cdb4ff0daebf3a6e4985d1818814c81e92ada8fc))
+
 ## [1.8.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.8.0...v1.8.1) (2023-10-04)
 
 
