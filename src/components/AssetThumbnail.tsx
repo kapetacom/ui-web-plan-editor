@@ -182,7 +182,7 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnail
                         </Typography>
                     )}
                 </Box>
-                {props.stats?.length && (
+                {props.stats?.length ? (
                     <Box>
                         {props.stats.map((stat, index) => {
                             const renderedStat = (
@@ -212,7 +212,7 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnail
                             );
                         })}
                     </Box>
-                )}
+                ) : null}
             </Stack>
         </Stack>
     );
