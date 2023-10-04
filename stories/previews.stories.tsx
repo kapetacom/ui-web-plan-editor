@@ -180,6 +180,32 @@ export const ThumbnailPlan = () => {
                         blocks: plan.value?.blockAssets || [],
                     };
                 }}
+                stats={[
+                    {
+                        label: '1 pending',
+                        color: 'primary',
+                    },
+                    {
+                        label: '1 deployed',
+                        color: 'success',
+                    },
+                    {
+                        label: '1 failed',
+                        color: 'error',
+                    },
+                    {
+                        label: '1 expiring',
+                        color: 'warning',
+                        progress: 80,
+                        pulsate: true,
+                        tooltip: {
+                            title: <Typography variant="body2">Some text about the expiring environment</Typography>,
+                            placement: 'right',
+                            arrow: true,
+                            maxWidth: 500,
+                        },
+                    },
+                ]}
             />
         </DefaultContext>
     );
@@ -218,32 +244,6 @@ export const ThumbnailBlock = () => {
                         blocks: [],
                     };
                 }}
-                stats={[
-                    {
-                        label: '1 pending',
-                        color: 'primary',
-                    },
-                    {
-                        label: '1 deployed',
-                        color: 'success',
-                    },
-                    {
-                        label: '1 failed',
-                        color: 'error',
-                    },
-                    {
-                        label: '1 expiring',
-                        color: 'warning',
-                        progress: 80,
-                        pulsate: true,
-                        tooltip: {
-                            title: <Typography variant="body2">Some text about the expiring environment</Typography>,
-                            placement: 'right',
-                            arrow: true,
-                            maxWidth: 500,
-                        },
-                    },
-                ]}
             />
         </DefaultContext>
     );
