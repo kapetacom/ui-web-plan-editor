@@ -85,6 +85,7 @@ export interface PlannerAction<P extends unknown> {
     icon: string | ((planner: PlannerContextData, info: ActionContext) => string);
     label: string | ((planner: PlannerContextData, info: ActionContext) => string);
     onClick(planner: PlannerContextData, context: ActionContext): void | Promise<void>;
+    warningInspector?: boolean;
 }
 
 export interface BlockInfo {

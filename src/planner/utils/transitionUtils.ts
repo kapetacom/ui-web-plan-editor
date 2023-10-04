@@ -1,4 +1,4 @@
-export const staggeredFade = (i: number, n: number, show: boolean, delay = 0.15) => {
+export const staggeredFade = (i: number, n: number, show: boolean, delay = 0.05) => {
     // staggered fade in from the middle
     const isEven = n % 2 === 0;
     // For even number, we care about the middle two elements, pick the closest one
@@ -14,7 +14,7 @@ export const staggeredFade = (i: number, n: number, show: boolean, delay = 0.15)
     const staggeredInDelay = distanceFromMiddle * delay;
     const staggeredOutDelay = distanceFromEdge * delay;
     return {
-        transition: `opacity 0.2s linear`,
+        transition: `opacity 0.1s linear`,
         transitionDelay: `${show ? staggeredInDelay : staggeredOutDelay}s`,
         opacity: show ? 1 : 0,
     };

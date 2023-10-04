@@ -7,19 +7,21 @@ import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
 import { PlannerContext } from '../planner/PlannerContext';
 import { useBlockValidationIssues } from '../planner/hooks/block-validation';
 import { PlannerSidebar } from './PlannerSidebar';
-import { Box } from '@mui/material';
+import { Box, Stack, Tab, Tabs } from '@mui/material';
 
 interface BlockInspectorPanelProps {
     instance?: BlockInstance;
     configuration?: any;
     logs?: LogEntry[];
     emitter?: LogEmitter;
+    initialTab?: string;
     open: boolean;
     onClosed: () => void;
 }
 
 export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
     const planner = useContext(PlannerContext);
+    const [tab, setTab] = React.useState(props.initialTab ?? 'logs');
 
     let block: BlockDefinition | undefined = undefined;
     if (props.instance?.block.ref) {
@@ -41,44 +43,50 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
     return (
         <PlannerSidebar title={title} open={props.open} size={'large'} onClose={props.onClosed}>
             {props.instance && (
-                <div className="item-inspector-panel">
-                    <TabContainer>
-                        {props.emitter && (
-                            <TabPage id="logs" title="Logs">
-                                <Box
-                                    sx={{
-                                        mt: 2,
-                                        height: 'calc(100% - 16px)',
-                                    }}
-                                >
-                                    <LogPanel logs={props.logs} emitter={props.emitter} />
-                                </Box>
-                            </TabPage>
-                        )}
-                        <TabPage id="issues" title="Issues">
-                            <div className="issues-container" key={`${props.instance.block.ref}_issues`}>
-                                {(!valid && (
-                                    <>
-                                        <span>Found the following issues in block</span>
-                                        <ul className="issues-list">
-                                            {issues.map((issue, ix) => {
-                                                return (
-                                                    <li key={`issue_${ix}`}>
-                                                        <div className="issue-context">
-                                                            <span className="level">{issue.level}</span>:
-                                                            <span className="name">{issue.name}</span>
-                                                        </div>
-                                                        <div className="issue-message">{issue.issue}</div>
-                                                    </li>
-                                                );
-                                            })}
-                                        </ul>
-                                    </>
-                                )) || <span>No issues found</span>}
-                            </div>
-                        </TabPage>
-                    </TabContainer>
-                </div>
+                <Stack
+                    direction={'column'}
+                    className="item-inspector-panel"
+                    sx={{
+                        height: '100%',
+                    }}
+                >
+                    <Tabs value={tab} onChange={(evt, newTabId) => setTab(newTabId)}>
+                        {props.emitter && <Tab label={'Logs'} value={'logs'} />}
+                        <Tab label={`Issues (${issues.length})`} value={'issues'} />
+                    </Tabs>
+                    {tab === 'logs' && (
+                        <Box
+                            flex={1}
+                            sx={{
+                                pt: 2,
+                            }}
+                        >
+                            <LogPanel logs={props.logs} emitter={props.emitter} />
+                        </Box>
+                    )}
+                    {tab === 'issues' && (
+                        <Box flex={1} className="issues-container">
+                            {(!valid && (
+                                <>
+                                    <span>Found the following issues in block</span>
+                                    <ul className="issues-list">
+                                        {issues.map((issue, ix) => {
+                                            return (
+                                                <li key={`issue_${ix}`}>
+                                                    <div className="issue-context">
+                                                        <span className="level">{issue.level}</span>:
+                                                        <span className="name">{issue.name}</span>
+                                                    </div>
+                                                    <div className="issue-message">{issue.issue}</div>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                </>
+                            )) || <span>No issues found</span>}
+                        </Box>
+                    )}
+                </Stack>
             )}
         </PlannerSidebar>
     );
