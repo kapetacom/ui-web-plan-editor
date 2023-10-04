@@ -1,3 +1,15 @@
+# [1.8.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.7...v1.8.0) (2023-10-04)
+
+
+### Bug Fixes
+
+* Move stats to ThumbnailPlan story ([dabc9c4](https://github.com/kapetacom/ui-web-plan-editor/commit/dabc9c4320cbfaf7e4a5cb770f9f3d64486cd58f))
+
+
+### Features
+
+* Update AssetThumbnail stats ([0c6876c](https://github.com/kapetacom/ui-web-plan-editor/commit/0c6876c9a28b3b4939986c04cd300697a8daf9d7))
+
 ## [1.7.7](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.7.6...v1.7.7) (2023-10-03)
 
 
