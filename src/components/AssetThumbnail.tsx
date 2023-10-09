@@ -42,6 +42,7 @@ interface AssetThumbnailInnerPreviewProps {
     width: number;
     height: number;
     installerService?: InstallerService;
+    subscription?: boolean;
     loadPlanContext: PlanContextLoader;
     stats?: AssetMetaStat[];
     onClick?: (asset: AssetInfo<SchemaKind>) => void;
@@ -105,12 +106,13 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnail
                             }
                             if (
                                 await confirm({
-                                    title: `Uninstall ${kindNameLC}`,
-                                    content: `
-                                    Are you sure you want to uninstall ${title}?
-                                    This will not delete anything from your disk.
-                                    `,
-                                    confirmationText: 'Uninstall',
+                                    title: props.subscription ? `Remove ${kindNameLC}` : `Uninstall ${kindNameLC}`,
+                                    content: props.subscription
+                                        ? `Are you sure you want to remove ${title}?
+                                    This will also remove all environments for this plan.`
+                                        : `Are you sure you want to uninstall ${title}?
+                                    This will not delete anything from your disk.`,
+                                    confirmationText: props.subscription ? 'Remove' : 'Uninstall',
                                 })
                             ) {
                                 try {
