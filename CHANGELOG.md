@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.8.3...v1.9.0) (2023-10-09)
+
+
+### Features
+
+* Adds subscription mode for asset thumbnail ([#91](https://github.com/kapetacom/ui-web-plan-editor/issues/91)) ([86fa309](https://github.com/kapetacom/ui-web-plan-editor/commit/86fa309f2a5ec0ceeacaa117548b7d9ad57a2f0c))
+
 ## [1.8.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.8.2...v1.8.3) (2023-10-04)
 
 
