@@ -17,10 +17,13 @@ import { InstanceStatus } from '@kapeta/ui-web-context';
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
 import { PlannerOutlet, plannerRenderer } from '../src/planner/renderers/plannerRenderer';
 import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
-import { PlannerResourceDrawer } from '../src/panels/PlannerResourceDrawer';
+import { PlannerResourcesList } from '../src/panels/tools/PlannerResourcesList';
 
 import './styles.less';
 import { useConfirmDelete } from '@kapeta/ui-web-components';
+import { PlannerDrawer } from '../src/panels/PlannerDrawer';
+import { Tab, Tabs } from '@mui/material';
+import { PublicUrlList } from '../src/panels/tools/PublicUrlList';
 
 const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const planner = useContext(PlannerContext);
@@ -186,9 +189,18 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
         ],
     };
 
+    const [currentTab, setCurrentTab] = React.useState(planner.mode === PlannerMode.EDIT ? 'resources' : 'urls');
+
     return (
         <div ref={forwardedRef} className="plan-container">
-            {planner.mode === PlannerMode.EDIT && <PlannerResourceDrawer onShowMoreAssets={() => {}} />}
+            <PlannerDrawer>
+                <Tabs value={currentTab} onChange={(_evt, value) => setCurrentTab(value)}>
+                    {planner.mode === PlannerMode.EDIT && <Tab value="resources" label="Resources" />}
+                    <Tab value="urls" label="Public URLs" />
+                </Tabs>
+                {currentTab === 'resources' && <PlannerResourcesList onShowMoreAssets={() => {}} />}
+                {currentTab === 'urls' && <PublicUrlList />}
+            </PlannerDrawer>
 
             <Planner
                 systemId="kapeta/something:local"

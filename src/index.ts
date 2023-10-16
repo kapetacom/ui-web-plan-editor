@@ -39,7 +39,7 @@ export * from './planner/renderers/plannerRenderer';
 
 export * from './panels/PlannerSidebar';
 export * from './panels/BlockInspectorPanel';
-export * from './panels/PlannerResourceDrawer';
+export * from './panels/tools/PlannerResourcesList';
 export * from './panels/tools/BlockTypeToolList';
 export * from './panels/tools/BlockTypeTool';
 

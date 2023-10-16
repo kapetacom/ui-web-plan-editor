@@ -1,9 +1,11 @@
 import React from 'react';
-import { PlannerResourceDrawer } from '../src/panels/PlannerResourceDrawer';
+import { PlannerResourcesList } from '../src/panels/tools/PlannerResourcesList';
 
 import './styles.less';
-import { createTheme, ThemeProvider } from '@mui/material';
-import { darkTheme } from '@kapeta/style';
+import { createTheme, Tab, Tabs, ThemeProvider } from '@mui/material';
+import { lightTheme } from '@kapeta/style';
+import { PlannerDrawer } from '../src/panels/PlannerDrawer';
+import { PublicUrlList } from '../src/panels/tools/PublicUrlList';
 
 export default {
     title: 'Resource Drawer',
@@ -14,23 +16,35 @@ export default {
 
 export const Empty = () => {
     return (
-        <ThemeProvider theme={createTheme(darkTheme)}>
+        <ThemeProvider theme={createTheme(lightTheme)}>
             <div style={{ backgroundColor: 'gray' }}>
-                <PlannerResourceDrawer />
+                <PlannerDrawer>
+                    <PlannerResourcesList />
+                </PlannerDrawer>
             </div>
         </ThemeProvider>
     );
 };
 
 export const MockData = () => {
+    const [currentTab, setCurrentTab] = React.useState(0);
     return (
-        <ThemeProvider theme={createTheme(darkTheme)}>
+        <ThemeProvider theme={createTheme(lightTheme)}>
             <div style={{ backgroundColor: 'gray' }}>
-                <PlannerResourceDrawer
-                    onShowMoreAssets={() => {
-                        console.log('show more assets');
-                    }}
-                />
+                <PlannerDrawer>
+                    <Tabs value={currentTab} onChange={(_evt, value) => setCurrentTab(value)}>
+                        <Tab value={0} label="Resources" />
+                        <Tab value={1} label="Public URLs" />
+                    </Tabs>
+                    {currentTab === 0 ? (
+                        <PlannerResourcesList
+                            onShowMoreAssets={() => {
+                                console.log('show more assets');
+                            }}
+                        />
+                    ) : null}
+                    {currentTab === 1 ? <PublicUrlList /> : null}
+                </PlannerDrawer>
             </div>
         </ThemeProvider>
     );

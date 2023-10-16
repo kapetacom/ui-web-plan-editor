@@ -66,6 +66,7 @@ blocks.push(
         require('./blocks/kapeta-todo-frontend.json'),
         require('./blocks/kapeta-todo-mobile.json'),
         require('./blocks/kapeta-images.json'),
+        require('./blocks/kapeta-gateway.json'),
     ].map((data) => {
         return {
             ref: `${data.metadata.name}:local`,
@@ -187,7 +188,6 @@ blocks.push(
 });
 
 const serviceBlock = require('./blocks/kapeta-block-type-service.json');
-
 BlockTypeProvider.register({
     kind: serviceBlock.metadata.name,
     version: '1.2.3',
@@ -207,6 +207,25 @@ BlockTypeProvider.register({
     //     return <circle r={40} cx={40} cy={40} />;
     // },
     definition: serviceBlock,
+});
+
+const gatewayBlock = require('./blocks/kapeta-block-type-gateway-http.json');
+BlockTypeProvider.register({
+    kind: gatewayBlock.metadata.name,
+    version: '1.2.3',
+    editorComponent: null as any,
+    validate: (block) => {
+        const errors: string[] = [];
+        if (!block?.spec?.target?.kind) {
+            errors.push('Missing target kind');
+        } else {
+            parseKapetaUri(block?.spec?.target?.kind);
+            BlockTargetProvider.get(block?.spec?.target?.kind, block.kind);
+        }
+
+        return errors;
+    },
+    definition: gatewayBlock,
 });
 
 const frontendBlock = require('./blocks/kapeta-block-type-frontend.json');
