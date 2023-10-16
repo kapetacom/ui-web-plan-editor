@@ -28,7 +28,7 @@ const BUILT_IN_CONFIGURATION_TYPES: Entity[] = [
             },
         },
     },
-    {
+    /*{ //Disabled for now - not sure if we need this
         name: 'InstanceProvider',
         type: EntityType.Native,
         description: 'A reference to a block instance with a specific provider resource',
@@ -49,7 +49,7 @@ const BUILT_IN_CONFIGURATION_TYPES: Entity[] = [
                 description: 'The name of the provider resource',
             },
         },
-    },
+    },*/
 ];
 
 export class BlockValidator {
