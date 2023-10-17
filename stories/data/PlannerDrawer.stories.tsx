@@ -22,6 +22,34 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
             props: { loading: true },
         },
         {
+            label: 'No URLs available',
+            props: {},
+        },
+        {
+            label: 'Editor mode',
+            props: {
+                fallbackText: 'Open in browser',
+                primary: undefined,
+                fallback: {
+                    url: 'http://localhost:3000',
+                    status: 'ok',
+                },
+            },
+        },
+        {
+            props: {
+                title: 'No urls',
+                fallbackText: 'Open in browser',
+                primary: undefined,
+                fallback: {
+                    url: null,
+                    status: 'ok',
+                },
+            },
+        },
+    ],
+    [
+        {
             label: 'Block statuses',
             props: { title: 'Starting', status: InstanceStatus.STARTING },
         },
@@ -38,16 +66,12 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
             props: { title: 'Exited', status: InstanceStatus.EXITED },
         },
     ],
-    [
-        {
-            label: 'No URLs (e.g. edit mode)',
-            props: {},
-        },
-    ],
+
     [
         {
             label: 'Custom URL',
             props: {
+                status: InstanceStatus.READY,
                 primary: {
                     url: 'https://example.com',
                     status: 'loading',
@@ -60,6 +84,7 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
         },
         {
             props: {
+                status: InstanceStatus.READY,
                 primary: {
                     url: 'https://example.com',
                     status: 'ok',
@@ -72,6 +97,7 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
         },
         {
             props: {
+                status: InstanceStatus.READY,
                 primary: {
                     url: 'https://example.com',
                     status: 'error',
@@ -95,6 +121,7 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
         {
             label: 'Fallback only',
             props: {
+                status: InstanceStatus.READY,
                 fallback: {
                     url: 'https://kap-abc.kapeta.dev',
                     status: 'loading',
@@ -103,14 +130,16 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
         },
         {
             props: {
+                status: InstanceStatus.READY,
                 fallback: {
                     url: 'https://kap-abc.kapeta.dev',
-                    status: 'active',
+                    status: 'ok',
                 },
             },
         },
         {
             props: {
+                status: InstanceStatus.READY,
                 fallback: {
                     url: 'https://kap-abc.kapeta.dev',
                     status: 'error',
@@ -137,7 +166,7 @@ export const LinksList = () => {
                             {variant.label ? <Typography variant="caption">{variant.label}</Typography> : null}
                             <PublicUrlListItem
                                 title="HTTP Gateway"
-                                onConfigure={() => {}}
+                                onConfigureGateway={() => {}}
                                 onMouseEnter={() => {}}
                                 onMouseLeave={() => {}}
                                 startTime={+new Date()}

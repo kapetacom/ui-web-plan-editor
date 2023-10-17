@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Box, IconButton, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { PlannerContext } from '../../planner/PlannerContext';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { withErrorBoundary } from 'react-error-boundary';
@@ -7,7 +7,7 @@ import { Tooltip as KapTooltip, EmptyStateBox, KindIcon } from '@kapeta/ui-web-c
 import { BlockDefinition, IconType } from '@kapeta/schemas';
 import MoreVert from '@mui/icons-material/MoreVert';
 import { InstanceStatus } from '@kapeta/ui-web-context';
-import { LinkOff } from '@mui/icons-material';
+import { Link, LinkOff } from '@mui/icons-material';
 
 interface PublicUrlListProps {
     onConfigureGateway: (blockId: string) => void;
@@ -15,6 +15,9 @@ interface PublicUrlListProps {
 
 interface PublicUrlListItemProps {
     title: string;
+    fallbackText?: string;
+    hidePrimary?: boolean;
+
     loading?: boolean;
     status?: InstanceStatus;
 
@@ -53,12 +56,14 @@ const TypeIconWrapper = (props: React.PropsWithChildren) => (
 );
 
 export const PublicUrlListItem = (props: PublicUrlListItemProps) => {
+    const [menuRef, setMenuRef] = React.useState<HTMLElement | null>(null);
     const entry = props.primary || props.fallback;
+    const fallbackText = props.fallbackText || 'Open on Kapeta.dev';
     const statusColor = {
         [InstanceStatus.STARTING]: 'success.main',
         [InstanceStatus.READY]: 'success.main',
         [InstanceStatus.STOPPED]: '#0000003b',
-        [InstanceStatus.EXITED]: 'warning.main',
+        [InstanceStatus.EXITED]: 'error.main',
         [InstanceStatus.UNHEALTHY]: 'warning.main',
     }[props.status || InstanceStatus.STOPPED];
     //
@@ -72,7 +77,7 @@ export const PublicUrlListItem = (props: PublicUrlListItemProps) => {
             gap={1}
             justifyContent="space-between"
         >
-            <Stack direction="row" sx={{ pl: 2, overflow: 'hidden' }} flexGrow={1} gap={1}>
+            <Stack direction="row" sx={{ pl: 1.5, overflow: 'hidden' }} flexGrow={1} gap={1}>
                 <TypeIconWrapper>
                     <KindIcon kind="null" icon={{ value: 'fa fa-globe', type: IconType.Fontawesome5 }} size={24} />
                 </TypeIconWrapper>
@@ -87,32 +92,38 @@ export const PublicUrlListItem = (props: PublicUrlListItemProps) => {
                     </KapTooltip>
 
                     {entry?.url ? (
-                        <KapTooltip arrow title={`${entry?.url}`}>
-                            <a
-                                href={entry?.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                    color: 'inherit',
-                                    textDecoration: 'none',
-                                    whiteSpace: 'nowrap',
-                                    textOverflow: 'ellipsis',
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                {entry.status === 'error' ? (
-                                    <LinkOff sx={{ mr: 1 }} fontSize="small" color="error" />
-                                ) : null}
-                                {entry?.url?.replace(/https?:\/\//, '')}
-                            </a>
-                        </KapTooltip>
+                        <Stack direction="row" alignItems="center" gap={0.5}>
+                            {entry.status === 'error' ? (
+                                <KapTooltip arrow title={entry.message}>
+                                    <LinkOff fontSize="small" color="error" />
+                                </KapTooltip>
+                            ) : (
+                                <Link fontSize="small" />
+                            )}
+                            <KapTooltip arrow title={`${entry?.url}`}>
+                                <a
+                                    href={entry?.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        color: 'inherit',
+                                        textDecoration: 'none',
+                                        whiteSpace: 'nowrap',
+                                        textOverflow: 'ellipsis',
+                                        overflow: 'hidden',
+                                    }}
+                                >
+                                    {entry?.url?.replace(/https?:\/\//, '')}
+                                </a>
+                            </KapTooltip>
+                        </Stack>
                     ) : null}
                 </Stack>
             </Stack>
             <Stack direction="row">
                 <Box
                     component="svg"
-                    width={24}
+                    width={8}
                     height={24}
                     color={statusColor}
                     sx={{
@@ -134,12 +145,43 @@ export const PublicUrlListItem = (props: PublicUrlListItemProps) => {
                             : {},
                     }}
                 >
-                    <circle cx={18} cy={8} r={4} fill="currentColor" />
+                    <circle cx={4} cy={8} r={4} fill="currentColor" />
                 </Box>
-                <IconButton>
+                <IconButton onClick={(e) => setMenuRef(e.currentTarget)}>
                     <MoreVert />
                 </IconButton>
             </Stack>
+
+            <Menu anchorEl={menuRef} open={!!menuRef} onClose={() => setMenuRef(null)}>
+                {props.onConfigureGateway ? (
+                    <MenuItem
+                        onClick={() => {
+                            props.onConfigureGateway?.();
+                            setMenuRef(null);
+                        }}
+                    >
+                        Configure
+                    </MenuItem>
+                ) : null}
+                {props.primary ? (
+                    <MenuItem
+                        component="a"
+                        href={props.primary?.url || ''}
+                        disabled={!props.primary?.url}
+                        onClick={() => setMenuRef(null)}
+                    >
+                        Open custom URL
+                    </MenuItem>
+                ) : null}
+                <MenuItem
+                    component="a"
+                    href={props.fallback?.url || ''}
+                    disabled={!props.fallback?.url}
+                    onClick={() => setMenuRef(null)}
+                >
+                    {fallbackText}
+                </MenuItem>
+            </Menu>
         </Stack>
     );
 };
