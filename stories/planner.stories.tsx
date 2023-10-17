@@ -199,7 +199,13 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                     <Tab value="urls" label="Public URLs" />
                 </Tabs>
                 {currentTab === 'resources' && <PlannerResourcesList onShowMoreAssets={() => {}} />}
-                {currentTab === 'urls' && <PublicUrlList />}
+                {currentTab === 'urls' && (
+                    <PublicUrlList
+                        onConfigureGateway={() => {
+                            console.log('configured!');
+                        }}
+                    />
+                )}
             </PlannerDrawer>
 
             <Planner

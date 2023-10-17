@@ -43,7 +43,13 @@ export const MockData = () => {
                             }}
                         />
                     ) : null}
-                    {currentTab === 1 ? <PublicUrlList /> : null}
+                    {currentTab === 1 ? (
+                        <PublicUrlList
+                            onConfigureGateway={() => {
+                                console.log('configured!');
+                            }}
+                        />
+                    ) : null}
                 </PlannerDrawer>
             </div>
         </ThemeProvider>

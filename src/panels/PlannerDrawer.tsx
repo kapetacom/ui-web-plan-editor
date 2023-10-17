@@ -9,7 +9,7 @@ export const PlannerDrawer = (props: React.PropsWithChildren) => {
             variant="elevation"
             sx={{
                 p: 2,
-                width: 284,
+                width: '284px',
                 height: '100%',
                 boxSizing: 'border-box',
                 flexShrink: 0,
