@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { PublicUrlListItem } from '../src/panels/tools/PublicUrlList';
+import { GatewayCard } from '../src/components/GatewayCard';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 
 export default {
@@ -15,7 +15,7 @@ export default {
     ],
 };
 
-const groups: { label?: string; props: Partial<React.ComponentProps<typeof PublicUrlListItem>> }[][] = [
+const groups: { label?: string; props: Partial<React.ComponentProps<typeof GatewayCard>> }[][] = [
     [
         {
             label: 'Loading',
@@ -177,7 +177,7 @@ export const GatewayCards = () => {
                     {group.map((variant) => (
                         <Box sx={{ width: '250px' }} key={variant.label}>
                             {variant.label ? <Typography variant="caption">{variant.label}</Typography> : null}
-                            <PublicUrlListItem
+                            <GatewayCard
                                 title="HTTP Gateway"
                                 onConfigureGateway={() => {}}
                                 onMouseEnter={() => {}}
