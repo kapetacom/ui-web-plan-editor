@@ -1,8 +1,7 @@
 import React from 'react';
 import { PlannerResourcesList } from '../src/panels/tools/PlannerResourcesList';
 
-import { createTheme, Tab, Tabs, ThemeProvider } from '@mui/material';
-import { lightTheme } from '@kapeta/style';
+import { Tab, Tabs } from '@mui/material';
 import { PlannerDrawer } from '../src/panels/PlannerDrawer';
 import { PublicUrlList } from '../src/panels/tools/PublicUrlList';
 
@@ -17,42 +16,38 @@ export default {
 
 export const Empty = () => {
     return (
-        <ThemeProvider theme={createTheme(lightTheme)}>
-            <div style={{ backgroundColor: 'gray' }}>
-                <PlannerDrawer>
-                    <PlannerResourcesList />
-                </PlannerDrawer>
-            </div>
-        </ThemeProvider>
+        <div style={{ backgroundColor: 'gray' }}>
+            <PlannerDrawer>
+                <PlannerResourcesList />
+            </PlannerDrawer>
+        </div>
     );
 };
 
 export const MockData = () => {
     const [currentTab, setCurrentTab] = React.useState(0);
     return (
-        <ThemeProvider theme={createTheme(lightTheme)}>
-            <div style={{ backgroundColor: 'gray' }}>
-                <PlannerDrawer>
-                    <Tabs value={currentTab} onChange={(_evt, value) => setCurrentTab(value)}>
-                        <Tab value={0} label="Resources" />
-                        <Tab value={1} label="Public URLs" />
-                    </Tabs>
-                    {currentTab === 0 ? (
-                        <PlannerResourcesList
-                            onShowMoreAssets={() => {
-                                console.log('show more assets');
-                            }}
-                        />
-                    ) : null}
-                    {currentTab === 1 ? (
-                        <PublicUrlList
-                            onConfigureGateway={() => {
-                                console.log('configured!');
-                            }}
-                        />
-                    ) : null}
-                </PlannerDrawer>
-            </div>
-        </ThemeProvider>
+        <div style={{ backgroundColor: 'gray' }}>
+            <PlannerDrawer>
+                <Tabs value={currentTab} onChange={(_evt, value) => setCurrentTab(value)}>
+                    <Tab value={0} label="Resources" />
+                    <Tab value={1} label="Public URLs" />
+                </Tabs>
+                {currentTab === 0 ? (
+                    <PlannerResourcesList
+                        onShowMoreAssets={() => {
+                            console.log('show more assets');
+                        }}
+                    />
+                ) : null}
+                {currentTab === 1 ? (
+                    <PublicUrlList
+                        onConfigureGateway={() => {
+                            console.log('configured!');
+                        }}
+                    />
+                ) : null}
+            </PlannerDrawer>
+        </div>
     );
 };
