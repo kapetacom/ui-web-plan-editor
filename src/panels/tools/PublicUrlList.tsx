@@ -5,6 +5,7 @@ import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { withErrorBoundary } from 'react-error-boundary';
 import { EmptyStateBox } from '@kapeta/ui-web-components';
 import { BlockDefinition } from '@kapeta/schemas';
+import { GatewayCard } from '../../components/GatewayCard';
 
 interface PublicUrlListProps {
     onConfigureGateway: (blockId: string) => void;

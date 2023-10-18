@@ -182,7 +182,6 @@ export const GatewayCards = () => {
                                 onConfigureGateway={() => {}}
                                 onMouseEnter={() => {}}
                                 onMouseLeave={() => {}}
-                                startTime={+new Date()}
                                 {...variant.props}
                             />
                         </Box>
