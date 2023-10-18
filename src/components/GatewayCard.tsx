@@ -7,7 +7,6 @@ import { Tooltip as KapTooltip } from '@kapeta/ui-web-components';
 interface GatewayCardProps {
     title: string;
     fallbackText?: string;
-    hidePrimary?: boolean;
 
     loading?: boolean;
     status?: InstanceStatus;
@@ -57,9 +56,20 @@ export const GatewayCard = (props: GatewayCardProps) => {
         [InstanceStatus.EXITED]: 'error.main',
         [InstanceStatus.UNHEALTHY]: 'warning.main',
     }[props.status || InstanceStatus.STOPPED];
+
+    const titleMapping = {
+        [InstanceStatus.STARTING]: 'Block is starting',
+        [InstanceStatus.READY]: 'Block is ready',
+        [InstanceStatus.UNHEALTHY]: 'Block is unhealthy',
+        // [InstanceStatus.FAILED]: 'Block failed to start',
+        [InstanceStatus.STOPPED]: 'Block has stopped',
+        // [InstanceStatus.STOPPING]: 'Block is stopping',
+        // [InstanceStatus.BUSY]: 'Block is unresponsive',
+    };
     //
     const shouldPulse =
         props.loading || props.status === InstanceStatus.STARTING || props.status === InstanceStatus.UNHEALTHY;
+    const statusText = titleMapping[props.status || InstanceStatus.STOPPED];
 
     return (
         <Stack
@@ -70,11 +80,11 @@ export const GatewayCard = (props: GatewayCardProps) => {
             onMouseEnter={props.onMouseEnter}
             onMouseLeave={props.onMouseLeave}
         >
-            <Stack direction="row" sx={{ pl: 1.5, overflow: 'hidden' }} flexGrow={1} gap={1}>
+            <Stack direction="row" sx={{ pl: 1.5, overflow: 'hidden' }} flexGrow={1} gap={1} alignItems={'center'}>
                 <TypeIconWrapper>
                     <Language />
                 </TypeIconWrapper>
-                <Stack sx={{ overflow: 'hidden' }} flexGrow={1}>
+                <Stack sx={{ overflow: 'hidden' }} flexGrow={1} justifyContent={'center'}>
                     <KapTooltip arrow title={props.title} placement="top">
                         <Typography
                             variant="body2"
@@ -116,32 +126,34 @@ export const GatewayCard = (props: GatewayCardProps) => {
                 </Stack>
             </Stack>
             <Stack direction="row">
-                <Box
-                    component="svg"
-                    width={8}
-                    height={24}
-                    color={statusColor}
-                    sx={{
-                        '& > circle': shouldPulse
-                            ? {
-                                  animation: 'pulse 1.5s infinite',
-                                  '@keyframes pulse': {
-                                      '0%': {
-                                          opacity: 1,
+                <KapTooltip arrow title={statusText} placement="top">
+                    <Box
+                        component="svg"
+                        width={8}
+                        height={24}
+                        color={statusColor}
+                        sx={{
+                            '& > circle': shouldPulse
+                                ? {
+                                      animation: 'pulse 1.5s infinite',
+                                      '@keyframes pulse': {
+                                          '0%': {
+                                              opacity: 1,
+                                          },
+                                          '50%': {
+                                              opacity: 0.5,
+                                          },
+                                          '100%': {
+                                              opacity: 1,
+                                          },
                                       },
-                                      '50%': {
-                                          opacity: 0.5,
-                                      },
-                                      '100%': {
-                                          opacity: 1,
-                                      },
-                                  },
-                              }
-                            : {},
-                    }}
-                >
-                    <circle cx={4} cy={8} r={4} fill="currentColor" />
-                </Box>
+                                  }
+                                : {},
+                        }}
+                    >
+                        <circle cx={4} cy={8} r={4} fill="currentColor" />
+                    </Box>
+                </KapTooltip>
                 <IconButton onClick={(e) => setMenuRef(e.currentTarget)}>
                     <MoreVert />
                 </IconButton>
@@ -157,19 +169,20 @@ export const GatewayCard = (props: GatewayCardProps) => {
                     },
                 }}
             >
-                {props.onConfigureGateway ? (
-                    <MenuItem
-                        onClick={() => {
-                            props.onConfigureGateway?.();
-                            setMenuRef(null);
-                        }}
-                    >
-                        Configure
-                    </MenuItem>
-                ) : null}
+                <MenuItem
+                    disabled={!props.onConfigureGateway}
+                    onClick={() => {
+                        props.onConfigureGateway?.();
+                        setMenuRef(null);
+                    }}
+                >
+                    Configure
+                </MenuItem>
                 {props.primary ? (
                     <MenuItem
                         component="a"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         href={props.primary?.url || ''}
                         disabled={!props.primary?.url}
                         onClick={() => setMenuRef(null)}
@@ -179,6 +192,8 @@ export const GatewayCard = (props: GatewayCardProps) => {
                 ) : null}
                 <MenuItem
                     component="a"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     href={props.fallback?.url || ''}
                     disabled={!props.fallback?.url}
                     onClick={() => setMenuRef(null)}
