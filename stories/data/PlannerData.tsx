@@ -106,6 +106,20 @@ export const PlannerData: Plan = {
                     height: -1,
                 },
             },
+            {
+                id: 'gateway',
+                name: 'Web gateway',
+                block: {
+                    ref: 'kapeta/gateway:local',
+                },
+
+                dimensions: {
+                    top: 700,
+                    width: 150,
+                    left: 950,
+                    height: -1,
+                },
+            },
         ],
 
         connections: [

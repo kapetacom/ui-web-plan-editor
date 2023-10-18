@@ -1,4 +1,3 @@
-import { Planner } from './planner/Planner';
 export * from './components/BlockNode';
 export * from './components/PlannerBlockWarningTag';
 export * from './components/BlockShape';
@@ -7,6 +6,7 @@ export * from './components/ResourceTypePreview';
 export * from './components/BlockTypePreview';
 export * from './components/PlanPreview';
 export * from './components/AssetThumbnail';
+export * from './components/GatewayCard';
 
 export * from './logs/LogPanel';
 export * from './utils/SVGDropShadow';
@@ -39,7 +39,7 @@ export * from './planner/renderers/plannerRenderer';
 
 export * from './panels/PlannerSidebar';
 export * from './panels/BlockInspectorPanel';
-export * from './panels/PlannerResourceDrawer';
+export * from './panels/tools/PlannerResourcesList';
 export * from './panels/tools/BlockTypeToolList';
 export * from './panels/tools/BlockTypeTool';
 

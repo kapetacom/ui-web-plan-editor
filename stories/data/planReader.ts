@@ -1,6 +1,5 @@
 import { BlockService } from './BlockServiceMock';
 import { PlannerData } from './PlannerData';
-import { Asset } from '@kapeta/ui-web-types';
 import { BlockDefinition, Plan } from '@kapeta/schemas';
 import _ from 'lodash';
 import { AssetInfo, fromAsset } from '../../src';

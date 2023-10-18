@@ -1,0 +1,8 @@
+{
+    "kind": "kapeta/block-type-gateway-http:1.2.3",
+    "metadata": {
+        "name": "kapeta/gateway",
+        "title": "HTTP Gateway"
+    },
+    "spec": {}
+}

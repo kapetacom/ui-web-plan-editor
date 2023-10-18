@@ -7,6 +7,8 @@ import { PlannerBlockResourceListItem } from '../src/planner/components/PlannerB
 import { BlockContext, PlannerBlockContextData } from '../src/planner/BlockContext';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
+import './styles.less';
+
 const ValidInstance: BlockInstance = {
     id: '1',
     name: 'Some Instance',

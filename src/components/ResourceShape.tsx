@@ -91,6 +91,7 @@ export const ResourceShape = (props: Props) => {
                 zIndex: props.dragging ? 50 : undefined,
                 width: '114px',
                 height: '48px',
+                lineHeight: '16px',
                 '& > .container': {
                     transition: 'all 100ms ease-in-out',
                     '& > .info': {
