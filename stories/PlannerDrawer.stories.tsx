@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { PublicUrlListItem } from '../../src/panels/tools/PublicUrlList';
+import { PublicUrlListItem } from '../src/panels/tools/PublicUrlList';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 
 export default {
-    title: 'Planner Drawer',
+    title: 'Gateway Cards',
     decorators: [
         (Story) => (
             // To defeat the 100% height/width of the storybook container
@@ -163,7 +163,7 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
     ],
 ];
 
-export const LinksList = () => {
+export const GatewayCards = () => {
     const [isVerified, setIsVerified] = React.useState(false);
     React.useEffect(() => {
         const timeout = setTimeout(() => setIsVerified(true), 30000);

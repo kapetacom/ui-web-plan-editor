@@ -24,7 +24,7 @@ export const Empty = () => {
     );
 };
 
-export const MockData = () => {
+export const DrawerTabs = () => {
     const [currentTab, setCurrentTab] = React.useState(0);
     return (
         <div style={{ backgroundColor: 'gray' }}>
