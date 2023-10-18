@@ -1,3 +1,15 @@
+# [1.10.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.9.0...v1.10.0) (2023-10-18)
+
+
+### Bug Fixes
+
+* Remove unused InstanceProvider type ([#92](https://github.com/kapetacom/ui-web-plan-editor/issues/92)) ([2d3af82](https://github.com/kapetacom/ui-web-plan-editor/commit/2d3af82358f920dfd2707fc2496c9f5114b9a56c))
+
+
+### Features
+
+* add GatewayCard component [KAP-1353] ([#93](https://github.com/kapetacom/ui-web-plan-editor/issues/93)) ([4c38515](https://github.com/kapetacom/ui-web-plan-editor/commit/4c385156e8ce070b63683fbdeb183cb169451d2b))
+
 # [1.9.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.8.3...v1.9.0) (2023-10-09)
 
 
