@@ -7,7 +7,7 @@ import { Tooltip as KapTooltip, EmptyStateBox, KindIcon } from '@kapeta/ui-web-c
 import { BlockDefinition, IconType } from '@kapeta/schemas';
 import MoreVert from '@mui/icons-material/MoreVert';
 import { InstanceStatus } from '@kapeta/ui-web-context';
-import { Link, LinkOff } from '@mui/icons-material';
+import { Language, Link, LinkOff } from '@mui/icons-material';
 
 interface PublicUrlListProps {
     onConfigureGateway: (blockId: string) => void;
@@ -72,19 +72,21 @@ export const PublicUrlListItem = (props: PublicUrlListItemProps) => {
 
     return (
         <Stack
-            sx={{ py: 2, border: '1px solid #0000003b', borderRadius: '6px', width: '100%' }}
+            sx={{ py: 1, border: '1px solid #0000003b', borderRadius: '6px', width: '100%' }}
             direction="row"
             gap={1}
             justifyContent="space-between"
         >
             <Stack direction="row" sx={{ pl: 1.5, overflow: 'hidden' }} flexGrow={1} gap={1}>
                 <TypeIconWrapper>
-                    <KindIcon kind="null" icon={{ value: 'fa fa-globe', type: IconType.Fontawesome5 }} size={24} />
+                    <Language />
                 </TypeIconWrapper>
                 <Stack sx={{ overflow: 'hidden' }} flexGrow={1}>
                     <KapTooltip arrow title={props.title} placement="top">
                         <Typography
-                            variant="subtitle2"
+                            variant="body2"
+                            fontSize={12}
+                            fontWeight={600}
                             sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
                         >
                             {props.title}
@@ -92,7 +94,7 @@ export const PublicUrlListItem = (props: PublicUrlListItemProps) => {
                     </KapTooltip>
 
                     {entry?.url ? (
-                        <Stack direction="row" alignItems="center" gap={0.5}>
+                        <Stack direction="row" alignItems="center" gap={0.5} height={18} fontSize={11}>
                             {entry.status === 'error' ? (
                                 <KapTooltip arrow title={entry.message}>
                                     <LinkOff fontSize="small" color="error" />

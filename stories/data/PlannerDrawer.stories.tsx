@@ -28,6 +28,7 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
         {
             label: 'Editor mode',
             props: {
+                status: InstanceStatus.READY,
                 fallbackText: 'Open in browser',
                 primary: undefined,
                 fallback: {
@@ -40,6 +41,18 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
             props: {
                 title: 'No urls',
                 fallbackText: 'Open in browser',
+                primary: undefined,
+                fallback: {
+                    url: null,
+                    status: 'ok',
+                },
+            },
+        },
+        {
+            props: {
+                title: 'View only',
+                fallbackText: 'Open in browser',
+                onConfigureGateway: undefined,
                 primary: undefined,
                 fallback: {
                     url: null,
@@ -101,7 +114,7 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
                 primary: {
                     url: 'https://example.com',
                     status: 'error',
-                    message: 'Unable to connect to the gateway',
+                    message: 'Unable to connect to gateway',
                 },
                 fallback: {
                     url: 'https://kap-abc.kapeta.dev',
@@ -143,7 +156,7 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Publi
                 fallback: {
                     url: 'https://kap-abc.kapeta.dev',
                     status: 'error',
-                    message: 'Unable to connect to the gateway',
+                    message: 'Unable to connect to gateway',
                 },
             },
         },
