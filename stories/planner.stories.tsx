@@ -19,11 +19,12 @@ import { PlannerOutlet, plannerRenderer } from '../src/planner/renderers/planner
 import { BlockInspectorPanel } from '../src/panels/BlockInspectorPanel';
 import { PlannerResourcesList } from '../src/panels/tools/PlannerResourcesList';
 
-import './styles.less';
 import { useConfirmDelete } from '@kapeta/ui-web-components';
 import { PlannerDrawer } from '../src/panels/PlannerDrawer';
 import { Tab, Tabs } from '@mui/material';
 import { PublicUrlList } from '../src/panels/tools/PublicUrlList';
+
+import './styles.less';
 
 const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const planner = useContext(PlannerContext);

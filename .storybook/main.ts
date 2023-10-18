@@ -51,6 +51,8 @@ const config: StorybookConfig = {
                 use: ['json-loader', 'yaml-loader'],
             });
         }
+        config.resolve!.extensions!.push('.less');
+
         return config;
     },
 };

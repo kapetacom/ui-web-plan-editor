@@ -1,11 +1,12 @@
 import React from 'react';
 import { PlannerResourcesList } from '../src/panels/tools/PlannerResourcesList';
 
-import './styles.less';
 import { createTheme, Tab, Tabs, ThemeProvider } from '@mui/material';
 import { lightTheme } from '@kapeta/style';
 import { PlannerDrawer } from '../src/panels/PlannerDrawer';
 import { PublicUrlList } from '../src/panels/tools/PublicUrlList';
+
+import './styles.less';
 
 export default {
     title: 'Resource Drawer',
