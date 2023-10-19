@@ -155,7 +155,8 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                     <LayoutNode x={point.x} y={point.y} key={blockContext.blockInstance.id}>
                         <svg
                             className={`${className} ${evt.isDragging ? 'dragging' : ''}`}
-                            onDoubleClick={() => planner.setFocusedBlock(blockContext.blockInstance)}
+                            // TODO: Disabled for now, focus mode is kind of broken
+                            // onDoubleClick={() => planner.setFocusedBlock(blockContext.blockInstance)}
                             onMouseEnter={() => {
                                 setIsHovered(true);
                                 if (props.onMouseEnter) {
