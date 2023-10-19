@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.0...v1.10.1) (2023-10-19)
+
+
+### Bug Fixes
+
+* export PlannerDrawer ([c87aafa](https://github.com/kapetacom/ui-web-plan-editor/commit/c87aafafb4a768faa966586e18ee692787749a22))
+
 # [1.10.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.9.0...v1.10.0) (2023-10-18)
 
 
