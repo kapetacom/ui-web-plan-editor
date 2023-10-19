@@ -336,7 +336,7 @@ const meta: Meta<typeof PlannerLoader> = {
                 InstanceStatus.STOPPED,
                 InstanceStatus.STARTING,
                 InstanceStatus.READY,
-                InstanceStatus.EXITED,
+                InstanceStatus.FAILED,
                 InstanceStatus.UNHEALTHY,
             ],
             control: 'select',

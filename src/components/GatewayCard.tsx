@@ -52,23 +52,28 @@ export const GatewayCard = (props: GatewayCardProps) => {
     const statusColor = {
         [InstanceStatus.STARTING]: 'success.main',
         [InstanceStatus.READY]: 'success.main',
+        [InstanceStatus.STOPPING]: 'success.main',
         [InstanceStatus.STOPPED]: '#0000003b',
-        [InstanceStatus.EXITED]: 'error.main',
+        [InstanceStatus.FAILED]: 'error.main',
         [InstanceStatus.UNHEALTHY]: 'warning.main',
+        [InstanceStatus.BUSY]: 'warning.main',
     }[props.status || InstanceStatus.STOPPED];
 
     const titleMapping = {
         [InstanceStatus.STARTING]: 'Block is starting',
         [InstanceStatus.READY]: 'Block is ready',
         [InstanceStatus.UNHEALTHY]: 'Block is unhealthy',
-        // [InstanceStatus.FAILED]: 'Block failed to start',
+        [InstanceStatus.FAILED]: 'Block failed to start, or has crashed. Check logs for more information.',
         [InstanceStatus.STOPPED]: 'Block has stopped',
-        // [InstanceStatus.STOPPING]: 'Block is stopping',
-        // [InstanceStatus.BUSY]: 'Block is unresponsive',
+        [InstanceStatus.STOPPING]: 'Block is stopping',
+        [InstanceStatus.BUSY]: 'Block is unresponsive',
     };
     //
     const shouldPulse =
-        props.loading || props.status === InstanceStatus.STARTING || props.status === InstanceStatus.UNHEALTHY;
+        props.loading ||
+        props.status === InstanceStatus.STARTING ||
+        props.status === InstanceStatus.STOPPING ||
+        props.status === InstanceStatus.UNHEALTHY;
     const statusText = titleMapping[props.status || InstanceStatus.STOPPED];
 
     return (
@@ -80,11 +85,11 @@ export const GatewayCard = (props: GatewayCardProps) => {
             onMouseEnter={props.onMouseEnter}
             onMouseLeave={props.onMouseLeave}
         >
-            <Stack direction="row" sx={{ pl: 1.5, overflow: 'hidden' }} flexGrow={1} gap={1} alignItems={'center'}>
+            <Stack direction="row" sx={{ pl: 1.5, overflow: 'hidden' }} flexGrow={1} gap={1} alignItems="center">
                 <TypeIconWrapper>
                     <Language />
                 </TypeIconWrapper>
-                <Stack sx={{ overflow: 'hidden' }} flexGrow={1} justifyContent={'center'}>
+                <Stack sx={{ overflow: 'hidden' }} flexGrow={1} justifyContent="center">
                     <KapTooltip arrow title={props.title} placement="top">
                         <Typography
                             variant="body2"
