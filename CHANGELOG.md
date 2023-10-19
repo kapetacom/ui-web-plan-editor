@@ -1,3 +1,10 @@
+## [1.10.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.2...v1.10.3) (2023-10-19)
+
+
+### Bug Fixes
+
+* handle new InstanceStatus options ([790b86f](https://github.com/kapetacom/ui-web-plan-editor/commit/790b86f239efc1174db90c56fa3746b7ca8b43db))
+
 ## [1.10.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.1...v1.10.2) (2023-10-19)
 
 
