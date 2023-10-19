@@ -76,7 +76,7 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
             props: { title: 'Stopped', status: InstanceStatus.STOPPED },
         },
         {
-            props: { title: 'Exited', status: InstanceStatus.EXITED },
+            props: { title: 'Failed', status: InstanceStatus.FAILED },
         },
     ],
 
