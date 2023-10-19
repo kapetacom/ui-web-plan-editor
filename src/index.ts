@@ -37,6 +37,7 @@ export * from './planner/types';
 export * from './planner/validation/BlockValidator';
 export * from './planner/renderers/plannerRenderer';
 
+export * from './panels/PlannerDrawer';
 export * from './panels/PlannerSidebar';
 export * from './panels/BlockInspectorPanel';
 export * from './panels/tools/PlannerResourcesList';
