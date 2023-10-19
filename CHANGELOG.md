@@ -1,3 +1,10 @@
+## [1.10.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.1...v1.10.2) (2023-10-19)
+
+
+### Bug Fixes
+
+* disable doubleclick focus mode ([#95](https://github.com/kapetacom/ui-web-plan-editor/issues/95)) ([ddb6d87](https://github.com/kapetacom/ui-web-plan-editor/commit/ddb6d87c21b99c2a1fa4c8cd226d3db44deb8929))
+
 ## [1.10.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.0...v1.10.1) (2023-10-19)
 
 
