@@ -8,7 +8,6 @@ interface Props extends PropsWithChildren, Omit<DrawerProps, 'children'> {
 }
 
 export const PlannerSidebar = (props: Props) => {
-    const title = props.title;
     const propsCopy: any = { ...props };
     delete propsCopy.title;
     let width = '680px';
@@ -28,38 +27,56 @@ export const PlannerSidebar = (props: Props) => {
                     width: width,
                     p: 4,
                     boxSizing: 'border-box',
+                    overflow: 'hidden',
                 },
             }}
             {...propsCopy}
         >
-            <Box mb={2}>
-                <Stack
-                    direction={'row'}
-                    justifyContent={'space-between'}
-                    alignItems={'center'}
-                    sx={{
-                        fontSize: '22px',
-                    }}
-                >
-                    <Typography fontSize={'inherit'} variant={'h3'}>
-                        {props.title}
-                    </Typography>
-                    <IconButton
+            <Stack
+                sx={{
+                    height: '100%',
+                }}
+                className={'kap-planner-sidebar-container'}
+                direction={'column'}
+                mb={2}
+            >
+                <Box mb={2} flex={0} className={'kap-planner-sidebar-titel'}>
+                    <Stack
+                        direction={'row'}
+                        justifyContent={'space-between'}
+                        alignItems={'center'}
                         sx={{
-                            fontSize: 'inherit',
-                        }}
-                        onClick={(evt) => {
-                            if (props.onClose) {
-                                props.onClose(evt, 'escapeKeyDown');
-                            }
+                            fontSize: '22px',
                         }}
                     >
-                        <CloseRounded />
-                    </IconButton>
-                </Stack>
-                <Divider />
-            </Box>
-            {props.children}
+                        <Typography fontSize={'inherit'} variant={'h3'}>
+                            {props.title}
+                        </Typography>
+                        <IconButton
+                            sx={{
+                                fontSize: 'inherit',
+                            }}
+                            onClick={(evt) => {
+                                if (props.onClose) {
+                                    props.onClose(evt, 'escapeKeyDown');
+                                }
+                            }}
+                        >
+                            <CloseRounded />
+                        </IconButton>
+                    </Stack>
+                    <Divider />
+                </Box>
+                <Box
+                    flex={1}
+                    sx={{
+                        overflowY: 'auto',
+                    }}
+                    className={'kap-planner-sidebar-content'}
+                >
+                    {props.children}
+                </Box>
+            </Stack>
         </Drawer>
     );
 };
