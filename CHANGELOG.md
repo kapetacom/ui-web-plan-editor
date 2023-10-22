@@ -1,3 +1,10 @@
+## [1.10.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.3...v1.10.4) (2023-10-22)
+
+
+### Bug Fixes
+
+* Avoid scrolling entire sidebar ([#97](https://github.com/kapetacom/ui-web-plan-editor/issues/97)) ([3569b78](https://github.com/kapetacom/ui-web-plan-editor/commit/3569b783a309536a4e456942cd78e0c3dadc882c))
+
 ## [1.10.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.2...v1.10.3) (2023-10-19)
 
 
