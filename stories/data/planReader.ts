@@ -1,5 +1,5 @@
 import { BlockService } from './BlockServiceMock';
-import { PlannerData } from './PlannerData';
+import { ValidPlannerData, InvalidPlannerData } from './PlannerData';
 import { BlockDefinition, Plan } from '@kapeta/schemas';
 import _ from 'lodash';
 import { AssetInfo, fromAsset } from '../../src';
@@ -8,14 +8,26 @@ export async function readPlanV2(): Promise<{
     plan: Plan;
     blockAssets: AssetInfo<BlockDefinition>[];
 }> {
-    for (const block of PlannerData.spec.blocks || []) {
+    for (const block of ValidPlannerData.spec.blocks || []) {
         await BlockService.get(block.block.ref);
     }
 
     const blocks = await BlockService.list();
 
     return {
-        plan: _.cloneDeep(PlannerData),
+        plan: _.cloneDeep(ValidPlannerData),
+        blockAssets: blocks.map(fromAsset),
+    };
+}
+
+export async function readInvalidPlan(): Promise<{
+    plan: Plan;
+    blockAssets: AssetInfo<BlockDefinition>[];
+}> {
+    const blocks = await BlockService.list();
+
+    return {
+        plan: _.cloneDeep(InvalidPlannerData),
         blockAssets: blocks.map(fromAsset),
     };
 }

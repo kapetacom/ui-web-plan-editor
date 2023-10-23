@@ -1,0 +1,101 @@
+{
+    "kind": "kapeta/block-type-service:1.2.3",
+    "metadata": {
+        "name": "kapeta/user-invalid-target"
+    },
+    "spec": {
+        "target": {
+            "kind": "kapeta/language-target-java-spring-boot:5.4.3",
+            "options": {
+                "groupId": "org.mycompany",
+                "artifactId": "service-users",
+                "basePackage": "org.mycompany.services.users"
+            }
+        },
+        "entities": {
+            "types": [
+                {
+                    "name": "User",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "email": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
+        "consumers": [
+            {
+                "kind": "kapeta/resource-type-postgresql:1.2.3",
+                "metadata": {
+                    "name": "usersdb"
+                }
+            },
+            {
+                "kind": "kapeta/resource-type-postgresql:1.2.3",
+                "metadata": {
+                    "name": "usersdb"
+                }
+            }
+        ],
+        "providers": [
+            {
+                "kind": "kapeta/resource-type-rest-api:1.2.3",
+                "metadata": {
+                    "name": "users"
+                },
+                "spec": {
+                    "methods": {
+                        "createUser": {
+                            "description": "Create user",
+                            "method": "POST",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                },
+                                "user": {
+                                    "type": "User",
+                                    "transport": "body"
+                                }
+                            },
+                            "responseType": {
+                                "$ref": "User"
+                            }
+                        },
+                        "getUser": {
+                            "description": "Get user by id",
+                            "method": "GET",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                }
+                            },
+                            "responseType": "User"
+                        },
+                        "deleteUser": {
+                            "description": "Delete user by id",
+                            "method": "DELETE",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}

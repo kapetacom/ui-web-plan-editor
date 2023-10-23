@@ -14,6 +14,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 import './Planner.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
+import { MissingReference, ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
+import { Alert, AlertTitle } from '@mui/material';
+
+type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent | typeof React.Component> | null;
 
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
@@ -31,6 +35,8 @@ interface Props {
     onConnectionMouseLeave?: (context: ActionContext) => void;
 
     onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void;
+    renderMissingReferences?: (missingReferences: MissingReference[]) => RenderResult;
+    renderError?: (error: Error) => RenderResult;
 }
 
 const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
@@ -141,11 +147,28 @@ export const Planner = (props: Props) => {
 
     return (
         <ErrorBoundary
-            onError={(error, info) => {
-                // eslint-disable-next-line no-console
-                console.error('Error rendering plan', error, info, plan);
+            fallbackRender={({ error, resetErrorBoundary }) => {
+                const err = error as ReferenceValidationError;
+                if (err?.missingReferences && props.renderMissingReferences) {
+                    return props.renderMissingReferences(err.missingReferences);
+                }
+
+                if (props.renderError) {
+                    return props.renderError(error);
+                }
+
+                return (
+                    <Alert
+                        sx={{
+                            m: 2,
+                            mt: 6,
+                        }}
+                        severity="error"
+                    >
+                        Failed to render plan. Please contact support.
+                    </Alert>
+                );
             }}
-            fallback={<div>Failed to render plan. Please contact support.</div>}
             resetKeys={[props.systemId]}
         >
             <PlannerCanvas onCreateBlock={props.onCreateBlock}>

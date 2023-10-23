@@ -5,7 +5,7 @@ import { ButtonStyle, DefaultContext } from '@kapeta/ui-web-components';
 
 import { Planner } from '../src/planner/Planner';
 
-import { readPlanV2 } from './data/planReader';
+import { readInvalidPlan, readPlanV2 } from './data/planReader';
 import { PlannerActionConfig, PlannerContext, withPlannerContext } from '../src/planner/PlannerContext';
 import { useAsync } from 'react-use';
 import { ItemType, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
@@ -273,7 +273,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
 const PlanEditor = withPlannerContext(InnerPlanEditor);
 
 const PlannerLoader = (props) => {
-    const plan = useAsync(() => readPlanV2());
+    const plan = useAsync(() => (props.planId === 'invalid' ? readInvalidPlan() : readPlanV2()), [props.planId]);
 
     const instanceStatuses = plan.value?.plan?.spec.blocks?.reduce((agg, blockInstance) => {
         agg[blockInstance.id] = props.instanceStatus;
@@ -331,6 +331,9 @@ const meta: Meta<typeof PlannerLoader> = {
                 },
             },
         },
+        planId: {
+            options: ['valid', 'invalid'],
+        },
         instanceStatus: {
             options: [
                 InstanceStatus.STOPPED,
@@ -351,18 +354,47 @@ export const ViewOnly: Story = {
     args: {
         plannerMode: PlannerMode.VIEW,
         instanceStatus: InstanceStatus.READY,
+        planId: 'valid',
     },
 };
+
+export const ViewOnlyError: Story = {
+    args: {
+        plannerMode: PlannerMode.VIEW,
+        instanceStatus: InstanceStatus.READY,
+        planId: 'invalid',
+    },
+};
+
 export const EditMode: Story = {
     args: {
         plannerMode: PlannerMode.EDIT,
         instanceStatus: InstanceStatus.READY,
+        planId: 'valid',
     },
 };
+
+export const EditModeError: Story = {
+    args: {
+        plannerMode: PlannerMode.EDIT,
+        instanceStatus: InstanceStatus.READY,
+        planId: 'invalid',
+    },
+};
+
 export const ConfigureMode: Story = {
     args: {
         plannerMode: PlannerMode.CONFIGURATION,
         instanceStatus: InstanceStatus.READY,
+        planId: 'valid',
+    },
+};
+
+export const ConfigureModeError: Story = {
+    args: {
+        plannerMode: PlannerMode.CONFIGURATION,
+        instanceStatus: InstanceStatus.READY,
+        planId: 'invalid',
     },
 };
 

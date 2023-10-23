@@ -6,7 +6,7 @@ import { BlockService } from './data/BlockServiceMock';
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockPreview, BlockTypePreview } from '../src/components/BlockTypePreview';
 import { ResourceTypePreview } from '../src/components/ResourceTypePreview';
-import { readPlanV2 } from './data/planReader';
+import { readInvalidPlan, readPlanV2 } from './data/planReader';
 import { AssetThumbnail, fromAsset } from '../src';
 import { DefaultContext } from '@kapeta/ui-web-components';
 import { Typography } from '@mui/material';
@@ -62,6 +62,30 @@ export const Plan = () => {
     );
 };
 
+export const PlanMissingReferences = () => {
+    const plan = useAsync(() => readInvalidPlan());
+
+    return (
+        <TempPreviewContainer>
+            {plan.value ? (
+                <PlanPreview
+                    width={WIDTH - 20}
+                    height={HEIGHT - 20}
+                    blocks={plan.value.blockAssets || []}
+                    asset={{
+                        ref: 'kapeta/something:local',
+                        version: 'local',
+                        editable: true,
+                        exists: true,
+                        content: plan.value.plan,
+                    }}
+                />
+            ) : (
+                <div>Loading...</div>
+            )}
+        </TempPreviewContainer>
+    );
+};
 export const BlockType = () => {
     const data = useAsync(async () => {
         return BlockTypeProvider.get('kapeta/block-type-frontend:1.2.3');
@@ -152,6 +176,68 @@ export const ResourceType = () => {
 
 export const ThumbnailPlan = () => {
     const plan = useAsync(() => readPlanV2());
+
+    if (!plan.value) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <DefaultContext>
+            <AssetThumbnail
+                asset={{
+                    content: plan.value.plan,
+                    ref: 'kapeta/something:local',
+                    version: 'local',
+                    editable: true,
+                    exists: true,
+                }}
+                width={400}
+                height={400}
+                onClick={() => {}}
+                installerService={{
+                    uninstall: () => Promise.resolve(),
+                    install: () => Promise.resolve(),
+                    get: () => Promise.resolve(true),
+                }}
+                loadPlanContext={() => {
+                    return {
+                        loading: false,
+                        blocks: plan.value?.blockAssets || [],
+                    };
+                }}
+                stats={[
+                    {
+                        label: '1 pending',
+                        color: 'primary',
+                    },
+                    {
+                        label: '1 deployed',
+                        color: 'success',
+                    },
+                    {
+                        label: '1 failed',
+                        color: 'error',
+                    },
+                    {
+                        label: '1 expiring',
+                        color: 'warning',
+                        progress: 80,
+                        pulsate: true,
+                        tooltip: {
+                            title: <Typography variant="body2">Some text about the expiring environment</Typography>,
+                            placement: 'right',
+                            arrow: true,
+                            maxWidth: 500,
+                        },
+                    },
+                ]}
+            />
+        </DefaultContext>
+    );
+};
+
+export const ThumbnailPlanMissingAssets = () => {
+    const plan = useAsync(() => readInvalidPlan());
 
     if (!plan.value) {
         return <div>Loading...</div>;

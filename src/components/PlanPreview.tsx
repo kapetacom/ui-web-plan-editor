@@ -51,8 +51,8 @@ const PlanPreviewInner = withPlannerContext<InnerProps>(
                 <div
                     className={'preview'}
                     style={{
-                        width: `${size.width}px`,
-                        height: `${size.height}px`,
+                        width: size.width > 0 ? `${size.width}px` : undefined,
+                        height: size.height > 0 ? `${size.height}px` : undefined,
                         transform: `scale(${ratio})`,
                     }}
                 >
