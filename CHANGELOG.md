@@ -1,3 +1,10 @@
+## [1.10.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.4...v1.10.5) (2023-10-24)
+
+
+### Bug Fixes
+
+* change block status colors to use MUI theme colors ([#99](https://github.com/kapetacom/ui-web-plan-editor/issues/99)) ([07d6709](https://github.com/kapetacom/ui-web-plan-editor/commit/07d6709a328e6e69e4620db6a96c1f2ae94e0501))
+
 ## [1.10.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.3...v1.10.4) (2023-10-22)
 
 
