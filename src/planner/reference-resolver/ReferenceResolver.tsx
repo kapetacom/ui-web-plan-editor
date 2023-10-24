@@ -1,7 +1,7 @@
-import { Alert, Box, Button, Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Alert, Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ReferenceResolverItem } from './ReferenceResolverItem';
-import { ActionType, MissingReferenceResolution, NO_RESOLUTION, ReferenceResolverProps } from './types';
+import { MissingReferenceResolution, NO_RESOLUTION, ReferenceResolverProps } from './types';
 import { isResolutionValid } from './ActionSelector';
 
 export const ReferenceResolver = (props: ReferenceResolverProps) => {

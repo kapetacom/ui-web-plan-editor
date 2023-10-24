@@ -1,6 +1,6 @@
 import { KapButton, KapDialog, SimpleLoader } from '@kapeta/ui-web-components';
 import { MissingReferenceResolution, ReferenceResolverProps } from './types';
-import React, { useState } from 'react';
+import React, { uuseEffect, seEffect, useState, useEffect } from 'react';
 import { ReferenceResolver } from './ReferenceResolver';
 import { Button, Stack } from '@mui/material';
 import {
@@ -24,6 +24,13 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
     const [showErrors, setShowErrors] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false);
     const [resolutionStates, setResolutionStates] = useState<ResolutionState[]>([]);
+
+    useEffect(() => {
+        if (props.open || props.inline) {
+            // Reset state whenever the modal is opened
+            setResolutionStates([]);
+        }
+    }, [props.open, props.inline]);
 
     const applyButton = (
         <KapButton
@@ -49,7 +56,6 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
                     try {
                         const result = await transformer.apply();
                         if (result.errors.length < 1) {
-                            setResolutionStates([]);
                             props.onResolved && (await props.onResolved(result));
                             props.onClose && props.onClose();
                         }
