@@ -1,6 +1,6 @@
 import React from 'react';
 import './styles.less';
-import { MissingReferenceResolution, ReferenceResolver } from '../src/planner/reference-resolver/ReferenceResolver';
+import { ReferenceResolver, MissingReferenceResolution } from '../src/planner/reference-resolver';
 import { MissingReference, ReferenceType } from '../src/planner/validation/PlanReferenceValidation';
 import { BlockService } from './data/BlockServiceMock';
 import { useAsync } from 'react-use';

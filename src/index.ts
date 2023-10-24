@@ -35,7 +35,9 @@ export * from './planner/Planner';
 export * from './planner/PlannerContext';
 export * from './planner/types';
 export * from './planner/validation/BlockValidator';
+export * from './planner/validation/PlanReferenceValidation';
 export * from './planner/renderers/plannerRenderer';
+export * from './planner/reference-resolver/index';
 
 export * from './panels/PlannerDrawer';
 export * from './panels/PlannerSidebar';
