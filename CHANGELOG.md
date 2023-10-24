@@ -1,3 +1,10 @@
+## [1.11.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.1...v1.11.2) (2023-10-24)
+
+
+### Bug Fixes
+
+* More type fixes ([84071dd](https://github.com/kapetacom/ui-web-plan-editor/commit/84071dd44042c357a162760a88b71f56aeaa435b))
+
 ## [1.11.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.0...v1.11.1) (2023-10-24)
 
 
