@@ -1,6 +1,6 @@
-import { KapButton, KapDialog, SimpleLoader } from '@kapeta/ui-web-components';
+import { KapButton, KapDialog } from '@kapeta/ui-web-components';
 import { MissingReferenceResolution, ReferenceResolverProps } from './types';
-import React, { uuseEffect, seEffect, useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ReferenceResolver } from './ReferenceResolver';
 import { Button, Stack } from '@mui/material';
 import {
