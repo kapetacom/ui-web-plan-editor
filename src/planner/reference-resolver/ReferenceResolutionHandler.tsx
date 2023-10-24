@@ -44,7 +44,7 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
                             plan: props.plan,
                             blockAssets: props.blockAssets,
                         },
-                        resolutions,
+                        resolutions ?? [],
                         {
                             installAsset: props.installAsset,
                             importAsset: props.importAsset,

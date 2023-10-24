@@ -19,7 +19,9 @@ export const ProviderReferenceResolverItem = (props: InnerItemProps) => {
     }
 
     const blockAsset = props.blockAssets.find(
-        (b) => normalizeKapetaUri(b.ref) === normalizeKapetaUri(props.missingReference.blockRef)
+        (b) =>
+            props.missingReference.blockRef &&
+            normalizeKapetaUri(b.ref) === normalizeKapetaUri(props.missingReference.blockRef)
     );
 
     if (!blockAsset) {

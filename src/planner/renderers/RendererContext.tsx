@@ -27,7 +27,7 @@ class RendererOutlet<TOutletId extends string, TOutletContext> extends React.Com
     static getDerivedStateFromError(error: Error) {
         return { hasError: true };
     }
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {};
     }

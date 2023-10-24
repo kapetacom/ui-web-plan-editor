@@ -238,6 +238,7 @@ export const ThumbnailPlan = () => {
 };
 
 function delayedPromise<T>(delay: number, value?: () => T): () => Promise<T> {
+    // @ts-ignore
     return () => new Promise<T>((resolve) => setTimeout(() => resolve(value ? value() : null), Math.random() * delay));
 }
 
@@ -283,6 +284,9 @@ export const ThumbnailPlanMissingAssets = () => {
                     }
                     if (result.blockAssets.length > 0) {
                         setBlockAssets((prev) => {
+                            if (!prev) {
+                                return [...result.blockAssets];
+                            }
                             return prev.map((blockAsset) => {
                                 return result.blockAssets.find((b) => b.ref === blockAsset.ref) ?? blockAsset;
                             });

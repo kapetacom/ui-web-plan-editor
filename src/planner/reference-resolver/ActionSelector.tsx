@@ -50,6 +50,8 @@ function toActionName(action: ActionType): string {
         case ActionType.REMOVE_BLOCK:
             return 'Remove block from plan';
     }
+
+    return '';
 }
 
 export const ActionSelector = (props: ActionSelectorProps) => {

@@ -216,7 +216,7 @@ export function getFocusZoomLevel(
 ): number {
     const positioningMap: { [key: string]: FocusPositioningData } = {};
 
-    Object.keys(zoomLevels).forEach((key: string) => {
+    Object.keys(zoomLevels).forEach((key: any) => {
         positioningMap[key] = getBlocksFitToScreen(focusInfo, zoomLevels[key], nodeSize);
     });
 

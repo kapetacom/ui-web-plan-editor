@@ -6,7 +6,7 @@ import './ActionButtons.less';
 import { usePrevious } from 'react-use';
 import { toClass } from '@kapeta/ui-web-utils';
 
-const CircleButton = (props) => {
+const CircleButton = (props: any) => {
     // NOTE: A bit strange - but this has to be a div to not experience a UI glitch where the button
     // receives some sort of focus and is moved into view when closing the sidepanel it opens
     return (
@@ -84,10 +84,10 @@ export const ActionButtons = (props: ActionButtonListProps) => {
     }[props.pointType || 'center'];
     const buttonWidth = width / renderedActions.length;
     const transitionFn = {
-        fade(buttonIx) {
+        fade(buttonIx: number) {
             return staggeredFade(buttonIx, renderedActions.length, props.show);
         },
-        slide(buttonIx) {
+        slide(buttonIx: number) {
             // start at the edge of the button and slide in from a common point
             return {
                 transition: `transform 0.3s`,

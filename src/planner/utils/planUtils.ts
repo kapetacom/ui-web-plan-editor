@@ -1,6 +1,6 @@
 import { AssetInfo, PlannerNodeSize } from '../../types';
 import { ResourceRole, Size } from '@kapeta/ui-web-types';
-import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, Plan } from '@kapeta/schemas';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 export const BLOCK_SIZE = 150;
@@ -89,6 +89,6 @@ export function getResourceId(blockId: string, resourceName: string, resourceRol
     return `${blockId}__${resourceName}__${resourceRole}`;
 }
 
-export function getBlockInstance(plan, blockId) {
-    return plan.spec.blocks.find((block) => block.id === blockId);
+export function getBlockInstance(plan: Plan, blockId: string) {
+    return plan.spec?.blocks?.find((block) => block.id === blockId);
 }
