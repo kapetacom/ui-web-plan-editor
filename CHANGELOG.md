@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.5...v1.11.0) (2023-10-24)
+
+
+### Features
+
+* Add missing reference resolution UI ([#98](https://github.com/kapetacom/ui-web-plan-editor/issues/98)) ([9f7592f](https://github.com/kapetacom/ui-web-plan-editor/commit/9f7592f3b9fed504ae4efcf289c13d75290637ea))
+
 ## [1.10.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.10.4...v1.10.5) (2023-10-24)
 
 
