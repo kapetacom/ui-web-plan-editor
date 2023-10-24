@@ -7,6 +7,7 @@ import React from 'react';
 import { createSubTitle, ReferenceTile } from './Tiles';
 import { ActionType, InnerItemProps } from './types';
 import { useAvailableActions } from './helpers';
+import { ResolutionStateDisplay } from './ResolutionStateDisplay';
 
 export const BlockReferenceResolverItem = (props: InnerItemProps) => {
     const alternativeVersions: AssetVersionSelectorEntry[] = props.blockAssets
@@ -40,14 +41,19 @@ export const BlockReferenceResolverItem = (props: InnerItemProps) => {
                 <ArrowForward />
             </TableCell>
             <TableCell>
-                <ActionSelector
-                    resolution={props.resolution}
-                    alternativeVersions={alternativeVersions}
-                    alternativeTypes={[]}
-                    availableActions={availableActions}
-                    selectAssetFromDisk={props.selectAssetFromDisk}
-                    onResolution={props.onResolution}
-                />
+                {props.resolutionState ? (
+                    <ResolutionStateDisplay resolutionState={props.resolutionState} />
+                ) : (
+                    <ActionSelector
+                        resolution={props.resolution}
+                        alternativeVersions={alternativeVersions}
+                        alternativeTypes={[]}
+                        availableActions={availableActions}
+                        selectAssetFromDisk={props.selectAssetFromDisk}
+                        onResolution={props.onResolution}
+                        showErrors={props.showErrors}
+                    />
+                )}
             </TableCell>
         </TableRow>
     );

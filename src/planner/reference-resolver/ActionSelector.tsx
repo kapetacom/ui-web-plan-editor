@@ -1,5 +1,5 @@
-import { IconButton, MenuItem, Select, Stack } from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { FormControl, FormHelperText, IconButton, MenuItem, Select, Stack } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import React from 'react';
 import { AssetVersionSelectorEntry } from '@kapeta/ui-web-components';
 import { ActionType, NO_RESOLUTION, Resolution } from './types';
@@ -12,6 +12,7 @@ interface ActionSelectorProps {
     alternativeVersions: AssetVersionSelectorEntry[];
     alternativeTypes: AssetVersionSelectorEntry[];
     selectAssetFromDisk?: () => Promise<string | undefined>;
+    showErrors?: boolean;
 }
 
 const ActionsWithForm = [
@@ -19,6 +20,22 @@ const ActionsWithForm = [
     ActionType.SELECT_ALTERNATIVE_VERSION,
     ActionType.SELECT_LOCAL_VERSION,
 ];
+
+export function isResolutionValid(resolution?: Resolution): boolean {
+    if (!resolution?.action) {
+        return false;
+    }
+
+    if (resolution?.action === ActionType.NONE) {
+        return false;
+    }
+
+    if (ActionsWithForm.includes(resolution.action)) {
+        return !!resolution.value;
+    }
+
+    return true;
+}
 
 function toActionName(action: ActionType): string {
     switch (action) {
@@ -40,7 +57,9 @@ export const ActionSelector = (props: ActionSelectorProps) => {
         return <span>There are no known solutions to fix this missing reference.</span>;
     }
 
-    if (ActionsWithForm.includes(props.resolution.action)) {
+    const actionHasValue = ActionsWithForm.includes(props.resolution.action);
+
+    if (actionHasValue) {
         return (
             <Stack
                 direction={'row'}
@@ -67,33 +86,44 @@ export const ActionSelector = (props: ActionSelectorProps) => {
                         props.onResolution(NO_RESOLUTION);
                     }}
                 >
-                    <RefreshIcon />
+                    <CloseIcon />
                 </IconButton>
             </Stack>
         );
     }
 
+    const currentAction = props.resolution.action ?? ActionType.NONE;
+    const hasError =
+        (props.showErrors && currentAction === ActionType.NONE) || (actionHasValue && !props.resolution.value);
+
     return (
-        <Select
-            sx={{
-                width: '240px',
-            }}
-            value={props.resolution.action ?? ActionType.NONE}
-            onChange={(evt) => {
-                props.onResolution({
-                    action: evt.target.value as ActionType,
-                    value: undefined,
-                });
-            }}
-        >
-            <MenuItem value={ActionType.NONE}>Select action...</MenuItem>
-            {props.availableActions.map((action, ix) => {
-                return (
-                    <MenuItem key={ix} value={action}>
-                        {toActionName(action)}
-                    </MenuItem>
-                );
-            })}
-        </Select>
+        <FormControl error={hasError}>
+            <Select
+                sx={{
+                    width: '240px',
+                }}
+                value={props.resolution.action ?? ActionType.NONE}
+                onChange={(evt) => {
+                    props.onResolution({
+                        action: evt.target.value as ActionType,
+                        value: undefined,
+                    });
+                }}
+            >
+                <MenuItem value={ActionType.NONE}>Select action...</MenuItem>
+                {props.availableActions.map((action, ix) => {
+                    return (
+                        <MenuItem key={ix} value={action}>
+                            {toActionName(action)}
+                        </MenuItem>
+                    );
+                })}
+            </Select>
+            {hasError && (
+                <FormHelperText>
+                    {actionHasValue && !props.resolution.value ? 'Missing value' : 'Missing action'}
+                </FormHelperText>
+            )}
+        </FormControl>
     );
 };

@@ -10,9 +10,9 @@ import { ProviderReferenceResolverItem } from './ProviderReferenceResolverItem';
 import { ItemProps } from './types';
 
 export const ReferenceResolverItem = (props: ItemProps) => {
-    const blockUri = parseKapetaUri(props.missingReference.blockRef);
+    const blockUri = props.missingReference.blockRef ? parseKapetaUri(props.missingReference.blockRef) : null;
     const refUri = parseKapetaUri(props.missingReference.ref);
-    const readOnlyBlock = blockUri.version !== 'local';
+    const readOnlyBlock = !blockUri || blockUri?.version !== 'local';
 
     const canInstall = useAsync(async () => {
         return Boolean(refUri.version !== 'local' && (await props.assetCanBeInstalled(props.missingReference.ref)));
@@ -42,8 +42,6 @@ export const ReferenceResolverItem = (props: ItemProps) => {
                 canInstall={canInstall.value}
                 blockUri={blockUri}
                 refUri={refUri}
-                resolution={props.resolution}
-                onResolution={props.onResolution}
             />
         );
     }
@@ -55,8 +53,6 @@ export const ReferenceResolverItem = (props: ItemProps) => {
             canInstall={canInstall.value}
             blockUri={blockUri}
             refUri={refUri}
-            resolution={props.resolution}
-            onResolution={props.onResolution}
         />
     );
 };

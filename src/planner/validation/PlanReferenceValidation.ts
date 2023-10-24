@@ -17,6 +17,7 @@ export interface MissingReference {
     ref: string;
     blockRef?: string;
     instanceId?: string;
+    resourceName?: string;
     instanceTitle?: string;
     referenceTitle?: string;
 }
@@ -113,6 +114,7 @@ export class BlockReferenceValidation implements ReferenceValidation {
                     type: ReferenceType.CONSUMER,
                     ref: normalizeKapetaUri(consumer.kind),
                     blockRef,
+                    resourceName: consumer.metadata.name,
                     referenceTitle: consumer.metadata.name,
                 });
             }
@@ -124,6 +126,7 @@ export class BlockReferenceValidation implements ReferenceValidation {
                     type: ReferenceType.PROVIDER,
                     ref: normalizeKapetaUri(provider.kind),
                     blockRef,
+                    resourceName: provider.metadata.name,
                     referenceTitle: provider.metadata.name,
                 });
             }
@@ -133,11 +136,12 @@ export class BlockReferenceValidation implements ReferenceValidation {
     }
 }
 
-export const usePlanValidation = (plan: Plan, blockAssets: AssetInfo<BlockDefinition>[]) => {
+export const usePlanValidation = (plan?: Plan, blockAssets?: AssetInfo<BlockDefinition>[]) => {
     return useMemo(() => {
-        const validation = new PlanReferenceValidation(plan, blockAssets);
-        const missingRefs = validation.validate();
-        console.log('missingRefs', missingRefs);
-        return missingRefs;
+        if (!plan) {
+            return [];
+        }
+        const validation = new PlanReferenceValidation(plan, blockAssets ?? []);
+        return validation.validate();
     }, [plan, blockAssets]);
 };

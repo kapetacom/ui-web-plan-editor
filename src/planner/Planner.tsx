@@ -11,11 +11,11 @@ import { ActionContext, PlannerPayload } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
-
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import './Planner.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
-import { MissingReference, ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
-import { Alert, AlertTitle } from '@mui/material';
+import { MissingReference, ReferenceValidationError } from './validation/PlanReferenceValidation';
+import { Alert, Stack, Box, Typography } from '@mui/material';
 
 type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent | typeof React.Component> | null;
 
@@ -37,6 +37,8 @@ interface Props {
     onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void;
     renderMissingReferences?: (missingReferences: MissingReference[]) => RenderResult;
     renderError?: (error: Error) => RenderResult;
+    onError?: (error: Error) => void;
+    onErrorResolved?: () => void;
 }
 
 const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
@@ -61,7 +63,7 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
 const emptyList = [];
 export const Planner = (props: Props) => {
     const { isDragging } = useContext(DnDContext);
-    const { nodeSize = PlannerNodeSize.MEDIUM, plan } = useContext(PlannerContext);
+    const { nodeSize = PlannerNodeSize.MEDIUM, plan, blockAssets } = useContext(PlannerContext);
 
     const instances = plan?.spec.blocks ?? emptyList;
     const connections = plan?.spec.connections ?? emptyList;
@@ -147,6 +149,8 @@ export const Planner = (props: Props) => {
 
     return (
         <ErrorBoundary
+            onError={props.onError}
+            onReset={props.onErrorResolved}
             fallbackRender={({ error, resetErrorBoundary }) => {
                 const err = error as ReferenceValidationError;
                 if (err?.missingReferences && props.renderMissingReferences) {
@@ -165,11 +169,13 @@ export const Planner = (props: Props) => {
                         }}
                         severity="error"
                     >
-                        Failed to render plan. Please contact support.
+                        Plan failed with error: "{error?.message ?? 'Unknown'}"
+                        <br />
+                        Please contact support.
                     </Alert>
                 );
             }}
-            resetKeys={[props.systemId]}
+            resetKeys={[props.systemId, plan, blockAssets]}
         >
             <PlannerCanvas onCreateBlock={props.onCreateBlock}>
                 {instances.map((instance, index) => {

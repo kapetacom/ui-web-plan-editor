@@ -5,6 +5,8 @@ import { MissingReference, ReferenceType } from '../src/planner/validation/PlanR
 import { BlockService } from './data/BlockServiceMock';
 import { useAsync } from 'react-use';
 import { fromAsset } from '../src/types';
+import { ReferenceResolutionHandler } from '../src/planner/reference-resolver/ReferenceResolutionHandler';
+import { InvalidPlannerData } from './data/PlannerData';
 
 export default {
     title: 'Reference Resolver',
@@ -80,13 +82,12 @@ export const ReadOnlyContext = () => {
         <>
             {!blocks.loading && (
                 <ReferenceResolver
+                    plan={InvalidPlannerData}
                     blockAssets={blocks.value.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
-                    installAsset={installAsset}
                     readOnly={true}
                     missingReferences={createMissingReferences('1.2.3')}
                     onChange={onChange}
-                    onApply={onApply}
                     selectAssetFromDisk={selectAssetFromDisk}
                 />
             )}
@@ -101,13 +102,12 @@ export const WriteableContextReadOnlyBlocks = () => {
         <>
             {!blocks.loading && (
                 <ReferenceResolver
+                    plan={InvalidPlannerData}
                     blockAssets={blocks.value.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
-                    installAsset={installAsset}
                     readOnly={false}
                     missingReferences={createMissingReferences('1.2.3')}
                     onChange={onChange}
-                    onApply={onApply}
                     selectAssetFromDisk={selectAssetFromDisk}
                 />
             )}
@@ -122,13 +122,34 @@ export const WriteableContext = () => {
         <>
             {!blocks.loading && (
                 <ReferenceResolver
+                    plan={InvalidPlannerData}
+                    blockAssets={blocks.value.map(fromAsset)}
+                    assetCanBeInstalled={assetCanBeInstalled}
+                    readOnly={false}
+                    missingReferences={createMissingReferences('local')}
+                    onChange={onChange}
+                    selectAssetFromDisk={selectAssetFromDisk}
+                />
+            )}
+        </>
+    );
+};
+
+export const WriteableContextModal = () => {
+    const blocks = useAsync(() => BlockService.list());
+
+    return (
+        <>
+            {!blocks.loading && (
+                <ReferenceResolutionHandler
+                    plan={InvalidPlannerData}
+                    open={true}
+                    onClose={() => {}}
                     blockAssets={blocks.value.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
                     installAsset={installAsset}
                     readOnly={false}
                     missingReferences={createMissingReferences('local')}
-                    onChange={onChange}
-                    onApply={onApply}
                     selectAssetFromDisk={selectAssetFromDisk}
                 />
             )}
@@ -142,13 +163,13 @@ export const MissingLocal = () => {
     return (
         <>
             {!blocks.loading && (
-                <ReferenceResolver
+                <ReferenceResolutionHandler
+                    plan={InvalidPlannerData}
                     blockAssets={blocks.value.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
-                    installAsset={installAsset}
                     readOnly={false}
-                    onChange={onChange}
-                    onApply={onApply}
+                    onClose={() => {}}
+                    open={true}
                     selectAssetFromDisk={selectAssetFromDisk}
                     missingReferences={[
                         {

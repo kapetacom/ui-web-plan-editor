@@ -16,11 +16,7 @@ import { createBlockInstanceForBlock, createBlockInstanceForBlockType } from './
 import { DnDPayload, DragEventInfo } from './DragAndDrop/types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { adjustBlockEdges } from './components/PlannerBlockNode';
-import {
-    PlanReferenceValidation,
-    ReferenceValidationError,
-    usePlanValidation,
-} from './validation/PlanReferenceValidation';
+import { ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
 
 const PLAN_PADDING = 50;
 

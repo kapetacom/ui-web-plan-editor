@@ -1,6 +1,6 @@
 import { AssetVersionSelector, AssetVersionSelectorEntry, FormContainer } from '@kapeta/ui-web-components';
 import React, { useEffect, useMemo } from 'react';
-import { Button } from '@mui/material';
+import { Box, Button, FormHelperText } from '@mui/material';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { ActionType, NO_RESOLUTION, Resolution } from './types';
 import { shortenPathName } from './helpers';
@@ -11,6 +11,7 @@ interface ActionFormInnerProps {
     alternativeTypes: AssetVersionSelectorEntry[];
     onResolution: (resolution: Resolution) => void;
     selectAssetFromDisk?: () => Promise<string | undefined>;
+    showErrors?: boolean;
 }
 
 export const ActionFormInner = (props: ActionFormInnerProps) => {
@@ -49,6 +50,8 @@ export const ActionFormInner = (props: ActionFormInnerProps) => {
         }
     };
 
+    const hasError = props.showErrors && !props.resolution.value;
+
     switch (props.resolution.action) {
         case ActionType.SELECT_ALTERNATIVE_TYPE:
             return (
@@ -64,30 +67,42 @@ export const ActionFormInner = (props: ActionFormInnerProps) => {
             );
         case ActionType.SELECT_LOCAL_VERSION:
             return (
-                <Button
-                    size={'large'}
-                    onClick={async () => {
-                        try {
-                            const ymlFile = await props.selectAssetFromDisk();
+                <Box>
+                    <Button
+                        size={'large'}
+                        onClick={async () => {
+                            try {
+                                const ymlFile = await props.selectAssetFromDisk();
 
-                            if (ymlFile) {
-                                props.onResolution({
-                                    action: props.resolution.action,
-                                    value: ymlFile,
-                                });
-                            } else {
-                                props.onResolution(NO_RESOLUTION);
+                                if (ymlFile) {
+                                    props.onResolution({
+                                        action: props.resolution.action,
+                                        value: ymlFile,
+                                    });
+                                } else {
+                                    props.onResolution(NO_RESOLUTION);
+                                }
+                            } catch (e) {
+                                // Ignore
                             }
-                        } catch (e) {
-                            // Ignore
-                        }
-                    }}
-                    variant={'text'}
-                    color={'primary'}
-                    startIcon={<FolderOpenIcon />}
-                >
-                    {props.resolution.value ? shortenPathName(props.resolution.value) : 'Select Asset'}
-                </Button>
+                        }}
+                        variant={'text'}
+                        color={hasError ? 'error' : 'primary'}
+                        startIcon={<FolderOpenIcon />}
+                    >
+                        {props.resolution.value ? shortenPathName(props.resolution.value) : 'Select Asset'}
+                    </Button>
+                    {hasError && (
+                        <FormHelperText
+                            sx={{
+                                ml: '14px',
+                                color: 'error.main',
+                            }}
+                        >
+                            Missing value
+                        </FormHelperText>
+                    )}
+                </Box>
             );
     }
 };

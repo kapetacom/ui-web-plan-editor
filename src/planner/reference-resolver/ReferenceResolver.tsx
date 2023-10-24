@@ -1,19 +1,10 @@
 import { Alert, Box, Button, Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
-import { MissingReference } from '../validation/PlanReferenceValidation';
 import { ReferenceResolverItem } from './ReferenceResolverItem';
-import { ActionType, MissingReferenceResolution, NO_RESOLUTION, SharedProps } from './types';
+import { ActionType, MissingReferenceResolution, NO_RESOLUTION, ReferenceResolverProps } from './types';
+import { isResolutionValid } from './ActionSelector';
 
-interface Props extends SharedProps {
-    missingReferences: MissingReference[];
-    assetCanBeInstalled: (ref: string) => Promise<boolean>;
-    readOnly: boolean;
-    onChange: (resolutions: MissingReferenceResolution[], valid: boolean) => void;
-    onApply: (resolutions: MissingReferenceResolution[]) => void;
-    onCancel?: () => void;
-}
-
-export const ReferenceResolver = (props: Props) => {
+export const ReferenceResolver = (props: ReferenceResolverProps) => {
     const [resolutions, setResolutions] = useState<MissingReferenceResolution[]>([
         ...props.missingReferences.map((mf) => {
             return {
@@ -35,7 +26,7 @@ export const ReferenceResolver = (props: Props) => {
     }, [props.missingReferences]);
 
     const valid = useMemo(() => {
-        return resolutions.every((r) => r.resolution?.action && r.resolution?.action !== ActionType.NONE);
+        return resolutions.every((r) => isResolutionValid(r.resolution));
     }, [resolutions]);
 
     useEffect(() => {
@@ -43,7 +34,12 @@ export const ReferenceResolver = (props: Props) => {
     }, [resolutions, valid]);
 
     return (
-        <Box className={'reference-resolver'}>
+        <Box
+            className={'reference-resolver'}
+            sx={{
+                minWidth: '900px',
+            }}
+        >
             <Alert severity={'error'}>The plan has missing references. Please resolve them before continuing.</Alert>
             <Table size={'small'}>
                 <TableHead>
@@ -68,13 +64,15 @@ export const ReferenceResolver = (props: Props) => {
                         return (
                             <ReferenceResolverItem
                                 key={index}
+                                plan={props.plan}
                                 missingReference={missingReferenceResolution}
                                 readOnlyPlan={props.readOnly}
                                 assetCanBeInstalled={props.assetCanBeInstalled}
-                                installAsset={props.installAsset}
                                 blockAssets={props.blockAssets}
+                                showErrors={props.showErrors}
                                 selectAssetFromDisk={props.selectAssetFromDisk}
                                 resolution={missingReferenceResolution.resolution}
+                                resolutionState={props.resolutionStates?.[index]}
                                 onResolution={(resolution) => {
                                     setResolutions((prev) => {
                                         const newResolutions = [...prev];
@@ -90,22 +88,6 @@ export const ReferenceResolver = (props: Props) => {
                     })}
                 </TableBody>
             </Table>
-
-            <Stack direction={'row'} mt={2} gap={2} justifyContent={'end'}>
-                <Button disabled={!valid} onClick={props?.onCancel}>
-                    Cancel
-                </Button>
-                <Button
-                    disabled={!valid}
-                    variant={'contained'}
-                    color={'primary'}
-                    onClick={() => {
-                        props.onApply(resolutions);
-                    }}
-                >
-                    Apply changes
-                </Button>
-            </Stack>
         </Box>
     );
 };

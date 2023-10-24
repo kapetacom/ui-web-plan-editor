@@ -1,5 +1,5 @@
-import { Box } from '@mui/material';
-import React, { forwardRef, useContext } from 'react';
+import { Box, Stack, Typography } from '@mui/material';
+import React, { forwardRef, useContext, useEffect } from 'react';
 
 import { BlockDefinition, Plan } from '@kapeta/schemas';
 import { Size } from '@kapeta/ui-web-types';
@@ -7,15 +7,42 @@ import { PlannerMode } from '../utils/enums';
 import { PlannerContext, PlannerContextProps, withPlannerContext } from '../planner/PlannerContext';
 import { Planner } from '../planner/Planner';
 import { AssetInfo } from '../types';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
+import {
+    MissingReference,
+    ReferenceValidationError,
+    usePlanValidation,
+} from '../planner/validation/PlanReferenceValidation';
 
 interface InnerProps extends PlannerContextProps {
     width: number;
     height: number;
+    onMissingReferences?: (references: MissingReference[]) => void;
 }
+
+const MissingRefs = () => {
+    return (
+        <Stack alignItems={'center'} justifyContent={'center'} height={'100%'}>
+            <Stack
+                sx={{
+                    color: 'action.disabled',
+                }}
+                direction={'row'}
+                gap={1}
+                alignItems={'center'}
+                justifyContent={'center'}
+            >
+                <LinkOffIcon />
+                <Typography>Missing assets</Typography>
+            </Stack>
+        </Stack>
+    );
+};
 
 const PlanPreviewInner = withPlannerContext<InnerProps>(
     forwardRef<HTMLDivElement, InnerProps>((props, ref) => {
         const planner = useContext(PlannerContext);
+        const [hasError, setHasError] = React.useState(false);
         const size: Size = {
             width: planner.canvasSize.width,
             height: planner.canvasSize.height,
@@ -26,6 +53,26 @@ const PlanPreviewInner = withPlannerContext<InnerProps>(
         const ratio = Math.min(heightRatio, widthRatio);
         const marginH = Math.max(0, props.width - size.width * ratio) / 2;
         const marginV = Math.max(0, props.height - size.height * ratio) / 2;
+
+        let sxError: any = {};
+        if (hasError) {
+            sxError = {
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            };
+        }
+
+        const missingReferences = usePlanValidation(planner.plan, planner.blockAssets);
+        useEffect(() => {
+            if (props.onMissingReferences) {
+                props.onMissingReferences(missingReferences);
+            }
+        }, [props.onMissingReferences, missingReferences]);
+
+        if (missingReferences.length > 0) {
+            return <MissingRefs />;
+        }
 
         return (
             <Box
@@ -46,6 +93,7 @@ const PlanPreviewInner = withPlannerContext<InnerProps>(
                     '.planner-zoom-buttons': {
                         display: 'none',
                     },
+                    ...sxError,
                 }}
             >
                 <div
@@ -56,7 +104,24 @@ const PlanPreviewInner = withPlannerContext<InnerProps>(
                         transform: `scale(${ratio})`,
                     }}
                 >
-                    <Planner systemId={props.asset.ref} />
+                    <Planner
+                        systemId={props.asset.ref}
+                        onError={(error: any) => {
+                            setHasError(true);
+                            if (props.onMissingReferences && error.missingReferences) {
+                                props.onMissingReferences(error.missingReferences);
+                            }
+                        }}
+                        onErrorResolved={() => {
+                            setHasError(false);
+                            if (props.onMissingReferences) {
+                                props.onMissingReferences([]);
+                            }
+                        }}
+                        renderMissingReferences={() => {
+                            return <MissingRefs />;
+                        }}
+                    />
                 </div>
             </Box>
         );
@@ -68,6 +133,7 @@ interface Props {
     height: number;
     asset: AssetInfo<Plan>;
     blocks: AssetInfo<BlockDefinition>[];
+    onMissingReferences?: (references: MissingReference[]) => void;
 }
 
 export const PlanPreview = (props: Props) => {
@@ -79,6 +145,7 @@ export const PlanPreview = (props: Props) => {
             asset={props.asset}
             blockAssets={props.blocks}
             mode={PlannerMode.VIEW}
+            onMissingReferences={props.onMissingReferences}
         />
     );
 };

@@ -11,14 +11,18 @@ import React from 'react';
 import { ActionType, InnerItemProps } from './types';
 import { providerToSelectorMapper, toRef, useAvailableActions } from './helpers';
 import { createSubTitle, ReferenceTile } from './Tiles';
+import { ResolutionStateDisplay } from './ResolutionStateDisplay';
 
 export const ProviderReferenceResolverItem = (props: InnerItemProps) => {
+    if (!props.missingReference.blockRef) {
+        return null;
+    }
+
     const blockAsset = props.blockAssets.find(
         (b) => normalizeKapetaUri(b.ref) === normalizeKapetaUri(props.missingReference.blockRef)
     );
 
     if (!blockAsset) {
-        console.warn('Missing block asset', props.missingReference.blockRef);
         return null;
     }
 
@@ -91,14 +95,19 @@ export const ProviderReferenceResolverItem = (props: InnerItemProps) => {
                 <ArrowForward />
             </TableCell>
             <TableCell>
-                <ActionSelector
-                    resolution={props.resolution}
-                    alternativeVersions={alternativeVersions.map(providerToSelectorMapper)}
-                    alternativeTypes={availableTypes.map(providerToSelectorMapper)}
-                    availableActions={availableActions}
-                    selectAssetFromDisk={props.selectAssetFromDisk}
-                    onResolution={props.onResolution}
-                />
+                {props.resolutionState ? (
+                    <ResolutionStateDisplay resolutionState={props.resolutionState} />
+                ) : (
+                    <ActionSelector
+                        resolution={props.resolution}
+                        alternativeVersions={alternativeVersions.map(providerToSelectorMapper)}
+                        alternativeTypes={availableTypes.map(providerToSelectorMapper)}
+                        availableActions={availableActions}
+                        selectAssetFromDisk={props.selectAssetFromDisk}
+                        onResolution={props.onResolution}
+                        showErrors={props.showErrors}
+                    />
+                )}
             </TableCell>
         </TableRow>
     );
