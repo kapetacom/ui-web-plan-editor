@@ -11,9 +11,13 @@ import { ActionContext, PlannerPayload } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
-
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import './Planner.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
+import { MissingReference, ReferenceValidationError } from './validation/PlanReferenceValidation';
+import { Alert, Stack, Box, Typography } from '@mui/material';
+
+type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent | typeof React.Component> | null;
 
 interface Props {
     // eslint-disable-next-line react/no-unused-prop-types
@@ -31,6 +35,10 @@ interface Props {
     onConnectionMouseLeave?: (context: ActionContext) => void;
 
     onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void;
+    renderMissingReferences?: (missingReferences: MissingReference[]) => RenderResult;
+    renderError?: (error: Error) => RenderResult;
+    onError?: (error: Error) => void;
+    onErrorResolved?: () => void;
 }
 
 const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
@@ -55,7 +63,7 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
 const emptyList = [];
 export const Planner = (props: Props) => {
     const { isDragging } = useContext(DnDContext);
-    const { nodeSize = PlannerNodeSize.MEDIUM, plan } = useContext(PlannerContext);
+    const { nodeSize = PlannerNodeSize.MEDIUM, plan, blockAssets } = useContext(PlannerContext);
 
     const instances = plan?.spec.blocks ?? emptyList;
     const connections = plan?.spec.connections ?? emptyList;
@@ -141,12 +149,33 @@ export const Planner = (props: Props) => {
 
     return (
         <ErrorBoundary
-            onError={(error, info) => {
-                // eslint-disable-next-line no-console
-                console.error('Error rendering plan', error, info, plan);
+            onError={props.onError}
+            onReset={props.onErrorResolved}
+            fallbackRender={({ error, resetErrorBoundary }) => {
+                const err = error as ReferenceValidationError;
+                if (err?.missingReferences && props.renderMissingReferences) {
+                    return props.renderMissingReferences(err.missingReferences);
+                }
+
+                if (props.renderError) {
+                    return props.renderError(error);
+                }
+
+                return (
+                    <Alert
+                        sx={{
+                            m: 2,
+                            mt: 6,
+                        }}
+                        severity="error"
+                    >
+                        Plan failed with error: "{error?.message ?? 'Unknown'}"
+                        <br />
+                        Please contact support.
+                    </Alert>
+                );
             }}
-            fallback={<div>Failed to render plan. Please contact support.</div>}
-            resetKeys={[props.systemId]}
+            resetKeys={[props.systemId, plan, blockAssets]}
         >
             <PlannerCanvas onCreateBlock={props.onCreateBlock}>
                 {instances.map((instance, index) => {

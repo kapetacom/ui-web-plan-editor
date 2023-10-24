@@ -21,6 +21,7 @@ import { BlockPreview, BlockTypePreview } from './BlockTypePreview';
 import { ResourceTypePreview } from './ResourceTypePreview';
 import { AssetInfo } from '../types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { MissingReference } from '../planner/validation/PlanReferenceValidation';
 
 const CONTAINER_CLASS = 'asset-thumbnail';
 const META_HEIGHT_INNER = 68;
@@ -46,6 +47,7 @@ interface AssetThumbnailInnerPreviewProps {
     loadPlanContext: PlanContextLoader;
     stats?: AssetMetaStat[];
     onClick?: (asset: AssetInfo<SchemaKind>) => void;
+    onMissingReferences?: (references: MissingReference[]) => void;
 }
 
 interface AssetThumbnailContainerProps extends AssetThumbnailInnerPreviewProps {
@@ -234,6 +236,7 @@ const AssetThumbnailInnerPreview = (props: AssetThumbnailInnerPreviewProps) => {
                                 width={props.width}
                                 height={props.height}
                                 blocks={context.blocks}
+                                onMissingReferences={props.onMissingReferences}
                             />
                         )}
                     </SimpleLoader>

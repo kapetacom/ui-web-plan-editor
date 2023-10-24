@@ -27,6 +27,12 @@ const blocks = [
     require('./blocks/kapeta-user.json'),
     require('./blocks/kapeta-todo.json'),
     require('./blocks/kapeta-images.json'),
+    require('./blocks/kapeta-todo-invalid-kind.json'),
+    require('./blocks/kapeta-user-invalid-resource.json'),
+    require('./blocks/kapeta-user-invalid-target.json'),
+    require('./blocks/kapeta-todo-missing-kind.json'),
+    require('./blocks/kapeta-user-missing-resource.json'),
+    require('./blocks/kapeta-user-missing-target.json'),
 ].map((data) => {
     return {
         ref: `${data.metadata.name}:1.2.3`,
@@ -67,6 +73,12 @@ blocks.push(
         require('./blocks/kapeta-todo-mobile.json'),
         require('./blocks/kapeta-images.json'),
         require('./blocks/kapeta-gateway.json'),
+        require('./blocks/kapeta-todo-invalid-kind.json'),
+        require('./blocks/kapeta-user-invalid-resource.json'),
+        require('./blocks/kapeta-user-invalid-target.json'),
+        require('./blocks/kapeta-todo-missing-kind.json'),
+        require('./blocks/kapeta-user-missing-resource.json'),
+        require('./blocks/kapeta-user-missing-target.json'),
     ].map((data) => {
         return {
             ref: `${data.metadata.name}:local`,
@@ -158,7 +170,7 @@ blocks.push(
     BlockTargetProvider.register({
         kind: targetKind,
         version: '1.2.3',
-        title: 'Test',
+        title: 'kapeta/language-target-java-spring-boot' === targetKind ? 'Java Spring Boot' : 'Test',
         blockKinds: ['kapeta/block-type-service'],
         definition: {
             kind: 'kapeta/language-target',
@@ -410,9 +422,10 @@ export const BlockService: BlockStore = {
             const aUri = parseKapetaUri(a.ref);
             return uri.fullName === aUri.fullName;
         });
+
         if (!out) {
             // eslint-disable-next-line no-console
-            console.error('Could not find ref: ', ref);
+            throw new Error('Could not find ref: ' + ref);
         }
         return out as Asset<BlockDefinition>;
     },

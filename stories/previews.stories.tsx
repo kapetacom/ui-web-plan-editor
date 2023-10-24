@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useAsync } from 'react-use';
 import { PlanPreview } from '../src/components/PlanPreview';
@@ -6,10 +6,11 @@ import { BlockService } from './data/BlockServiceMock';
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockPreview, BlockTypePreview } from '../src/components/BlockTypePreview';
 import { ResourceTypePreview } from '../src/components/ResourceTypePreview';
-import { readPlanV2 } from './data/planReader';
-import { AssetThumbnail, fromAsset } from '../src';
+import { readInvalidPlan, readPlanV2 } from './data/planReader';
+import { AssetInfo, AssetThumbnail, fromAsset, MissingReference, ReferenceResolutionHandler } from '../src';
 import { DefaultContext } from '@kapeta/ui-web-components';
 import { Typography } from '@mui/material';
+import { BlockDefinition, Plan } from '@kapeta/schemas';
 
 import './styles.less';
 
@@ -37,7 +38,7 @@ const TempPreviewContainer = ({ children }: any) => {
     );
 };
 
-export const Plan = () => {
+export const PlanViewer = () => {
     const plan = useAsync(() => readPlanV2());
 
     return (
@@ -62,6 +63,30 @@ export const Plan = () => {
     );
 };
 
+export const PlanMissingReferences = () => {
+    const plan = useAsync(() => readInvalidPlan());
+
+    return (
+        <TempPreviewContainer>
+            {plan.value ? (
+                <PlanPreview
+                    width={WIDTH - 20}
+                    height={HEIGHT - 20}
+                    blocks={plan.value.blockAssets || []}
+                    asset={{
+                        ref: 'kapeta/something:local',
+                        version: 'local',
+                        editable: true,
+                        exists: true,
+                        content: plan.value.plan,
+                    }}
+                />
+            ) : (
+                <div>Loading...</div>
+            )}
+        </TempPreviewContainer>
+    );
+};
 export const BlockType = () => {
     const data = useAsync(async () => {
         return BlockTypeProvider.get('kapeta/block-type-frontend:1.2.3');
@@ -179,6 +204,118 @@ export const ThumbnailPlan = () => {
                     return {
                         loading: false,
                         blocks: plan.value?.blockAssets || [],
+                    };
+                }}
+                stats={[
+                    {
+                        label: '1 pending',
+                        color: 'primary',
+                    },
+                    {
+                        label: '1 deployed',
+                        color: 'success',
+                    },
+                    {
+                        label: '1 failed',
+                        color: 'error',
+                    },
+                    {
+                        label: '1 expiring',
+                        color: 'warning',
+                        progress: 80,
+                        pulsate: true,
+                        tooltip: {
+                            title: <Typography variant="body2">Some text about the expiring environment</Typography>,
+                            placement: 'right',
+                            arrow: true,
+                            maxWidth: 500,
+                        },
+                    },
+                ]}
+            />
+        </DefaultContext>
+    );
+};
+
+function delayedPromise<T>(delay: number, value?: () => T): () => Promise<T> {
+    return () => new Promise<T>((resolve) => setTimeout(() => resolve(value ? value() : null), Math.random() * delay));
+}
+
+export const ThumbnailPlanMissingAssets = () => {
+    const planState = useAsync(() => readInvalidPlan());
+    const [plan, setPlan] = useState<Plan>();
+    const [blockAssets, setBlockAssets] = useState<AssetInfo<BlockDefinition>[]>();
+
+    const [open, setOpen] = React.useState(false);
+    const [missingReferences, setMissingReferences] = React.useState<MissingReference[]>([]);
+
+    useEffect(() => {
+        setPlan(planState.value?.plan);
+        setBlockAssets(planState.value?.blockAssets);
+    }, [planState.value]);
+
+    if (!plan || !blockAssets) {
+        return <div>Loading...</div>;
+    }
+
+    const installerService = {
+        install: delayedPromise<void>(10000),
+        import: delayedPromise<void>(10000),
+        get: delayedPromise(1000, () => Math.random() > 0.5),
+    };
+
+    return (
+        <DefaultContext>
+            <ReferenceResolutionHandler
+                open={open}
+                plan={plan}
+                blockAssets={blockAssets}
+                assetCanBeInstalled={() => installerService.get()}
+                installAsset={() => installerService.install()}
+                importAsset={() => installerService.import()}
+                readOnly={false}
+                missingReferences={missingReferences}
+                onClose={() => setOpen(false)}
+                onResolved={(result) => {
+                    console.log('resolved', result);
+                    if (result.plan) {
+                        setPlan(result.plan);
+                    }
+                    if (result.blockAssets.length > 0) {
+                        setBlockAssets((prev) => {
+                            return prev.map((blockAsset) => {
+                                return result.blockAssets.find((b) => b.ref === blockAsset.ref) ?? blockAsset;
+                            });
+                        });
+                    }
+                    setMissingReferences([]);
+                }}
+            />
+            <AssetThumbnail
+                asset={{
+                    content: plan,
+                    ref: 'kapeta/something:local',
+                    version: 'local',
+                    editable: true,
+                    exists: true,
+                }}
+                width={400}
+                height={400}
+                onClick={() => {
+                    if (missingReferences.length > 0) {
+                        setOpen(true);
+                    } else {
+                        console.log('No missing references!');
+                    }
+                }}
+                onMissingReferences={(references) => {
+                    setMissingReferences(references);
+                }}
+                installerService={installerService}
+                loadPlanContext={() => {
+                    return {
+                        loading: false,
+                        blocks: blockAssets,
                     };
                 }}
                 stats={[

@@ -16,6 +16,7 @@ import { createBlockInstanceForBlock, createBlockInstanceForBlockType } from './
 import { DnDPayload, DragEventInfo } from './DragAndDrop/types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { adjustBlockEdges } from './components/PlannerBlockNode';
+import { ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
 
 const PLAN_PADDING = 50;
 
@@ -100,6 +101,11 @@ export const PlannerCanvas: React.FC<Props> = (props) => {
         'focus-toolbar': true,
         'focus-toolbar-hidden': !planner.focusedBlock,
     });
+
+    const missingReferences = usePlanValidation(planner.plan, planner.blockAssets);
+    if (missingReferences.length > 0) {
+        throw new ReferenceValidationError('Missing references', missingReferences);
+    }
 
     return (
         <div className={`planner-area-container ${classNames}`}>

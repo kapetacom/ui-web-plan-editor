@@ -1,0 +1,78 @@
+{
+    "kind": "kapeta/block-type-service:5.40.2",
+    "metadata": {
+        "name": "kapeta/todo-invalid-kind",
+        "title": "Todo"
+    },
+    "spec": {
+        "target": {
+            "kind": "kapeta/language-target-java-spring-boot",
+            "options": {
+                "groupId": "org.mycompany",
+                "artifactId": "service-todo",
+                "basePackage": "org.mycompany.services.todo"
+            }
+        },
+        "entities": [],
+        "consumers": [
+            {
+                "kind": "kapeta/resource-type-mongodb:1.2.3",
+                "metadata": {
+                    "name": "tasks"
+                }
+            },
+            {
+                "kind": "kapeta/resource-type-rest-client:5.4.1",
+                "metadata": {
+                    "name": "users"
+                },
+                "spec": {
+                    "methods": {
+                        "createUser": {
+                            "description": "Create user",
+                            "method": "POST",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                },
+                                "user": {
+                                    "type": "User",
+                                    "transport": "body"
+                                }
+                            },
+                            "responseType": {
+                                "$ref": "User"
+                            }
+                        },
+                        "getUser": {
+                            "description": "Get user by id",
+                            "method": "GET",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                }
+                            },
+                            "responseType": "User"
+                        },
+                        "deleteUser": {
+                            "description": "Delete user by id",
+                            "method": "DELETE",
+                            "path": "/users/{id}",
+                            "arguments": {
+                                "id": {
+                                    "type": "string",
+                                    "transport": "path"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "providers": []
+    }
+}
