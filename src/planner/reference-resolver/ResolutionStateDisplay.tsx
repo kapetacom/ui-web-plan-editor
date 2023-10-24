@@ -9,7 +9,7 @@ interface Props {
 
 export const ResolutionStateDisplay = (props: Props) => {
     let message = '';
-    let icon = null;
+    let icon: any = null;
     let color = '';
     switch (props.resolutionState.state) {
         case ResolutionStateType.IDLE:
