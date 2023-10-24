@@ -11,11 +11,10 @@ import { ActionContext, PlannerPayload } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
-import LinkOffIcon from '@mui/icons-material/LinkOff';
-import './Planner.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { MissingReference, ReferenceValidationError } from './validation/PlanReferenceValidation';
-import { Alert, Stack, Box, Typography } from '@mui/material';
+import { Alert } from '@mui/material';
+import './Planner.less';
 
 type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent | typeof React.Component> | null;
 
@@ -60,28 +59,26 @@ const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode 
     ) : null;
 };
 
-const emptyList = [];
 export const Planner = (props: Props) => {
     const { isDragging } = useContext(DnDContext);
     const { nodeSize = PlannerNodeSize.MEDIUM, plan, blockAssets } = useContext(PlannerContext);
 
-    const instances = plan?.spec.blocks ?? emptyList;
-    const connections = plan?.spec.connections ?? emptyList;
+    const instances = plan?.spec.blocks ?? [];
+    const connections = plan?.spec.connections ?? [];
 
     // Manage connection render order to ensure that connections are rendered on top when hovered
-    const [topConnection, setTopConnection] = useState(null);
+    const [topConnection, setTopConnection] = useState<number | null>(null);
 
     const onConnectionMouseOver = useCallback(
-        (connectionId) =>
-            (...args) => {
-                setTopConnection(connectionId);
-            },
+        (connectionId: number) => () => {
+            setTopConnection(connectionId);
+        },
         [setTopConnection]
     );
     const onConnectionMouseLeave = useCallback(
-        (...args) => {
+        (context: ActionContext) => {
             setTopConnection(null);
-            props.onConnectionMouseEnter?.call(null, ...args);
+            props.onConnectionMouseEnter?.(context);
         },
         [props.onConnectionMouseEnter]
     );
@@ -98,7 +95,7 @@ export const Planner = (props: Props) => {
     );
 
     const onEnter = useCallback(
-        (cb) => (context: ActionContext) => {
+        (cb: any) => (context: ActionContext) => {
             if (context.blockInstance) {
                 setTopBlock(context.blockInstance.id);
             }
@@ -110,7 +107,7 @@ export const Planner = (props: Props) => {
     );
 
     const onLeave = useCallback(
-        (cb) => (context: ActionContext) => {
+        (cb: any) => (context: ActionContext) => {
             if (context.blockInstance?.id === topBlock) {
                 setTopBlock(null);
             }
@@ -145,7 +142,7 @@ export const Planner = (props: Props) => {
     const focusInfo = useFocusInfo();
     const focusModeEnabled = !!focusInfo;
 
-    const connectionKeys = {};
+    const connectionKeys: { [p: string]: boolean } = {};
 
     return (
         <ErrorBoundary

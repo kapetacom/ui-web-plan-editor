@@ -96,7 +96,6 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: EditI
                 sourceEntities={[]} // connection.fromResource.block.getEntities()}
                 targetEntities={[]} // connection.toResource.block.getEntities()}
                 value={connection.mapping}
-                onDataChanged={(change) => this.onMappingChanged(change)}
             />
         );
     }
@@ -112,7 +111,7 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: EditI
 
         return (
             <div>
-                {this.renderBlockFields(data)}
+                {renderBlockFields(data)}
                 <ErrorBoundary
                     fallbackRender={(props) => (
                         <div>

@@ -64,14 +64,14 @@ export class PlanResolutionTransformer extends EventEmitter {
     }
 
     public async apply(): Promise<PlanResolutionResult> {
-        const errors = [];
+        const errors: string[] = [];
 
         const promises = this.resolutionStates.map(async ({ reference }) => {
             this.emitApplyStart(reference);
             try {
                 await this.applyResolution(reference);
                 this.emitApplyEnd(reference);
-            } catch (e) {
+            } catch (e: any) {
                 console.log('Error applying resolution', e);
                 this.emitApplyError(reference, e.message);
                 errors.push(e);
@@ -96,18 +96,18 @@ export class PlanResolutionTransformer extends EventEmitter {
 
             case ActionType.SELECT_ALTERNATIVE_VERSION:
                 // Replace this in the right context
-                return this.replaceReference(referenceResolution, referenceResolution.resolution.value);
+                return this.replaceReference(referenceResolution, referenceResolution.resolution.value!);
             case ActionType.SELECT_ALTERNATIVE_TYPE:
                 // Replace this in the right context
-                return this.replaceReference(referenceResolution, referenceResolution.resolution.value);
+                return this.replaceReference(referenceResolution, referenceResolution.resolution.value!);
 
             case ActionType.SELECT_LOCAL_VERSION:
                 // Import this from the path provided
-                return this.importLocalVersion(referenceResolution.resolution.value);
+                return this.importLocalVersion(referenceResolution.resolution.value!);
 
             case ActionType.REMOVE_BLOCK:
                 // Remove block from plan
-                return this.removeInstance(referenceResolution.instanceId);
+                return this.removeInstance(referenceResolution.instanceId!);
         }
     }
 
@@ -156,7 +156,7 @@ export class PlanResolutionTransformer extends EventEmitter {
 
         switch (referenceResolution.type) {
             case ReferenceType.TARGET:
-                blockDef.spec.target.kind = value;
+                blockDef.spec.target!.kind = value;
                 this.addChangedBlock(blockAsset);
                 break;
             case ReferenceType.KIND:
@@ -170,7 +170,7 @@ export class PlanResolutionTransformer extends EventEmitter {
                         ? blockDef.spec.consumers
                         : blockDef.spec.providers;
 
-                const resource = resourceList.find((resource) => {
+                const resource = resourceList?.find((resource) => {
                     return resource.metadata.name === referenceResolution.resourceName;
                 });
 

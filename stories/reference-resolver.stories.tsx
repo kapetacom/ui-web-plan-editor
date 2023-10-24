@@ -83,7 +83,7 @@ export const ReadOnlyContext = () => {
             {!blocks.loading && (
                 <ReferenceResolver
                     plan={InvalidPlannerData}
-                    blockAssets={blocks.value.map(fromAsset)}
+                    blockAssets={blocks.value!.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
                     readOnly={true}
                     missingReferences={createMissingReferences('1.2.3')}
@@ -103,7 +103,7 @@ export const WriteableContextReadOnlyBlocks = () => {
             {!blocks.loading && (
                 <ReferenceResolver
                     plan={InvalidPlannerData}
-                    blockAssets={blocks.value.map(fromAsset)}
+                    blockAssets={blocks.value!.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
                     readOnly={false}
                     missingReferences={createMissingReferences('1.2.3')}
@@ -123,7 +123,7 @@ export const WriteableContext = () => {
             {!blocks.loading && (
                 <ReferenceResolver
                     plan={InvalidPlannerData}
-                    blockAssets={blocks.value.map(fromAsset)}
+                    blockAssets={blocks.value!.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
                     readOnly={false}
                     missingReferences={createMissingReferences('local')}
@@ -145,7 +145,7 @@ export const WriteableContextModal = () => {
                     plan={InvalidPlannerData}
                     open={true}
                     onClose={() => {}}
-                    blockAssets={blocks.value.map(fromAsset)}
+                    blockAssets={blocks.value!.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
                     installAsset={installAsset}
                     readOnly={false}
@@ -165,7 +165,7 @@ export const MissingLocal = () => {
             {!blocks.loading && (
                 <ReferenceResolutionHandler
                     plan={InvalidPlannerData}
-                    blockAssets={blocks.value.map(fromAsset)}
+                    blockAssets={blocks.value!.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
                     readOnly={false}
                     onClose={() => {}}

@@ -93,7 +93,7 @@ export const BlockShape = forwardRef((props: ShapeProps, parentRef) => {
 
     const duration = 100;
 
-    const transitionStyles = {
+    const transitionStyles: any = {
         entering: {
             width: targetWidth,
             height: targetHeight,

@@ -328,8 +328,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         setFocusedBlock((prevFocus) => (prevFocus && block && block.id === prevFocus.id ? undefined : block));
     };
 
-    const [viewStates, setViewStates] = useState({});
-    const [resourceConfig, setResourceConfig] = useState({});
+    const [viewStates, setViewStates] = useState<{ [p: string]: any }>({});
+    const [resourceConfig, setResourceConfig] = useState<{ [p: string]: any }>({});
     const assetState: PlannerContextData['assetState'] = useMemo(
         () => ({
             getViewModeForResource(blockInstanceId, resourceName, role) {
@@ -424,7 +424,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         return isTempInstance(assetState, blockInstance);
     };
 
-    const updateBlockInstance = (instanceId: string, updater) => {
+    const updateBlockInstance = (instanceId: string, updater: (block: BlockInstance) => BlockInstance) => {
         const canEditBlocks = viewMode === PlannerMode.EDIT;
         if (!canEditBlocks) {
             return;

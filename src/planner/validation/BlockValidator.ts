@@ -79,11 +79,11 @@ export class BlockValidator {
                 try {
                     const typeErrors = resourceType.validate(resource, this.block.spec.entities?.types ?? []);
                     errors.push(...typeErrors);
-                } catch (e) {
+                } catch (e: any) {
                     errors.push(`Resource was invalid: ${e.message}`);
                 }
             }
-        } catch (e) {
+        } catch (e: any) {
             errors.push(`Failed for resource kind: ${e.message}`);
         }
 
@@ -107,11 +107,11 @@ export class BlockValidator {
                     const configErrors = blockType.validateConfiguration(this.block, this.instance, config);
 
                     errors.push(...configErrors);
-                } catch (e) {
+                } catch (e: any) {
                     errors.push(`Kind-specific config validation failed: ${e.message}`);
                 }
             }
-        } catch (e) {
+        } catch (e: any) {
             errors.push(`Failed to validate kind: ${e.message}`);
         }
         return errors;
@@ -136,7 +136,7 @@ export class BlockValidator {
                 if (this.instance.block.ref) {
                     parseKapetaUri(this.instance.block.ref);
                 }
-            } catch (e) {
+            } catch (e: any) {
                 errors.push(`BlockDefinition reference was invalid: ${e.message}`);
             }
         }
@@ -164,11 +164,11 @@ export class BlockValidator {
                     const typeErrors = blockType.validate(this.block);
 
                     errors.push(...typeErrors);
-                } catch (e) {
+                } catch (e: any) {
                     errors.push(`Kind-specific validation failed: ${e.message}`);
                 }
             }
-        } catch (e) {
+        } catch (e: any) {
             errors.push(`Failed to validate kind: ${e.message}`);
         }
         return errors;

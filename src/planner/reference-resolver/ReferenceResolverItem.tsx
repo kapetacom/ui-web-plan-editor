@@ -39,7 +39,7 @@ export const ReferenceResolverItem = (props: ItemProps) => {
             <BlockReferenceResolverItem
                 {...props}
                 readOnlyBlock={readOnlyBlock}
-                canInstall={canInstall.value}
+                canInstall={Boolean(canInstall.value)}
                 blockUri={blockUri}
                 refUri={refUri}
             />
@@ -50,7 +50,7 @@ export const ReferenceResolverItem = (props: ItemProps) => {
         <ProviderReferenceResolverItem
             {...props}
             readOnlyBlock={readOnlyBlock}
-            canInstall={canInstall.value}
+            canInstall={Boolean(canInstall.value)}
             blockUri={blockUri}
             refUri={refUri}
         />

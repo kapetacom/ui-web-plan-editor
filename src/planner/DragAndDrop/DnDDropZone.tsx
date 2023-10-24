@@ -66,11 +66,11 @@ export const DnDDropZone: <T extends DnDPayload>(props: DropZoneProps<T> & DropZ
 ) => {
     const id = useMemo(() => randomUUID(), []);
     const { callbacks } = useContext(DnDContext);
-    const [element, setElement] = useState<HTMLElement | null>(null);
+    const [element, setElement] = useState<Element | null>(null);
 
     const instance = useMemo(() => new DnDZoneInstance(true), []);
 
-    const onRef = (ref) => {
+    const onRef = (ref: Element | null) => {
         setElement(ref);
     };
 
@@ -81,7 +81,7 @@ export const DnDDropZone: <T extends DnDPayload>(props: DropZoneProps<T> & DropZ
             id,
             {
                 ...props,
-                element,
+                element: element as HTMLElement,
                 instance,
             },
             props.data

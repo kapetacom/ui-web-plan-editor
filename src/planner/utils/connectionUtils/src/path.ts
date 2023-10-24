@@ -2,6 +2,7 @@ import * as PF from 'pathfinding';
 
 export function simplifyPath(grid: PF.Grid, path: number[][]) {
     const canMoveTo = (sx: number, sy: number, ex: number, ey: number) => {
+        // @ts-ignore
         const interpolated = PF.Util.interpolate(sx, sy, ex, ey);
         //
         if (sx === ex || sy === ey) {
@@ -69,6 +70,7 @@ export function findMatrixPath(
     ];
     const boundedEnd = [Math.max(0, Math.min(grid.width - 1, end[0])), Math.max(0, Math.min(grid.height - 1, end[1]))];
     const finder = new PF.AStarFinder({ diagonalMovement: PF.DiagonalMovement.Never });
+    // @ts-ignore
     const path = finder.findPath(...boundedStart, ...boundedEnd, grid);
     // Simplify the path by converting lines to single [start, end] instead of [start, ...intermediate, end]
     // EDIT: Maybe we dont want this, since it animates better with more points

@@ -6,7 +6,7 @@ import { InstanceStatus } from '@kapeta/ui-web-context';
 export default {
     title: 'Gateway Cards',
     decorators: [
-        (Story) => (
+        (Story: any) => (
             // To defeat the 100% height/width of the storybook container
             <div>
                 <Story />

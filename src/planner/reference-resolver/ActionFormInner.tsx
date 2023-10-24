@@ -25,11 +25,10 @@ export const ActionFormInner = (props: ActionFormInnerProps) => {
                 return {
                     value: props.alternativeVersions[0]?.ref,
                 };
-            case ActionType.SELECT_LOCAL_VERSION:
-                return {
-                    value: undefined,
-                };
         }
+        return {
+            value: undefined,
+        };
     }, [props.resolution.action]);
 
     useEffect(() => {
@@ -72,7 +71,7 @@ export const ActionFormInner = (props: ActionFormInnerProps) => {
                         size={'large'}
                         onClick={async () => {
                             try {
-                                const ymlFile = await props.selectAssetFromDisk();
+                                const ymlFile = await props.selectAssetFromDisk!();
 
                                 if (ymlFile) {
                                     props.onResolution({
@@ -105,4 +104,6 @@ export const ActionFormInner = (props: ActionFormInnerProps) => {
                 </Box>
             );
     }
+
+    return null;
 };
