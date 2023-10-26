@@ -1,3 +1,10 @@
+## [1.11.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.3...v1.11.4) (2023-10-26)
+
+
+### Bug Fixes
+
+* support string and date log timestamps ([#103](https://github.com/kapetacom/ui-web-plan-editor/issues/103)) ([4c7cd33](https://github.com/kapetacom/ui-web-plan-editor/commit/4c7cd33802a1ba8f8dd3e40646e7f20748749a68))
+
 ## [1.11.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.2...v1.11.3) (2023-10-26)
 
 
