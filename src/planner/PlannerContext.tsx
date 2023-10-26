@@ -449,6 +449,15 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     const canEditConnections = viewMode === PlannerMode.EDIT;
     const uri = parseKapetaUri(props.asset.ref);
 
+    const getBlockByRef = (ref: string) => {
+        const blockAsset = blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(parseKapetaUri(ref)));
+        return blockAsset?.content;
+    };
+    const getBlockById = (blockId: string) => {
+        const block = plan.spec.blocks?.find((bx) => bx.id === blockId);
+        return block && getBlockByRef(block.block.ref);
+    };
+
     return {
         // view state
         focusedBlock,
@@ -478,14 +487,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         setBlockAssets(newBlockAssets: AssetInfo<BlockDefinition>[]) {
             setBlockAssets(newBlockAssets);
         },
-        getBlockByRef(ref: string) {
-            const blockAsset = blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(parseKapetaUri(ref)));
-            return blockAsset?.content;
-        },
-        getBlockById(blockId: string) {
-            const block = plan.spec.blocks?.find((bx) => bx.id === blockId);
-            return block && this.getBlockByRef(block.block.ref);
-        },
+        getBlockByRef,
+        getBlockById,
         updateBlockDefinition(ref: string, update: BlockDefinition) {
             if (!canEditBlocks) {
                 return;
@@ -741,7 +744,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         },
         getResourceByBlockIdAndName(blockId: string, resourceName: string, resourceRole: ResourceRole) {
             const block = plan.spec.blocks?.find((bx) => bx.id === blockId)?.block;
-            const blockAsset = block && this.getBlockByRef(block.ref);
+            const blockAsset = block && getBlockByRef(block.ref);
             const list =
                 resourceRole === ResourceRole.PROVIDES ? blockAsset?.spec.providers : blockAsset?.spec.consumers;
             return list?.find((rx) => rx.metadata.name === resourceName);

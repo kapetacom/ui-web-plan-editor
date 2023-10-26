@@ -53,7 +53,7 @@ const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) =
     return <rect className="resource-mask" width={width} height={height} x={left} y={top} />;
 };
 
-const getResourceConnectionPoint = ({ isConsumer, isExpanded, buttonWidth = 0 }) => {
+const getResourceConnectionPoint = ({ isConsumer = false, isExpanded = false, buttonWidth = 0 }) => {
     const baseOffset = isConsumer ? -45 : 195;
     const expansionSign = isConsumer ? -1 : 1;
     const expansionWidth = isExpanded ? 100 : 0;

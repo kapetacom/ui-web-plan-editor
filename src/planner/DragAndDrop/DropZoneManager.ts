@@ -31,7 +31,7 @@ export class DropZoneManager<T extends DnDPayload> {
         return isContained;
     }
 
-    private getValidZones(draggable) {
+    private getValidZones(draggable: T) {
         return this.zones.filter((zone) => (zone.zone.accept ? zone.zone.accept(draggable) : true));
     }
 

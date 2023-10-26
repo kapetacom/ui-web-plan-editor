@@ -272,7 +272,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
 
 const PlanEditor = withPlannerContext(InnerPlanEditor);
 
-const PlannerLoader = (props) => {
+const PlannerLoader = (props: { planId?: string; instanceStatus: InstanceStatus; plannerMode: PlannerMode }) => {
     const plan = useAsync(() => (props.planId === 'invalid' ? readInvalidPlan() : readPlanV2()), [props.planId]);
 
     const instanceStatuses = plan.value?.plan?.spec.blocks?.reduce((agg, blockInstance) => {

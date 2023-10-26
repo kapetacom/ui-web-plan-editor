@@ -3,12 +3,11 @@ import { DnDPayload, DragEventInfo } from './types';
 import { DnDContext } from './DnDContext';
 import { DnDZoneContext, DnDZoneInstance } from './DnDDropZone';
 import { Point } from '@kapeta/ui-web-types';
-import { useTimeoutFn } from 'react-use';
 
 interface DnDCallbackProps<T extends DnDPayload> extends DragEventInfo<T> {
     isDragging: boolean;
     componentProps: {
-        onMouseDown;
+        onMouseDown: MouseEventHandler;
     };
 }
 
@@ -158,7 +157,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 dragEvent: initialDragEvt,
             });
 
-            let lastEvt = downEvt;
+            let lastEvt = downEvt.nativeEvent;
             // Transform scroll into drag events
             const unsubscribeZone = parentZone.onScrollChange(() => {
                 const dragEvt = getDragEventInfo(
@@ -173,7 +172,7 @@ export const DnDDraggable: <T extends DnDPayload>(props: DnDDraggableProps<T>) =
                 );
                 setStatusFromEvent(dragEvt);
             });
-            const onMouseMove = (evt) => {
+            const onMouseMove = (evt: MouseEvent) => {
                 cancelActionTimeout();
 
                 const dragEvt = getDragEventInfo(
