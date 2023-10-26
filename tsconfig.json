@@ -15,7 +15,8 @@
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "forceConsistentCasingInFileNames": true,
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "isolatedModules": true
     },
     "exclude": ["node_modules", "dist"]
 }

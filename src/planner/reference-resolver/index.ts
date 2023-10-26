@@ -1,3 +1,3 @@
 export * from './ReferenceResolver';
 export * from './ReferenceResolutionHandler';
-export { MissingReferenceResolution, Resolution } from './types';
+export type { MissingReferenceResolution, Resolution } from './types';
