@@ -1,3 +1,12 @@
+## [1.11.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.2...v1.11.3) (2023-10-26)
+
+
+### Bug Fixes
+
+* better type handling by fixing implicit any + more ([c71de97](https://github.com/kapetacom/ui-web-plan-editor/commit/c71de97579f39de217d7177ab15c4078581e5277))
+* export types for isolatedModules compat ([972e97d](https://github.com/kapetacom/ui-web-plan-editor/commit/972e97dc6e45cca4cfaa05cdaa9c425a1756424b))
+* tighten up to work with typescript strict mode ([5f49094](https://github.com/kapetacom/ui-web-plan-editor/commit/5f49094f234e5fff0872c92e96d3bc2ac726d5ef))
+
 ## [1.11.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.1...v1.11.2) (2023-10-24)
 
 
