@@ -22,7 +22,7 @@ export enum LogSource {
 }
 
 export interface LogEntry {
-    time: number;
+    time: string | number | Date;
     message: string;
     level: LogLevel;
     source?: LogSource;
