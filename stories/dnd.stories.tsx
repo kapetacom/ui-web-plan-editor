@@ -8,7 +8,7 @@ export default {
     },
 };
 
-const DropZoneWrapper = (props) => {
+const DropZoneWrapper = (props: { style: any }) => {
     const [{ isActive, data: hoverData }, setActive] = useState({
         isActive: false,
         data: null as null | any,

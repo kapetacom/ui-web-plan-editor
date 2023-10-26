@@ -40,7 +40,7 @@ const MissingRefs = () => {
 };
 
 const PlanPreviewInner = withPlannerContext<InnerProps>(
-    forwardRef<HTMLDivElement, InnerProps>((props, ref) => {
+    forwardRef<HTMLElement, InnerProps>((props, ref) => {
         const planner = useContext(PlannerContext);
         const [hasError, setHasError] = React.useState(false);
         const size: Size = {

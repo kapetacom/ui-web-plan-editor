@@ -216,8 +216,12 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                             draggable.data.instance.id !== blockContext.blockInstance.id
                                         );
                                     }}
-                                    onDrop={(draggable: ResourcePayload | ResourceTypePayload) => {
-                                        if (blockContext.isBlockDefinitionReadOnly) {
+                                    onDrop={(draggable) => {
+                                        if (
+                                            blockContext.isBlockDefinitionReadOnly ||
+                                            (draggable.type !== PlannerPayloadType.RESOURCE_TYPE &&
+                                                draggable.type !== PlannerPayloadType.RESOURCE)
+                                        ) {
                                             return;
                                         }
 
@@ -291,10 +295,15 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                         // Add connection to new consumer
                                         planner.addConnection(newConnection);
                                     }}
-                                    onDragEnter={(draggable: ResourcePayload | ResourceTypePayload) => {
-                                        if (blockContext.isBlockDefinitionReadOnly) {
+                                    onDragEnter={(draggable) => {
+                                        if (
+                                            blockContext.isBlockDefinitionReadOnly ||
+                                            (draggable.type !== PlannerPayloadType.RESOURCE_TYPE &&
+                                                draggable.type !== PlannerPayloadType.RESOURCE)
+                                        ) {
                                             return;
                                         }
+
                                         const role =
                                             draggable.type === 'resource-type'
                                                 ? draggable.data.config.role

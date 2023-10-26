@@ -7,7 +7,7 @@ import { getResourceId } from '../utils/planUtils';
 import { ActionContext, PlannerAction } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { Connection } from '@kapeta/schemas';
+import { BlockInstance, Connection } from '@kapeta/schemas';
 import * as PF from 'pathfinding';
 
 import { fillMatrix } from '../utils/connectionUtils/src/matrix';
@@ -21,7 +21,7 @@ import { DnDContext } from '../DragAndDrop/DnDContext';
 
 import './PlannerConnection.less';
 
-const empty = [];
+const empty: BlockInstance[] = [];
 
 export const PlannerConnection: React.FC<{
     connection: Connection;
