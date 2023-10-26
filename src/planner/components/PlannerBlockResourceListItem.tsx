@@ -136,7 +136,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
             errors.push(...resourceConfig.validate(props.resource, blockDefinition?.spec.entities?.types ?? []));
         }
     } catch (e) {
-        errors.push(`Failed to read resource kind: ${e.message}`);
+        errors.push(`Failed to read resource kind: ${e && (e as Error).message}`);
     }
 
     // Check for name conflicts
@@ -338,7 +338,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                 <DragAndDrop.DropZone
                                     data={
                                         {
-                                            type: 'resource',
+                                            type: PlannerPayloadType.RESOURCE,
                                             data: {
                                                 resource: props.resource,
                                                 instance: blockInstance,
@@ -349,9 +349,9 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                     }
                                     onDragEnter={() => setDragOver(true)}
                                     onDragLeave={() => setDragOver(false)}
-                                    onDrop={(payload: ResourcePayload) => {
+                                    onDrop={(payload) => {
                                         setDragOver(false);
-                                        if (payload.type !== 'resource') {
+                                        if (payload.type !== PlannerPayloadType.RESOURCE) {
                                             return;
                                         }
                                         const connection = createConnection(
