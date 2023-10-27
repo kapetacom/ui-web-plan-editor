@@ -1,3 +1,10 @@
+## [1.11.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.4...v1.11.5) (2023-10-27)
+
+
+### Bug Fixes
+
+* Add specific handling of unresolvable state ([#104](https://github.com/kapetacom/ui-web-plan-editor/issues/104)) ([aeef311](https://github.com/kapetacom/ui-web-plan-editor/commit/aeef311411b2331806fde3b24dafebd924399cb8))
+
 ## [1.11.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.3...v1.11.4) (2023-10-26)
 
 
