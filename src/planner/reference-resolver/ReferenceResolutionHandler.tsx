@@ -1,6 +1,6 @@
 import { KapButton, KapDialog } from '@kapeta/ui-web-components';
-import { MissingReferenceResolution, ReferenceResolverProps } from './types';
-import React, { useEffect, useState } from 'react';
+import { ActionType, MissingReferenceResolution, ReferenceResolverProps } from './types';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ReferenceResolver } from './ReferenceResolver';
 import { Button, Stack } from '@mui/material';
 import {
@@ -25,6 +25,10 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
     const [processing, setProcessing] = useState<boolean>(false);
     const [resolutionStates, setResolutionStates] = useState<ResolutionState[]>([]);
 
+    const unresolvable = useMemo(() => {
+        return resolutions?.some((r) => r.resolution?.action === ActionType.NONE_AVAILABLE) || false;
+    }, [resolutions]);
+
     useEffect(() => {
         if (props.open || props.inline) {
             // Reset state whenever the modal is opened
@@ -32,7 +36,7 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
         }
     }, [props.open, props.inline]);
 
-    const applyButton = (
+    const applyButton = !unresolvable ? (
         <KapButton
             variant={'contained'}
             color={'primary'}
@@ -69,7 +73,7 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
         >
             Apply changes
         </KapButton>
-    );
+    ) : null;
 
     const mainContent = (
         <ReferenceResolver
@@ -111,7 +115,11 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
             <KapDialog.Title>Resolve missing references in plan</KapDialog.Title>
             <KapDialog.Content>{mainContent}</KapDialog.Content>
             <KapDialog.Actions>
-                {props.onClose && <Button onClick={props.onClose}>Cancel</Button>}
+                {props.onClose && (
+                    <Button variant={unresolvable ? 'contained' : 'text'} onClick={props.onClose}>
+                        {unresolvable ? 'Close' : 'Cancel'}
+                    </Button>
+                )}
                 {applyButton}
             </KapDialog.Actions>
         </KapDialog>

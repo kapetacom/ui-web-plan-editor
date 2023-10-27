@@ -11,6 +11,7 @@ export enum ActionType {
     SELECT_ALTERNATIVE_TYPE,
     SELECT_LOCAL_VERSION,
     REMOVE_BLOCK,
+    NONE_AVAILABLE,
 }
 
 export interface Resolution {

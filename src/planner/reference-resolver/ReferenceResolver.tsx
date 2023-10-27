@@ -1,7 +1,7 @@
 import { Alert, Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ReferenceResolverItem } from './ReferenceResolverItem';
-import { MissingReferenceResolution, NO_RESOLUTION, ReferenceResolverProps } from './types';
+import { ActionType, MissingReferenceResolution, NO_RESOLUTION, ReferenceResolverProps } from './types';
 import { isResolutionValid } from './ActionSelector';
 
 export const ReferenceResolver = (props: ReferenceResolverProps) => {
@@ -33,6 +33,10 @@ export const ReferenceResolver = (props: ReferenceResolverProps) => {
         props.onChange(resolutions, valid);
     }, [resolutions, valid]);
 
+    const unresolvable = useMemo(() => {
+        return resolutions.some((r) => r.resolution?.action === ActionType.NONE_AVAILABLE);
+    }, [resolutions]);
+
     return (
         <Box
             className={'reference-resolver'}
@@ -40,7 +44,19 @@ export const ReferenceResolver = (props: ReferenceResolverProps) => {
                 minWidth: '900px',
             }}
         >
-            <Alert severity={'error'}>The plan has missing references. Please resolve them before continuing.</Alert>
+            <Alert severity={'error'}>
+                {unresolvable ? (
+                    <>
+                        The plan has missing references which can not be resolved. Please{' '}
+                        <a href="mailto:support@kapeta.com" target={'_blank'}>
+                            contact support
+                        </a>{' '}
+                        for further assistance
+                    </>
+                ) : (
+                    'The plan has missing references. Please resolve them before continuing.'
+                )}
+            </Alert>
             <Table size={'small'}>
                 <TableHead>
                     <TableRow>
