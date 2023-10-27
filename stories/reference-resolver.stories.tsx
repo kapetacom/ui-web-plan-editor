@@ -188,3 +188,35 @@ export const MissingLocal = () => {
         </>
     );
 };
+
+export const CanNotResolve = () => {
+    const blocks = useAsync(() => BlockService.list());
+
+    return (
+        <>
+            {!blocks.loading && (
+                <ReferenceResolutionHandler
+                    plan={InvalidPlannerData}
+                    blockAssets={blocks.value!.map(fromAsset)}
+                    assetCanBeInstalled={() => Promise.resolve(false)}
+                    readOnly={true}
+                    onClose={() => {}}
+                    open={true}
+                    selectAssetFromDisk={selectAssetFromDisk}
+                    missingReferences={[
+                        {
+                            type: ReferenceType.BLOCK,
+                            blockRef: 'not-kapeta/todo:3.2.1',
+                            ref: 'not-kapeta/todo:3.2.1',
+                        },
+                        {
+                            type: ReferenceType.TARGET,
+                            blockRef: 'kapeta/todo:1.2.3',
+                            ref: 'not-kapeta/language-target-java-spring-boot:3.2.1',
+                        },
+                    ]}
+                />
+            )}
+        </>
+    );
+};

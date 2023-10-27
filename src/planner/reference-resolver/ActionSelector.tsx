@@ -1,6 +1,6 @@
 import { FormControl, FormHelperText, IconButton, MenuItem, Select, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AssetVersionSelectorEntry } from '@kapeta/ui-web-components';
 import { ActionType, NO_RESOLUTION, Resolution } from './types';
 import { ActionFormInner } from './ActionFormInner';
@@ -30,6 +30,10 @@ export function isResolutionValid(resolution?: Resolution): boolean {
         return false;
     }
 
+    if (resolution?.action === ActionType.NONE_AVAILABLE) {
+        return false;
+    }
+
     if (ActionsWithForm.includes(resolution.action)) {
         return !!resolution.value;
     }
@@ -55,6 +59,14 @@ function toActionName(action: ActionType): string {
 }
 
 export const ActionSelector = (props: ActionSelectorProps) => {
+    useEffect(() => {
+        if (props.availableActions.length === 0 && props.resolution.action !== ActionType.NONE_AVAILABLE) {
+            props.onResolution({
+                action: ActionType.NONE_AVAILABLE,
+            });
+        }
+    }, [props.availableActions.length]);
+
     if (props.availableActions.length === 0) {
         return <span>There are no known solutions to fix this missing reference.</span>;
     }
