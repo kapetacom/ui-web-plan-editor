@@ -22,6 +22,10 @@ import { DnDContainer } from './DragAndDrop/DnDContainer';
 import { connectionEquals } from './utils/connectionUtils';
 import { BlockResouceIconProps } from './components/BlockResourceIcon';
 
+export type BlockDefinitionReference = {
+    ref: string;
+    update: BlockDefinition;
+};
 type BlockUpdater = (block: BlockInstance) => BlockInstance;
 type Callback = () => void;
 type InstanceAddedCallback = (blockInstance: BlockInstance) => void;
@@ -97,6 +101,8 @@ export interface PlannerContextData {
     removeBlockDefinition(update: AssetInfo<BlockDefinition>): void;
 
     updateBlockDefinition(ref: string, update: BlockDefinition): void;
+
+    updateBlockDefinitions(definitionRefs: BlockDefinitionReference[]): void;
 
     addBlockDefinition(asset: AssetInfo<BlockDefinition>): void;
 
@@ -182,6 +188,7 @@ const defaultValue: PlannerContextData = {
 
     removeBlockDefinition() {},
     updateBlockDefinition() {},
+    updateBlockDefinitions() {},
     addBlockDefinition() {},
     hasBlockDefinition() {
         return false;
@@ -283,6 +290,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         plan: props.plan,
         blockAssets: props.blockAssets,
     });
+
     const setPlan = useCallback(
         function setPlan(updater: React.SetStateAction<Plan>) {
             setAssets((prev) => {
@@ -368,34 +376,57 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
     const instanceStates = useMemo(() => props.instanceStates || {}, [props.instanceStates]);
 
+    const updateAssets = useCallback(
+        function updateAssets(
+            updater: React.SetStateAction<ContextData>,
+            preventChangeEvent?: (state: ContextData) => boolean
+        ) {
+            setAssets((prev) => {
+                const newContext = typeof updater === 'function' ? updater(prev) : updater;
+
+                if (newContext.plan !== prev.plan) {
+                    if (!(preventChangeEvent && preventChangeEvent(newContext))) {
+                        props.onChange?.(newContext.plan);
+                    }
+                }
+
+                if (newContext.blockAssets !== prev.blockAssets && props.onAssetChange) {
+                    newContext.blockAssets.forEach((newAsset) => {
+                        if (!prev.blockAssets.includes(newAsset)) {
+                            props.onAssetChange?.(newAsset);
+                        }
+                    });
+                }
+
+                return newContext;
+            });
+        },
+        [setAssets]
+    );
+
     const updatePlan = (changer: (prev: Plan) => Plan, preventChangeEvent?: (state: ContextData) => boolean) => {
-        setAssets((prev) => {
+        updateAssets((prev) => {
             const newPlan = changer(prev.plan);
             if (newPlan !== prev.plan) {
-                const newState = {
+                return {
                     plan: newPlan,
                     blockAssets: prev.blockAssets,
                 };
-                if (!(preventChangeEvent && preventChangeEvent(newState)) && props.onChange) {
-                    props.onChange(newPlan);
-                }
-                return newState;
             }
             return prev;
-        });
+        }, preventChangeEvent);
     };
 
     const updateBlockAssets = (changer: (prev: AssetInfo<BlockDefinition>[]) => AssetInfo<BlockDefinition>[]) => {
-        setBlockAssets((prev) => {
-            const newAssets = changer(prev);
-            if (props.onAssetChange) {
-                newAssets.forEach((newAsset, ix) => {
-                    if (props.onAssetChange && prev.indexOf(newAsset) === -1) {
-                        props.onAssetChange(newAsset);
-                    }
-                });
+        updateAssets((prev) => {
+            const newAssets = changer(prev.blockAssets);
+            if (newAssets !== prev.blockAssets) {
+                return {
+                    plan: prev.plan,
+                    blockAssets: newAssets,
+                };
             }
-            return newAssets;
+            return prev;
         });
     };
 
@@ -458,6 +489,70 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         return block && getBlockByRef(block.block.ref);
     };
 
+    function updateBlockDefinitions(blockDefinitionRefs: BlockDefinitionReference[]) {
+        if (!canEditBlocks) {
+            return;
+        }
+
+        updateAssets((state) => {
+            let planCopy = state.plan;
+            let blockAssets = state.blockAssets;
+
+            blockDefinitionRefs.forEach(({ ref, update }) => {
+                const oldUri = parseKapetaUri(ref);
+                const newUri = parseKapetaUri(`kapeta://${update.metadata.name}:local`);
+
+                blockAssets = blockAssets.map((block) =>
+                    parseKapetaUri(block.ref).equals(oldUri)
+                        ? ({
+                              ...block,
+                              content: update,
+                          } satisfies AssetInfo<BlockDefinition>)
+                        : block
+                );
+
+                if (oldUri.equals(newUri) || !state.plan.spec.blocks) {
+                    return;
+                }
+
+                const block = blockAssets.find((block) => parseKapetaUri(block.ref).equals(oldUri));
+                if (block) {
+                    // We're adding a temp block - this will be replaced as soon as the assets are reloaded
+                    // and is just to avoid a missing reference error in the meantime
+                    console.log('Adding temp block', newUri.toNormalizedString());
+                    blockAssets.push({
+                        ...block,
+                        ref: newUri.toNormalizedString(),
+                        content: update,
+                        exists: false,
+                    });
+                }
+
+                if (planCopy === state.plan) {
+                    planCopy = cloneDeep(state.plan);
+                }
+
+                planCopy.spec.blocks = planCopy.spec.blocks.map((block) => {
+                    if (parseKapetaUri(block.block.ref).equals(oldUri)) {
+                        return {
+                            ...block,
+                            block: {
+                                ref: newUri.toNormalizedString(),
+                            },
+                        };
+                    }
+
+                    return block;
+                });
+            });
+
+            return {
+                plan: planCopy,
+                blockAssets,
+            };
+        });
+    }
+
     return {
         // view state
         focusedBlock,
@@ -484,28 +579,18 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
         asset: props.asset,
         uri: uri,
         blockAssets,
-        setBlockAssets(newBlockAssets: AssetInfo<BlockDefinition>[]) {
-            setBlockAssets(newBlockAssets);
-        },
+        setBlockAssets,
         getBlockByRef,
         getBlockById,
         updateBlockDefinition(ref: string, update: BlockDefinition) {
-            if (!canEditBlocks) {
-                return;
-            }
-            const uri = parseKapetaUri(ref);
-            updateBlockAssets((state) =>
-                state.map((block) =>
-                    parseKapetaUri(block.ref).equals(uri)
-                        ? ({
-                              ...block,
-                              ref: `kapeta://${update.metadata.name}:local`,
-                              content: update,
-                          } satisfies AssetInfo<BlockDefinition>)
-                        : block
-                )
-            );
+            updateBlockDefinitions([
+                {
+                    ref,
+                    update,
+                },
+            ]);
         },
+        updateBlockDefinitions,
         hasBlockDefinition(ref: string): boolean {
             const newUri = parseKapetaUri(ref);
             return blockAssets.some((asset) => newUri.equals(parseKapetaUri(asset.ref)));
