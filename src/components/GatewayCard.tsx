@@ -62,8 +62,8 @@ export const GatewayCard = (props: GatewayCardProps) => {
     const titleMapping = {
         [InstanceStatus.STARTING]: 'Block is starting',
         [InstanceStatus.READY]: 'Block is ready',
-        [InstanceStatus.UNHEALTHY]: 'Block is unhealthy',
-        [InstanceStatus.FAILED]: 'Block failed to start, or has crashed. Check logs for more information.',
+        [InstanceStatus.UNHEALTHY]: 'Block is unhealthy. View logs to see more information.',
+        [InstanceStatus.FAILED]: 'Block failed to start or crashed. View logs to see more information.',
         [InstanceStatus.STOPPED]: 'Block has stopped',
         [InstanceStatus.STOPPING]: 'Block is stopping',
         [InstanceStatus.BUSY]: 'Block is unresponsive',

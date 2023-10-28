@@ -8,7 +8,7 @@ import { BlockPreview, BlockTypePreview } from '../src/components/BlockTypePrevi
 import { ResourceTypePreview } from '../src/components/ResourceTypePreview';
 import { readInvalidPlan, readPlanV2 } from './data/planReader';
 import { AssetInfo, AssetThumbnail, fromAsset, MissingReference, ReferenceResolutionHandler } from '../src';
-import { DefaultContext } from '@kapeta/ui-web-components';
+import { AssetInstallStatus, DefaultContext } from '@kapeta/ui-web-components';
 import { Typography } from '@mui/material';
 import { BlockDefinition, Plan } from '@kapeta/schemas';
 
@@ -198,7 +198,7 @@ export const ThumbnailPlan = () => {
                 installerService={{
                     uninstall: () => Promise.resolve(),
                     install: () => Promise.resolve(),
-                    get: () => Promise.resolve(true),
+                    get: () => Promise.resolve(AssetInstallStatus.INSTALLED),
                 }}
                 loadPlanContext={() => {
                     return {
@@ -262,7 +262,9 @@ export const ThumbnailPlanMissingAssets = () => {
     const installerService = {
         install: delayedPromise<void>(10000),
         import: delayedPromise<void>(10000),
-        get: delayedPromise(1000, () => Math.random() > 0.5),
+        get: delayedPromise<AssetInstallStatus>(1000, () =>
+            Math.random() > 0.5 ? AssetInstallStatus.INSTALLED : AssetInstallStatus.NOT_INSTALLED
+        ),
     };
 
     return (
@@ -271,7 +273,7 @@ export const ThumbnailPlanMissingAssets = () => {
                 open={open}
                 plan={plan}
                 blockAssets={blockAssets}
-                assetCanBeInstalled={() => installerService.get()}
+                assetCanBeInstalled={async () => (await installerService.get()) !== AssetInstallStatus.INSTALLED}
                 installAsset={() => installerService.install()}
                 importAsset={() => installerService.import()}
                 readOnly={false}
@@ -378,7 +380,7 @@ export const ThumbnailBlock = () => {
                 installerService={{
                     uninstall: () => Promise.resolve(),
                     install: () => Promise.resolve(),
-                    get: () => Promise.resolve(true),
+                    get: () => Promise.resolve(AssetInstallStatus.INSTALLED),
                 }}
                 loadPlanContext={() => {
                     return {
