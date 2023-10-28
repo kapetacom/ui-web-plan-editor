@@ -55,7 +55,7 @@
     "devDependencies": {
         "@kapeta/nodejs-utils": "<2",
         "@kapeta/prettier-config": "^0.6.0",
-        "@kapeta/style": "^0.92.0",
+        "@kapeta/style": "^0.94.0",
         "@mui/icons-material": "^5.14.3",
         "@mui/material": "^5.14.3",
         "@sambego/storybook-state": "^2.0.1",
