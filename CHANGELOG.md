@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.6...v1.12.0) (2023-10-28)
+
+
+### Features
+
+* Adds tip icons and data-kap-ids ([#106](https://github.com/kapetacom/ui-web-plan-editor/issues/106)) ([c70d70c](https://github.com/kapetacom/ui-web-plan-editor/commit/c70d70c1487d8d6dc49f75a0ac0e764eb9707a08))
+
 ## [1.11.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.5...v1.11.6) (2023-10-28)
 
 
