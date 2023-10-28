@@ -108,7 +108,7 @@ export const PlannerCanvas: React.FC<Props> = (props) => {
     }
 
     return (
-        <div className={`planner-area-container ${classNames}`}>
+        <div className={`planner-area-container ${classNames}`} data-kap-id={'plan-editor-canvas'}>
             <div className={focusToolbar}>
                 <FocusTopbar setFocusBlock={planner.setFocusedBlock} focusedBlock={planner.focusedBlock} />
             </div>

@@ -18,6 +18,7 @@ export const ZoomButtons = (props: Props) => {
 
     return (
         <Box
+            data-kap-id={'plan-editor-zoom-buttons'}
             className={'planner-zoom-buttons'}
             sx={{
                 display: 'flex',
