@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.12.0...v1.13.0) (2023-10-28)
+
+
+### Features
+
+* Add a single method for changing state ([#107](https://github.com/kapetacom/ui-web-plan-editor/issues/107)) ([053992c](https://github.com/kapetacom/ui-web-plan-editor/commit/053992c72773def6a46fe0182a24b727d765b6b8))
+
 # [1.12.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.6...v1.12.0) (2023-10-28)
 
 
