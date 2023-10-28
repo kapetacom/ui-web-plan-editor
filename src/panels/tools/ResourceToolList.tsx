@@ -5,9 +5,13 @@ import { DragAndDrop } from '../../planner/utils/dndUtils';
 import React, { useState } from 'react';
 import { PlannerPayloadType } from '../../planner/types';
 import { ResourceShape } from '../../components/ResourceShape';
+import { TipIcon } from '../../components/TipIcon';
 
 interface Props {
+    dataKapId: string;
     title: string;
+    description?: string | React.ReactNode;
+    readMoreLink?: string;
     resources: IResourceTypeProvider[];
 }
 
@@ -21,6 +25,7 @@ export const ResourceToolList = (props: Props) => {
             <Stack
                 direction={'column'}
                 className={'planner-resource-list'}
+                data-kap-id={props.dataKapId}
                 sx={{
                     pb: 2,
                     pt: 2,
@@ -40,8 +45,15 @@ export const ResourceToolList = (props: Props) => {
                             height: 6,
                         }}
                     />
-                    <Typography color={'text.secondary'} flex={0} fontSize={'12px'} lineHeight={'12px'}>
+                    <Typography
+                        color={'text.secondary'}
+                        whiteSpace={'nowrap'}
+                        flex={0}
+                        fontSize={'12px'}
+                        lineHeight={'12px'}
+                    >
                         {props.title}
+                        {props.description && <TipIcon content={props.description} readMoreLink={props.readMoreLink} />}
                     </Typography>
                     <Divider
                         flexItem={true}
