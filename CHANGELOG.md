@@ -1,3 +1,10 @@
+## [1.11.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.5...v1.11.6) (2023-10-28)
+
+
+### Bug Fixes
+
+* Align and expand tooltip for health issues on blocks ([#105](https://github.com/kapetacom/ui-web-plan-editor/issues/105)) ([0b364e4](https://github.com/kapetacom/ui-web-plan-editor/commit/0b364e4b0dc02d67a8b44a99ffed1d67908572ba))
+
 ## [1.11.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.11.4...v1.11.5) (2023-10-27)
 
 
