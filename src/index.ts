@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 export * from './components/BlockNode';
 export * from './components/PlannerBlockWarningTag';
 export * from './components/BlockShape';

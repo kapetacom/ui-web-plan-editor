@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { ExoticComponent, RefAttributes, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Point, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';

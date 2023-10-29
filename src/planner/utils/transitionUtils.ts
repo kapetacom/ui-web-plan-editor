@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 export const staggeredFade = (i: number, n: number, show: boolean, delay = 0.05) => {
     // staggered fade in from the middle
     const isEven = n % 2 === 0;

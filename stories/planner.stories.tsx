@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { ForwardedRef, forwardRef, useContext } from 'react';
 import { Meta, StoryObj } from '@storybook/react';
 

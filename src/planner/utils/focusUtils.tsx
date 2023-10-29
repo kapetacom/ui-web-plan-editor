@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { Point, ResourceRole, Size } from '@kapeta/ui-web-types';
 
 import { FocusPositioningData, PlannerNodeSize } from '../../types';

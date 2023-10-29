@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { describe, it, expect } from '@jest/globals';
 import { fillMatrix } from './matrix';
 

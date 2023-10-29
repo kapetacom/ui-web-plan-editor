@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { useRef, useState } from 'react';
 import { DragAndDrop } from '../src/planner/DragAndDrop';
 

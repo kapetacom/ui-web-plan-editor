@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { forwardRef, useState } from 'react';
 import { Box, Chip, CircularProgress, Stack, SvgIconProps, Typography } from '@mui/material';
 import { SchemaKind } from '@kapeta/ui-web-types';

@@ -15,7 +15,12 @@
     "keywords": [
         "kapeta"
     ],
-    "license": "MIT",
+    "license": "BUSL-1.1",
+    "author": {
+        "email": "engineering@kapeta.com",
+        "name": "Kapeta",
+        "url": "https://kapeta.com"
+    },
     "scripts": {
         "prebuild": "rm -rf dist",
         "storybook": "storybook dev --port=54321",

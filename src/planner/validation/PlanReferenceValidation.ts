@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { BlockDefinition, Plan } from '@kapeta/schemas';
 import { BlockTypeProvider, BlockTargetProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { AssetInfo } from '../../types';

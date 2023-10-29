@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { MouseEventHandler, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { DnDPayload, DragEventInfo } from './types';
 import { DnDContext } from './DnDContext';

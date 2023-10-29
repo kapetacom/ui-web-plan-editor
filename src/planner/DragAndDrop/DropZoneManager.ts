@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { DnDPayload, DragEventInfo } from './types';
 import { DnDZoneInstance } from './DnDDropZone';
 import { Point } from '@kapeta/ui-web-types';

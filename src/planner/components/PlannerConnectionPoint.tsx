@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { useContext, useEffect } from 'react';
 import { PlannerContext } from '../PlannerContext';
 import { LayoutContext } from '../LayoutContext';

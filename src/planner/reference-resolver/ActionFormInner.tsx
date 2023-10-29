@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { AssetVersionSelector, AssetVersionSelectorEntry, FormContainer } from '@kapeta/ui-web-components';
 import React, { useEffect, useMemo } from 'react';
 import { Box, Button, FormHelperText } from '@mui/material';
