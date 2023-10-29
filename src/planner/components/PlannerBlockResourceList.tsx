@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { useContext } from 'react';
 
 import { ResourceRole } from '@kapeta/ui-web-types';

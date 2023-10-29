@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React from 'react';
 import { Tooltip, TooltipProps } from '@kapeta/ui-web-components';
 import { InfoOutlined } from '@mui/icons-material';

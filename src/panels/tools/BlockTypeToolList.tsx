@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { IBlockTypeProvider } from '@kapeta/ui-web-types';
 import { Box, Stack } from '@mui/material';
 import React from 'react';

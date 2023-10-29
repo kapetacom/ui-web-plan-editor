@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { useMemo } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';

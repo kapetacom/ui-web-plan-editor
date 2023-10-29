@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { useEffect, useMemo } from 'react';
 
 import { XTerm, escapeSequence, toDateText, KapDateTime } from '@kapeta/ui-web-components';

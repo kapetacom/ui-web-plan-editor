@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { FormControl, FormHelperText, IconButton, MenuItem, Select, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useEffect } from 'react';

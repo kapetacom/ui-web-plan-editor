@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { KapButton, KapDialog } from '@kapeta/ui-web-components';
 import { ActionType, MissingReferenceResolution, ReferenceResolverProps } from './types';
 import React, { useEffect, useMemo, useState } from 'react';

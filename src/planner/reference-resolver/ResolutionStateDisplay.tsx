@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { ResolutionState, ResolutionStateType } from '../validation/PlanResolutionTransformer';
 import React from 'react';
 import { Box, CircularProgress, Stack, Typography } from '@mui/material';

@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { createDragAndDrop } from '../DragAndDrop';
 import { PlannerPayload } from '../types';
 const MAX_ROTATION_DEG = 5;

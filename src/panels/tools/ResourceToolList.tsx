@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { IResourceTypeProvider, ItemType, Point } from '@kapeta/ui-web-types';
 import { Box, Divider, Portal, Stack, Typography } from '@mui/material';
 import { DragAndDrop } from '../../planner/utils/dndUtils';

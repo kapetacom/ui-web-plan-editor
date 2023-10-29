@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { GatewayCard } from '../src/components/GatewayCard';

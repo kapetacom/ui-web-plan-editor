@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { PropsWithChildren } from 'react';
 import { DrawerProps, Drawer, Typography, Divider, Box, Stack, IconButton } from '@mui/material';
 import { CloseRounded } from '@mui/icons-material';

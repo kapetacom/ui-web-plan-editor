@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import * as PF from 'pathfinding';
 
 export function simplifyPath(grid: PF.Grid, path: number[][]) {
