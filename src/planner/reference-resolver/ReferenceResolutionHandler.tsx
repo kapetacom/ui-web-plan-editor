@@ -27,6 +27,7 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
     const [resolutions, setResolutions] = useState<MissingReferenceResolution[]>();
     const [valid, setValid] = useState<boolean>(false);
     const [showErrors, setShowErrors] = useState<boolean>(false);
+    const [delaying, setDelaying] = useState<boolean>(false);
     const [processing, setProcessing] = useState<boolean>(false);
     const [resolutionStates, setResolutionStates] = useState<ResolutionState[]>([]);
 
@@ -45,7 +46,7 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
         <KapButton
             variant={'contained'}
             color={'primary'}
-            loading={processing}
+            loading={processing || delaying}
             onClick={async () => {
                 if (valid) {
                     const transformer = new PlanResolutionTransformer(
@@ -85,6 +86,7 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
             {...props}
             resolutionStates={resolutionStates}
             showErrors={showErrors}
+            onDelayingCheck={(delaying) => setDelaying(delaying)}
             onChange={(resolutions, valid) => {
                 setResolutions(resolutions);
                 setValid(valid);

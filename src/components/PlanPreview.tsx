@@ -18,6 +18,8 @@ import {
     ReferenceValidationError,
     usePlanValidation,
 } from '../planner/validation/PlanReferenceValidation';
+import { Waiter } from '../planner/reference-resolver/Waiter';
+import { DEFAULT_MISSING_REFERENCE_DELAY } from '../planner/reference-resolver/types';
 
 interface InnerProps extends PlannerContextProps {
     width: number;
@@ -25,7 +27,30 @@ interface InnerProps extends PlannerContextProps {
     onMissingReferences?: (references: MissingReference[]) => void;
 }
 
-const MissingRefs = () => {
+const MissingRefs = ({ delayCheck }: { delayCheck?: number }) => {
+    const [delayingCheck, setDelayingCheck] = React.useState(delayCheck && delayCheck > 0);
+
+    useEffect(() => {
+        if (!delayCheck) {
+            return () => {};
+        }
+        const timeout = setTimeout(() => setDelayingCheck(false), delayCheck);
+        return () => {
+            clearTimeout(timeout);
+            setDelayingCheck(false);
+        };
+    }, [delayCheck]);
+
+    if (delayingCheck) {
+        return (
+            <Waiter
+                sx={{
+                    color: 'action.disabled',
+                }}
+            />
+        );
+    }
+
     return (
         <Stack alignItems={'center'} justifyContent={'center'} height={'100%'}>
             <Stack
@@ -76,7 +101,7 @@ const PlanPreviewInner = withPlannerContext<InnerProps>(
         }, [props.onMissingReferences, missingReferences]);
 
         if (missingReferences.length > 0) {
-            return <MissingRefs />;
+            return <MissingRefs delayCheck={DEFAULT_MISSING_REFERENCE_DELAY} />;
         }
 
         return (

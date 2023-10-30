@@ -9,6 +9,9 @@ import { AssetInfo } from '../../types';
 import { BlockDefinition, Plan } from '@kapeta/schemas';
 import { ResolutionState } from '../validation/PlanResolutionTransformer';
 
+// We delay the UI a bit to avoid flickering
+export const DEFAULT_MISSING_REFERENCE_DELAY = 5000;
+
 export enum ActionType {
     NONE = 1,
     INSTALL,
@@ -44,6 +47,7 @@ export interface ReferenceResolverProps extends SharedProps {
     resolutionStates?: ResolutionState[];
     assetCanBeInstalled: (ref: string) => Promise<boolean>;
     readOnly: boolean;
+    delayedCheck?: number;
     onChange: (resolutions: MissingReferenceResolution[], valid: boolean) => void;
 }
 
