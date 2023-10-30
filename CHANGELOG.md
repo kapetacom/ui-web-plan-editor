@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.13.0...v1.13.1) (2023-10-30)
+
+
+### Bug Fixes
+
+* Add a delay before we show missing reference UI ([#109](https://github.com/kapetacom/ui-web-plan-editor/issues/109)) ([93b8fea](https://github.com/kapetacom/ui-web-plan-editor/commit/93b8fea9de5abc091fb0bf319cefb1f710be88b1))
+
 # [1.13.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.12.0...v1.13.0) (2023-10-28)
 
 
