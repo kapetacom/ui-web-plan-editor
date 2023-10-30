@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.13.1...v1.14.0) (2023-10-30)
+
+
+### Features
+
+* add support for data-kap-id selectors on planner components ([#110](https://github.com/kapetacom/ui-web-plan-editor/issues/110)) ([16cd0cd](https://github.com/kapetacom/ui-web-plan-editor/commit/16cd0cd4a2e9fc5befda683371b5b774613ae16a))
+
 ## [1.13.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.13.0...v1.13.1) (2023-10-30)
 
 
