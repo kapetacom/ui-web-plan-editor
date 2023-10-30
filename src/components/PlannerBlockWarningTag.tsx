@@ -59,6 +59,7 @@ export const PlannerBlockWarningTag = forwardRef<SVGSVGElement, PlannerBlockWarn
                             width={25}
                             height={40}
                             onClick={props.onClick}
+                            data-kap-id="planner-block-warning-tag"
                         >
                             <defs>
                                 <filter id="banner-shadow" x="-100%" y="-100%" width="300%" height="300%">

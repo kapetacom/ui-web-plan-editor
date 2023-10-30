@@ -58,9 +58,28 @@ function toActionName(action: ActionType): string {
             return 'Select alternative type';
         case ActionType.REMOVE_BLOCK:
             return 'Remove block from plan';
+        default:
+            return '';
     }
+}
 
-    return '';
+function toActionId(action: ActionType): string {
+    switch (action) {
+        case ActionType.INSTALL:
+            return 'install';
+        case ActionType.SELECT_LOCAL_VERSION:
+            return 'select-local';
+        case ActionType.SELECT_ALTERNATIVE_VERSION:
+            return 'change-version';
+        case ActionType.SELECT_ALTERNATIVE_TYPE:
+            return 'change-type';
+        case ActionType.REMOVE_BLOCK:
+            return 'remove';
+        case ActionType.NONE:
+            return 'none';
+        default:
+            return '';
+    }
 }
 
 export const ActionSelector = (props: ActionSelectorProps) => {
@@ -118,6 +137,7 @@ export const ActionSelector = (props: ActionSelectorProps) => {
     return (
         <FormControl error={hasError}>
             <Select
+                data-kap-id="resolution-selector"
                 sx={{
                     width: '240px',
                 }}
@@ -129,10 +149,12 @@ export const ActionSelector = (props: ActionSelectorProps) => {
                     });
                 }}
             >
-                <MenuItem value={ActionType.NONE}>Select action...</MenuItem>
+                <MenuItem value={ActionType.NONE} data-kap-id="none">
+                    Select action...
+                </MenuItem>
                 {props.availableActions.map((action, ix) => {
                     return (
-                        <MenuItem key={ix} value={action}>
+                        <MenuItem key={ix} value={action} data-kap-id={`resolve-${toActionId(action)}`}>
                             {toActionName(action)}
                         </MenuItem>
                     );

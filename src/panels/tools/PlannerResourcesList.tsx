@@ -75,7 +75,12 @@ export const PlannerResourcesList = (props: Props) => {
                         textAlign: 'center',
                     }}
                 >
-                    <Button size="small" onClick={props.onShowMoreAssets} variant="outlined">
+                    <Button
+                        size="small"
+                        onClick={props.onShowMoreAssets}
+                        variant="outlined"
+                        data-kap-id="resources-open-blockhub"
+                    >
                         More assets
                     </Button>
                 </Box>
