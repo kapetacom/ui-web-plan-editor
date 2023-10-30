@@ -52,6 +52,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 icon: 'fa fa-search',
                 label: 'Inspect',
                 warningInspector: true,
+                kapId: 'inspect-block-instance',
             },
             {
                 enabled(): boolean {
@@ -63,6 +64,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 buttonStyle: ButtonStyle.PRIMARY,
                 icon: 'fa fa-play',
                 label: 'Test',
+                kapId: 'test-button',
             },
             {
                 enabled(context, { blockInstance }): boolean {
@@ -84,6 +86,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 buttonStyle: ButtonStyle.DANGER,
                 icon: 'fa fa-trash',
                 label: 'Delete',
+                kapId: 'delete-block-instance',
             },
             {
                 enabled(context, { blockInstance }): boolean {
@@ -103,6 +106,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 buttonStyle: ButtonStyle.SECONDARY,
                 icon: 'fa fa-pencil',
                 label: 'Edit',
+                kapId: 'edit-block-instance',
             },
             {
                 enabled(context, { blockInstance }): boolean {
@@ -139,6 +143,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 buttonStyle: ButtonStyle.SECONDARY,
                 icon: 'fa fa-pencil',
                 label: 'Edit',
+                kapId: 'edit-resource',
             },
             {
                 enabled(context, { blockInstance }): boolean {
@@ -160,6 +165,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 buttonStyle: ButtonStyle.DANGER,
                 icon: 'fa fa-trash',
                 label: 'Delete',
+                kapId: 'delete-resource',
             },
         ],
         connection: [
@@ -191,6 +197,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 buttonStyle: ButtonStyle.DANGER,
                 icon: 'fa fa-trash',
                 label: 'Delete',
+                kapId: 'delete-connection',
             },
         ],
     };

@@ -102,6 +102,7 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnail
             <Box className="preview" flex={1}>
                 {props.installerService?.uninstall && (
                     <Chip
+                        data-kap-id="asset-thumbnail-delete-button"
                         label={deleting ? <CircularProgress size={24} /> : <Delete />}
                         variant="filled"
                         color="default"

@@ -91,6 +91,7 @@ export interface PlannerAction<P extends unknown> {
     label: string | ((planner: PlannerContextData, info: ActionContext) => string);
     onClick(planner: PlannerContextData, context: ActionContext): void | Promise<void>;
     warningInspector?: boolean;
+    kapId?: string;
 }
 
 export interface BlockInfo {

@@ -16,6 +16,7 @@ const CircleButton = (props: any) => {
     // receives some sort of focus and is moved into view when closing the sidepanel it opens
     return (
         <div
+            data-kap-id={props['data-kap-id']}
             onClick={props.onClick}
             className={`svg-circle-button ${props.className}`}
             style={{ padding: 0, border: 0, background: 'none', ...(props.style || {}) }}
@@ -125,7 +126,8 @@ export const ActionButtons = (props: ActionButtonListProps) => {
                     {renderedActions.map((action: PlannerAction<any>, ix) => {
                         return (
                             <ActionButton
-                                key={ix}
+                                key={action.kapId || ix}
+                                kapId={action.kapId}
                                 action={action}
                                 show={props.show}
                                 transitionFn={() => transitionFn(ix)}
@@ -146,6 +148,10 @@ interface ActionButtonProps {
     actionContext: ActionContext;
     show: boolean;
     transitionFn: () => any;
+    /**
+     * Used to identify the button in tests and analytics
+     */
+    kapId?: string;
 }
 
 const ActionButton = (props: ActionButtonProps) => {
@@ -176,6 +182,7 @@ const ActionButton = (props: ActionButtonProps) => {
 
     return (
         <CircleButton
+            data-kap-id={props.kapId}
             label={label}
             icon={icon}
             className={containerClass}

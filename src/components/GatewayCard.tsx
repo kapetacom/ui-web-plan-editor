@@ -117,6 +117,7 @@ export const GatewayCard = (props: GatewayCardProps) => {
                             )}
                             <KapTooltip arrow title={`${entry?.url}`}>
                                 <a
+                                    data-kap-id="open-gateway-url"
                                     href={entry?.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -164,7 +165,7 @@ export const GatewayCard = (props: GatewayCardProps) => {
                         <circle cx={4} cy={8} r={4} fill="currentColor" />
                     </Box>
                 </KapTooltip>
-                <IconButton onClick={(e) => setMenuRef(e.currentTarget)}>
+                <IconButton onClick={(e) => setMenuRef(e.currentTarget)} data-kap-id="gateway-context-menu">
                     <MoreVert />
                 </IconButton>
             </Stack>
@@ -185,6 +186,7 @@ export const GatewayCard = (props: GatewayCardProps) => {
                         props.onConfigureGateway?.();
                         setMenuRef(null);
                     }}
+                    data-kap-id="configure-gateway"
                 >
                     Configure
                 </MenuItem>
@@ -196,6 +198,7 @@ export const GatewayCard = (props: GatewayCardProps) => {
                         href={props.primary?.url || ''}
                         disabled={!props.primary?.url}
                         onClick={() => setMenuRef(null)}
+                        data-kap-id="open-custom-url"
                     >
                         Open custom URL
                     </MenuItem>
@@ -207,6 +210,7 @@ export const GatewayCard = (props: GatewayCardProps) => {
                     href={props.fallback?.url || ''}
                     disabled={!props.fallback?.url}
                     onClick={() => setMenuRef(null)}
+                    data-kap-id="open-kapeta-url"
                 >
                     {fallbackText}
                 </MenuItem>

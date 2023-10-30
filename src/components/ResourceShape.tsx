@@ -83,6 +83,8 @@ export const ResourceShape = (props: Props) => {
 
     return (
         <Box
+            data-kap-id="draggable-resource-shape"
+            className={`kap-resource-shape ${props.resource.type}`}
             onMouseDown={props.onMouseDown}
             style={{
                 left: props.position?.x,

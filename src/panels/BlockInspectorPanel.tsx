@@ -56,8 +56,12 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
                     }}
                 >
                     <Tabs value={tab} onChange={(evt, newTabId) => setTab(newTabId)}>
-                        {props.emitter && <Tab label={'Logs'} value={'logs'} />}
-                        <Tab label={`Issues (${issues.length})`} value={'issues'} />
+                        {props.emitter && <Tab label={'Logs'} value={'logs'} data-kap-id="block-inspector-log-tab" />}
+                        <Tab
+                            label={`Issues (${issues.length})`}
+                            value={'issues'}
+                            data-kap-id="block-inspector-issues-tab"
+                        />
                     </Tabs>
                     {tab === 'logs' && (
                         <Box
