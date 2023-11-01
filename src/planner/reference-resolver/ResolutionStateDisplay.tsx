@@ -21,7 +21,7 @@ export const ResolutionStateDisplay = (props: Props) => {
         case ResolutionStateType.ACTIVE:
             message = 'Applying...';
             color = 'info.main';
-            icon = <CircularProgress color="inherit" />;
+            icon = <CircularProgress size={20} color="inherit" />;
             break;
         case ResolutionStateType.DONE:
             message = 'Done';
