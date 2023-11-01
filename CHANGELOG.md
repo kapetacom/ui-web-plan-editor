@@ -1,3 +1,10 @@
+## [1.15.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.15.0...v1.15.1) (2023-11-01)
+
+
+### Bug Fixes
+
+* Prevent doing the same solution twice at the same time ([#112](https://github.com/kapetacom/ui-web-plan-editor/issues/112)) ([39300ea](https://github.com/kapetacom/ui-web-plan-editor/commit/39300ea0fbbbe5865c962bc86efd4bea2bc9ee2e))
+
 # [1.15.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.14.0...v1.15.0) (2023-11-01)
 
 
