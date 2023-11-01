@@ -39,7 +39,7 @@ export const PublicUrlList = withErrorBoundary(
             });
 
         return (
-            <Stack gap={2}>
+            <Stack gap={2} sx={{ py: 3 }}>
                 <Typography>Public URLs will be available on all gateways in the plan.</Typography>
 
                 {gateways.length ? (

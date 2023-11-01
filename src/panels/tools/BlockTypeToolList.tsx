@@ -14,21 +14,8 @@ interface Props {
 
 export const BlockTypeToolList = (props: Props) => {
     return (
-        <Box
-            className={'planner-block-type-list'}
-            sx={{
-                pb: 2,
-            }}
-        >
-            <Stack
-                direction={'row'}
-                alignItems={'flex-start'}
-                flexWrap={'wrap'}
-                sx={{
-                    mt: 2,
-                }}
-                gap={2}
-            >
+        <Box className="planner-block-type-list">
+            <Stack direction="row" alignItems="flex-start" flexWrap="wrap" gap={2}>
                 {props.blockTypes.map((blockType, ix) => {
                     return <BlockTypeTool key={`block-type-${ix}`} blockType={blockType} />;
                 })}

@@ -4,7 +4,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { IResourceTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceToolList } from './ResourceToolList';
@@ -40,38 +40,53 @@ export const PlannerResourcesList = (props: Props) => {
     }, []);
 
     return (
-        <Box>
-            <Box className="resources" data-kap-id={'plan-editor-resource-container'}>
+        <Stack gap={4} sx={{ py: 3 }}>
+            <Stack className="resources" data-kap-id="plan-editor-resource-container" gap={2}>
+                <Typography
+                    fontSize={HEADER_SIZE}
+                    fontWeight={700}
+                    sx={{ display: 'inline-flex', alignItems: 'center' }}
+                >
+                    Resources
+                    <TipIcon
+                        readMoreLink="https://docs.kapeta.com/docs/blocks#resources"
+                        content="Resources are plugins you can use to define what your block requires to function. Drag and drop a resource to a block to connect it."
+                    />
+                </Typography>
                 <ResourceToolList
                     title="Consumers"
-                    dataKapId={'plan-editor-resource-consumers'}
-                    description={'Drag consumers to your blocks to add dependencies on external resources.'}
-                    readMoreLink={'https://docs.kapeta.com/docs/resource-types'}
+                    dataKapId="plan-editor-resource-consumers"
+                    description="Drag consumers to your blocks to add dependencies on external resources."
+                    readMoreLink="https://docs.kapeta.com/docs/resource-types"
                     resources={consumerResources}
                 />
                 <ResourceToolList
                     title="Providers"
-                    dataKapId={'plan-editor-resource-providers'}
-                    description={'Drag providers to your blocks to provide new functionality to your plan.'}
-                    readMoreLink={'https://docs.kapeta.com/docs/resource-types'}
+                    dataKapId="plan-editor-resource-providers"
+                    description="Drag providers to your blocks to provide new functionality to your plan."
+                    readMoreLink="https://docs.kapeta.com/docs/resource-types"
                     resources={providerResources}
                 />
-            </Box>
-            <Box className="block-types" data-kap-id={'plan-editor-resource-block-types'}>
-                <Typography fontSize={HEADER_SIZE} sx={{ pt: 1, pb: 1 }} fontWeight={700}>
+            </Stack>
+            <Stack className="block-types" data-kap-id="plan-editor-resource-block-types" gap={2}>
+                <Typography
+                    fontSize={HEADER_SIZE}
+                    fontWeight={700}
+                    sx={{ display: 'inline-flex', alignItems: 'center' }}
+                >
                     Blocks
                     <TipIcon
-                        readMoreLink={'https://docs.kapeta.com/docs/blocks'}
+                        readMoreLink="https://docs.kapeta.com/docs/blocks"
                         content="Blocks are used to build your plan. Drag and drop blocks to the canvas to create a new one."
                     />
                 </Typography>
                 <BlockTypeToolList blockTypes={blockTypes} />
-            </Box>
+            </Stack>
             {props.onShowMoreAssets && (
                 <Box
-                    data-kap-id={'plan-editor-resource-show-more'}
+                    data-kap-id="plan-editor-resource-show-more"
                     sx={{
-                        p: 5,
+                        p: 2,
                         textAlign: 'center',
                     }}
                 >
@@ -85,6 +100,6 @@ export const PlannerResourcesList = (props: Props) => {
                     </Button>
                 </Box>
             )}
-        </Box>
+        </Stack>
     );
 };
