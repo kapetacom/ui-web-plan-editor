@@ -46,11 +46,12 @@ export const Tile = (props: PropsWithChildren & { sx?: SxProps }) => {
 export const ReferenceTile = (props: {
     title: string;
     subtitle: string | ReactNode;
+    blockTitle?: string;
     kind: string;
     icon?: IconValue;
 }) => {
-    const blockTitle = props.title;
-    const blockSubTitle = props.subtitle;
+    const referenceTitle = props.title;
+    const referenceSubTitle = props.subtitle;
     return (
         <Tile
             sx={{
@@ -67,9 +68,14 @@ export const ReferenceTile = (props: {
                 }}
             >
                 <Typography fontSize={'inherit'} fontWeight={500}>
-                    {blockTitle}
+                    {referenceTitle}
                 </Typography>
-                <Typography fontSize={'inherit'}>{blockSubTitle}</Typography>
+                <Typography fontSize={'inherit'}>{referenceSubTitle}</Typography>
+                {props.blockTitle && (
+                    <Typography fontSize={'inherit'} sx={{ b: { fontWeight: 500 } }}>
+                        within block <b>{props.blockTitle}</b>
+                    </Typography>
+                )}
             </Box>
         </Tile>
     );
