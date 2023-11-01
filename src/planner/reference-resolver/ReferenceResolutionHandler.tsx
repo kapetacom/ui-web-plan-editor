@@ -35,6 +35,10 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
         return resolutions?.some((r) => r.resolution?.action === ActionType.NONE_AVAILABLE) || false;
     }, [resolutions]);
 
+    const allInstallable = useMemo(() => {
+        return resolutions?.every((r) => r.resolution?.action === ActionType.INSTALL) || false;
+    }, [resolutions]);
+
     useEffect(() => {
         if (props.open || props.inline) {
             // Reset state whenever the modal is opened
@@ -77,7 +81,7 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
                 }
             }}
         >
-            Apply changes
+            {allInstallable ? 'Install now' : 'Apply changes'}
         </KapButton>
     ) : null;
 

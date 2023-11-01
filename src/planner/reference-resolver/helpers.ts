@@ -5,10 +5,11 @@
 
 import { useEffect, useMemo } from 'react';
 import { ReferenceType } from '../validation/PlanReferenceValidation';
-import { ProviderBase } from '@kapeta/ui-web-types';
-import { AssetVersionSelectorEntry } from '@kapeta/ui-web-components';
+import { ProviderBase, ResourceRole } from '@kapeta/ui-web-types';
+import { AssetVersionSelectorEntry, CoreTypes } from '@kapeta/ui-web-components';
 import { normalizeKapetaUri } from '@kapeta/nodejs-utils';
 import { ActionType, InnerItemProps } from './types';
+import { BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 export function shortenPathName(path: string) {
     const parts = path.split(/[\\/]/g);
@@ -74,4 +75,34 @@ export const providerToSelectorMapper = (provider: ProviderBase<any>): AssetVers
         icon: provider.icon,
         title: provider.title,
     };
+};
+
+export const referenceTypeToKind = (type: ReferenceType) => {
+    switch (type) {
+        case ReferenceType.TARGET:
+            return CoreTypes.LANGUAGE_TARGET;
+        case ReferenceType.PROVIDER:
+            return CoreTypes.PROVIDER_INTERNAL;
+        case ReferenceType.CONSUMER:
+            return CoreTypes.PROVIDER_INTERNAL;
+        case ReferenceType.KIND:
+            return CoreTypes.BLOCK_TYPE;
+    }
+
+    return '';
+};
+
+export const referenceTypeToName = (type: ReferenceType) => {
+    switch (type) {
+        case ReferenceType.TARGET:
+            return 'Language target';
+        case ReferenceType.PROVIDER:
+            return 'Provider resource';
+        case ReferenceType.CONSUMER:
+            return 'Consumer resource';
+        case ReferenceType.KIND:
+            return 'Block Type';
+        case ReferenceType.BLOCK:
+            return 'Block';
+    }
 };

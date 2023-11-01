@@ -72,7 +72,7 @@ const assetCanBeInstalled = (ref: string) => {
 };
 const installAsset = (ref: string) => {
     console.log('INSTALL', ref);
-    return Promise.resolve();
+    return new Promise<void>((resolve) => setTimeout(() => resolve(), 3000 * Math.random()));
 };
 
 const onChange = (resolution: MissingReferenceResolution[], valid: boolean) => {
@@ -158,6 +158,28 @@ export const WriteableContextModal = () => {
                     onClose={() => {}}
                     blockAssets={blocks.value!.map(fromAsset)}
                     assetCanBeInstalled={assetCanBeInstalled}
+                    installAsset={installAsset}
+                    readOnly={false}
+                    missingReferences={createMissingReferences('local')}
+                    selectAssetFromDisk={selectAssetFromDisk}
+                />
+            )}
+        </>
+    );
+};
+
+export const WriteableContextAllInstallModal = () => {
+    const blocks = useAsync(() => BlockService.list());
+
+    return (
+        <>
+            {!blocks.loading && (
+                <ReferenceResolutionHandler
+                    plan={InvalidPlannerData}
+                    open={true}
+                    onClose={() => {}}
+                    blockAssets={blocks.value!.map(fromAsset)}
+                    assetCanBeInstalled={(ref) => Promise.resolve(true)}
                     installAsset={installAsset}
                     readOnly={false}
                     missingReferences={createMissingReferences('local')}

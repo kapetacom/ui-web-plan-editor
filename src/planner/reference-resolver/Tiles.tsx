@@ -22,6 +22,7 @@ export function createSubTitle(hasVersionAlternatives: boolean, refUri: KapetaUR
 export const Tile = (props: PropsWithChildren & { sx?: SxProps }) => {
     return (
         <Stack
+            className={'tile'}
             direction={'row'}
             gap={1}
             alignItems={'center'}

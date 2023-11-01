@@ -37,6 +37,7 @@ export const ResolutionStateDisplay = (props: Props) => {
 
     return (
         <Stack
+            className={'resolution-state'}
             sx={{
                 color,
             }}

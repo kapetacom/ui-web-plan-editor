@@ -39,12 +39,14 @@ export const ReferenceResolverItem = (props: ItemProps) => {
         );
     }
 
+    const canInstallValue = Boolean(canInstall.value);
+
     if (props.missingReference.type === ReferenceType.BLOCK) {
         return (
             <BlockReferenceResolverItem
                 {...props}
                 readOnlyBlock={readOnlyBlock}
-                canInstall={Boolean(canInstall.value)}
+                canInstall={canInstallValue}
                 blockUri={blockUri}
                 refUri={refUri}
             />
@@ -55,7 +57,7 @@ export const ReferenceResolverItem = (props: ItemProps) => {
         <ProviderReferenceResolverItem
             {...props}
             readOnlyBlock={readOnlyBlock}
-            canInstall={Boolean(canInstall.value)}
+            canInstall={canInstallValue}
             blockUri={blockUri}
             refUri={refUri}
         />
