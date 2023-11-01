@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import { IResourceTypeProvider, ItemType, Point } from '@kapeta/ui-web-types';
-import { Box, Divider, Portal, Stack, Typography } from '@mui/material';
+import { IResourceTypeProvider, Point } from '@kapeta/ui-web-types';
+import { Divider, Portal, Stack, SxProps, Typography } from '@mui/material';
 import { DragAndDrop } from '../../planner/utils/dndUtils';
 
 import React, { useState } from 'react';
@@ -18,6 +18,7 @@ interface Props {
     description?: string | React.ReactNode;
     readMoreLink?: string;
     resources: IResourceTypeProvider[];
+    sx?: SxProps;
 }
 
 export const ResourceToolList = (props: Props) => {
@@ -27,41 +28,34 @@ export const ResourceToolList = (props: Props) => {
 
     return (
         <>
-            <Stack
-                direction={'column'}
-                className={'planner-resource-list'}
-                data-kap-id={props.dataKapId}
-                sx={{
-                    pb: 2,
-                    pt: 2,
-                }}
-            >
+            <Stack className="planner-resource-list" data-kap-id={props.dataKapId} sx={props.sx}>
                 <Stack
-                    direction={'row'}
-                    justifyContent={'center'}
-                    alignItems={'center'}
-                    className={'planner-resource-list-header'}
+                    direction="row"
+                    justifyContent="center"
+                    alignItems="center"
+                    className="planner-resource-list-header"
                     gap={1}
                 >
                     <Divider
-                        flexItem={true}
+                        flexItem
                         sx={{
                             flex: 1,
                             height: 6,
                         }}
                     />
                     <Typography
-                        color={'text.secondary'}
-                        whiteSpace={'nowrap'}
+                        color="text.secondary"
+                        whiteSpace="nowrap"
                         flex={0}
-                        fontSize={'12px'}
-                        lineHeight={'12px'}
+                        fontSize="12px"
+                        lineHeight="12px"
+                        sx={{ display: 'inline-flex', alignItems: 'center' }}
                     >
                         {props.title}
                         {props.description && <TipIcon content={props.description} readMoreLink={props.readMoreLink} />}
                     </Typography>
                     <Divider
-                        flexItem={true}
+                        flexItem
                         sx={{
                             flex: 1,
                             height: 6,
@@ -69,9 +63,9 @@ export const ResourceToolList = (props: Props) => {
                     />
                 </Stack>
                 <Stack
-                    direction={'row'}
-                    alignItems={'flex-start'}
-                    flexWrap={'wrap'}
+                    direction="row"
+                    alignItems="flex-start"
+                    flexWrap="wrap"
                     sx={{
                         mt: 2,
                     }}

@@ -12,7 +12,7 @@ interface Props {
     content: string | React.ReactNode;
     readMoreLink?: string;
     fontSize?: SvgIconProps['fontSize'];
-    color?: string;
+    color?: SvgIconProps['color'];
     placement?: TooltipProps['placement'];
 }
 
@@ -26,7 +26,7 @@ export const TipIcon = (props: Props) => {
                     {props.readMoreLink && (
                         <>
                             <br />
-                            <a href={props.readMoreLink} target={'_blank'}>
+                            <a href={props.readMoreLink} target="_blank">
                                 Read more
                             </a>
                         </>
@@ -38,7 +38,7 @@ export const TipIcon = (props: Props) => {
                 fontSize={props.fontSize ?? 'inherit'}
                 sx={{
                     ml: 0.5,
-                    color: props.color ?? 'secondary.main',
+                    color: props.color ?? 'action.active',
                     lineHeight: 'inherit',
                     cursor: 'help',
                     display: 'inline-block',
