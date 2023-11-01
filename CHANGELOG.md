@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.14.0...v1.15.0) (2023-11-01)
+
+
+### Features
+
+* Change tab resources to assets ([1c51d98](https://github.com/kapetacom/ui-web-plan-editor/commit/1c51d98105d561314c2d4e999e6e0944fabc4c52))
+
 # [1.14.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.13.1...v1.14.0) (2023-10-30)
 
 
