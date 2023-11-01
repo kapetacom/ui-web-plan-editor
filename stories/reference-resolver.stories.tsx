@@ -57,6 +57,12 @@ const createMissingReferences = (blockVersion: string): MissingReference[] => {
             ref: 'kapeta/language-target-java-spring-boot:2.2.0',
             instanceTitle: 'User',
         },
+        {
+            type: ReferenceType.TARGET,
+            blockRef: 'kapeta/todo:' + blockVersion,
+            ref: 'kapeta/language-target-java-spring-boot:2.2.0',
+            instanceTitle: 'User',
+        },
     ];
 };
 

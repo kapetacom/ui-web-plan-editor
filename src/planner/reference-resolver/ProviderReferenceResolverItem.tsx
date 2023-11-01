@@ -91,12 +91,16 @@ export const ProviderReferenceResolverItem = (props: InnerItemProps) => {
 
     let message = alternativeVersions.length > 0 ? `${typeName} version not found` : `${typeName} not found`;
 
+    const blockInstance = props.plan?.spec?.blocks?.find((b) => b.id === props.missingReference.instanceId);
+
+    const blockTitle = blockInstance?.name ?? blockAsset.content.metadata.title ?? blockAsset.content.metadata.name;
+
     const subtitle = createSubTitle(alternativeVersions.length > 0, props.refUri);
 
     return (
         <TableRow>
             <TableCell>
-                <ReferenceTile title={message} subtitle={subtitle} kind={kind} icon={icon} />
+                <ReferenceTile blockTitle={blockTitle} title={message} subtitle={subtitle} kind={kind} icon={icon} />
             </TableCell>
             <TableCell align={'center'}>
                 <ArrowForward />

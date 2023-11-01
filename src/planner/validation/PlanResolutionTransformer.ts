@@ -45,6 +45,7 @@ export class PlanResolutionTransformer extends EventEmitter {
     private readonly options?: PlanResolutionOptions;
     private readonly changedBlocks: AssetInfo<BlockDefinition>[] = [];
     private resolutionStates: ResolutionState[] = [];
+    private solutions: { [key: string]: Promise<void> } = {};
     private changedPlan?: Plan;
 
     constructor(
@@ -70,7 +71,7 @@ export class PlanResolutionTransformer extends EventEmitter {
 
     public async apply(): Promise<PlanResolutionResult> {
         const errors: string[] = [];
-
+        this.solutions = {};
         const promises = this.resolutionStates.map(async ({ reference }) => {
             this.emitApplyStart(reference);
             try {
@@ -232,11 +233,18 @@ export class PlanResolutionTransformer extends EventEmitter {
     }
 
     private async importLocalVersion(kapetaYmlPath: string) {
-        return this.options?.importAsset?.(kapetaYmlPath);
+        if (!this.solutions[kapetaYmlPath]) {
+            this.solutions[kapetaYmlPath] = this.options?.importAsset?.(kapetaYmlPath) ?? Promise.resolve();
+        }
+
+        return this.solutions[kapetaYmlPath];
     }
 
     private async install(ref: string) {
-        return this.options?.installAsset?.(ref);
+        if (!this.solutions[ref]) {
+            this.solutions[ref] = this.options?.installAsset?.(ref) ?? Promise.resolve();
+        }
+        return this.solutions[ref];
     }
 
     public onApplyStart(listener: (reference: MissingReferenceResolution) => void) {
