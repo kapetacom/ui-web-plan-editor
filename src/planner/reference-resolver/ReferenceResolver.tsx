@@ -3,15 +3,32 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import { Alert, Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import { Alert, Box, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ReferenceResolverItem } from './ReferenceResolverItem';
 import { ActionType, MissingReferenceResolution, NO_RESOLUTION, ReferenceResolverProps } from './types';
 import { isResolutionValid } from './ActionSelector';
 import { Waiter } from './Waiter';
+import { createSubTitle, ReferenceTile } from './Tiles';
+import { ReferenceType } from '../validation/PlanReferenceValidation';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { referenceTypeToKind, referenceTypeToName } from './helpers';
+import { ResolutionState } from '../validation/PlanResolutionTransformer';
+import { ResolutionStateDisplay } from './ResolutionStateDisplay';
 
 interface Props extends ReferenceResolverProps {
     onDelayingCheck?: (delaying: boolean) => void;
+}
+
+function ensureUniqueReferences(missingReferences: MissingReferenceResolution[]): MissingReferenceResolution[] {
+    const uniqueRefs: { [key: string]: boolean } = {};
+    return missingReferences.filter((ref) => {
+        if (uniqueRefs[ref.ref]) {
+            return false;
+        }
+        uniqueRefs[ref.ref] = true;
+        return true;
+    });
 }
 
 export const ReferenceResolver = (props: Props) => {
@@ -66,6 +83,10 @@ export const ReferenceResolver = (props: Props) => {
         return resolutions.some((r) => r.resolution?.action === ActionType.NONE_AVAILABLE);
     }, [resolutions]);
 
+    const allInstallable = useMemo(() => {
+        return resolutions.every((r) => r.resolution?.action === ActionType.INSTALL);
+    }, [resolutions]);
+
     return (
         <Box
             className={'reference-resolver'}
@@ -73,8 +94,11 @@ export const ReferenceResolver = (props: Props) => {
                 minWidth: '900px',
             }}
         >
-            {delayingCheck && <Waiter />}
-            {!delayingCheck && (
+            {allInstallable && (
+                <AllInstallableDisplay resolutions={resolutions} resolutionStates={props.resolutionStates} />
+            )}
+            {!allInstallable && delayingCheck && <Waiter />}
+            {!allInstallable && !delayingCheck && (
                 <>
                     <Alert severity={'error'}>
                         {unresolvable ? (
@@ -138,6 +162,57 @@ export const ReferenceResolver = (props: Props) => {
                     </Table>
                 </>
             )}
+        </Box>
+    );
+};
+
+interface AllInstallableDisplayProps {
+    resolutions: MissingReferenceResolution[];
+    resolutionStates?: ResolutionState[];
+}
+
+const AllInstallableDisplay = (props: AllInstallableDisplayProps) => {
+    const uniqueRefs: { [key: string]: boolean } = {};
+
+    return (
+        <Box>
+            <Alert severity={'info'}>
+                This plan is missing some dependencies. Click "Install Now" to install them after which the plan will
+                load.
+            </Alert>
+            <Typography variant={'h6'} sx={{ my: 2 }}>
+                Assets that will be installed
+            </Typography>
+            <Stack gap={1}>
+                {props.resolutions.map((resolution, index) => {
+                    if (uniqueRefs[resolution.ref]) {
+                        // Hide duplicates
+                        return null;
+                    }
+                    uniqueRefs[resolution.ref] = true;
+                    const resolutionState = props.resolutionStates?.[index];
+                    const refUri = parseKapetaUri(resolution.ref);
+                    const kind = referenceTypeToKind(resolution.type);
+                    const title = referenceTypeToName(resolution.type);
+                    return (
+                        <Stack
+                            direction={'row'}
+                            gap={2}
+                            sx={{
+                                '& > .tile': {
+                                    flex: 1,
+                                },
+                                '& > .resolution-state': {
+                                    width: '240px',
+                                },
+                            }}
+                        >
+                            <ReferenceTile key={index} title={title} subtitle={refUri.id} kind={kind} />
+                            {resolutionState && <ResolutionStateDisplay resolutionState={resolutionState} />}
+                        </Stack>
+                    );
+                })}
+            </Stack>
         </Box>
     );
 };
