@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.15.1...v1.16.0) (2023-11-01)
+
+
+### Features
+
+* If all references can be resolved by installing show simpler UI ([#113](https://github.com/kapetacom/ui-web-plan-editor/issues/113)) ([700060d](https://github.com/kapetacom/ui-web-plan-editor/commit/700060da2610393f1d362a97a876296841511c21))
+
 ## [1.15.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.15.0...v1.15.1) (2023-11-01)
 
 
