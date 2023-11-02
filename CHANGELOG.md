@@ -1,3 +1,10 @@
+## [1.16.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.1...v1.16.2) (2023-11-02)
+
+
+### Bug Fixes
+
+* Change GatewayCard so that globe is status ([a8bc9f0](https://github.com/kapetacom/ui-web-plan-editor/commit/a8bc9f009ac473c9fbaef5b45cb2fe34e559de00))
+
 ## [1.16.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.0...v1.16.1) (2023-11-02)
 
 
