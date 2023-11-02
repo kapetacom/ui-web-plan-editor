@@ -16,7 +16,7 @@ import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { IBlockTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
 import { randomUUID } from '../../utils/cryptoUtils';
 import { BLOCK_SIZE } from './planUtils';
-import { DSL_LANGUAGE_ID, DSLConverters, DSLWriter } from '@kapeta/ui-web-components';
+import { DSL_LANGUAGE_ID, DSLConverters, DSLEntity, DSLWriter } from '@kapeta/ui-web-components';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockInfo } from '../types';
 import { AssetInfo } from '../../types';
@@ -201,7 +201,7 @@ function addEntity(entity: Entity, target?: EntityList) {
             types: target,
             source: {
                 type: DSL_LANGUAGE_ID,
-                value: DSLWriter.write(target.map(DSLConverters.fromSchemaEntity)),
+                value: DSLWriter.write(target.map(DSLConverters.fromSchemaEntity).filter(Boolean) as DSLEntity[]),
             },
         };
     }
@@ -217,7 +217,7 @@ function addEntity(entity: Entity, target?: EntityList) {
         };
     }
 
-    const code = DSLWriter.write([DSLConverters.fromSchemaEntity(entity)]);
+    const code = DSLWriter.write([DSLConverters.fromSchemaEntity(entity)].filter(Boolean) as DSLEntity[]);
     targets.source.value += '\n\n' + code;
     targets.source.value = targets.source.value.trim();
     targets.types = [...targets.types, entity];
