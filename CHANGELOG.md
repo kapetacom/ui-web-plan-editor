@@ -1,3 +1,10 @@
+## [1.16.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.0...v1.16.1) (2023-11-02)
+
+
+### Bug Fixes
+
+* bump ui-web-components and ensure compat ([#114](https://github.com/kapetacom/ui-web-plan-editor/issues/114)) ([6c63cef](https://github.com/kapetacom/ui-web-plan-editor/commit/6c63cef080fc198f51c777c78154ae9f5b380745))
+
 # [1.16.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.15.1...v1.16.0) (2023-11-01)
 
 
