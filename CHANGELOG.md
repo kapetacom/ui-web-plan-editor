@@ -1,3 +1,10 @@
+## [1.16.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.2...v1.16.3) (2023-11-03)
+
+
+### Bug Fixes
+
+* Use box-sizing border-box in the GatewayCard ([938dcd6](https://github.com/kapetacom/ui-web-plan-editor/commit/938dcd665c540c1744573b9622802a3e62a9f6ec))
+
 ## [1.16.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.1...v1.16.2) (2023-11-02)
 
 
