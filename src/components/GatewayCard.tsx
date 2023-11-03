@@ -110,7 +110,6 @@ const GlobeIcon = ({ statusText, statusColor = 'black', pulsate = false }: Globe
         <Box
             sx={{
                 position: 'relative',
-                boxSizing: 'border-box',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -183,6 +182,9 @@ export const GatewayCard = (props: GatewayCardProps) => {
                 border: '1px solid #0000003b',
                 borderRadius: 1.5,
                 width: '100%',
+                '*, *::before, *::after': {
+                    boxSizing: 'border-box',
+                },
             }}
         >
             <GlobeIcon statusText={statusText} statusColor={statusColor} pulsate={shouldPulsate} />
