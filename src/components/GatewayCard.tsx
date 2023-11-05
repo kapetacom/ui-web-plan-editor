@@ -182,7 +182,7 @@ export const GatewayCard = (props: GatewayCardProps) => {
                 border: '1px solid #0000003b',
                 borderRadius: 1.5,
                 width: '100%',
-                '*, *::before, *::after': {
+                '&, *, *::before, *::after': {
                     boxSizing: 'border-box',
                 },
             }}
