@@ -1,3 +1,10 @@
+## [1.16.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.3...v1.16.4) (2023-11-05)
+
+
+### Bug Fixes
+
+* Tweak selector to include itself ([c421565](https://github.com/kapetacom/ui-web-plan-editor/commit/c4215655d369ea7974a530b09bf5f25da2852bea))
+
 ## [1.16.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.2...v1.16.3) (2023-11-03)
 
 
