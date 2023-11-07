@@ -106,7 +106,7 @@ interface GlobeIconProps {
     pulsate?: boolean;
 }
 const GlobeIcon = ({ statusText, statusColor = 'black', pulsate = false }: GlobeIconProps) => (
-    <KapTooltip title={statusText}>
+    <KapTooltip title={statusText} disableInteractive>
         <Box
             sx={{
                 position: 'relative',
@@ -190,7 +190,7 @@ export const GatewayCard = (props: GatewayCardProps) => {
             <GlobeIcon statusText={statusText} statusColor={statusColor} pulsate={shouldPulsate} />
 
             <Stack sx={{ flexGrow: 1, overflow: 'hidden' }}>
-                <KapTooltip arrow title={props.title} placement="top">
+                <KapTooltip arrow title={props.title} placement="top" disableInteractive>
                     <Typography variant="body2" fontSize={12} fontWeight={600} noWrap>
                         {props.title}
                     </Typography>
@@ -199,13 +199,13 @@ export const GatewayCard = (props: GatewayCardProps) => {
                 {entry?.url ? (
                     <Stack direction="row" alignItems="center" gap={0.5} height={18} fontSize={11}>
                         {entry.status === 'error' ? (
-                            <KapTooltip arrow title={entry.message}>
+                            <KapTooltip arrow title={entry.message} disableInteractive>
                                 <LinkOff fontSize="small" color="error" />
                             </KapTooltip>
                         ) : (
                             <Link fontSize="small" />
                         )}
-                        <KapTooltip arrow title={`${entry?.url}`}>
+                        <KapTooltip arrow title={`${entry?.url}`} disableInteractive>
                             <Typography variant="body2" fontSize={12} noWrap>
                                 {entry?.url?.replace(/https?:\/\//, '')}
                             </Typography>
