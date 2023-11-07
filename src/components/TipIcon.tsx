@@ -33,6 +33,7 @@ export const TipIcon = (props: Props) => {
                     )}
                 </>
             }
+            leaveDelay={200}
         >
             <InfoOutlined
                 fontSize={props.fontSize ?? 'inherit'}
