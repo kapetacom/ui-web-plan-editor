@@ -4,8 +4,6 @@
  */
 
 import React, { useContext, useMemo } from 'react';
-import { TabContainer, TabPage } from '@kapeta/ui-web-components';
-
 import './BlockInspectorPanel.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
@@ -46,7 +44,7 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
     }, [props.instance]);
 
     return (
-        <PlannerSidebar title={title} open={props.open} size={'large'} onClose={props.onClosed}>
+        <PlannerSidebar title={title} open={props.open} size="large" onClose={props.onClosed} minWidth={400}>
             {props.instance && (
                 <Stack
                     direction={'column'}

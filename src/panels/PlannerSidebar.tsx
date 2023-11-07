@@ -6,36 +6,57 @@
 import React, { PropsWithChildren } from 'react';
 import { DrawerProps, Drawer, Typography, Divider, Box, Stack, IconButton } from '@mui/material';
 import { CloseRounded } from '@mui/icons-material';
+import { VerticalResizeHandle, useResize } from './useResize';
 
-interface Props extends PropsWithChildren, Omit<DrawerProps, 'children'> {
+interface PlannerSidebarProps extends PropsWithChildren, Omit<DrawerProps, 'children' | 'anchor'> {
+    /**
+     * The title of the planner sidebar
+     */
     title: string;
+    /**
+     * The size of the planner sidebar. Default is 'medium' (600px).
+     */
     size?: 'small' | 'medium' | 'large';
+    /**
+     * Minimum width of the planner sidebar. Default is 400.
+     */
+    minWidth?: number;
+    /**
+     * Maximum width of the planner sidebar
+     */
+    maxWidth?: number;
 }
 
-export const PlannerSidebar = (props: Props) => {
-    const propsCopy: any = { ...props };
-    delete propsCopy.title;
-    let width = '680px';
-    switch (props.size) {
-        case 'large':
-            width = 'calc(100% - 530px)';
-            break;
-        case 'medium':
-            width = 'calc(100% - 730px)';
-    }
+const sizeToWidth = {
+    small: 400,
+    medium: 600,
+    large: 800,
+};
+
+export const PlannerSidebar = (props: PlannerSidebarProps) => {
+    const { title, size = 'medium', minWidth = sizeToWidth.small, maxWidth, children, ...drawerProps } = props;
+
+    const { onResize, ...resizeWidths } = useResize({
+        direction: 'left',
+        initialWidth: sizeToWidth[size],
+        minWidth,
+        maxWidth,
+    });
+
     return (
         <Drawer
-            className={'kap-planner-sidebar'}
-            anchor={'right'}
+            className="kap-planner-sidebar"
             sx={{
+                position: 'relative',
                 '& .MuiDrawer-paper': {
-                    width: width,
                     p: 4,
                     boxSizing: 'border-box',
-                    overflow: 'hidden',
+                    overflow: 'visible',
+                    ...resizeWidths,
                 },
             }}
-            {...propsCopy}
+            {...drawerProps}
+            anchor="right"
         >
             <Stack
                 sx={{
@@ -55,15 +76,15 @@ export const PlannerSidebar = (props: Props) => {
                         }}
                     >
                         <Typography fontSize={'inherit'} variant={'h3'}>
-                            {props.title}
+                            {title}
                         </Typography>
                         <IconButton
                             sx={{
                                 fontSize: 'inherit',
                             }}
                             onClick={(evt) => {
-                                if (props.onClose) {
-                                    props.onClose(evt, 'escapeKeyDown');
+                                if (drawerProps.onClose) {
+                                    drawerProps.onClose(evt, 'escapeKeyDown');
                                 }
                             }}
                         >
@@ -79,9 +100,11 @@ export const PlannerSidebar = (props: Props) => {
                     }}
                     className={'kap-planner-sidebar-content'}
                 >
-                    {props.children}
+                    {children}
                 </Box>
             </Stack>
+
+            <VerticalResizeHandle onResize={onResize} placement="left" />
         </Drawer>
     );
 };
