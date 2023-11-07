@@ -1,3 +1,11 @@
+## [1.16.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.4...v1.16.5) (2023-11-07)
+
+
+### Bug Fixes
+
+* Add leave delay to make it easier to keep the tooltip open when moving to it ([1c2f726](https://github.com/kapetacom/ui-web-plan-editor/commit/1c2f726b282653cbf948d4e7a872ce60e84e54f5))
+* Disable interactive on gateway card tooltips ([aee0058](https://github.com/kapetacom/ui-web-plan-editor/commit/aee0058c622288c74fd2f21a4d52dce2dd5ec15c))
+
 ## [1.16.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.3...v1.16.4) (2023-11-05)
 
 
