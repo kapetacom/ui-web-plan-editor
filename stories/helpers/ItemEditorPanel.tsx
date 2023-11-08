@@ -238,7 +238,7 @@ export const ItemEditorPanel: React.FC<Props> = (props) => {
     }, [props.editableItem]);
 
     return (
-        <PlannerSidebar title={panelHeader()} anchor={'right'} open={!!props.open} onClose={props.onClose}>
+        <PlannerSidebar title={panelHeader()} minWidth={400} open={!!props.open} onClose={props.onClose}>
             {initialValue && props.editableItem && (
                 <div className="item-editor-panel">
                     <FormContainer
