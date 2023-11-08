@@ -1,3 +1,10 @@
+## [1.17.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.17.0...v1.17.1) (2023-11-08)
+
+
+### Bug Fixes
+
+* Disable user selection while resizing ([c28bfd5](https://github.com/kapetacom/ui-web-plan-editor/commit/c28bfd55a67e49da1a6e8f8bb1ba6c03fc80e38e))
+
 # [1.17.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.5...v1.17.0) (2023-11-08)
 
 
