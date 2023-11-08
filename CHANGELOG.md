@@ -1,3 +1,15 @@
+# [1.17.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.5...v1.17.0) (2023-11-08)
+
+
+### Bug Fixes
+
+* Add license ([c104f87](https://github.com/kapetacom/ui-web-plan-editor/commit/c104f8762177e3da0a4cd7c7fa769163aba46bcb))
+
+
+### Features
+
+* Resizeable PlannerSidebar ([283fc56](https://github.com/kapetacom/ui-web-plan-editor/commit/283fc56c629ba9fc85afcd5a5a625b7e4349cad3))
+
 ## [1.16.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.16.4...v1.16.5) (2023-11-07)
 
 
