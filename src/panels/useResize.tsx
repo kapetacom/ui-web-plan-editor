@@ -79,6 +79,7 @@ export const useResize = (props: UseResizeProps) => {
 
     return {
         onResize,
+        isResizing,
         width: `min(${width}px, 100%)`,
         minWidth: `${minWidth}px`,
     };
