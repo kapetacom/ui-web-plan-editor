@@ -36,7 +36,7 @@ const sizeToWidth = {
 export const PlannerSidebar = (props: PlannerSidebarProps) => {
     const { title, size = 'medium', minWidth = sizeToWidth.small, maxWidth, children, ...drawerProps } = props;
 
-    const { onResize, ...resizeWidths } = useResize({
+    const { onResize, isResizing, ...resizeWidths } = useResize({
         direction: 'left',
         initialWidth: sizeToWidth[size],
         minWidth,
@@ -52,6 +52,7 @@ export const PlannerSidebar = (props: PlannerSidebarProps) => {
                     p: 4,
                     boxSizing: 'border-box',
                     overflow: 'visible',
+                    ...(isResizing ? { userSelect: 'none' } : {}),
                     ...resizeWidths,
                 },
             }}
