@@ -16,7 +16,7 @@ import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { IBlockTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
 import { randomUUID } from '../../utils/cryptoUtils';
 import { BLOCK_SIZE } from './planUtils';
-import { DSL_LANGUAGE_ID, DSLConverters, DSLEntity, DSLWriter } from '@kapeta/ui-web-components';
+import { DSL_LANGUAGE_ID, DSLConverters, DSLEntity, DSLWriter } from '@kapeta/dsl-editor';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockInfo } from '../types';
 import { AssetInfo } from '../../types';
