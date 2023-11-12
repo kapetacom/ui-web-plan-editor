@@ -50,6 +50,7 @@
         "react-use": ">=17"
     },
     "dependencies": {
+        "@kapeta/dsl-editor": "^1.0.0",
         "@types/lodash": "^4.14.185",
         "@types/node": "^20.8.9",
         "@types/pathfinding": "^0.0.8",
