@@ -1,3 +1,10 @@
+# [1.18.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.17.1...v1.18.0) (2023-11-12)
+
+
+### Features
+
+* Copy indirectly used entities when copying resource ([#122](https://github.com/kapetacom/ui-web-plan-editor/issues/122)) ([564c3e6](https://github.com/kapetacom/ui-web-plan-editor/commit/564c3e60448ca369ca7d45c5896a7dfa30f2ee33))
+
 ## [1.17.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.17.0...v1.17.1) (2023-11-08)
 
 
