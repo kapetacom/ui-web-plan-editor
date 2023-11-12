@@ -9,8 +9,12 @@ import {
     BlockResource,
     Entity,
     EntityList,
+    isBuiltInType,
+    isDTO,
+    isList,
     isSchemaEntityCompatible,
     Resource,
+    typeName,
 } from '@kapeta/schemas';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { IBlockTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
@@ -20,6 +24,7 @@ import { DSL_LANGUAGE_ID, DSLConverters, DSLEntity, DSLWriter } from '@kapeta/ui
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockInfo } from '../types';
 import { AssetInfo } from '../../types';
+import _ from 'lodash';
 
 export function createBlockInstanceForBlock(blockAsset: AssetInfo<BlockDefinition>): BlockInstance {
     return {
@@ -106,19 +111,37 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
     const fromEntities = provider.block.spec.entities?.types ?? [];
 
     // Get entities in use by resource being copied
-    const entityNames = ResourceTypeProvider.resolveEntities(provider.resource);
+    const directUseEntities = ResourceTypeProvider.resolveEntities(provider.resource);
 
-    // Convert resource to consumable resource
-    const newResource = ResourceTypeProvider.convertToConsumable(provider.resource);
-
-    entityNames.forEach((entityName) => {
+    // Get entities in use by entities in use by resource being copied
+    const referencedEntities: string[] = [];
+    directUseEntities.forEach((entityName) => {
         const entity = fromEntities.find((e) => e.name === entityName);
         if (!entity) {
             return;
         }
 
+        resolveEntitiesFromEntity(entity, fromEntities).forEach((e) => {
+            if (referencedEntities.indexOf(e.name) === -1) {
+                referencedEntities.push(e.name);
+            }
+        });
+    });
+
+    // Convert resource to consumable resource
+    const newResource = ResourceTypeProvider.convertToConsumable(provider.resource);
+
+    const allEntities = new Set<string>([...directUseEntities, ...referencedEntities]);
+    const newEntities: Entity[] = [];
+    const renamedEntities: { [from: string]: string } = {};
+    allEntities.forEach((entityName) => {
+        const fromEntity = fromEntities.find((e) => e.name === entityName);
+        if (!fromEntity) {
+            return;
+        }
+
         // See if target block already has an entity that is identical to this one
-        const existingEntity = getMatchingEntity(consumerBlock, entity, fromEntities);
+        const existingEntity = getMatchingEntityForName(consumerBlock, fromEntity, fromEntities);
         if (existingEntity) {
             // If already there no need to do anything
             return;
@@ -126,29 +149,81 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
 
         let conflictingEntity;
         let conflictCount = 1;
-        const originalName = entity.name;
-        do {
-            // Check if an entity exists of the same name - but different properties
-            conflictingEntity = getConflictingEntity(consumerBlock, entity, fromEntities);
+        const originalName = fromEntity.name;
+        let addEntity = true;
+        let toEntity = getMatchingEntityForSchema(consumerBlock, fromEntity, fromEntities);
+        if (toEntity) {
+            addEntity = false;
+        } else {
+            toEntity = _.cloneDeep(fromEntity);
 
-            if (conflictingEntity) {
-                // We need to rename the new entity and all references to it to be able to add it to the target block.
-                entity.name = `${originalName}_${conflictCount}`;
-                conflictCount++;
+            do {
+                // Check if an entity exists of the same name - but different properties
+                conflictingEntity = getConflictingEntity(consumerBlock, toEntity, fromEntities);
+
+                if (conflictingEntity) {
+                    // We need to rename the new entity and all references to it to be able to add it to the target block.
+                    toEntity.name = `${originalName}_${conflictCount}`;
+                    conflictCount++;
+                }
+            } while (conflictingEntity);
+        }
+        if (toEntity.name !== originalName) {
+            // See if target block already has an entity that is identical to this one
+            if (addEntity && getMatchingEntityForName(consumerBlock, toEntity, fromEntities)) {
+                // If already there do not add
+                addEntity = false;
             }
-        } while (conflictingEntity);
 
-        if (entity.name !== originalName) {
-            // We need to change our references
-            ResourceTypeProvider.renameEntityReferences(newResource, originalName, entity.name);
+            if (directUseEntities.includes(originalName)) {
+                // We need to change the ref name in the resource
+                ResourceTypeProvider.renameEntityReferences(newResource, originalName, toEntity.name);
+            }
+
+            renamedEntities[originalName] = toEntity.name;
         }
 
+        if (addEntity) {
+            newEntities.push(toEntity);
+        }
+    });
+
+    applyEntityNameChanges(newEntities, renamedEntities);
+
+    newEntities.forEach((entity) => {
         consumerBlock.spec.entities = addEntity(entity, consumerBlock.spec.entities);
     });
 
     newResource.metadata.name = resourceName;
 
     return newResource;
+}
+
+export function applyEntityNameChanges(entities: Entity[], nameChanges: { [from: string]: string }): void {
+    Object.entries(nameChanges).forEach(([from, to]) => {
+        entities.forEach((entity) => {
+            if (!isDTO(entity)) {
+                return;
+            }
+
+            Object.values(entity.properties).forEach((property) => {
+                if (isBuiltInType(property)) {
+                    return;
+                }
+
+                if (from !== typeName(property)) {
+                    return;
+                }
+
+                // Change the reference in the entity
+                if (isList(property)) {
+                    property.ref = to + '[]';
+                } else {
+                    property.ref = to;
+                }
+            });
+        });
+    });
 }
 
 function getEntityByName(block: BlockDefinition, entityName: string): Entity | undefined {
@@ -159,7 +234,11 @@ function getEntityByName(block: BlockDefinition, entityName: string): Entity | u
     return block.spec.entities.types.find((t: Entity) => t.name === entityName);
 }
 
-function getMatchingEntity(block: BlockDefinition, entity: Entity, sourceEntities: Entity[]): Entity | undefined {
+function getMatchingEntityForName(
+    block: BlockDefinition,
+    entity: Entity,
+    sourceEntities: Entity[]
+): Entity | undefined {
     const namedEntity = getEntityByName(block, entity.name);
     let matchedEntity;
 
@@ -173,13 +252,23 @@ function getMatchingEntity(block: BlockDefinition, entity: Entity, sourceEntitie
     return matchedEntity;
 }
 
+function getMatchingEntityForSchema(
+    block: BlockDefinition,
+    entity: Entity,
+    sourceEntities: Entity[]
+): Entity | undefined {
+    return block.spec.entities?.types?.find((targetEntity: Entity) => {
+        return isSchemaEntityCompatible(entity, targetEntity, sourceEntities, block.spec?.entities?.types ?? []);
+    });
+}
+
 function getConflictingEntity(block: BlockDefinition, entity: Entity, sourceEntities: Entity[]): Entity | undefined {
     const namedEntity = getEntityByName(block, entity.name);
     let conflictingEntity;
 
     if (
         namedEntity &&
-        isSchemaEntityCompatible(entity, namedEntity, sourceEntities, block.spec?.entities?.types ?? [])
+        !isSchemaEntityCompatible(entity, namedEntity, sourceEntities, block.spec?.entities?.types ?? [])
     ) {
         conflictingEntity = namedEntity;
     }
@@ -223,4 +312,42 @@ function addEntity(entity: Entity, target?: EntityList) {
     targets.types = [...targets.types, entity];
 
     return { ...target };
+}
+
+export function resolveEntitiesFromEntity(entity: Entity, entities: Entity[]): Entity[] {
+    if (!isDTO(entity)) {
+        return [];
+    }
+
+    const out: string[] = [];
+
+    Object.values(entity.properties).forEach((property) => {
+        if (typeof property.type === 'string') {
+            return;
+        }
+
+        const name = typeName(property);
+        if (entity.name === name) {
+            return;
+        }
+
+        if (out.indexOf(name) > -1) {
+            return;
+        }
+
+        out.push(name);
+
+        const subEntity = entities.find((e) => e.name === name);
+
+        if (subEntity) {
+            const subEntityEntities = resolveEntitiesFromEntity(subEntity, entities);
+            subEntityEntities.forEach((e) => {
+                if (out.indexOf(e.name) === -1) {
+                    out.push(e.name);
+                }
+            });
+        }
+    });
+
+    return out.map((name) => entities.find((e) => e.name === name)).filter((e) => !!e) as Entity[];
 }
