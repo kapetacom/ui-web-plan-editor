@@ -22,7 +22,7 @@ import { toClass } from '@kapeta/ui-web-utils';
 import { copyResourceToBlock } from '../utils/blockUtils';
 import { createConnection } from '../utils/connectionUtils';
 import { useBlockValidation } from '../hooks/block-validation';
-import { BlockTargetProvider, BlockTypeProvider } from '@kapeta/ui-web-context';
+import { BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockLayout } from '@kapeta/ui-web-components';
 
 import './PlannerBlockNode.less';
@@ -40,6 +40,24 @@ export function adjustBlockEdges(point: Point) {
     }
 
     return point;
+}
+
+function canConvertToAny(sourceKind: string, targetKinds: string[]) {
+    if (!ResourceTypeProvider.exists(sourceKind)) {
+        return false;
+    }
+
+    const sourceProvider = ResourceTypeProvider.get(sourceKind);
+
+    if (!sourceProvider || !sourceProvider.consumableKind) {
+        return false;
+    }
+
+    const consumableUri = parseKapetaUri(sourceProvider.consumableKind);
+
+    return targetKinds.some((targetKind) => {
+        return consumableUri.fullName === targetKind;
+    });
 }
 
 interface Props {
@@ -144,14 +162,22 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
             return false;
         }
 
-        if (blockType && blockType.resourceKinds && !blockType.resourceKinds.includes(resourceKindUri.fullName)) {
+        const isResource = draggable.type === PlannerPayloadType.RESOURCE;
+
+        if (
+            blockType &&
+            blockType.resourceKinds &&
+            !blockType.resourceKinds.includes(resourceKindUri.fullName) &&
+            !(isResource && canConvertToAny(resourceKindUri.fullName, blockType.resourceKinds))
+        ) {
             return false;
         }
 
         if (
             languageTargetProvider &&
             languageTargetProvider.resourceKinds &&
-            !languageTargetProvider.resourceKinds.includes(resourceKindUri.fullName)
+            !languageTargetProvider.resourceKinds.includes(resourceKindUri.fullName) &&
+            !(isResource && canConvertToAny(resourceKindUri.fullName, languageTargetProvider.resourceKinds))
         ) {
             return false;
         }

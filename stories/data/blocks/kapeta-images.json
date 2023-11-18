@@ -33,7 +33,7 @@
         },
         "consumers": [
             {
-                "kind": "kapeta/resource-type-postgresql",
+                "kind": "kapeta/resource-type-postgresql:1.2.3",
                 "metadata": {
                     "name": "imagesdb"
                 }
@@ -41,7 +41,7 @@
         ],
         "providers": [
             {
-                "kind": "kapeta/resource-type-rest-api",
+                "kind": "kapeta/resource-type-rest-api:1.2.3",
                 "metadata": {
                     "name": "images"
                 },

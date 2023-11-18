@@ -6,7 +6,7 @@
     },
     "spec": {
         "target": {
-            "kind": "kapeta/language-target-java-spring-boot",
+            "kind": "kapeta/language-target-java-spring-boot:1.2.3",
             "options": {
                 "groupId": "org.mycompany",
                 "artifactId": "service-todo",
