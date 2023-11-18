@@ -1,3 +1,10 @@
+## [1.19.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.19.0...v1.19.1) (2023-11-18)
+
+
+### Bug Fixes
+
+* Issue when dragging convertible resource ([#124](https://github.com/kapetacom/ui-web-plan-editor/issues/124)) ([c1935db](https://github.com/kapetacom/ui-web-plan-editor/commit/c1935db1cbf1fab6b494ed6208c48ed581c01999))
+
 # [1.19.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.18.0...v1.19.0) (2023-11-18)
 
 
