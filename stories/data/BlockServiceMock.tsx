@@ -177,6 +177,13 @@ blocks.push(
         version: '1.2.3',
         title: 'kapeta/language-target-java-spring-boot' === targetKind ? 'Java Spring Boot' : 'Test',
         blockKinds: ['kapeta/block-type-service'],
+        resourceKinds: [
+            'kapeta/resource-type-mongodb',
+            'kapeta/resource-type-postgresql',
+            'kapeta/resource-type-rest-api',
+            'kapeta/resource-type-rest-client',
+            'kapeta/resource-type-smtp-client',
+        ],
         definition: {
             kind: 'kapeta/language-target',
             metadata: {
@@ -231,6 +238,7 @@ BlockTypeProvider.register({
     kind: gatewayBlock.metadata.name,
     version: '1.2.3',
     editorComponent: null as any,
+    resourceKinds: ['kapeta/resource-type-rest-client', 'kapeta/resource-type-rest-api'],
     validate: (block) => {
         const errors: string[] = [];
         if (!block?.spec?.target?.kind) {
