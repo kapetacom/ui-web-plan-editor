@@ -1,3 +1,10 @@
+# [1.20.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.19.1...v1.20.0) (2023-11-18)
+
+
+### Features
+
+* Add highlighting of connections and show connected resources ([#125](https://github.com/kapetacom/ui-web-plan-editor/issues/125)) ([4c6ac1b](https://github.com/kapetacom/ui-web-plan-editor/commit/4c6ac1b9babc86796452c0a7566e98ec78f00906))
+
 ## [1.19.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.19.0...v1.19.1) (2023-11-18)
 
 
