@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.18.0...v1.19.0) (2023-11-18)
+
+
+### Features
+
+* Add checks to make sure we can only add valid resource types ([#123](https://github.com/kapetacom/ui-web-plan-editor/issues/123)) ([c9649b1](https://github.com/kapetacom/ui-web-plan-editor/commit/c9649b1234b40593c1a7f872f1b1d74e7b7163aa))
+
 # [1.18.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.17.1...v1.18.0) (2023-11-12)
 
 
