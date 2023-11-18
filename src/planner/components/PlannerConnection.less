@@ -4,6 +4,7 @@
 @kapeta-success-main: #2e7d32;
 @kapeta-success-light: #4caf50;
 
+
 .planner-connection {
     .mouse-catcher,
     .line {
@@ -21,7 +22,7 @@
     .line {
         .transition();
         stroke: @kapeta-success-light;
-        stroke-width: 4;
+        stroke-width: 3;
         stroke-linecap: round;
     }
 
@@ -40,8 +41,10 @@
 
     &.highlight {
         .line {
-            stroke-dasharray: 5;
-            stroke: @bw-orange-light;
+            stroke: #651fff;
+        }
+        .background {
+            opacity: 0;
         }
     }
 
