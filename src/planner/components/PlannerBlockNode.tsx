@@ -135,10 +135,8 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
 
         let resourceKindUri: KapetaURI | undefined = undefined;
         if (draggable.type === PlannerPayloadType.RESOURCE_TYPE) {
-            console.log('draggable.data.kind', draggable.data.kind);
             resourceKindUri = parseKapetaUri(draggable.data.kind);
         } else if (draggable.type === PlannerPayloadType.RESOURCE) {
-            console.log('draggable.data.resource.kind', draggable.data.resource.kind);
             resourceKindUri = parseKapetaUri(draggable.data.resource.kind);
         }
 
