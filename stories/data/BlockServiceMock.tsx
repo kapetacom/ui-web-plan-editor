@@ -166,7 +166,19 @@ blocks.push(
         title: resource.metadata.title,
         type: ResourceProviderType.INTERNAL,
         role: ResourceRole.PROVIDES,
-        // consumableKind: 'kapeta/resource-type-rest-client',
+        consumableKind: 'kapeta/resource-type-web-fragment',
+        definition: resource,
+        converters: [{ fromKind: 'kapeta/resource-type-web-fragment' }],
+    });
+});
+
+[require('./blocks/kapeta-resource-type-web-fragment.json')].forEach((resource) => {
+    ResourceTypeProvider.register({
+        kind: resource.metadata.name,
+        version: '1.2.3',
+        title: resource.metadata.title,
+        type: ResourceProviderType.INTERNAL,
+        role: ResourceRole.CONSUMES,
         definition: resource,
     });
 });
@@ -238,7 +250,7 @@ BlockTypeProvider.register({
     kind: gatewayBlock.metadata.name,
     version: '1.2.3',
     editorComponent: null as any,
-    resourceKinds: ['kapeta/resource-type-rest-client', 'kapeta/resource-type-rest-api'],
+    resourceKinds: ['kapeta/resource-type-rest-client', 'kapeta/resource-type-web-fragment'],
     validate: (block) => {
         const errors: string[] = [];
         if (!block?.spec?.target?.kind) {

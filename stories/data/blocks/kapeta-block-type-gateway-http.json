@@ -1,5 +1,5 @@
 {
-    "kind": "core/block-type",
+    "kind": "core/block-type-operator",
     "metadata": {
         "name": "kapeta/block-type-gateway-http",
         "title": "HTTP Gateway"

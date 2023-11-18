@@ -1,0 +1,17 @@
+{
+    "kind": "core/resource-type-internal",
+    "metadata": {
+        "name": "kapeta/resource-type-web-fragment",
+        "title": "Web Fragment",
+        "description": "Create web-based UI's for your plan.",
+        "visibility": "public"
+    },
+    "spec": {
+        "ports": [
+            {
+                "name": "http",
+                "type": "web"
+            }
+        ]
+    }
+}
