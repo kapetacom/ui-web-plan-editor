@@ -146,17 +146,17 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
 
     // Check for name conflicts
     if (props.role === ResourceRole.CONSUMES) {
-        const hasNameConflict = blockDefinition?.spec.consumers?.some((consumer, ix) => {
-            return props.index !== ix && consumer.metadata.name === props.resource.metadata.name;
-        });
-        if (hasNameConflict) {
+        const nameCount = blockDefinition?.spec.consumers?.filter((consumer, ix) => {
+            return consumer.metadata.name === props.resource.metadata.name;
+        }).length;
+        if (nameCount && nameCount > 1) {
             errors.push('Name conflicts with another consumer');
         }
     } else if (props.role === ResourceRole.PROVIDES) {
-        const hasNameConflict = blockDefinition?.spec.providers?.some((provider, ix) => {
-            return props.index !== ix && provider.metadata.name === props.resource.metadata.name;
-        });
-        if (hasNameConflict) {
+        const nameCount = blockDefinition?.spec.providers?.filter((provider, ix) => {
+            return provider.metadata.name === props.resource.metadata.name;
+        }).length;
+        if (nameCount && nameCount > 1) {
             errors.push('Name conflicts with another provider');
         }
     }
@@ -167,7 +167,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const resourceIcon = resourceConfig ? <AssetKindIcon asset={resourceConfig.definition} size={20} /> : '';
 
     const counterValue = resourceConfig?.getCounterValue ? resourceConfig!.getCounterValue(props.resource) : 0;
-    const valid = errors.length === 0 && true; // TODO props.resource.isValid();
+    const valid = errors.length === 0;
 
     const [isHovered, setHoverState] = useState(false);
     const overrideMode = planner.assetState.getViewModeForResource(

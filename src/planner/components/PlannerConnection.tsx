@@ -4,7 +4,7 @@
  */
 
 import React, { useContext, useMemo, useState } from 'react';
-import { PlannerContext } from '../PlannerContext';
+import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
@@ -12,21 +12,62 @@ import { getResourceId } from '../utils/planUtils';
 import { ActionContext, PlannerAction } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { BlockInstance, Connection } from '@kapeta/schemas';
+import { Connection } from '@kapeta/schemas';
 import * as PF from 'pathfinding';
-
-import { fillMatrix } from '../utils/connectionUtils/src/matrix';
 import {
     convertMatrixPathToPoints,
     findMatrixPath,
     getPathMidpoint,
     replaceJoinsWithArcs,
 } from '../utils/connectionUtils/src/path';
-import { DnDContext } from '../DragAndDrop/DnDContext';
 
 import './PlannerConnection.less';
+import { CELL_SIZE_X, CELL_SIZE_Y, POINT_PADDING_X } from '../utils/connectionUtils';
+import { applyObstacles } from '../utils/connectionUtils/src/matrix';
+import _ from 'lodash';
 
-const empty: BlockInstance[] = [];
+function useConnectionValidation(connection: Connection, planner: PlannerContextData) {
+    const fromResource = useMemo(
+        () =>
+            planner.getResourceByBlockIdAndName(
+                connection.provider.blockId,
+                connection.provider.resourceName,
+                ResourceRole.PROVIDES
+            ),
+        [connection.provider, planner]
+    );
+
+    const toResource = useMemo(
+        () =>
+            planner.getResourceByBlockIdAndName(
+                connection.consumer.blockId,
+                connection.consumer.resourceName,
+                ResourceRole.CONSUMES
+            ),
+        [connection.consumer, planner]
+    );
+
+    if (fromResource && toResource) {
+        const fromEntities = planner.getBlockById(connection.provider.blockId)?.spec.entities?.types || [];
+        const toEntities = planner.getBlockById(connection.consumer.blockId)?.spec.entities?.types || [];
+
+        try {
+            const converter = ResourceTypeProvider.getConverterFor(fromResource.kind, toResource.kind);
+            if (converter) {
+                const errors = converter.validateMapping
+                    ? converter.validateMapping(connection, fromResource, toResource, fromEntities, toEntities)
+                    : [];
+                return errors.length === 0;
+            }
+        } catch (e) {
+            // Ignore in case the resource types are not loaded or the converter is not found
+            // eslint-disable-next-line no-console
+            console.error('Connection cannot render.', e);
+        }
+    }
+
+    return true;
+}
 
 export const PlannerConnection: React.FC<{
     connection: Connection;
@@ -35,13 +76,13 @@ export const PlannerConnection: React.FC<{
     className?: string;
     // eslint-disable-next-line react/no-unused-prop-types
     viewOnly?: boolean;
+    blockMatrix?: number[][];
     actions?: PlannerAction<any>[];
     onMouseEnter?: (context: ActionContext) => void;
     onMouseOver?: (context: ActionContext) => void;
     onMouseLeave?: (context: ActionContext) => void;
     style?: React.CSSProperties;
 }> = (props) => {
-    const { draggable } = useContext(DnDContext);
     const planner = useContext(PlannerContext);
     const [hasFocus, setHasFocus] = useState(false);
 
@@ -59,38 +100,11 @@ export const PlannerConnection: React.FC<{
         props.connection.consumer.resourceName,
         ResourceRole.CONSUMES
     );
+
     const from = planner.connectionPoints.getPointById(fromId);
     const to = planner.connectionPoints.getPointById(toId);
 
-    const fromResource = planner.getResourceByBlockIdAndName(
-        props.connection.provider.blockId,
-        props.connection.provider.resourceName,
-        ResourceRole.PROVIDES
-    );
-    const toResource = planner.getResourceByBlockIdAndName(
-        props.connection.consumer.blockId,
-        props.connection.consumer.resourceName,
-        ResourceRole.CONSUMES
-    );
-    const fromEntities = planner.getBlockById(props.connection.provider.blockId)?.spec.entities?.types || [];
-    const toEntities = planner.getBlockById(props.connection.consumer.blockId)?.spec.entities?.types || [];
-
-    let connectionValid = true;
-    if (fromResource && toResource) {
-        try {
-            const converter = ResourceTypeProvider.getConverterFor(fromResource.kind, toResource.kind);
-            if (converter) {
-                const errors = converter.validateMapping
-                    ? converter.validateMapping(props.connection, fromResource, toResource, fromEntities, toEntities)
-                    : [];
-                connectionValid = errors.length === 0;
-            }
-        } catch (e) {
-            // Ignore in case the resource types are not loaded or the converter is not found
-            // eslint-disable-next-line no-console
-            console.error('Connection cannot render.', e);
-        }
-    }
+    let connectionValid = useConnectionValidation(props.connection, planner);
 
     let className = toClass({
         'planner-connection': true,
@@ -104,23 +118,12 @@ export const PlannerConnection: React.FC<{
         className += ` ${props.className}`;
     }
 
-    // More horizontal than vertical
-    const cellCount = useMemo(() => [30, 20], []);
-
-    // Remove the dragged block from the list of blocks, so that the pathfinding algorithm
-    // can is not obstructed by the dragged block
-    const draggedBlockId = draggable?.data?.id;
-    const blocks = planner.plan?.spec.blocks.filter((block) => block.id !== draggedBlockId) || empty;
-
-    // Minimum connection indent - straight line
-    const indent = 20;
-
     const points = useMemo(() => {
         if (!from || !to) {
             return [];
         }
-        const fromX = from.x + indent;
-        const toX = to.x - indent;
+        const fromX = from.x + POINT_PADDING_X;
+        const toX = to.x - POINT_PADDING_X;
 
         const fallbackPath =
             fromX > toX
@@ -141,57 +144,52 @@ export const PlannerConnection: React.FC<{
                   ];
 
         // Special handling of temp-connections
-        if (isTemp) {
+        if (isTemp || !props.blockMatrix) {
             return fallbackPath;
         }
 
-        // Do a dynamic cell size based on the distance, to try to get perfect alignment
-        // Catch: set a minimum size to avoid creating too many cells
-        const cellSizeX = Math.max(5, Math.abs(toX - fromX) / cellCount[0]);
-        const cellSizeY = Math.max(5, Math.abs(to.y - from.y) / cellCount[1]);
+        if (fromX > toX && Math.abs(from.y - to.y) < 200) {
+            // Below the minimum distance, just draw a straight line
+            return fallbackPath;
+        }
 
-        const matrix = fillMatrix(
-            blocks
-                .map((block) => ({
-                    x: block.dimensions.left,
-                    y: block.dimensions.top,
-                    width: block.dimensions.width + 40 || 190,
-                    height: Math.max(block.dimensions.height + 40, 190),
-                }))
-                // block the path from ending from the right during dragging
-                .concat([
-                    {
-                        x: toX + cellSizeX,
-                        y: to.y - 190 / 2,
-                        width: 2,
-                        height: 190,
-                    },
-                    {
-                        x: fromX - cellSizeX,
-                        y: from.y - 190 / 2,
-                        width: 2,
-                        height: 190,
-                    },
-                ]),
-            [Math.ceil(planner.canvasSize.width / cellSizeX), Math.ceil(planner.canvasSize.height / cellSizeY)],
-            [cellSizeX, cellSizeY]
+        const start: [number, number] = [Math.floor(fromX / CELL_SIZE_X), Math.floor(from.y / CELL_SIZE_Y)];
+        const end: [number, number] = [Math.floor(toX / CELL_SIZE_X), Math.floor(to.y / CELL_SIZE_Y)];
+
+        const matrix = _.cloneDeep(props.blockMatrix);
+        applyObstacles(
+            matrix,
+            [
+                {
+                    x: toX + CELL_SIZE_X,
+                    y: to.y - 50 / 2,
+                    width: 2,
+                    height: 190,
+                },
+                {
+                    x: fromX - CELL_SIZE_X,
+                    y: from.y - 50 / 2,
+                    width: 2,
+                    height: 190,
+                },
+            ],
+            [CELL_SIZE_X, CELL_SIZE_Y]
         );
 
-        const grid = new PF.Grid(matrix);
-        const matrixPath = findMatrixPath(
-            [Math.floor(fromX / cellSizeX), Math.floor(from.y / cellSizeY)],
-            [Math.floor(toX / cellSizeX), Math.floor(to.y / cellSizeY)],
-            grid
-        );
+        // Note: PF.Grid can't be reused, so we create a new one each time
+        const grid = new PF.Grid(props.blockMatrix);
+        const matrixPath = findMatrixPath(start, end, grid);
+
         if (matrixPath.length < 2) {
             // If the path is blocked, just draw a straight line
             return fallbackPath;
         }
+
         const rawPath = convertMatrixPathToPoints(matrixPath, {
             offsetX: 0,
-            offsetY: from.y % cellSizeY,
-            stepX: cellSizeX,
-            stepY: cellSizeY,
+            offsetY: from.y % CELL_SIZE_Y,
+            stepX: CELL_SIZE_X,
+            stepY: CELL_SIZE_Y,
         });
 
         // We always want to end on a horizontal line
@@ -205,15 +203,8 @@ export const PlannerConnection: React.FC<{
             rawPath.push([lastPoint[0], to.y]);
         }
 
-        return [
-            [from.x, from.y],
-            // [Math.min(fromX, rawPath[0][0]), from.y],
-
-            ...rawPath,
-            //
-            [to.x, to.y],
-        ];
-    }, [from, to, blocks, cellCount, planner.canvasSize.width, planner.canvasSize.height, isTemp]);
+        return [[from.x, from.y], ...rawPath, [to.x, to.y]];
+    }, [from?.x, from?.y, to?.x, to?.y, props.blockMatrix, isTemp]);
 
     if (!from || !to) {
         // Where can we render this error if there is no destination?

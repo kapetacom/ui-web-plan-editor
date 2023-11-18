@@ -8,6 +8,7 @@ export interface MatrixObstacle {
     y: number;
     width: number;
     height: number;
+    id?: string;
 }
 
 export function fillMatrix(
@@ -15,9 +16,20 @@ export function fillMatrix(
     matrixSize: [number, number],
     [cellSizeX, cellSizeY]: [number, number]
 ): number[][] {
-    const [matrixWidth, matrixHeight] = matrixSize;
+    const [matrixWidth, matrixHeight] = matrixSize.map((v) => Math.floor(v / cellSizeX));
     const matrix: number[][] = Array.from({ length: matrixHeight }, () => Array(matrixWidth).fill(0));
 
+    applyObstacles(matrix, objects, [cellSizeX, cellSizeY]);
+
+    return matrix;
+}
+
+export function applyObstacles(
+    matrix: number[][],
+    objects: MatrixObstacle[],
+    [cellSizeX, cellSizeY]: [number, number]
+): number[][] {
+    const [matrixWidth, matrixHeight] = [matrix[0].length, matrix.length];
     for (const obj of objects) {
         const { x, y, width, height } = obj;
 

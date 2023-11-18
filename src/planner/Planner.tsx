@@ -10,7 +10,7 @@ import { PlannerBlockNode } from './components/PlannerBlockNode';
 import { BlockContextProvider } from './BlockContext';
 import { PlannerCanvas } from './PlannerCanvas';
 import { PlannerConnection } from './components/PlannerConnection';
-import { getConnectionId, isConnectionTo } from './utils/connectionUtils';
+import { getConnectionId, isConnectionTo, useBlockMatrix } from './utils/connectionUtils';
 import { DnDContext, DnDContextType } from './DragAndDrop/DnDContext';
 import { ActionContext, PlannerPayload } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
@@ -256,6 +256,8 @@ export const Planner = (props: Props) => {
 
     const connectionKeys: { [p: string]: boolean } = {};
 
+    const blockMatrix = useBlockMatrix();
+
     return (
         <ErrorBoundary
             onError={props.onError}
@@ -343,9 +345,10 @@ export const Planner = (props: Props) => {
 
                     return (
                         <PlannerConnection
+                            key={key}
+                            blockMatrix={blockMatrix}
                             style={{ zIndex: highlighted ? -1 : -50 }}
                             size={nodeSize}
-                            key={key}
                             className={className}
                             connection={connection}
                             actions={props.actions?.connection || []}

@@ -63,7 +63,7 @@ interface BlockSizeProps {
     blockDefinition?: BlockDefinition;
 }
 
-export const calculateBlockHeights = (props: BlockSizeProps) => {
+export const calculateBlockSize = (props: BlockSizeProps) => {
     const consumers = props.blockDefinition?.spec.consumers || [];
     const providers = props.blockDefinition?.spec.providers || [];
 
@@ -78,6 +78,7 @@ export const calculateBlockHeights = (props: BlockSizeProps) => {
     return {
         instanceBlockHeight,
         instanceResourceHeight,
+        instanceBlockWidth: props.blockType?.shapeWidth || 150,
     };
 };
 export const BlockContextProvider = (props: BlockProviderProps) => {
@@ -97,7 +98,7 @@ export const BlockContextProvider = (props: BlockProviderProps) => {
         const consumers = blockDefinition?.spec.consumers || [];
         const providers = blockDefinition?.spec.providers || [];
 
-        const { instanceResourceHeight, instanceBlockHeight } = calculateBlockHeights({
+        const { instanceResourceHeight, instanceBlockHeight } = calculateBlockSize({
             nodeSize: planner.nodeSize,
             blockType,
             blockMode,

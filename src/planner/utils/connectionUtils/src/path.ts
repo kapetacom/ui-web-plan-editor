@@ -74,14 +74,15 @@ export function findMatrixPath(
         Math.max(0, Math.min(grid.height - 1, start[1])),
     ];
     const boundedEnd = [Math.max(0, Math.min(grid.width - 1, end[0])), Math.max(0, Math.min(grid.height - 1, end[1]))];
-    const finder = new PF.AStarFinder({ diagonalMovement: PF.DiagonalMovement.Never });
+    const finder = new PF.BreadthFirstFinder({ diagonalMovement: PF.DiagonalMovement.Never });
     // @ts-ignore
     const path = finder.findPath(...boundedStart, ...boundedEnd, grid);
     // Simplify the path by converting lines to single [start, end] instead of [start, ...intermediate, end]
     // EDIT: Maybe we dont want this, since it animates better with more points
-    if (path.length > 2) {
-        return simplifyPath(grid, path);
-    }
+    // UPDATE: BreadthFirstFinder creates simpler paths, so we don't need to simplify them
+    //if (path.length > 2) {
+    //return simplifyPath(grid, path);
+    //}
     return PF.Util.compressPath(path);
 }
 
