@@ -22,6 +22,7 @@ import { Alert } from '@mui/material';
 import './Planner.less';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceMode } from '../utils/enums';
+import { PlannerConnections } from './components/PlannerConnections';
 
 type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent | typeof React.Component> | null;
 
@@ -46,25 +47,6 @@ interface Props {
     onError?: (error: Error) => void;
     onErrorResolved?: () => void;
 }
-
-const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
-    return draggable && draggable.type === 'resource' ? (
-        <PlannerConnection
-            size={PlannerNodeSize.MEDIUM}
-            connection={{
-                provider: {
-                    blockId: draggable.data.instance.id,
-                    resourceName: draggable.data.resource.metadata.name,
-                },
-                consumer: {
-                    blockId: 'temp-block',
-                    resourceName: 'temp-resource',
-                },
-                port: draggable.data.resource.spec.port,
-            }}
-        />
-    ) : null;
-};
 
 export const Planner = (props: Props) => {
     const { isDragging } = useContext(DnDContext);
@@ -254,10 +236,6 @@ export const Planner = (props: Props) => {
     const focusInfo = useFocusInfo();
     const focusModeEnabled = !!focusInfo;
 
-    const connectionKeys: { [p: string]: boolean } = {};
-
-    const blockMatrix = useBlockMatrix();
-
     return (
         <ErrorBoundary
             onError={props.onError}
@@ -319,47 +297,14 @@ export const Planner = (props: Props) => {
                     );
                 })}
 
-                {connections.map((connection, id) => {
-                    // Handle deleted connections that are still in the ordering list
-                    if (!connection) {
-                        return null;
-                    }
-
-                    const key = getConnectionId(connection);
-
-                    if (connectionKeys[key]) {
-                        // Prevent rendering duplicate connections
-                        return null;
-                    }
-                    connectionKeys[key] = true;
-
-                    const highlighted = highlightedConnections.includes(key);
-
-                    // Hide connections that are not connected to the focused block
-                    const className = toClass({
-                        'connection-hidden': Boolean(
-                            focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
-                        ),
-                        highlight: highlighted,
-                    });
-
-                    return (
-                        <PlannerConnection
-                            key={key}
-                            blockMatrix={blockMatrix}
-                            style={{ zIndex: highlighted ? -1 : -50 }}
-                            size={nodeSize}
-                            className={className}
-                            connection={connection}
-                            actions={props.actions?.connection || []}
-                            onMouseOver={callbacks.onConnectionMouseEnter}
-                            onMouseLeave={callbacks.onResourceMouseLeave}
-                        />
-                    );
-                })}
-
-                {/* Render temp connections to dragged resources */}
-                <DnDContext.Consumer>{renderTempResources}</DnDContext.Consumer>
+                <PlannerConnections
+                    actions={props.actions}
+                    nodeSize={nodeSize}
+                    focusInfo={focusInfo}
+                    highlightedConnections={highlightedConnections}
+                    onConnectionMouseEnter={callbacks.onConnectionMouseEnter}
+                    onConnectionMouseLeave={callbacks.onConnectionMouseLeave}
+                />
             </PlannerCanvas>
         </ErrorBoundary>
     );

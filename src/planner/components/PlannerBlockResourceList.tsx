@@ -19,6 +19,7 @@ import { ActionContext, PlannerAction, PlannerPayload } from '../types';
 import { PlannerNodeSize } from '../../types';
 import { Connection, Endpoint, Resource } from '@kapeta/schemas';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 function canHaveConnections(kind: string) {
     if (!ResourceTypeProvider.exists(kind)) {
@@ -169,6 +170,13 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
             const connectDiff = aConnects - bConnects;
             if (connectDiff !== 0) {
                 return connectDiff;
+            }
+
+            const aUri = parseKapetaUri(a.kind);
+            const bUri = parseKapetaUri(b.kind);
+            const nameCompare = aUri.fullName.localeCompare(bUri.fullName);
+            if (nameCompare !== 0) {
+                return nameCompare;
             }
 
             const aConnections = getConnectedResources(connections, props.role, a);
