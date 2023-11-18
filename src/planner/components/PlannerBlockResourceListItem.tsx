@@ -321,7 +321,6 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                     <>
                         <svg
                             className={containerClass}
-                            // clipPath={`url(#${fixedClipPathId})`}
                             x={isConsumer ? 0 : -160}
                             y={0}
                             onMouseEnter={() => {
