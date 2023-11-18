@@ -15,26 +15,20 @@ import { Point, ResourceRole } from '@kapeta/ui-web-types';
 import { BlockMode, PlannerMode } from '../../utils/enums';
 import { DragAndDrop } from '../utils/dndUtils';
 import { LayoutNode } from '../LayoutContext';
-import {
-    ActionContext,
-    BlockInfo,
-    PlannerPayload,
-    PlannerPayloadType,
-    ResourcePayload,
-    ResourceTypePayload,
-} from '../types';
+import { ActionContext, BlockInfo, PlannerPayload, PlannerPayloadType } from '../types';
 import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { copyResourceToBlock } from '../utils/blockUtils';
 import { createConnection } from '../utils/connectionUtils';
 import { useBlockValidation } from '../hooks/block-validation';
-import { BlockTypeProvider } from '@kapeta/ui-web-context';
+import { BlockTargetProvider, BlockTypeProvider } from '@kapeta/ui-web-context';
 import { BlockLayout } from '@kapeta/ui-web-components';
 
 import './PlannerBlockNode.less';
 import { withErrorBoundary } from 'react-error-boundary';
 import { Resource } from '@kapeta/schemas';
+import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 
 export function adjustBlockEdges(point: Point) {
     if (point.x < 220) {
@@ -78,6 +72,22 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     const focusInfo = useFocusInfo();
     const isPrimaryFocus = focusInfo?.focus.instance.id === blockContext.blockInstance.id;
 
+    const languageTargetProvider = useMemo(() => {
+        if (!blockContext.blockDefinition?.spec.target?.kind) {
+            return null;
+        }
+
+        try {
+            return BlockTargetProvider.get(
+                blockContext.blockDefinition.spec.target.kind,
+                blockContext.blockDefinition.kind
+            );
+        } catch (err) {
+            console.error('Failed to get target provider', err);
+            return null;
+        }
+    }, [blockContext.blockDefinition?.spec.target?.kind]);
+
     const data: PlannerPayload = useMemo(
         () => ({ type: PlannerPayloadType.BLOCK, data: blockContext.blockInstance }),
         [blockContext.blockInstance]
@@ -117,6 +127,37 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
         block: blockContext.blockDefinition,
         blockInstance: blockContext.blockInstance,
     };
+
+    function canDropResource(draggable: PlannerPayload) {
+        if (!blockType) {
+            return true;
+        }
+
+        let resourceKindUri: KapetaURI | undefined = undefined;
+        if (draggable.type === PlannerPayloadType.RESOURCE_TYPE) {
+            resourceKindUri = parseKapetaUri(draggable.data.kind);
+        } else if (draggable.type === PlannerPayloadType.RESOURCE) {
+            resourceKindUri = parseKapetaUri(draggable.data.resource.kind);
+        }
+
+        if (!resourceKindUri) {
+            return false;
+        }
+
+        if (blockType && blockType.resourceKinds && !blockType.resourceKinds.includes(resourceKindUri.fullName)) {
+            return false;
+        }
+
+        if (
+            languageTargetProvider &&
+            languageTargetProvider.resourceKinds &&
+            !languageTargetProvider.resourceKinds.includes(resourceKindUri.fullName)
+        ) {
+            return false;
+        }
+
+        return true;
+    }
 
     return (
         // TODO: Readonly/ viewonly
@@ -210,6 +251,10 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                             return false;
                                         }
 
+                                        if (!canDropResource(draggable)) {
+                                            return false;
+                                        }
+
                                         if (draggable.type === 'resource-type') {
                                             // New resource being added
                                             return true;
@@ -227,6 +272,10 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                             (draggable.type !== PlannerPayloadType.RESOURCE_TYPE &&
                                                 draggable.type !== PlannerPayloadType.RESOURCE)
                                         ) {
+                                            return;
+                                        }
+
+                                        if (!canDropResource(draggable)) {
                                             return;
                                         }
 
@@ -309,8 +358,12 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                             return;
                                         }
 
+                                        if (!canDropResource(draggable)) {
+                                            return;
+                                        }
+
                                         const role =
-                                            draggable.type === 'resource-type'
+                                            draggable.type === PlannerPayloadType.RESOURCE_TYPE
                                                 ? draggable.data.config.role
                                                 : draggable.data.role;
                                         if (role === ResourceRole.CONSUMES) {
