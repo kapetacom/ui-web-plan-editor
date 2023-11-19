@@ -6,11 +6,11 @@
 import React, { useContext, useMemo, useState } from 'react';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
-import { ResourceRole } from '@kapeta/ui-web-types';
+import { Point, ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { getResourceId } from '../utils/planUtils';
 import { ActionContext, PlannerAction } from '../types';
-import { ActionButtons } from './ActionButtons';
+import { ActionButtonListProps, ActionButtons } from './ActionButtons';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { Connection } from '@kapeta/schemas';
 import * as PF from 'pathfinding';
@@ -22,7 +22,13 @@ import {
 } from '../utils/connectionUtils/src/path';
 
 import './PlannerConnection.less';
-import { CELL_SIZE_X, CELL_SIZE_Y, POINT_PADDING_X } from '../utils/connectionUtils';
+import {
+    CELL_SIZE,
+    ConnectionExtension,
+    createSimplePath,
+    createSimplePathVia,
+    POINT_PADDING_X,
+} from '../utils/connectionUtils';
 import { applyObstacles } from '../utils/connectionUtils/src/matrix';
 import _ from 'lodash';
 
@@ -69,13 +75,27 @@ function useConnectionValidation(connection: Connection, planner: PlannerContext
     return true;
 }
 
+type PathInfo = {
+    path: string;
+    actionsPoint?: { x: number; y: number };
+    portalPoint?: { x: number; y: number };
+    provider?: boolean;
+    pointType?: ActionButtonListProps['pointType'];
+};
+
+function pointsToSVG(points: number[][]) {
+    return `M ${points.map(([x, y]) => `${x} ${y}`).join(' L ')}`;
+}
+
 export const PlannerConnection: React.FC<{
-    connection: Connection;
+    connection: ConnectionExtension;
     // eslint-disable-next-line react/no-unused-prop-types
     size: PlannerNodeSize;
     className?: string;
     // eslint-disable-next-line react/no-unused-prop-types
     viewOnly?: boolean;
+    focused?: boolean;
+    firstForProvider?: boolean;
     blockMatrix?: number[][];
     actions?: PlannerAction<any>[];
     onMouseEnter?: (context: ActionContext) => void;
@@ -90,28 +110,34 @@ export const PlannerConnection: React.FC<{
         props.connection.consumer.blockId === 'temp-block' &&
         props.connection.consumer.resourceName === 'temp-resource';
 
-    const fromId = getResourceId(
+    const providerId = getResourceId(
         props.connection.provider.blockId,
         props.connection.provider.resourceName,
         ResourceRole.PROVIDES
     );
-    const toId = getResourceId(
+    const consumerId = getResourceId(
         props.connection.consumer.blockId,
         props.connection.consumer.resourceName,
         ResourceRole.CONSUMES
     );
 
-    const from = planner.connectionPoints.getPointById(fromId);
-    const to = planner.connectionPoints.getPointById(toId);
+    const providerPoint = planner.connectionPoints.getPointById(providerId);
+    const consumerPoint = planner.connectionPoints.getPointById(consumerId);
+    const providerCluster = props.connection.providerClusterId
+        ? planner.connectionPoints.getPointById(props.connection.providerClusterId)
+        : null;
+    const consumerCluster = props.connection.consumerClusterId
+        ? planner.connectionPoints.getPointById(props.connection.consumerClusterId)
+        : null;
 
     let connectionValid = useConnectionValidation(props.connection, planner);
 
+    const behaveAsPortal = Boolean(props.connection.portals && props.focused !== true);
+
     let className = toClass({
         'planner-connection': true,
-        // highlight: this.props.connection
-        //     ? this.props.connection.editing
-        //     : false,
         invalid: !connectionValid,
+        portal: behaveAsPortal,
     });
 
     if (props.className) {
@@ -119,29 +145,25 @@ export const PlannerConnection: React.FC<{
     }
 
     const points = useMemo(() => {
-        if (!from || !to) {
+        if (!providerPoint || !consumerPoint || behaveAsPortal) {
             return [];
         }
-        const fromX = from.x + POINT_PADDING_X;
-        const toX = to.x - POINT_PADDING_X;
 
-        const fallbackPath =
-            fromX > toX
-                ? [
-                      [from.x, from.y],
-                      [fromX, from.y],
-                      [fromX, from.y + (to.y - from.y) / 2],
-                      [toX, from.y + (to.y - from.y) / 2],
-                      [toX, to.y],
-                      [to.x, to.y],
-                  ]
-                : [
-                      [from.x, from.y],
-                      [fromX, from.y],
-                      [toX, from.y],
-                      [toX, to.y],
-                      [to.x, to.y],
-                  ];
+        let from = providerCluster ?? providerPoint;
+        let to = consumerCluster ?? consumerPoint;
+
+        const fromX = Math.floor((from.x + POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
+        const toX = Math.floor((to.x - POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
+
+        const startingPoints = providerCluster ? createSimplePath(providerPoint, providerCluster) : [[from.x, from.y]];
+        const endingPoints = consumerCluster ? createSimplePath(consumerCluster, consumerPoint, true) : [[to.x, to.y]];
+
+        const fallbackPath = createSimplePathVia(
+            providerPoint,
+            providerPoint.x + POINT_PADDING_X,
+            consumerPoint,
+            consumerPoint.x - POINT_PADDING_X
+        );
 
         // Special handling of temp-connections
         if (isTemp || !props.blockMatrix) {
@@ -153,27 +175,30 @@ export const PlannerConnection: React.FC<{
             return fallbackPath;
         }
 
-        const start: [number, number] = [Math.floor(fromX / CELL_SIZE_X), Math.floor(from.y / CELL_SIZE_Y)];
-        const end: [number, number] = [Math.floor(toX / CELL_SIZE_X), Math.floor(to.y / CELL_SIZE_Y)];
+        const matrixStart = [fromX, from.y];
+        const matrixEnd = [toX, to.y];
+
+        const start: [number, number] = matrixStart.map((v) => Math.floor(v / CELL_SIZE)) as [number, number];
+        const end: [number, number] = matrixEnd.map((v) => Math.floor(v / CELL_SIZE)) as [number, number];
 
         const matrix = _.cloneDeep(props.blockMatrix);
         applyObstacles(
             matrix,
             [
                 {
-                    x: toX + CELL_SIZE_X,
+                    x: toX + CELL_SIZE,
                     y: to.y - 50 / 2,
                     width: 2,
                     height: 190,
                 },
                 {
-                    x: fromX - CELL_SIZE_X,
+                    x: fromX - CELL_SIZE,
                     y: from.y - 50 / 2,
                     width: 2,
                     height: 190,
                 },
             ],
-            [CELL_SIZE_X, CELL_SIZE_Y]
+            [CELL_SIZE, CELL_SIZE]
         );
 
         // Note: PF.Grid can't be reused, so we create a new one each time
@@ -187,9 +212,9 @@ export const PlannerConnection: React.FC<{
 
         const rawPath = convertMatrixPathToPoints(matrixPath, {
             offsetX: 0,
-            offsetY: from.y % CELL_SIZE_Y,
-            stepX: CELL_SIZE_X,
-            stepY: CELL_SIZE_Y,
+            offsetY: from.y % CELL_SIZE,
+            stepX: CELL_SIZE,
+            stepY: CELL_SIZE,
         });
 
         // We always want to end on a horizontal line
@@ -203,17 +228,74 @@ export const PlannerConnection: React.FC<{
             rawPath.push([lastPoint[0], to.y]);
         }
 
-        return [[from.x, from.y], ...rawPath, [to.x, to.y]];
-    }, [from?.x, from?.y, to?.x, to?.y, props.blockMatrix, isTemp]);
+        return [...startingPoints, ...rawPath, ...endingPoints];
+    }, [
+        providerPoint?.x,
+        providerPoint?.y,
+        consumerPoint?.x,
+        consumerPoint?.y,
+        providerCluster?.x,
+        providerCluster?.y,
+        consumerCluster?.x,
+        consumerCluster?.y,
+        props.blockMatrix,
+        isTemp,
+        behaveAsPortal,
+    ]);
 
-    if (!from || !to) {
+    if (!providerPoint || !consumerPoint) {
         // Where can we render this error if there is no destination?
         return null;
     }
 
-    const path = replaceJoinsWithArcs(`M ${points.map(([x, y]) => `${x} ${y}`).join(' L ')}`, 10);
+    const paths: PathInfo[] = [];
 
-    const middlePoint = getPathMidpoint(points);
+    if (behaveAsPortal) {
+        const showProviderPortal = props.firstForProvider !== false;
+        const ACTION_POINT_OFFSET = 100;
+        const BUTTON_OFFSET = 20;
+        const providerPortalPoint = {
+            x: providerPoint.x + ACTION_POINT_OFFSET,
+            y: providerPoint.y,
+        };
+        const providerPortal = createSimplePath(providerPoint, providerPortalPoint);
+        paths.push({
+            path: pointsToSVG(providerPortal),
+            actionsPoint: {
+                ...providerPortalPoint,
+                x: providerPortalPoint.x + BUTTON_OFFSET,
+            },
+            portalPoint: showProviderPortal ? providerPortalPoint : undefined,
+            pointType: 'center',
+            provider: true,
+        });
+
+        const consumerPortalPoint = {
+            x: consumerPoint.x - ACTION_POINT_OFFSET,
+            y: consumerPoint.y,
+        };
+        const consumerPortal = createSimplePath(consumerPoint, consumerPortalPoint);
+        paths.push({
+            path: pointsToSVG(consumerPortal),
+            actionsPoint: {
+                ...consumerPortalPoint,
+                x: consumerPortalPoint.x - BUTTON_OFFSET,
+            },
+            portalPoint: consumerPortalPoint,
+            pointType: 'center',
+            provider: false,
+        });
+    } else {
+        const svgPath = pointsToSVG(points);
+        const path = replaceJoinsWithArcs(svgPath, 10);
+        const actionsPoint = getPathMidpoint(points);
+
+        paths.push({
+            path,
+            actionsPoint,
+            pointType: 'center',
+        });
+    }
 
     const actionContext = {
         connection: props.connection,
@@ -241,20 +323,42 @@ export const PlannerConnection: React.FC<{
                     }
                 }}
             >
-                <path className="mouse-catcher" d={path} />
-                <path className="background" d={path} />
-                <path className="line" d={path} />
+                {paths.map((pathInfo, ix) => {
+                    return (
+                        <g key={ix}>
+                            <path className="mouse-catcher" d={pathInfo.path} />
+                            <path className="background" d={pathInfo.path} />
 
-                {props.connection && middlePoint && props.actions && (
-                    <ActionButtons
-                        show={hasFocus}
-                        x={middlePoint.x}
-                        // TODO: how can we avoid the magic number?
-                        y={middlePoint.y - 5}
-                        actions={props.actions}
-                        actionContext={actionContext}
-                    />
-                )}
+                            {behaveAsPortal && pathInfo.portalPoint && (
+                                <svg
+                                    x={-23}
+                                    y={pathInfo.portalPoint.y - 25}
+                                    width={10}
+                                    height={30}
+                                    style={{ zIndex: 10, position: 'relative' }}
+                                >
+                                    <g className={'portal'} transform={`translate(${pathInfo.portalPoint.x},0)`}>
+                                        <use href={pathInfo.provider ? '#svg-portal-reverse' : '#svg-portal'} />
+                                    </g>
+                                </svg>
+                            )}
+
+                            <path className="line" d={pathInfo.path} />
+
+                            {pathInfo.actionsPoint && props.actions && (
+                                <ActionButtons
+                                    show={hasFocus}
+                                    pointType={pathInfo.pointType}
+                                    x={pathInfo.actionsPoint.x}
+                                    // TODO: how can we avoid the magic number?
+                                    y={pathInfo.actionsPoint.y - 5}
+                                    actions={props.actions}
+                                    actionContext={actionContext}
+                                />
+                            )}
+                        </g>
+                    );
+                })}
             </g>
         </svg>
     );

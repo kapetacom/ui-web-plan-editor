@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { Point, ResourceProviderType, ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
@@ -13,13 +13,15 @@ import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { useBlockContext } from '../BlockContext';
 import { BlockMode, ResourceMode } from '../../utils/enums';
 import { getResourceId, RESOURCE_HEIGHTS } from '../utils/planUtils';
-import { SVGLayoutNode } from '../LayoutContext';
+import { LayoutNode, SVGLayoutNode } from '../LayoutContext';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { ActionContext, PlannerAction, PlannerPayload } from '../types';
 import { PlannerNodeSize } from '../../types';
 import { Connection, Endpoint, Resource } from '@kapeta/schemas';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { PlannerConnectionPoint } from './PlannerConnectionPoint';
+import { ResourceCluster } from '../utils/connectionUtils';
 
 function canHaveConnections(kind: string) {
     if (!ResourceTypeProvider.exists(kind)) {
@@ -90,6 +92,7 @@ export interface PlannerBlockResourceListProps {
     role: ResourceRole;
     actions: PlannerAction<any>[];
     nodeSize: PlannerNodeSize;
+    resourceClusters?: ResourceCluster[];
     onResourceMouseEnter?: (context: ActionContext) => void;
     onResourceMouseLeave?: (context: ActionContext) => void;
 }
@@ -103,6 +106,7 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
     const listOffset = props.role === ResourceRole.PROVIDES ? blockCtx.instanceBlockWidth : 0;
     const placeholderWidth = 3;
     const placeholderOffset = props.role === ResourceRole.PROVIDES ? listOffset : -placeholderWidth;
+    const [resourceOffsets, setResourceOffsets] = useState<{ [key: string]: number }>({});
 
     // Enable SHOW mode if the whole block is in SHOW mode
     const mode =
@@ -196,9 +200,21 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
         return result;
     }, [connections, props.role, blockCtx.consumers, blockCtx.providers]);
 
-    const listHeight = list.length * RESOURCE_HEIGHTS[props.nodeSize];
-    const yPosition =
-        (blockCtx.instanceBlockHeight - listHeight - placeholderCount * RESOURCE_HEIGHTS[props.nodeSize]) / 2;
+    const onXPositionChange = useCallback(
+        (name: string, offset: number) => {
+            setResourceOffsets((prev) => {
+                return {
+                    ...prev,
+                    [name]: offset,
+                };
+            });
+        },
+        [setResourceOffsets]
+    );
+
+    const resourceHeight = RESOURCE_HEIGHTS[props.nodeSize];
+    const listHeight = list.length * resourceHeight;
+    const yPosition = (blockCtx.instanceBlockHeight - listHeight - placeholderCount * resourceHeight) / 2;
 
     return (
         <SVGLayoutNode className={plannerResourceListClass} overflow="visible" x={0} y={yPosition}>
@@ -210,6 +226,7 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
                             key={`${blockCtx.blockInstance.id}_${resource.metadata.name}`}
                             index={index}
                             resource={resource}
+                            onXPositionChange={onXPositionChange}
                             // Should we render a consumer or provider?
                             role={props.role}
                             // Default to hidden unless the block has focus or the planner has a drag in progress
@@ -225,13 +242,42 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
                 })}
             </svg>
 
+            {props.resourceClusters &&
+                props.resourceClusters.map((cluster: ResourceCluster) => {
+                    let topResource = -1;
+                    let pointOffset = 0;
+                    const clusterResources = list.filter((resource, ix) => {
+                        const id = getResourceId(blockCtx.blockInstance.id, resource.metadata.name, props.role);
+                        if (!cluster.resources.includes(id)) {
+                            return false;
+                        }
+                        const offset = Math.abs(resourceOffsets[resource.metadata.name] ?? 0);
+                        if (offset > pointOffset) {
+                            pointOffset = offset;
+                        }
+                        if (topResource === -1 || topResource > ix) {
+                            topResource = ix;
+                        }
+                        return true;
+                    });
+
+                    const clusterHeight = clusterResources.length * resourceHeight;
+                    const topOffset = topResource * resourceHeight;
+                    const yPosition = topOffset - 2 + clusterHeight / 2;
+
+                    const clusterOffsetX =
+                        props.role === ResourceRole.PROVIDES ? pointOffset + 50 : -(pointOffset + 30);
+
+                    return (
+                        <LayoutNode key={cluster.id} x={clusterOffsetX} y={yPosition}>
+                            <PlannerConnectionPoint pointId={cluster.id} />
+                        </LayoutNode>
+                    );
+                })}
+
             {/* "ghost" target when we're about to create a new resource in the list */}
             <svg x={placeholderOffset} y={listHeight}>
-                <rect
-                    className="resource-placeholder"
-                    height={RESOURCE_HEIGHTS[props.nodeSize] - 4}
-                    width={placeholderWidth}
-                />
+                <rect className="resource-placeholder" height={resourceHeight - 4} width={placeholderWidth} />
             </svg>
         </SVGLayoutNode>
     );

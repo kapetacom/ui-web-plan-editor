@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState, useEffect } from 'react';
 
 import { IResourceTypeProvider, ResourceProviderType, ResourceRole } from '@kapeta/ui-web-types';
 
@@ -41,6 +41,7 @@ interface PlannerBlockResourceListItemProps {
     actions?: PlannerAction<any>[];
     onMouseEnter?: (context: ActionContext) => void;
     onMouseLeave?: (context: ActionContext) => void;
+    onXPositionChange?: (resourceName: string, xPosition: number) => void;
 }
 
 const renderClipPath = (height: number, role: ResourceRole, expanded: boolean) => {
@@ -242,11 +243,10 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const isForceDisabled = overrideMode === ResourceMode.HIDDEN;
     const isExpanded = !isForceDisabled && (mode !== ResourceMode.HIDDEN || dragIsCompatible);
     const buttonsVisible = !draggable && mode === ResourceMode.SHOW_OPTIONS;
-
     const connectionResourceId = getResourceId(blockInstance.id, props.resource.metadata.name, props.role);
 
     const extension = isExpanded ? 90 : 0;
-    const getXPosition = () => (props.role === ResourceRole.CONSUMES ? -35 - extension : 45 + extension);
+    const xPosition = props.role === ResourceRole.CONSUMES ? -35 - extension : 45 + extension;
 
     const nodeSize = props.size !== undefined ? props.size : PlannerNodeSize.MEDIUM;
     const height = RESOURCE_HEIGHTS[nodeSize];
@@ -270,6 +270,20 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
         x: counterX,
         y: counterY,
     };
+
+    const connectionPointX = getResourceConnectionPoint({
+        isConsumer,
+        isExpanded,
+        buttonWidth: buttonsVisible ? actionButtonsWidth : 0,
+    });
+
+    useEffect(() => {
+        const name = props.resource.metadata.name;
+        props.onXPositionChange?.(name, connectionPointX);
+        return () => {
+            props.onXPositionChange?.(name, 0);
+        };
+    }, [props.resource.metadata.name, connectionPointX, props.onXPositionChange]);
 
     const containerClass = toClass({
         'planner-block-resource-list-item': true,
@@ -338,7 +352,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                             // Only register the drag handler if the resource should be draggable (Providers only atm)
                             {...(props.role === ResourceRole.PROVIDES ? draggableOpts.componentProps : {})}
                         >
-                            <g className={bodyClass} transform={`translate(${getXPosition()},0)`} height={heightInner}>
+                            <g className={bodyClass} transform={`translate(${xPosition},0)`} height={heightInner}>
                                 <DragAndDrop.DropZone
                                     data={
                                         {
@@ -402,14 +416,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                 />
 
                                 {/* TODO: To avoid shifting, maybe remove this */}
-                                <LayoutNode
-                                    x={getResourceConnectionPoint({
-                                        isConsumer,
-                                        isExpanded,
-                                        buttonWidth: buttonsVisible ? actionButtonsWidth : 0,
-                                    })}
-                                    y={buttonY}
-                                >
+                                <LayoutNode x={connectionPointX} y={buttonY}>
                                     <PlannerConnectionPoint pointId={connectionResourceId} />
                                 </LayoutNode>
 

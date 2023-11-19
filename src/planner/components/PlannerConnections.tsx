@@ -1,4 +1,4 @@
-import { getConnectionId, isConnectionTo, useBlockMatrix } from '../utils/connectionUtils';
+import { ConnectionExtension, getConnectionId, isConnectionTo, useBlockMatrix } from '../utils/connectionUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { PlannerConnection } from './PlannerConnection';
 import { DnDContext, DnDContextType } from '../DragAndDrop/DnDContext';
@@ -7,6 +7,8 @@ import { ActionContext, PlannerPayload } from '../types';
 import { PlannerNodeSize } from '../../types';
 import { PlannerActionConfig, PlannerContext } from '../PlannerContext';
 import { useFocusInfo } from '../utils/focusUtils';
+import { getResourceId } from '../utils/planUtils';
+import { ResourceRole } from '@kapeta/ui-web-types';
 
 const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
     return draggable && draggable.type === 'resource' ? (
@@ -32,19 +34,19 @@ interface Props {
     actions?: PlannerActionConfig;
     nodeSize: PlannerNodeSize;
     highlightedConnections: string[];
+    connections: ConnectionExtension[];
     onConnectionMouseEnter?: (context: ActionContext) => void;
     onConnectionMouseLeave?: (context: ActionContext) => void;
 }
 
 export const PlannerConnections = (props: Props) => {
-    const planner = useContext(PlannerContext);
-    const connections = planner.plan?.spec.connections ?? [];
     const connectionKeys: { [p: string]: boolean } = {};
+    const providerSeen: { [p: string]: boolean } = {};
     const blockMatrix = useBlockMatrix();
 
     return (
         <>
-            {connections.map((connection, id) => {
+            {props.connections.map((connection) => {
                 // Handle deleted connections that are still in the ordering list
                 if (!connection) {
                     return null;
@@ -56,6 +58,17 @@ export const PlannerConnections = (props: Props) => {
                     return null;
                 }
                 connectionKeys[key] = true;
+
+                const providerId = getResourceId(
+                    connection.provider.blockId,
+                    connection.provider.resourceName,
+                    ResourceRole.PROVIDES
+                );
+                let firstForProvider = false;
+                if (!providerSeen[providerId]) {
+                    providerSeen[providerId] = true;
+                    firstForProvider = true;
+                }
 
                 const highlighted = props.highlightedConnections.includes(key);
 
@@ -71,7 +84,8 @@ export const PlannerConnections = (props: Props) => {
                     <PlannerConnection
                         key={key}
                         blockMatrix={blockMatrix}
-                        style={{ zIndex: highlighted ? -1 : -50 }}
+                        firstForProvider={firstForProvider}
+                        style={{ zIndex: highlighted ? -1 : firstForProvider ? -40 : -50 }}
                         size={props.nodeSize}
                         className={className}
                         connection={connection}

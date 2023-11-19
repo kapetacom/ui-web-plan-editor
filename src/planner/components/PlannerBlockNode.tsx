@@ -20,7 +20,7 @@ import { ActionButtons } from './ActionButtons';
 import { getBlockPositionForFocus, isBlockInFocus, useFocusInfo } from '../utils/focusUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { copyResourceToBlock } from '../utils/blockUtils';
-import { createConnection } from '../utils/connectionUtils';
+import { createConnection, ResourceCluster } from '../utils/connectionUtils';
 import { useBlockValidation } from '../hooks/block-validation';
 import { BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockLayout } from '@kapeta/ui-web-components';
@@ -69,6 +69,7 @@ interface Props {
     onMouseLeave?: (context: ActionContext) => void;
     onResourceMouseEnter?: (context: ActionContext) => void;
     onResourceMouseLeave?: (context: ActionContext) => void;
+    resourceClusters?: ResourceCluster[];
 }
 
 const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
@@ -261,6 +262,9 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                     actions={props.actions?.resource || []}
                                     onResourceMouseEnter={props.onResourceMouseEnter}
                                     onResourceMouseLeave={props.onResourceMouseLeave}
+                                    resourceClusters={props.resourceClusters?.filter(
+                                        (c) => c.role === ResourceRole.CONSUMES
+                                    )}
                                 />
                                 <PlannerBlockResourceList
                                     nodeSize={planner.nodeSize}
@@ -268,6 +272,9 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                     actions={props.actions?.resource || []}
                                     onResourceMouseEnter={props.onResourceMouseEnter}
                                     onResourceMouseLeave={props.onResourceMouseLeave}
+                                    resourceClusters={props.resourceClusters?.filter(
+                                        (c) => c.role === ResourceRole.PROVIDES
+                                    )}
                                 />
 
                                 <DragAndDrop.DropZone

@@ -10,7 +10,7 @@ import { PlannerBlockNode } from './components/PlannerBlockNode';
 import { BlockContextProvider } from './BlockContext';
 import { PlannerCanvas } from './PlannerCanvas';
 import { PlannerConnection } from './components/PlannerConnection';
-import { getConnectionId, isConnectionTo, useBlockMatrix } from './utils/connectionUtils';
+import { getConnectionId, isConnectionTo, useBlockMatrix, useConnectionExtensions } from './utils/connectionUtils';
 import { DnDContext, DnDContextType } from './DragAndDrop/DnDContext';
 import { ActionContext, PlannerPayload } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
@@ -54,7 +54,7 @@ export const Planner = (props: Props) => {
     const nodeSize = planner.nodeSize ?? PlannerNodeSize.MEDIUM;
 
     const instances = planner.plan?.spec.blocks ?? [];
-    const connections = planner.plan?.spec.connections ?? [];
+    const { connections, resourceClusters } = useConnectionExtensions();
 
     // Manage connection render order to ensure that connections are rendered on top when hovered
     const [highlightedConnections, setHighlightedConnections] = useState<string[]>([]);
@@ -267,6 +267,17 @@ export const Planner = (props: Props) => {
             resetKeys={[props.systemId, planner.plan, planner.blockAssets]}
         >
             <PlannerCanvas onCreateBlock={props.onCreateBlock}>
+                <svg>
+                    <defs>
+                        <g id={'svg-portal'}>
+                            <ellipse cx="25" cy="25" rx="5" ry="5" fill={'inherit'} />
+                        </g>
+                        <g id={'svg-portal-reverse'}>
+                            <ellipse cx="25" cy="25" rx="5" ry="5" fill={'inherit'} />
+                        </g>
+                    </defs>
+                </svg>
+
                 {instances.map((instance, index) => {
                     const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
                     const isInFocus = !!(focusInfo && isBlockInFocus(focusInfo, instance.id));
@@ -292,6 +303,7 @@ export const Planner = (props: Props) => {
                                 onMouseLeave={callbacks.onBlockMouseLeave}
                                 onResourceMouseEnter={callbacks.onResourceMouseEnter}
                                 onResourceMouseLeave={callbacks.onResourceMouseLeave}
+                                resourceClusters={resourceClusters.filter((c) => c.blockInstanceId === instance.id)}
                             />
                         </BlockContextProvider>
                     );
@@ -299,6 +311,7 @@ export const Planner = (props: Props) => {
 
                 <PlannerConnections
                     actions={props.actions}
+                    connections={connections}
                     nodeSize={nodeSize}
                     focusInfo={focusInfo}
                     highlightedConnections={highlightedConnections}

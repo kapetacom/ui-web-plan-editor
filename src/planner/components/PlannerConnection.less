@@ -19,6 +19,7 @@
         opacity: 0;
     }
 
+
     .line {
         .transition();
         stroke: @kapeta-success-light;
@@ -28,6 +29,10 @@
 
     .background {
         fill: none;
+        .transition();
+        stroke: @bw-planner-background;
+        stroke-width: 6;
+        stroke-linecap: round;
     }
 
     .buttons {
@@ -35,10 +40,26 @@
         stroke-dasharray: none;
     }
 
+    g.portal {
+        fill: @kapeta-success-light;
+        .transition();
+    }
+
+    &.portal {
+        .line {
+            stroke-linecap: square;
+        }
+    }
+
     &.highlight {
         .line {
             stroke: #651fff;
         }
+
+        g.portal {
+            fill: #651fff;
+        }
+
         .background {
             opacity: 0;
         }
