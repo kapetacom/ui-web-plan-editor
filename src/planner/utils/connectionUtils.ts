@@ -158,6 +158,7 @@ export const useBlockMatrix = () => {
 type ConnectionExtensionResult = {
     connections: ConnectionExtension[];
     resourceClusters: ResourceCluster[];
+    portalResourceIds: string[];
 };
 
 export function useConnectionExtensions(): ConnectionExtensionResult {
@@ -168,8 +169,11 @@ export function useConnectionExtensions(): ConnectionExtensionResult {
             return {
                 connections: [],
                 resourceClusters: [],
+                portalResourceIds: [],
             };
         }
+
+        const portalResources = new Set<string>();
         const out: ConnectionExtension[] = [...planner.plan?.spec.connections].map((connection) => {
             return {
                 ...connection,
@@ -194,23 +198,31 @@ export function useConnectionExtensions(): ConnectionExtensionResult {
             }
             blockConnections[blockConnection].push(id);
 
-            const providerResource = getResourceId(
+            const providerResourceId = getResourceId(
                 connection.provider.blockId,
                 connection.provider.resourceName,
                 ResourceRole.PROVIDES
             );
-            if (!providerConnections[providerResource]) {
-                providerConnections[providerResource] = [];
+            if (!providerConnections[providerResourceId]) {
+                providerConnections[providerResourceId] = [];
             }
 
-            providerConnections[providerResource].push(id);
+            providerConnections[providerResourceId].push(id);
         });
 
-        Object.entries(providerConnections).forEach(([key, connections]) => {
+        Object.entries(providerConnections).forEach(([providerResourceId, connections]) => {
             if (connections.length > MANY_CONNECTIONS_THRESHOLD) {
-                providerWithManyConnections[key] = connections;
+                providerWithManyConnections[providerResourceId] = connections;
+                portalResources.add(providerResourceId);
                 connections.forEach((connectionId) => {
                     connectionMap[connectionId].portals = true;
+                    const connection = connectionMap[connectionId];
+                    const consumerResourceId = getResourceId(
+                        connection.consumer.blockId,
+                        connection.consumer.resourceName,
+                        ResourceRole.CONSUMES
+                    );
+                    portalResources.add(consumerResourceId);
                 });
             }
         });
@@ -298,6 +310,7 @@ export function useConnectionExtensions(): ConnectionExtensionResult {
         return {
             connections: out,
             resourceClusters,
+            portalResourceIds: Array.from(portalResources),
         };
     }, [planner.plan?.spec.connections]);
 }

@@ -54,7 +54,7 @@ export const Planner = (props: Props) => {
     const nodeSize = planner.nodeSize ?? PlannerNodeSize.MEDIUM;
 
     const instances = planner.plan?.spec.blocks ?? [];
-    const { connections, resourceClusters } = useConnectionExtensions();
+    const { connections, resourceClusters, portalResourceIds } = useConnectionExtensions();
 
     // Manage connection render order to ensure that connections are rendered on top when hovered
     const [highlightedConnections, setHighlightedConnections] = useState<string[]>([]);
@@ -304,6 +304,7 @@ export const Planner = (props: Props) => {
                                 onResourceMouseEnter={callbacks.onResourceMouseEnter}
                                 onResourceMouseLeave={callbacks.onResourceMouseLeave}
                                 resourceClusters={resourceClusters.filter((c) => c.blockInstanceId === instance.id)}
+                                portalResourceIds={portalResourceIds}
                             />
                         </BlockContextProvider>
                     );

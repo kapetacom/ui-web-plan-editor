@@ -93,6 +93,7 @@ export interface PlannerBlockResourceListProps {
     actions: PlannerAction<any>[];
     nodeSize: PlannerNodeSize;
     resourceClusters?: ResourceCluster[];
+    portalResourceIds?: string[];
     onResourceMouseEnter?: (context: ActionContext) => void;
     onResourceMouseLeave?: (context: ActionContext) => void;
 }
@@ -174,6 +175,17 @@ export const PlannerBlockResourceList: React.FC<PlannerBlockResourceListProps> =
             const connectDiff = aConnects - bConnects;
             if (connectDiff !== 0) {
                 return connectDiff;
+            }
+
+            if (props.portalResourceIds) {
+                const aId = getResourceId(blockCtx.blockInstance.id, a.metadata.name, props.role);
+                const bId = getResourceId(blockCtx.blockInstance.id, b.metadata.name, props.role);
+                const aIsPortal = props.portalResourceIds.includes(aId);
+                const bIsPortal = props.portalResourceIds.includes(bId);
+                const portalDiff = (aIsPortal ? 1 : 0) - (bIsPortal ? 1 : 0);
+                if (portalDiff !== 0) {
+                    return portalDiff * -1;
+                }
             }
 
             const aUri = parseKapetaUri(a.kind);

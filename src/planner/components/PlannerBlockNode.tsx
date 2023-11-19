@@ -70,6 +70,7 @@ interface Props {
     onResourceMouseEnter?: (context: ActionContext) => void;
     onResourceMouseLeave?: (context: ActionContext) => void;
     resourceClusters?: ResourceCluster[];
+    portalResourceIds?: string[];
 }
 
 const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
@@ -262,6 +263,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                     actions={props.actions?.resource || []}
                                     onResourceMouseEnter={props.onResourceMouseEnter}
                                     onResourceMouseLeave={props.onResourceMouseLeave}
+                                    portalResourceIds={props.portalResourceIds}
                                     resourceClusters={props.resourceClusters?.filter(
                                         (c) => c.role === ResourceRole.CONSUMES
                                     )}
@@ -272,6 +274,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                     actions={props.actions?.resource || []}
                                     onResourceMouseEnter={props.onResourceMouseEnter}
                                     onResourceMouseLeave={props.onResourceMouseLeave}
+                                    portalResourceIds={props.portalResourceIds}
                                     resourceClusters={props.resourceClusters?.filter(
                                         (c) => c.role === ResourceRole.PROVIDES
                                     )}
