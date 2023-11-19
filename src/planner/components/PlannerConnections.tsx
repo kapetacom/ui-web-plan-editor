@@ -1,11 +1,16 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { ConnectionExtension, getConnectionId, isConnectionTo, useBlockMatrix } from '../utils/connectionUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { PlannerConnection } from './PlannerConnection';
 import { DnDContext, DnDContextType } from '../DragAndDrop/DnDContext';
-import React, { ReactNode, useContext } from 'react';
+import React, { ReactNode } from 'react';
 import { ActionContext, PlannerPayload } from '../types';
 import { PlannerNodeSize } from '../../types';
-import { PlannerActionConfig, PlannerContext } from '../PlannerContext';
+import { PlannerActionConfig } from '../PlannerContext';
 import { useFocusInfo } from '../utils/focusUtils';
 import { getResourceId } from '../utils/planUtils';
 import { ResourceRole } from '@kapeta/ui-web-types';
