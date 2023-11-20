@@ -102,7 +102,7 @@ export const PlannerConnections = (props: Props) => {
 
     return (
         <>
-            {props.connections.map((connection) => {
+            {connections.map((connection) => {
                 // Handle deleted connections that are still in the ordering list
                 if (!connection) {
                     return null;

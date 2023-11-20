@@ -161,9 +161,9 @@ export const PlannerConnection: React.FC<{
             adjustedConsumerCluster &&
             props.clusterIndex !== undefined &&
             props.clusterSize !== undefined &&
-            props.clusterSize !== 0
+            props.clusterSize > 1
         ) {
-            const yAdjust = (props.clusterSize / 2) * -1;
+            const yAdjust = ((props.clusterSize - 1) / 2) * -CLUSTER_INDEX_OFFSET;
             const clusterOffset = yAdjust + props.clusterIndex * CLUSTER_INDEX_OFFSET;
             adjustedProviderCluster = {
                 x: adjustedProviderCluster.x,
