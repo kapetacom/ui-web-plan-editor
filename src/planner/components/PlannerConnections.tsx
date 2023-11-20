@@ -7,10 +7,10 @@ import { ConnectionExtension, getConnectionId, isConnectionTo, useBlockMatrix } 
 import { toClass } from '@kapeta/ui-web-utils';
 import { PlannerConnection } from './PlannerConnection';
 import { DnDContext, DnDContextType } from '../DragAndDrop/DnDContext';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useContext, useMemo } from 'react';
 import { ActionContext, PlannerPayload } from '../types';
 import { PlannerNodeSize } from '../../types';
-import { PlannerActionConfig } from '../PlannerContext';
+import { PlannerActionConfig, PlannerContext } from '../PlannerContext';
 import { useFocusInfo } from '../utils/focusUtils';
 import { getResourceId } from '../utils/planUtils';
 import { ResourceRole } from '@kapeta/ui-web-types';
@@ -48,6 +48,57 @@ export const PlannerConnections = (props: Props) => {
     const connectionKeys: { [p: string]: boolean } = {};
     const providerSeen: { [p: string]: boolean } = {};
     const blockMatrix = useBlockMatrix();
+    const planner = useContext(PlannerContext);
+
+    const connections = useMemo(() => {
+        const out = [...props.connections];
+        out.sort((a, b) => {
+            const aId = getResourceId(a.provider.blockId, a.provider.resourceName, ResourceRole.PROVIDES);
+            const aPoint = planner.connectionPoints.getPointById(aId);
+
+            const bId = getResourceId(b.provider.blockId, b.provider.resourceName, ResourceRole.PROVIDES);
+            const bPoint = planner.connectionPoints.getPointById(bId);
+            if (!aPoint && !bPoint) {
+                return 0;
+            }
+
+            if (aPoint && !bPoint) {
+                return -1;
+            }
+
+            if (!aPoint && bPoint) {
+                return 1;
+            }
+
+            if (!aPoint || !bPoint) {
+                return 0;
+            }
+
+            return aPoint.y - bPoint.y;
+        });
+        return out;
+    }, [props.connections, planner.connectionPoints]);
+
+    const connectionClusters: { [key: string]: string[] } = useMemo(() => {
+        const out: { [key: string]: string[] } = {};
+        const clusters: { [key: string]: string[] } = {};
+        connections.forEach((connection) => {
+            if (!connection.consumerClusterId || !connection.providerClusterId) {
+                return;
+            }
+
+            const connectionId = connection.id!;
+
+            const clusterId = `${connection.consumerClusterId}|${connection.providerClusterId}`;
+
+            if (!clusters[clusterId]) {
+                clusters[clusterId] = [];
+            }
+            clusters[clusterId].push(connectionId);
+            out[connectionId] = clusters[clusterId];
+        });
+        return out;
+    }, [connections]);
 
     return (
         <>
@@ -57,12 +108,12 @@ export const PlannerConnections = (props: Props) => {
                     return null;
                 }
 
-                const key = getConnectionId(connection);
-                if (connectionKeys[key]) {
+                const connectionId = getConnectionId(connection);
+                if (connectionKeys[connectionId]) {
                     // Prevent rendering duplicate connections
                     return null;
                 }
-                connectionKeys[key] = true;
+                connectionKeys[connectionId] = true;
 
                 const providerId = getResourceId(
                     connection.provider.blockId,
@@ -75,7 +126,14 @@ export const PlannerConnections = (props: Props) => {
                     firstForProvider = true;
                 }
 
-                const highlighted = props.highlightedConnections.includes(key);
+                const highlighted = props.highlightedConnections.includes(connectionId);
+
+                let clusterIndex = 0;
+                let clusterSize = 0;
+                if (connectionClusters[connectionId]) {
+                    clusterIndex = connectionClusters[connectionId].indexOf(connectionId);
+                    clusterSize = connectionClusters[connectionId].length;
+                }
 
                 // Hide connections that are not connected to the focused block
                 const className = toClass({
@@ -87,9 +145,11 @@ export const PlannerConnections = (props: Props) => {
 
                 return (
                     <PlannerConnection
-                        key={key}
+                        key={connectionId}
                         blockMatrix={blockMatrix}
                         firstForProvider={firstForProvider}
+                        clusterIndex={clusterIndex}
+                        clusterSize={clusterSize}
                         style={{ zIndex: highlighted ? -1 : firstForProvider ? -40 : -50 }}
                         size={props.nodeSize}
                         className={className}

@@ -31,6 +31,11 @@ function canHaveConnections(kind: string) {
     return provider.type === ResourceProviderType.INTERNAL || provider.type === ResourceProviderType.EXTENSION;
 }
 
+function getPointForConsumer(planner: PlannerContextData, blockInstanceId: string, resourceName: string) {
+    const resourceId = getResourceId(blockInstanceId, resourceName, ResourceRole.CONSUMES);
+    return planner.connectionPoints.getPointById(resourceId);
+}
+
 function getPointForInstance(planner: PlannerContextData, blockInstanceId: string) {
     const blockInstance = planner.plan?.spec.blocks.find((block) => block.id === blockInstanceId);
     if (!blockInstance) {
@@ -71,6 +76,11 @@ function getGreatestVerticalDifference(
 
     const points = endpoints
         .map((endpoint) => {
+            if (role === ResourceRole.CONSUMES) {
+                // We only do this if the opposite endpoint is a consumer - otherwise we're just
+                // it will keep shifting
+                return getPointForConsumer(planner, endpoint.blockId, endpoint.resourceName);
+            }
             return getPointForInstance(planner, endpoint.blockId);
         })
         .filter((v) => Boolean(v)) as Point[];

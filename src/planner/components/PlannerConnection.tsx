@@ -32,6 +32,8 @@ import {
 import { applyObstacles } from '../utils/connectionUtils/src/matrix';
 import _ from 'lodash';
 
+const CLUSTER_INDEX_OFFSET = 10;
+const ENABLE_CLUSTERING = true;
 function useConnectionValidation(connection: Connection, planner: PlannerContextData) {
     const fromResource = useMemo(
         () =>
@@ -102,6 +104,8 @@ export const PlannerConnection: React.FC<{
     onMouseOver?: (context: ActionContext) => void;
     onMouseLeave?: (context: ActionContext) => void;
     style?: React.CSSProperties;
+    clusterIndex?: number;
+    clusterSize?: number;
 }> = (props) => {
     const planner = useContext(PlannerContext);
     const [hasFocus, setHasFocus] = useState(false);
@@ -149,14 +153,40 @@ export const PlannerConnection: React.FC<{
             return [];
         }
 
-        let from = providerCluster ?? providerPoint;
-        let to = consumerCluster ?? consumerPoint;
+        let adjustedProviderCluster = ENABLE_CLUSTERING ? providerCluster : null;
+        let adjustedConsumerCluster = ENABLE_CLUSTERING ? consumerCluster : null;
+
+        if (
+            adjustedProviderCluster &&
+            adjustedConsumerCluster &&
+            props.clusterIndex !== undefined &&
+            props.clusterSize !== undefined &&
+            props.clusterSize !== 0
+        ) {
+            const yAdjust = (props.clusterSize / 2) * -1;
+            const clusterOffset = yAdjust + props.clusterIndex * CLUSTER_INDEX_OFFSET;
+            adjustedProviderCluster = {
+                x: adjustedProviderCluster.x,
+                y: adjustedProviderCluster.y + clusterOffset,
+            };
+            adjustedConsumerCluster = {
+                x: adjustedConsumerCluster.x,
+                y: adjustedConsumerCluster.y + clusterOffset,
+            };
+        }
+
+        let from = adjustedProviderCluster ?? providerPoint;
+        let to = adjustedConsumerCluster ?? consumerPoint;
 
         const fromX = Math.floor((from.x + POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
         const toX = Math.floor((to.x - POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
 
-        const startingPoints = providerCluster ? createSimplePath(providerPoint, providerCluster) : [[from.x, from.y]];
-        const endingPoints = consumerCluster ? createSimplePath(consumerCluster, consumerPoint, true) : [[to.x, to.y]];
+        const startingPoints = adjustedProviderCluster
+            ? createSimplePath(providerPoint, adjustedProviderCluster)
+            : [[from.x, from.y]];
+        const endingPoints = adjustedConsumerCluster
+            ? createSimplePath(adjustedConsumerCluster, consumerPoint, true)
+            : [[to.x, to.y]];
 
         const fallbackPath = createSimplePathVia(
             providerPoint,
