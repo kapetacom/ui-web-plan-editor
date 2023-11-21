@@ -100,6 +100,27 @@ export const PlannerConnections = (props: Props) => {
         return out;
     }, [connections]);
 
+    const providerHasHighlightedPortal: { [key: string]: boolean } = useMemo(() => {
+        const out: { [key: string]: boolean } = {};
+        connections.forEach((connection) => {
+            if (!connection.portal) {
+                return;
+            }
+
+            const providerId = getResourceId(
+                connection.provider.blockId,
+                connection.provider.resourceName,
+                ResourceRole.PROVIDES
+            );
+            const connectionId = connection.id!;
+            const isHighlighted = props.highlightedConnections.includes(connectionId);
+            if (isHighlighted) {
+                out[providerId] = true;
+            }
+        });
+        return out;
+    }, [connections, props.highlightedConnections]);
+
     return (
         <>
             {connections.map((connection) => {
@@ -120,13 +141,20 @@ export const PlannerConnections = (props: Props) => {
                     connection.provider.resourceName,
                     ResourceRole.PROVIDES
                 );
+
                 let firstForProvider = false;
                 if (!providerSeen[providerId]) {
                     providerSeen[providerId] = true;
                     firstForProvider = true;
                 }
 
-                const highlighted = props.highlightedConnections.includes(connectionId);
+                let highlighted = props.highlightedConnections.includes(connectionId);
+                let showPortal = false;
+                if (firstForProvider && !providerHasHighlightedPortal[providerId]) {
+                    showPortal = true;
+                } else if (highlighted) {
+                    showPortal = true;
+                }
 
                 let clusterIndex = 0;
                 let clusterSize = 0;
@@ -147,10 +175,10 @@ export const PlannerConnections = (props: Props) => {
                     <PlannerConnection
                         key={connectionId}
                         blockMatrix={blockMatrix}
-                        firstForProvider={firstForProvider}
+                        showPortal={showPortal}
                         clusterIndex={clusterIndex}
                         clusterSize={clusterSize}
-                        style={{ zIndex: highlighted ? -1 : firstForProvider ? -40 : -50 }}
+                        style={{ zIndex: highlighted ? -1 : showPortal ? -40 : -50 }}
                         size={props.nodeSize}
                         className={className}
                         connection={connection}

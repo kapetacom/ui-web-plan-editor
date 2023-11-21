@@ -97,7 +97,7 @@ export const PlannerConnection: React.FC<{
     // eslint-disable-next-line react/no-unused-prop-types
     viewOnly?: boolean;
     focused?: boolean;
-    firstForProvider?: boolean;
+    showPortal?: boolean;
     blockMatrix?: number[][];
     actions?: PlannerAction<any>[];
     onMouseEnter?: (context: ActionContext) => void;
@@ -281,7 +281,7 @@ export const PlannerConnection: React.FC<{
     const paths: PathInfo[] = [];
 
     if (behaveAsPortal) {
-        const showProviderPortal = props.firstForProvider !== false;
+        const showProviderPortal = props.showPortal !== false;
         const ACTION_POINT_OFFSET = 100;
         const BUTTON_OFFSET = 20;
         const providerPortalPoint = {
