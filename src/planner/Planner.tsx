@@ -266,17 +266,6 @@ export const Planner = (props: Props) => {
             resetKeys={[props.systemId, planner.plan, planner.blockAssets]}
         >
             <PlannerCanvas onCreateBlock={props.onCreateBlock}>
-                <svg>
-                    <defs>
-                        <g id={'svg-portal'}>
-                            <ellipse cx="25" cy="25" rx="5" ry="5" fill={'inherit'} />
-                        </g>
-                        <g id={'svg-portal-reverse'}>
-                            <ellipse cx="25" cy="25" rx="5" ry="5" fill={'inherit'} />
-                        </g>
-                    </defs>
-                </svg>
-
                 {instances.map((instance, index) => {
                     const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
                     const isInFocus = !!(focusInfo && isBlockInFocus(focusInfo, instance.id));

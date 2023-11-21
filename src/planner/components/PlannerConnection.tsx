@@ -368,7 +368,7 @@ export const PlannerConnection: React.FC<{
                                     style={{ zIndex: 10, position: 'relative' }}
                                 >
                                     <g className={'portal'} transform={`translate(${pathInfo.portalPoint.x},0)`}>
-                                        <use href={pathInfo.provider ? '#svg-portal-reverse' : '#svg-portal'} />
+                                        <ellipse cx="25" cy="25" rx="5" ry="5" fill={'inherit'} />
                                     </g>
                                 </svg>
                             )}
