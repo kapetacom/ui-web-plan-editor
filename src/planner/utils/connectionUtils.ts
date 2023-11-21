@@ -241,7 +241,7 @@ export function useConnectionExtensions(): ConnectionExtensionResult {
             }
         });
 
-        Object.entries(sameBlocksBuckets).forEach(([blockConnectionId, connectionIds]) => {
+        Object.values(sameBlocksBuckets).forEach((connectionIds) => {
             const connections = Array.from(connectionIds).map((id) => connectionMap[id]);
             const providerResourceIds: string[] = [];
             const consumerResourceIds: string[] = [];
