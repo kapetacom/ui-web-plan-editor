@@ -3,16 +3,15 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { PlannerActionConfig, PlannerContext } from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';
 import { BlockContextProvider } from './BlockContext';
 import { PlannerCanvas } from './PlannerCanvas';
-import { PlannerConnection } from './components/PlannerConnection';
-import { getConnectionId, isConnectionTo, useBlockMatrix, useConnectionExtensions } from './utils/connectionUtils';
-import { DnDContext, DnDContextType } from './DragAndDrop/DnDContext';
-import { ActionContext, PlannerPayload } from './types';
+import { getConnectionId, useConnectionExtensions } from './utils/connectionUtils';
+import { DnDContext } from './DragAndDrop/DnDContext';
+import { ActionContext } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';

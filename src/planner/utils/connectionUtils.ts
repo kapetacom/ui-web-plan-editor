@@ -182,21 +182,21 @@ export function useConnectionExtensions(): ConnectionExtensionResult {
         });
 
         const connectionMap: { [key: string]: ConnectionExtension } = {};
-        const blockConnections: { [key: string]: string[] } = {};
-        const sameBlocksBuckets: { [key: string]: string[] } = {};
+        const blockConnections: { [key: string]: Set<string> } = {};
+        const sameBlocksBuckets: { [key: string]: Set<string> } = {};
         const resourceClusters: ResourceCluster[] = [];
 
-        const providerConnections: { [key: string]: string[] } = {};
-        const providerWithManyConnections: { [key: string]: string[] } = {};
+        const providerConnections: { [key: string]: Set<string> } = {};
+        const providerWithManyConnections: { [key: string]: Set<string> } = {};
 
         out.forEach((connection) => {
             const id = connection.id!;
             connectionMap[id] = connection;
             const blockConnection = `${connection.consumer.blockId}|${connection.provider.blockId}`;
             if (!blockConnections[blockConnection]) {
-                blockConnections[blockConnection] = [];
+                blockConnections[blockConnection] = new Set<string>();
             }
-            blockConnections[blockConnection].push(id);
+            blockConnections[blockConnection].add(id);
 
             const providerResourceId = getResourceId(
                 connection.provider.blockId,
@@ -204,14 +204,14 @@ export function useConnectionExtensions(): ConnectionExtensionResult {
                 ResourceRole.PROVIDES
             );
             if (!providerConnections[providerResourceId]) {
-                providerConnections[providerResourceId] = [];
+                providerConnections[providerResourceId] = new Set<string>();
             }
 
-            providerConnections[providerResourceId].push(id);
+            providerConnections[providerResourceId].add(id);
         });
 
         Object.entries(providerConnections).forEach(([providerResourceId, connections]) => {
-            if (connections.length > MANY_CONNECTIONS_THRESHOLD) {
+            if (connections.size > MANY_CONNECTIONS_THRESHOLD) {
                 providerWithManyConnections[providerResourceId] = connections;
                 portalResources.add(providerResourceId);
                 connections.forEach((connectionId) => {
@@ -228,18 +228,21 @@ export function useConnectionExtensions(): ConnectionExtensionResult {
         });
 
         Object.entries(blockConnections).forEach(([blockConnectionId, connections]) => {
-            const remainingConnections = connections.map((id) => connectionMap[id]).filter((c) => !c.portals);
-            if (remainingConnections.length > 1) {
+            const remainingConnections = Array.from(connections)
+                .map((id) => connectionMap[id])
+                .filter((c) => !c.portals);
+            const connectionIds = new Set<string>(remainingConnections.map((c) => c.id!));
+            if (connectionIds.size > 1) {
                 remainingConnections.forEach((connection, ix) => {
                     connection.consumerClusterId = connection.consumer.blockId + '-' + ResourceRole.CONSUMES;
                     connection.providerClusterId = connection.provider.blockId + '-' + ResourceRole.PROVIDES;
                 });
-                sameBlocksBuckets[blockConnectionId] = remainingConnections.map((c) => c.id!);
+                sameBlocksBuckets[blockConnectionId] = connectionIds;
             }
         });
 
         Object.entries(sameBlocksBuckets).forEach(([blockConnectionId, connectionIds]) => {
-            const connections = connectionIds.map((id) => connectionMap[id]);
+            const connections = Array.from(connectionIds).map((id) => connectionMap[id]);
             const providerResourceIds: string[] = [];
             const consumerResourceIds: string[] = [];
             connections.map((connection) => {
