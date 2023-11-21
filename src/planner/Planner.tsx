@@ -161,10 +161,9 @@ export const Planner = (props: Props) => {
 
     const onLeave = useCallback(
         (cb: any) => (context: ActionContext) => {
-            if (context.blockInstance?.id === topBlock) {
+            if (!context.connection && !context.resource && context.blockInstance?.id === topBlock) {
                 setTopBlock(null);
             }
-
             if (currentActionContext) {
                 if (
                     context.connection &&
