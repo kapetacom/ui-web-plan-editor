@@ -14,7 +14,7 @@ import { Transition } from 'react-transition-group';
 import { BlockLayout } from '@kapeta/ui-web-components';
 import { PlannerBlockResourceList } from '../planner/components/PlannerBlockResourceList';
 import { PlannerNodeSize } from '../types';
-import { BlockContext, calculateBlockHeights } from '../planner/BlockContext';
+import { BlockContext, calculateBlockSize } from '../planner/BlockContext';
 import { BlockMode } from '../utils/enums';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 
@@ -75,7 +75,7 @@ export const BlockShape = forwardRef((props: ShapeProps, parentRef) => {
         dimensions: { height: 0, width: 0, top: 0, left: 0 },
     };
 
-    const { instanceBlockHeight, instanceResourceHeight } = calculateBlockHeights({
+    const { instanceBlockHeight, instanceResourceHeight } = calculateBlockSize({
         nodeSize: PlannerNodeSize.MEDIUM,
         blockType: props.blockType,
         blockDefinition: props.block,

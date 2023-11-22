@@ -66,7 +66,7 @@ describe('fillMatrix', () => {
 
     it('should handle objects with a cell size larger than 1 - overflow', () => {
         const objects = [{ x: 1, y: 1, width: 2, height: 2 }];
-        const matrixSize: [number, number] = [4, 4];
+        const matrixSize: [number, number] = [8, 8];
         const cellSize: [number, number] = [2, 2];
         const expectedMatrix = [
             [1, 1, 0, 0],
@@ -80,7 +80,7 @@ describe('fillMatrix', () => {
 
     it('should handle objects with a cell size larger than 1 - contained', () => {
         const objects = [{ x: 0, y: 0, width: 2, height: 2 }];
-        const matrixSize: [number, number] = [4, 4];
+        const matrixSize: [number, number] = [8, 8];
         const cellSize: [number, number] = [2, 2];
         const expectedMatrix = [
             [1, 0, 0, 0],

@@ -3,16 +3,15 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { ReactNode, useCallback, useContext, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { PlannerActionConfig, PlannerContext } from './PlannerContext';
 import { PlannerNodeSize } from '../types';
 import { PlannerBlockNode } from './components/PlannerBlockNode';
 import { BlockContextProvider } from './BlockContext';
 import { PlannerCanvas } from './PlannerCanvas';
-import { PlannerConnection } from './components/PlannerConnection';
-import { getConnectionId, isConnectionTo } from './utils/connectionUtils';
-import { DnDContext, DnDContextType } from './DragAndDrop/DnDContext';
-import { ActionContext, PlannerPayload } from './types';
+import { getConnectionId, useConnectionExtensions } from './utils/connectionUtils';
+import { DnDContext } from './DragAndDrop/DnDContext';
+import { ActionContext } from './types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { isBlockInFocus, useFocusInfo } from './utils/focusUtils';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -22,6 +21,7 @@ import { Alert } from '@mui/material';
 import './Planner.less';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceMode } from '../utils/enums';
+import { PlannerConnections } from './components/PlannerConnections';
 
 type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent | typeof React.Component> | null;
 
@@ -47,32 +47,13 @@ interface Props {
     onErrorResolved?: () => void;
 }
 
-const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
-    return draggable && draggable.type === 'resource' ? (
-        <PlannerConnection
-            size={PlannerNodeSize.MEDIUM}
-            connection={{
-                provider: {
-                    blockId: draggable.data.instance.id,
-                    resourceName: draggable.data.resource.metadata.name,
-                },
-                consumer: {
-                    blockId: 'temp-block',
-                    resourceName: 'temp-resource',
-                },
-                port: draggable.data.resource.spec.port,
-            }}
-        />
-    ) : null;
-};
-
 export const Planner = (props: Props) => {
     const { isDragging } = useContext(DnDContext);
     const planner = useContext(PlannerContext);
     const nodeSize = planner.nodeSize ?? PlannerNodeSize.MEDIUM;
 
     const instances = planner.plan?.spec.blocks ?? [];
-    const connections = planner.plan?.spec.connections ?? [];
+    const { connections, resourceClusters, portalResourceIds } = useConnectionExtensions();
 
     // Manage connection render order to ensure that connections are rendered on top when hovered
     const [highlightedConnections, setHighlightedConnections] = useState<string[]>([]);
@@ -180,10 +161,9 @@ export const Planner = (props: Props) => {
 
     const onLeave = useCallback(
         (cb: any) => (context: ActionContext) => {
-            if (context.blockInstance?.id === topBlock) {
+            if (!context.connection && !context.resource && context.blockInstance?.id === topBlock) {
                 setTopBlock(null);
             }
-
             if (currentActionContext) {
                 if (
                     context.connection &&
@@ -254,8 +234,6 @@ export const Planner = (props: Props) => {
     const focusInfo = useFocusInfo();
     const focusModeEnabled = !!focusInfo;
 
-    const connectionKeys: { [p: string]: boolean } = {};
-
     return (
         <ErrorBoundary
             onError={props.onError}
@@ -312,51 +290,22 @@ export const Planner = (props: Props) => {
                                 onMouseLeave={callbacks.onBlockMouseLeave}
                                 onResourceMouseEnter={callbacks.onResourceMouseEnter}
                                 onResourceMouseLeave={callbacks.onResourceMouseLeave}
+                                resourceClusters={resourceClusters.filter((c) => c.blockInstanceId === instance.id)}
+                                portalResourceIds={portalResourceIds}
                             />
                         </BlockContextProvider>
                     );
                 })}
 
-                {connections.map((connection, id) => {
-                    // Handle deleted connections that are still in the ordering list
-                    if (!connection) {
-                        return null;
-                    }
-
-                    const key = getConnectionId(connection);
-
-                    if (connectionKeys[key]) {
-                        // Prevent rendering duplicate connections
-                        return null;
-                    }
-                    connectionKeys[key] = true;
-
-                    const highlighted = highlightedConnections.includes(key);
-
-                    // Hide connections that are not connected to the focused block
-                    const className = toClass({
-                        'connection-hidden': Boolean(
-                            focusInfo?.focus && !isConnectionTo(connection, focusInfo?.focus.instance.id)
-                        ),
-                        highlight: highlighted,
-                    });
-
-                    return (
-                        <PlannerConnection
-                            style={{ zIndex: highlighted ? -1 : -50 }}
-                            size={nodeSize}
-                            key={key}
-                            className={className}
-                            connection={connection}
-                            actions={props.actions?.connection || []}
-                            onMouseOver={callbacks.onConnectionMouseEnter}
-                            onMouseLeave={callbacks.onResourceMouseLeave}
-                        />
-                    );
-                })}
-
-                {/* Render temp connections to dragged resources */}
-                <DnDContext.Consumer>{renderTempResources}</DnDContext.Consumer>
+                <PlannerConnections
+                    actions={props.actions}
+                    connections={connections}
+                    nodeSize={nodeSize}
+                    focusInfo={focusInfo}
+                    highlightedConnections={highlightedConnections}
+                    onConnectionMouseEnter={callbacks.onConnectionMouseEnter}
+                    onConnectionMouseLeave={callbacks.onConnectionMouseLeave}
+                />
             </PlannerCanvas>
         </ErrorBoundary>
     );

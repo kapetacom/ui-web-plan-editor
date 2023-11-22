@@ -32,7 +32,7 @@ const CircleButton = (props: any) => {
     );
 };
 
-interface ActionButtonListProps {
+export interface ActionButtonListProps {
     pointType?: 'left' | 'right' | 'center';
     transition?: 'fade' | 'slide';
     x: number;

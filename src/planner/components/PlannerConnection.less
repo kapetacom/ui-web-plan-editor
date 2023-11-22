@@ -15,9 +15,10 @@
     .mouse-catcher {
         stroke: transparent;
         fill: none;
-        stroke-width: 30;
+        stroke-width: 10;
         opacity: 0;
     }
+
 
     .line {
         .transition();
@@ -30,7 +31,7 @@
         fill: none;
         .transition();
         stroke: @bw-planner-background;
-        stroke-width: 12;
+        stroke-width: 6;
         stroke-linecap: round;
     }
 
@@ -39,10 +40,26 @@
         stroke-dasharray: none;
     }
 
+    g.portal {
+        .transition();
+        fill: @kapeta-success-light;
+    }
+
+    &.portal {
+        .line {
+            stroke-linecap: square;
+        }
+    }
+
     &.highlight {
         .line {
             stroke: #651fff;
         }
+
+        g.portal {
+            fill: #651fff;
+        }
+
         .background {
             opacity: 0;
         }

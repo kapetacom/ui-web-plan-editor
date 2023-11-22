@@ -40,7 +40,7 @@
             {
                 "kind": "kapeta/resource-type-postgresql:1.2.3",
                 "metadata": {
-                    "name": "usersdb"
+                    "name": "usersdb2"
                 }
             }
         ],
