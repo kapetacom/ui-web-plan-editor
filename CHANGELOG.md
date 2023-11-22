@@ -1,3 +1,10 @@
+# [1.21.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.20.0...v1.21.0) (2023-11-22)
+
+
+### Features
+
+* Optimizes path finding ([#126](https://github.com/kapetacom/ui-web-plan-editor/issues/126)) ([1097e8f](https://github.com/kapetacom/ui-web-plan-editor/commit/1097e8f6537468c83e20296c27efffb061158685))
+
 # [1.20.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.19.1...v1.20.0) (2023-11-18)
 
 
