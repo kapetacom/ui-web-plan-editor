@@ -8,7 +8,7 @@ import { DrawerProps, Drawer, Typography, Divider, Box, Stack, IconButton } from
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { VerticalResizeHandle, useResize } from './useResize';
 
-interface PlannerSidebarProps extends PropsWithChildren, Omit<DrawerProps, 'children' | 'anchor' | 'title'> {
+export interface PlannerSidebarProps extends PropsWithChildren, Omit<DrawerProps, 'children' | 'anchor' | 'title'> {
     /**
      * The title of the planner sidebar
      */
