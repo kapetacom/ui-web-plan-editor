@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, ReactNode } from 'react';
 import { DrawerProps, Drawer, Typography, Divider, Box, Stack, IconButton } from '@mui/material';
-import { CloseRounded } from '@mui/icons-material';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import { VerticalResizeHandle, useResize } from './useResize';
 
-interface PlannerSidebarProps extends PropsWithChildren, Omit<DrawerProps, 'children' | 'anchor'> {
+interface PlannerSidebarProps extends PropsWithChildren, Omit<DrawerProps, 'children' | 'anchor' | 'title'> {
     /**
      * The title of the planner sidebar
      */
-    title: string;
+    title: ReactNode;
     /**
      * The size of the planner sidebar. Default is 'medium' (600px).
      */
@@ -76,9 +76,13 @@ export const PlannerSidebar = (props: PlannerSidebarProps) => {
                             fontSize: '22px',
                         }}
                     >
-                        <Typography fontSize={'inherit'} variant={'h3'}>
-                            {title}
-                        </Typography>
+                        {typeof title === 'string' ? (
+                            <Typography fontSize={'inherit'} variant={'h3'}>
+                                {title}
+                            </Typography>
+                        ) : (
+                            title
+                        )}
                         <IconButton
                             sx={{
                                 fontSize: 'inherit',
@@ -88,11 +92,12 @@ export const PlannerSidebar = (props: PlannerSidebarProps) => {
                                     drawerProps.onClose(evt, 'escapeKeyDown');
                                 }
                             }}
+                            size="medium"
                         >
-                            <CloseRounded />
+                            <CloseRoundedIcon fontSize="inherit" />
                         </IconButton>
                     </Stack>
-                    <Divider />
+                    <Divider sx={{ mt: 0.5 }} />
                 </Box>
                 <Box
                     flex={1}
