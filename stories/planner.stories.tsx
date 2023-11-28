@@ -16,7 +16,7 @@ import { useAsync } from 'react-use';
 import { ItemType, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { ItemEditorPanel } from './helpers/ItemEditorPanel';
-import { EditItemInfo, PlannerMode } from '../src';
+import { EditItemInfo, PlannerMode, PlannerSidebar } from '../src';
 import { InstanceStatus } from '@kapeta/ui-web-context';
 
 import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
@@ -26,8 +26,9 @@ import { PlannerResourcesList } from '../src/panels/tools/PlannerResourcesList';
 
 import { useConfirmDelete } from '@kapeta/ui-web-components';
 import { PlannerDrawer } from '../src/panels/PlannerDrawer';
-import { Tab, Tabs } from '@mui/material';
+import { Box, IconButton, Tab, Tabs, Typography } from '@mui/material';
 import { PublicUrlList } from '../src/panels/tools/PublicUrlList';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 import './styles.less';
 
@@ -420,5 +421,41 @@ export const CustomRenderer = () => {
         <plannerRenderer.Provider outlets={outlets}>
             <PlannerLoader plannerMode={PlannerMode.EDIT} instanceStatus={InstanceStatus.STARTING} />
         </plannerRenderer.Provider>
+    );
+};
+
+export const PlannerSidebarWithStringTitle = () => {
+    const [open, setOpen] = React.useState(true);
+    return (
+        <PlannerSidebar open={open} title="Sidebar title" onClose={() => setOpen(false)}>
+            Sidebar content
+        </PlannerSidebar>
+    );
+};
+
+export const PlannerSidebarWithCustomTitle = () => {
+    const [open, setOpen] = React.useState(true);
+    return (
+        <PlannerSidebar
+            open={open}
+            title={
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: '100%',
+                    }}
+                >
+                    <Typography variant="h6">Sidebar title</Typography>
+                    <IconButton size="medium">
+                        <SettingsOutlinedIcon fontSize="inherit" />
+                    </IconButton>
+                </Box>
+            }
+            onClose={() => setOpen(false)}
+        >
+            Sidebar content
+        </PlannerSidebar>
     );
 };
