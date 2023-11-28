@@ -1,3 +1,11 @@
+## [1.21.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.21.0...v1.21.1) (2023-11-28)
+
+
+### Bug Fixes
+
+* Enable custom title in PlannerSidebar ([594e13c](https://github.com/kapetacom/ui-web-plan-editor/commit/594e13c113d029a04a9fe616b58ca1f5840dc7e7))
+* Export props ([2367584](https://github.com/kapetacom/ui-web-plan-editor/commit/236758405dea7f579d0e9b4b5232ed6df1b2f5fe))
+
 # [1.21.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.20.0...v1.21.0) (2023-11-22)
 
 
