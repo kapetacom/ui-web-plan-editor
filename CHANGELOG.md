@@ -1,3 +1,10 @@
+## [1.21.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.21.1...v1.21.2) (2023-11-29)
+
+
+### Bug Fixes
+
+* Make it possible to use the sx prop of PlannerSidebar ([6f9dde3](https://github.com/kapetacom/ui-web-plan-editor/commit/6f9dde3838912f629efed9e3a89e5fd9f3514c06))
+
 ## [1.21.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.21.0...v1.21.1) (2023-11-28)
 
 
