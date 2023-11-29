@@ -46,7 +46,9 @@ export const PlannerSidebar = (props: PlannerSidebarProps) => {
     return (
         <Drawer
             className="kap-planner-sidebar"
+            {...drawerProps}
             sx={{
+                ...drawerProps.sx,
                 position: 'relative',
                 '& .MuiDrawer-paper': {
                     p: 4,
@@ -56,7 +58,6 @@ export const PlannerSidebar = (props: PlannerSidebarProps) => {
                     ...resizeWidths,
                 },
             }}
-            {...drawerProps}
             anchor="right"
         >
             <Stack
