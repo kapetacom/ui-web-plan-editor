@@ -17,7 +17,6 @@ import {
     Typography,
     useTheme,
 } from '@mui/material';
-import { InstanceStatus } from '@kapeta/ui-web-context';
 import { Language, Link, LinkOff, MoreVert } from '@mui/icons-material';
 import { Tooltip as KapTooltip } from '@kapeta/ui-web-components';
 
@@ -26,8 +25,6 @@ interface GatewayCardProps {
     fallbackText?: string;
 
     loading?: boolean;
-    status?: InstanceStatus;
-
     primary?: {
         url: string | null;
         status?: 'ok' | 'loading' | 'error';
@@ -134,40 +131,13 @@ export const GatewayCard = (props: GatewayCardProps) => {
 
     // Status color
     const { palette } = useTheme();
-    const statusColorMap: Record<InstanceStatus, string> = {
-        [InstanceStatus.STARTING]: palette.success.main,
-        [InstanceStatus.READY]: palette.success.main,
-        [InstanceStatus.STOPPING]: palette.success.main,
-        [InstanceStatus.STOPPED]: '#0000003b',
-        [InstanceStatus.FAILED]: palette.error.main,
-        [InstanceStatus.UNHEALTHY]: palette.warning.main,
-        [InstanceStatus.BUSY]: palette.warning.main,
-    };
-    const statusColor = statusColorMap[props.status || InstanceStatus.STOPPED];
-
-    // Status text
-    const titleMapping: Record<InstanceStatus, string> = {
-        [InstanceStatus.STARTING]: 'Block is starting',
-        [InstanceStatus.READY]: 'Block is ready',
-        [InstanceStatus.UNHEALTHY]: 'Block is unhealthy. View logs to see more information.',
-        [InstanceStatus.FAILED]: 'Block failed to start or crashed. View logs to see more information.',
-        [InstanceStatus.STOPPED]: 'Block has stopped',
-        [InstanceStatus.STOPPING]: 'Block is stopping',
-        [InstanceStatus.BUSY]: 'Block is unresponsive',
-    };
-    let statusText: string = '';
-    if (props.loading) {
-        statusText = 'Loading...';
-    } else {
-        statusText = titleMapping[props.status || InstanceStatus.STOPPED];
-    }
-
-    // Status pulsate
-    const shouldPulsate =
-        props.loading ||
-        props.status === InstanceStatus.STARTING ||
-        props.status === InstanceStatus.STOPPING ||
-        props.status === InstanceStatus.UNHEALTHY;
+    const statusColor = {
+        ok: palette.success.main,
+        loading: '#0000003b',
+        error: palette.error.main,
+    }[entry?.status || 'loading'];
+    const statusText: string = entry?.message || (props.loading && 'Loading') || '';
+    const shouldPulsate = props.loading || entry?.status === 'loading';
 
     const card = (
         <Stack

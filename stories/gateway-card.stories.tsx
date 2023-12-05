@@ -6,7 +6,6 @@
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { GatewayCard } from '../src/components/GatewayCard';
-import { InstanceStatus } from '@kapeta/ui-web-context';
 
 export default {
     title: 'Gateway Cards',
@@ -33,7 +32,6 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
         {
             label: 'Editor mode',
             props: {
-                status: InstanceStatus.READY,
                 fallbackText: 'Open in browser',
                 primary: undefined,
                 fallback: {
@@ -68,20 +66,17 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
     ],
     [
         {
-            label: 'Block statuses',
-            props: { title: 'Starting', status: InstanceStatus.STARTING },
+            label: 'URL statuses',
+            props: { title: 'Loading', primary: { status: 'loading', url: 'https://example.com' } },
         },
         {
-            props: { title: 'Ready', status: InstanceStatus.READY },
+            props: {
+                title: 'Error',
+                primary: { status: 'error', url: 'https://example.com', message: 'An error occurred' },
+            },
         },
         {
-            props: { title: 'Unhealthy', status: InstanceStatus.UNHEALTHY },
-        },
-        {
-            props: { title: 'Stopped', status: InstanceStatus.STOPPED },
-        },
-        {
-            props: { title: 'Failed', status: InstanceStatus.FAILED },
+            props: { title: 'Ok', primary: { status: 'ok', url: 'https://example.com', message: 'URL is ready' } },
         },
     ],
 
@@ -89,7 +84,6 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
         {
             label: 'Custom URL',
             props: {
-                status: InstanceStatus.READY,
                 primary: {
                     url: 'https://example.com',
                     status: 'loading',
@@ -102,7 +96,6 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
         },
         {
             props: {
-                status: InstanceStatus.READY,
                 primary: {
                     url: 'https://example.com',
                     status: 'ok',
@@ -115,7 +108,6 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
         },
         {
             props: {
-                status: InstanceStatus.READY,
                 primary: {
                     url: 'https://example.com',
                     status: 'error',
@@ -139,7 +131,6 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
         {
             label: 'Fallback only',
             props: {
-                status: InstanceStatus.READY,
                 fallback: {
                     url: 'https://kap-abc.kapeta.dev',
                     status: 'loading',
@@ -148,7 +139,6 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
         },
         {
             props: {
-                status: InstanceStatus.READY,
                 fallback: {
                     url: 'https://kap-abc.kapeta.dev',
                     status: 'ok',
@@ -157,7 +147,6 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
         },
         {
             props: {
-                status: InstanceStatus.READY,
                 fallback: {
                     url: 'https://kap-abc.kapeta.dev',
                     status: 'error',
