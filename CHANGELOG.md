@@ -1,3 +1,10 @@
+# [1.22.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.21.2...v1.22.0) (2023-12-05)
+
+
+### Features
+
+* use simplified gateway status for gatewaycards ([#128](https://github.com/kapetacom/ui-web-plan-editor/issues/128)) ([b4ecce9](https://github.com/kapetacom/ui-web-plan-editor/commit/b4ecce93394a5ec7247ec3d120bda38eb7d0b324))
+
 ## [1.21.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.21.1...v1.21.2) (2023-11-29)
 
 
