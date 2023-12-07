@@ -23,8 +23,6 @@ import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { adjustBlockEdges } from './components/PlannerBlockNode';
 import { ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
 
-const PLAN_PADDING = 50;
-
 const toBlockPoint = (mousePoint: Point, zoom: number): Point => {
     return {
         y: mousePoint.y / zoom,
@@ -174,8 +172,8 @@ export const PlannerCanvas: React.FC<Props> = (props) => {
                                 style={{
                                     transformOrigin: 'top left',
                                     transform: `scale(${planner.zoom})`,
-                                    width: PLAN_PADDING + canvasSize.width,
-                                    height: PLAN_PADDING + canvasSize.height,
+                                    width: canvasSize.width,
+                                    height: canvasSize.height,
                                 }}
                             >
                                 {props.children}
