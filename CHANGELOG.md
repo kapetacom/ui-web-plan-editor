@@ -1,3 +1,10 @@
+## [1.22.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.0...v1.22.1) (2023-12-07)
+
+
+### Bug Fixes
+
+* prevent canvas from always overflowing ([#131](https://github.com/kapetacom/ui-web-plan-editor/issues/131)) ([c1b1808](https://github.com/kapetacom/ui-web-plan-editor/commit/c1b1808eb19b8d4bba3a41d28b8150002b328f8c))
+
 # [1.22.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.21.2...v1.22.0) (2023-12-05)
 
 
