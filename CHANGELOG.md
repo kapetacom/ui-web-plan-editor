@@ -1,3 +1,10 @@
+## [1.22.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.1...v1.22.2) (2023-12-08)
+
+
+### Bug Fixes
+
+* foreignObjects sometimes have a hidden overflow ([#130](https://github.com/kapetacom/ui-web-plan-editor/issues/130)) ([8e19226](https://github.com/kapetacom/ui-web-plan-editor/commit/8e192263759a3f3c20fd16185c22e39d277072b5))
+
 ## [1.22.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.0...v1.22.1) (2023-12-07)
 
 
