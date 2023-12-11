@@ -72,7 +72,7 @@ const assetCanBeInstalled = (ref: string) => {
 };
 const installAsset = (ref: string) => {
     console.log('INSTALL', ref);
-    return new Promise<void>((resolve) => setTimeout(() => resolve(), 3000 * Math.random()));
+    return new Promise<void>((resolve) => setTimeout(resolve, 3000 * Math.random()));
 };
 
 const onChange = (resolution: MissingReferenceResolution[], valid: boolean) => {
@@ -176,7 +176,7 @@ export const WriteableContextAllInstallModal = () => {
             {!blocks.loading && (
                 <ReferenceResolutionHandler
                     plan={InvalidPlannerData}
-                    open={true}
+                    open
                     onClose={() => {}}
                     blockAssets={blocks.value!.map(fromAsset)}
                     assetCanBeInstalled={(ref) => Promise.resolve(true)}
@@ -184,6 +184,7 @@ export const WriteableContextAllInstallModal = () => {
                     readOnly={false}
                     missingReferences={createMissingReferences('local')}
                     selectAssetFromDisk={selectAssetFromDisk}
+                    importAsset={() => Promise.resolve('kapeta/other:local')}
                 />
             )}
         </>
@@ -202,18 +203,21 @@ export const MissingLocal = () => {
                     assetCanBeInstalled={assetCanBeInstalled}
                     readOnly={false}
                     onClose={() => {}}
-                    open={true}
+                    open
                     selectAssetFromDisk={selectAssetFromDisk}
+                    importAsset={() => Promise.resolve('kapeta/other:local')}
                     missingReferences={[
                         {
                             type: ReferenceType.BLOCK,
                             blockRef: 'kapeta/todo:local',
                             ref: 'kapeta/todo:local',
+                            instanceId: InvalidPlannerData.spec.blocks[0].id,
                         },
                         {
                             type: ReferenceType.TARGET,
                             blockRef: 'kapeta/todo:local',
                             ref: 'kapeta/language-target-java-spring-boot:local',
+                            instanceId: InvalidPlannerData.spec.blocks[0].id,
                         },
                     ]}
                 />
@@ -232,9 +236,10 @@ export const CanNotResolve = () => {
                     plan={InvalidPlannerData}
                     blockAssets={blocks.value!.map(fromAsset)}
                     assetCanBeInstalled={() => Promise.resolve(false)}
-                    readOnly={true}
+                    readOnly
                     onClose={() => {}}
-                    open={true}
+                    open
+                    importAsset={() => Promise.resolve(null)}
                     selectAssetFromDisk={selectAssetFromDisk}
                     missingReferences={[
                         {

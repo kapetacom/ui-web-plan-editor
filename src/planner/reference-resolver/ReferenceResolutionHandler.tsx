@@ -19,7 +19,12 @@ interface ReferenceResolverModalProps extends Omit<ReferenceResolverProps, 'onCh
     onClose?: () => void;
     onResolved?: (result: PlanResolutionResult) => void | Promise<void>;
     installAsset?: (ref: string) => Promise<void>;
-    importAsset?: (ref: string) => Promise<void>;
+    /**
+     *
+     * @param ref Asset path to import
+     * @returns The new asset ref as a string or null if the import failed
+     */
+    importAsset?: (ref: string) => Promise<string | null>;
     inline?: boolean;
 }
 
