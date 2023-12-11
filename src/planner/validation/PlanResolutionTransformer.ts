@@ -153,10 +153,7 @@ export class PlanResolutionTransformer extends EventEmitter {
             throw new Error('Instance not found');
         }
 
-        if (
-            referenceResolution.type === ReferenceType.BLOCK ||
-            (referenceResolution.type === ReferenceType.TARGET && instance.block.ref !== referenceResolution.ref)
-        ) {
+        if (referenceResolution.type === ReferenceType.BLOCK) {
             instance.block.ref = value;
             this.setChangedPlan(tempPlan);
             return;
