@@ -10,7 +10,7 @@ import { ArrowForward } from '@mui/icons-material';
 import { ActionSelector } from './ActionSelector';
 import React from 'react';
 import { createSubTitle, ReferenceTile } from './Tiles';
-import { ActionType, InnerItemProps } from './types';
+import { ActionType, InnerItemProps, NO_RESOLUTION } from './types';
 import { useAvailableActions } from './helpers';
 import { ResolutionStateDisplay } from './ResolutionStateDisplay';
 
@@ -47,7 +47,10 @@ export const BlockReferenceResolverItem = (props: InnerItemProps) => {
             </TableCell>
             <TableCell>
                 {props.resolutionState ? (
-                    <ResolutionStateDisplay resolutionState={props.resolutionState} />
+                    <ResolutionStateDisplay
+                        resolutionState={props.resolutionState}
+                        onRetry={() => props.onResolution(NO_RESOLUTION)}
+                    />
                 ) : (
                     <ActionSelector
                         resolution={props.resolution}

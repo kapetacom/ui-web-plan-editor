@@ -12,7 +12,7 @@ import { TableCell, TableRow } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
 import { ActionSelector } from './ActionSelector';
 import React from 'react';
-import { ActionType, InnerItemProps } from './types';
+import { ActionType, InnerItemProps, NO_RESOLUTION } from './types';
 import {
     providerToSelectorMapper,
     referenceTypeToKind,
@@ -68,6 +68,11 @@ export const ProviderReferenceResolverItem = (props: InnerItemProps) => {
             });
             availableTypes = BlockTypeProvider.list();
             break;
+        case ReferenceType.BLOCK:
+            throw new Error('Wrong resolver for type block');
+        default:
+            props.missingReference.type satisfies never;
+            break;
     }
 
     const availableActions: ActionType[] = useAvailableActions(
@@ -104,7 +109,10 @@ export const ProviderReferenceResolverItem = (props: InnerItemProps) => {
             </TableCell>
             <TableCell>
                 {props.resolutionState ? (
-                    <ResolutionStateDisplay resolutionState={props.resolutionState} />
+                    <ResolutionStateDisplay
+                        resolutionState={props.resolutionState}
+                        onRetry={() => props.onResolution(NO_RESOLUTION)}
+                    />
                 ) : (
                     <ActionSelector
                         resolution={props.resolution}

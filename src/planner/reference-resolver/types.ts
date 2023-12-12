@@ -29,6 +29,7 @@ export interface Resolution {
 
 export const NO_RESOLUTION: Resolution = {
     action: ActionType.NONE,
+    value: undefined,
 };
 
 export interface MissingReferenceResolution extends MissingReference {

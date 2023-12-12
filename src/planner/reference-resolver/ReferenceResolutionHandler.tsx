@@ -12,6 +12,7 @@ import {
     PlanResolutionResult,
     PlanResolutionTransformer,
     ResolutionState,
+    ResolutionStateType,
 } from '../validation/PlanResolutionTransformer';
 
 interface ReferenceResolverModalProps extends Omit<ReferenceResolverProps, 'onChange'> {
@@ -98,6 +99,10 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
             onDelayingCheck={(delaying) => setDelaying(delaying)}
             onChange={(resolutions, valid) => {
                 setResolutions(resolutions);
+                setResolutionStates((states) =>
+                    // Clear state for resolutions that are no longer present
+                    states.filter((s, ix) => resolutions[ix]?.resolution?.action !== ActionType.NONE)
+                );
                 setValid(valid);
                 if (valid && showErrors) {
                     setShowErrors(false);
