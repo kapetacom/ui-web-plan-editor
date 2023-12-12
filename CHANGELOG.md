@@ -1,3 +1,11 @@
+## [1.22.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.2...v1.22.3) (2023-12-12)
+
+
+### Bug Fixes
+
+* add reset button to retry in case of import errors ([b7796de](https://github.com/kapetacom/ui-web-plan-editor/commit/b7796dec3b1da194089dffd558f23c3dae177d7b))
+* handle local resolutions with different name than original [KAP-2187] ([06a69ba](https://github.com/kapetacom/ui-web-plan-editor/commit/06a69bac3d65efaa73341bd5e144668cdf8df613))
+
 ## [1.22.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.1...v1.22.2) (2023-12-08)
 
 
