@@ -12,6 +12,7 @@ import {
     PlanResolutionResult,
     PlanResolutionTransformer,
     ResolutionState,
+    ResolutionStateType,
 } from '../validation/PlanResolutionTransformer';
 
 interface ReferenceResolverModalProps extends Omit<ReferenceResolverProps, 'onChange'> {
@@ -19,7 +20,12 @@ interface ReferenceResolverModalProps extends Omit<ReferenceResolverProps, 'onCh
     onClose?: () => void;
     onResolved?: (result: PlanResolutionResult) => void | Promise<void>;
     installAsset?: (ref: string) => Promise<void>;
-    importAsset?: (ref: string) => Promise<void>;
+    /**
+     *
+     * @param ref Asset path to import
+     * @returns The new asset ref as a string or null if the import failed
+     */
+    importAsset?: (ref: string) => Promise<string | null>;
     inline?: boolean;
 }
 
@@ -93,6 +99,10 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
             onDelayingCheck={(delaying) => setDelaying(delaying)}
             onChange={(resolutions, valid) => {
                 setResolutions(resolutions);
+                setResolutionStates((states) =>
+                    // Clear state for resolutions that are no longer present
+                    states.filter((s, ix) => resolutions[ix]?.resolution?.action !== ActionType.NONE)
+                );
                 setValid(valid);
                 if (valid && showErrors) {
                     setShowErrors(false);

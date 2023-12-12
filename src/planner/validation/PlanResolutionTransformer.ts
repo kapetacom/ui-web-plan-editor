@@ -24,7 +24,7 @@ export type PlanResolutionResult = {
 
 export type PlanResolutionOptions = {
     installAsset?: (ref: string) => Promise<void>;
-    importAsset?: (ref: string) => Promise<void>;
+    importAsset?: (ref: string) => Promise<string | null>;
 };
 
 export enum ResolutionStateType {
@@ -45,7 +45,7 @@ export class PlanResolutionTransformer extends EventEmitter {
     private readonly options?: PlanResolutionOptions;
     private readonly changedBlocks: AssetInfo<BlockDefinition>[] = [];
     private resolutionStates: ResolutionState[] = [];
-    private solutions: { [key: string]: Promise<void> } = {};
+    private solutions: { [key: string]: Promise<string | null> } = {};
     private changedPlan?: Plan;
 
     constructor(
@@ -109,11 +109,18 @@ export class PlanResolutionTransformer extends EventEmitter {
 
             case ActionType.SELECT_LOCAL_VERSION:
                 // Import this from the path provided
-                return this.importLocalVersion(referenceResolution.resolution.value!);
+                const importedRef = await this.importLocalVersion(referenceResolution.resolution.value!);
+                if (!importedRef) {
+                    throw new Error('No asset imported from path ' + referenceResolution.resolution.value);
+                }
+                // In case it's not the exact same reference, replace it in the plan:
+                return this.replaceReference(referenceResolution, importedRef);
 
             case ActionType.REMOVE_BLOCK:
                 // Remove block from plan
                 return this.removeInstance(referenceResolution.instanceId!);
+            default:
+                throw new Error('Unknown action type');
         }
     }
 
@@ -234,7 +241,7 @@ export class PlanResolutionTransformer extends EventEmitter {
 
     private async importLocalVersion(kapetaYmlPath: string) {
         if (!this.solutions[kapetaYmlPath]) {
-            this.solutions[kapetaYmlPath] = this.options?.importAsset?.(kapetaYmlPath) ?? Promise.resolve();
+            this.solutions[kapetaYmlPath] = this.options?.importAsset?.(kapetaYmlPath) ?? Promise.resolve(null);
         }
 
         return this.solutions[kapetaYmlPath];
@@ -242,7 +249,7 @@ export class PlanResolutionTransformer extends EventEmitter {
 
     private async install(ref: string) {
         if (!this.solutions[ref]) {
-            this.solutions[ref] = this.options?.installAsset?.(ref) ?? Promise.resolve();
+            this.solutions[ref] = this.options?.installAsset?.(ref).then(() => '') ?? Promise.resolve(null);
         }
         return this.solutions[ref];
     }
