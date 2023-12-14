@@ -100,7 +100,9 @@ export const ActionButtons = (props: ActionButtonListProps) => {
                 transform: props.show
                     ? 'translateX(0px)'
                     : `translateX(${
-                          props.pointType === 'left' ? -buttonWidth * (buttonIx + 1) : width - buttonWidth * buttonIx
+                          props.pointType === 'left'
+                              ? -8 - buttonWidth * (buttonIx + 1)
+                              : width + 8 - buttonWidth * buttonIx
                       }px)`,
             };
         },
