@@ -1,3 +1,10 @@
+## [1.22.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.3...v1.22.4) (2023-12-14)
+
+
+### Bug Fixes
+
+* hide actionButtons behind resource body [KAP-2241] ([#134](https://github.com/kapetacom/ui-web-plan-editor/issues/134)) ([2296be6](https://github.com/kapetacom/ui-web-plan-editor/commit/2296be675f7bba83ce560bc727da1c146716db17))
+
 ## [1.22.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.2...v1.22.3) (2023-12-12)
 
 
