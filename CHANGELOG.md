@@ -1,3 +1,10 @@
+# [1.23.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.4...v1.23.0) (2023-12-18)
+
+
+### Features
+
+* Add pixel grid to planner canvas ([3034f99](https://github.com/kapetacom/ui-web-plan-editor/commit/3034f99ecae7c7d2ceacb92c93049a08bd46a57b))
+
 ## [1.22.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.3...v1.22.4) (2023-12-14)
 
 
