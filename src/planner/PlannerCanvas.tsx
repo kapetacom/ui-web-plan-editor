@@ -22,6 +22,7 @@ import { DnDPayload, DragEventInfo } from './DragAndDrop/types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { adjustBlockEdges } from './components/PlannerBlockNode';
 import { ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
+import { Box } from '@mui/material';
 
 const toBlockPoint = (mousePoint: Point, zoom: number): Point => {
     return {
@@ -46,11 +47,12 @@ const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstanc
     };
 };
 
-interface Props extends PropsWithChildren {
+export interface PlannerCanvasProps extends PropsWithChildren {
     onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void;
+    showPixelGrid?: boolean;
 }
 
-export const PlannerCanvas: React.FC<Props> = (props) => {
+export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
     const planner = useContext(PlannerContext);
     const { isDragging } = useContext(DragAndDrop.Context);
 
@@ -167,17 +169,38 @@ export const PlannerCanvas: React.FC<Props> = (props) => {
                 >
                     {({ onRef: zoneRef }) => (
                         <div className="planner-area-scroll" ref={zoneRef}>
-                            <div
+                            <Box
                                 className="planner-area-canvas"
-                                style={{
+                                sx={{
                                     transformOrigin: 'top left',
                                     transform: `scale(${planner.zoom})`,
                                     width: canvasSize.width,
                                     height: canvasSize.height,
+
+                                    ...(props.showPixelGrid
+                                        ? {
+                                              '&::before': {
+                                                  content: '""',
+
+                                                  position: 'absolute',
+                                                  width: '100%',
+                                                  height: '100%',
+                                                  top: 0,
+                                                  left: 0,
+
+                                                  backgroundImage: 'radial-gradient(#bb845a 1px, transparent 0)',
+                                                  backgroundSize: '7px 7px',
+                                                  backgroundPosition: '-8.5px -8.5px',
+
+                                                  WebkitMaskImage:
+                                                      'radial-gradient(ellipse at center, rgba(0,0,0,0.15), transparent 100%)',
+                                              },
+                                          }
+                                        : {}),
                                 }}
                             >
                                 {props.children}
-                            </div>
+                            </Box>
                         </div>
                     )}
                 </DragAndDrop.DropZone>

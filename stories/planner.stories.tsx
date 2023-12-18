@@ -232,6 +232,7 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                         type: ItemType.BLOCK,
                     });
                 }}
+                showPixelGrid
             />
 
             <ItemEditorPanel
