@@ -25,10 +25,11 @@ import { PlannerConnections } from './components/PlannerConnections';
 
 type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent | typeof React.Component> | null;
 
-interface Props {
+export interface PlannerProps {
     // eslint-disable-next-line react/no-unused-prop-types
     systemId: string;
     zoomToFit?: { width: number; height: number };
+    showPixelGrid?: boolean;
     // Should we instead augment the
     actions?: PlannerActionConfig;
     configurations?: { [key: string]: any };
@@ -47,7 +48,7 @@ interface Props {
     onErrorResolved?: () => void;
 }
 
-export const Planner = (props: Props) => {
+export const Planner = (props: PlannerProps) => {
     const { isDragging } = useContext(DnDContext);
     const planner = useContext(PlannerContext);
     const nodeSize = planner.nodeSize ?? PlannerNodeSize.MEDIUM;
@@ -264,7 +265,7 @@ export const Planner = (props: Props) => {
             }}
             resetKeys={[props.systemId, planner.plan, planner.blockAssets]}
         >
-            <PlannerCanvas onCreateBlock={props.onCreateBlock}>
+            <PlannerCanvas onCreateBlock={props.onCreateBlock} showPixelGrid={props.showPixelGrid}>
                 {instances.map((instance, index) => {
                     const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
                     const isInFocus = !!(focusInfo && isBlockInFocus(focusInfo, instance.id));
