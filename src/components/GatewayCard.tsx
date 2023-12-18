@@ -25,6 +25,8 @@ interface GatewayCardProps {
     fallbackText?: string;
 
     loading?: boolean;
+    color?: string;
+
     primary?: {
         url: string | null;
         status?: 'ok' | 'loading' | 'error';
@@ -131,11 +133,14 @@ export const GatewayCard = (props: GatewayCardProps) => {
 
     // Status color
     const { palette } = useTheme();
-    const statusColor = {
-        ok: palette.success.main,
-        loading: '#0000003b',
-        error: palette.error.main,
-    }[entry?.status || 'loading'];
+    const statusColor =
+        props.color ||
+        {
+            ok: palette.success.main,
+            loading: '#0000003b',
+            error: palette.error.main,
+            warning: palette.warning.main,
+        }[entry?.status || 'loading'];
     const statusText: string = entry?.message || (props.loading && 'Loading') || '';
     const shouldPulsate = props.loading || entry?.status === 'loading';
 
