@@ -78,6 +78,15 @@ const groups: { label?: string; props: Partial<React.ComponentProps<typeof Gatew
         {
             props: { title: 'Ok', primary: { status: 'ok', url: 'https://example.com', message: 'URL is ready' } },
         },
+        {
+            label: 'Custom color',
+            props: {
+                title: 'Ok',
+                color: 'warning.main',
+                loading: true,
+                primary: { status: 'ok', url: 'https://example.com', message: 'URL is ready' },
+            },
+        },
     ],
 
     [
