@@ -1,3 +1,10 @@
+## [1.23.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.23.0...v1.23.1) (2023-12-20)
+
+
+### Bug Fixes
+
+* allow custom color for gateway status [KAP-2261] ([#136](https://github.com/kapetacom/ui-web-plan-editor/issues/136)) ([31cb737](https://github.com/kapetacom/ui-web-plan-editor/commit/31cb737a7f2e27ec7e578f9260ce0821bca03247))
+
 # [1.23.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.22.4...v1.23.0) (2023-12-18)
 
 
