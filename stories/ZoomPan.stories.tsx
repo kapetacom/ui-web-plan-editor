@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React from 'react';
 import { ZoomPanContainer } from '../src/planner/ZoomAndPan/ZoomPanContainer';
 import { Box } from '@mui/material';

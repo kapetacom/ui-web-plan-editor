@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import { ZoomTransform } from 'd3-zoom';
 import { Rectangle } from '../types';
 

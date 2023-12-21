@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { useCallback, useState } from 'react';
 import { Box, BoxProps, Button, ButtonGroup, styled } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
