@@ -32,7 +32,8 @@ export const Empty = () => {
 export const DrawerTabs = () => {
     const [currentTab, setCurrentTab] = React.useState(0);
     return (
-        <div style={{ backgroundColor: 'gray' }}>
+        // Height 100% to be able to resize the drawer in storybook to test overflow
+        <div style={{ backgroundColor: 'gray', height: '100%' }}>
             <PlannerDrawer>
                 <Tabs value={currentTab} onChange={(_evt, value) => setCurrentTab(value)}>
                     <Tab value={0} label="Resources" />

@@ -4,7 +4,7 @@
  */
 
 import { IResourceTypeProvider, Point } from '@kapeta/ui-web-types';
-import { Divider, Portal, Stack, SxProps, Typography } from '@mui/material';
+import { Divider, Grid, Portal, Stack, SxProps, Typography } from '@mui/material';
 import { DragAndDrop } from '../../planner/utils/dndUtils';
 
 import React, { useState } from 'react';
@@ -62,52 +62,52 @@ export const ResourceToolList = (props: Props) => {
                         }}
                     />
                 </Stack>
-                <Stack
-                    direction="row"
-                    alignItems="flex-start"
-                    flexWrap="wrap"
+                <Grid
+                    container
                     sx={{
                         mt: 2,
                     }}
-                    gap={2}
+                    spacing={2}
                 >
                     {props.resources.map((resource, ix) => {
                         return (
-                            <DragAndDrop.Draggable
-                                key={`resource-${ix}`}
-                                disabled={false}
-                                data={{
-                                    type: PlannerPayloadType.RESOURCE_TYPE,
-                                    data: {
-                                        title: resource.title || resource.kind,
-                                        kind: resource.kind,
-                                        config: resource,
-                                    },
-                                }}
-                                onDragStart={(evt) => {
-                                    setDragging(resource);
-                                }}
-                                onDragEnd={(evt) => {
-                                    setDragging(undefined);
-                                    setDraggingPosition(null);
-                                    setDraggedDiff(null);
-                                }}
-                                onDrag={(evt) => {
-                                    setDraggingPosition({
-                                        x: evt.client.end.x,
-                                        y: evt.client.end.y,
-                                    });
-                                    setDraggedDiff(evt.diff);
-                                }}
-                                onDrop={(evt) => {}}
-                            >
-                                {(evt) => {
-                                    return <ResourceShape {...evt.componentProps} resource={resource} />;
-                                }}
-                            </DragAndDrop.Draggable>
+                            <Grid item xs={6}>
+                                <DragAndDrop.Draggable
+                                    key={`resource-${ix}`}
+                                    disabled={false}
+                                    data={{
+                                        type: PlannerPayloadType.RESOURCE_TYPE,
+                                        data: {
+                                            title: resource.title || resource.kind,
+                                            kind: resource.kind,
+                                            config: resource,
+                                        },
+                                    }}
+                                    onDragStart={(evt) => {
+                                        setDragging(resource);
+                                    }}
+                                    onDragEnd={(evt) => {
+                                        setDragging(undefined);
+                                        setDraggingPosition(null);
+                                        setDraggedDiff(null);
+                                    }}
+                                    onDrag={(evt) => {
+                                        setDraggingPosition({
+                                            x: evt.client.end.x,
+                                            y: evt.client.end.y,
+                                        });
+                                        setDraggedDiff(evt.diff);
+                                    }}
+                                    onDrop={(evt) => {}}
+                                >
+                                    {(evt) => {
+                                        return <ResourceShape {...evt.componentProps} resource={resource} />;
+                                    }}
+                                </DragAndDrop.Draggable>
+                            </Grid>
                         );
                     })}
-                </Stack>
+                </Grid>
             </Stack>
             {dragging && draggingPosition && (
                 <Portal>
