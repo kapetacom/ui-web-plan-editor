@@ -4,7 +4,7 @@
  */
 
 import { IBlockTypeProvider } from '@kapeta/ui-web-types';
-import { Box, Stack } from '@mui/material';
+import { Box, Grid, Stack } from '@mui/material';
 import React from 'react';
 import { BlockTypeTool } from './BlockTypeTool';
 
@@ -15,11 +15,15 @@ interface Props {
 export const BlockTypeToolList = (props: Props) => {
     return (
         <Box className="planner-block-type-list">
-            <Stack direction="row" alignItems="flex-start" flexWrap="wrap" gap={2}>
+            <Grid container spacing={2}>
                 {props.blockTypes.map((blockType, ix) => {
-                    return <BlockTypeTool key={`block-type-${ix}`} blockType={blockType} />;
+                    return (
+                        <Grid item xs={6}>
+                            <BlockTypeTool key={`block-type-${ix}`} blockType={blockType} />
+                        </Grid>
+                    );
                 })}
-            </Stack>
+            </Grid>
         </Box>
     );
 };

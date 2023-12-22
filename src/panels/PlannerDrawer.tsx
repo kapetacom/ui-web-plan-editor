@@ -9,7 +9,7 @@ import { Paper, Stack } from '@mui/material';
 export const PlannerDrawer = (props: React.PropsWithChildren) => {
     return (
         <Paper
-            data-kap-id={'plan-editor-resource-drawer'}
+            data-kap-id="plan-editor-resource-drawer"
             className="planner-resource-drawer"
             square
             variant="elevation"
