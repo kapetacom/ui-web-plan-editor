@@ -1,3 +1,10 @@
+## [1.23.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.23.1...v1.23.2) (2023-12-22)
+
+
+### Bug Fixes
+
+* more stable layout of drawer resources [CORE-1180] ([#137](https://github.com/kapetacom/ui-web-plan-editor/issues/137)) ([c1e4651](https://github.com/kapetacom/ui-web-plan-editor/commit/c1e46515d1b1133c1eab33e2342eaf728e37d84c))
+
 ## [1.23.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.23.0...v1.23.1) (2023-12-20)
 
 
