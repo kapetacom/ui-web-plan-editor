@@ -65,7 +65,7 @@ export const ResourceToolList = (props: Props) => {
                 <Grid
                     container
                     sx={{
-                        mt: 2,
+                        mt: 0,
                     }}
                     spacing={2}
                 >
