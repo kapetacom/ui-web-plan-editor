@@ -67,6 +67,15 @@ export const calculateCanvasSize = (
         });
     }
 
+    if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
+        return {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 50,
+        };
+    }
+
     const canvasSize = {
         x: minX - CANVAS_PADDING[1],
         y: minY - CANVAS_PADDING[0],
