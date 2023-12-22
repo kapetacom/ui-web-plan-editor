@@ -30,18 +30,6 @@ import { withErrorBoundary } from 'react-error-boundary';
 import { Resource } from '@kapeta/schemas';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
 
-export function adjustBlockEdges(point: Point) {
-    if (point.x < 220) {
-        point.x = 220;
-    }
-
-    if (point.y < 5) {
-        point.y = 5;
-    }
-
-    return point;
-}
-
 function canConvertToAny(sourceKind: string, targetKinds: string[]) {
     if (!ResourceTypeProvider.exists(sourceKind)) {
         return false;
@@ -198,10 +186,10 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
             }}
         >
             {(evt) => {
-                let point: Point = adjustBlockEdges({
+                let point: Point = {
                     x: blockContext.blockInstance.dimensions!.left + evt.zone.diff.x / planner.zoom,
                     y: blockContext.blockInstance.dimensions!.top + evt.zone.diff.y / planner.zoom,
-                });
+                };
 
                 if (focusInfo) {
                     const blockInfo: BlockInfo = {

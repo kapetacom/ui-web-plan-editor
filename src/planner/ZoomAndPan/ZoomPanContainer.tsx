@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { Box, BoxProps } from '@mui/material';
 import { zoom, zoomIdentity, D3ZoomEvent } from 'd3-zoom';
