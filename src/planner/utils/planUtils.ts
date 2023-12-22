@@ -4,7 +4,7 @@
  */
 
 import { AssetInfo, PlannerNodeSize } from '../../types';
-import { ResourceRole, Size } from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockDefinition, BlockInstance, Plan } from '@kapeta/schemas';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
@@ -19,8 +19,7 @@ export const RESOURCE_HEIGHTS = {
 export const calculateCanvasSize = (
     blocks: BlockInstance[],
     blockAssets: AssetInfo<BlockDefinition>[],
-    size: PlannerNodeSize,
-    containerSize: Size
+    size: PlannerNodeSize
 ) => {
     // We want the canvas to always have enough space for the block + connections, even at the edges
     const canvasPadding = 150;
@@ -66,8 +65,8 @@ export const calculateCanvasSize = (
     return {
         x: minX,
         y: minY,
-        width: Math.max(maxWidth, containerSize.width),
-        height: Math.max(maxHeight, containerSize.height),
+        width: maxWidth,
+        height: maxHeight,
     };
 };
 

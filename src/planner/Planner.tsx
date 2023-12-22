@@ -28,7 +28,6 @@ type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent
 export interface PlannerProps {
     // eslint-disable-next-line react/no-unused-prop-types
     systemId: string;
-    zoomToFit?: { width: number; height: number };
     showPixelGrid?: boolean;
     // Should we instead augment the
     actions?: PlannerActionConfig;

@@ -11,6 +11,7 @@ import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
+import { Tooltip } from '@kapeta/ui-web-components';
 
 export interface ZoomPanControlsProps extends BoxProps {
     onZoomIn?: () => void;
@@ -60,27 +61,35 @@ export const ZoomPanControls = (props: ZoomPanControlsProps) => {
         >
             <StyledButtonGroup orientation="vertical" variant="text" color="inherit" aria-label="zoom buttons">
                 {onZoomIn && (
-                    <Button onClick={onZoomIn}>
-                        <AddIcon fontSize="inherit" />
-                    </Button>
+                    <Tooltip title="Zoom in" placement="right" enterDelay={1000}>
+                        <Button onClick={onZoomIn}>
+                            <AddIcon fontSize="inherit" />
+                        </Button>
+                    </Tooltip>
                 )}
 
                 {onZoomOut && (
-                    <Button onClick={onZoomOut}>
-                        <RemoveIcon fontSize="inherit" />
-                    </Button>
+                    <Tooltip title="Zoom out" placement="right" enterDelay={1000}>
+                        <Button onClick={onZoomOut}>
+                            <RemoveIcon fontSize="inherit" />
+                        </Button>
+                    </Tooltip>
                 )}
 
                 {onFitToView && (
-                    <Button onClick={onFitToView}>
-                        <ZoomOutMapIcon fontSize="inherit" />
-                    </Button>
+                    <Tooltip title="Fit in view" placement="right" enterDelay={1000}>
+                        <Button onClick={onFitToView}>
+                            <ZoomOutMapIcon fontSize="inherit" />
+                        </Button>
+                    </Tooltip>
                 )}
 
                 {onCenter && (
-                    <Button onClick={onCenter}>
-                        <CenterFocusStrongIcon fontSize="inherit" />
-                    </Button>
+                    <Tooltip title="Center in view" placement="right" enterDelay={1000}>
+                        <Button onClick={onCenter}>
+                            <CenterFocusStrongIcon fontSize="inherit" />
+                        </Button>
+                    </Tooltip>
                 )}
 
                 {(onLock || onUnlock) && (

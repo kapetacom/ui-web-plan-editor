@@ -55,8 +55,8 @@ export type ZoomPanBackgroundProps = {
 export const ZoomPanBackgroundUnmemoized = forwardRef<ZoomPanBackgroundHandle, ZoomPanBackgroundProps>((props, ref) => {
     const {
         variant = BackgroundVariant.Dots,
-        gap = variantGap[variant], // for dots and cross
-        size, // for lines and cross
+        gap = variantGap[variant],
+        size,
         lineWidth = 1,
         offset = 2,
         color,
@@ -66,17 +66,16 @@ export const ZoomPanBackgroundUnmemoized = forwardRef<ZoomPanBackgroundHandle, Z
 
     const [transform, setTransform] = React.useState([0, 0, 1]);
     const patternColor = color || variantColor[variant];
-    const patternSize = size || variantSize[variant];
+    const baseSize = size || variantSize[variant];
+    const scaledSize = baseSize * transform[2]; // Apply zoom scaling
     const isDots = variant === BackgroundVariant.Dots;
     const isCross = variant === BackgroundVariant.Cross;
-    const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap];
-    const scaledGap: [number, number] = [gapXY[0] * transform[2] || 1, gapXY[1] * transform[2] || 1];
-    const scaledSize = patternSize * transform[2];
-    const patternDimensions: [number, number] = isCross ? [scaledSize, scaledSize] : scaledGap;
 
-    const patternOffset = isDots
-        ? [scaledSize / offset, scaledSize / offset]
-        : [patternDimensions[0] / offset, patternDimensions[1] / offset];
+    const gapXY: [number, number] = Array.isArray(gap) ? gap : [gap, gap];
+    const scaledGap: [number, number] = [gapXY[0] * transform[2], gapXY[1] * transform[2]];
+
+    const patternDimensions: [number, number] = isCross ? [scaledSize, scaledSize] : scaledGap;
+    const patternOffset = [patternDimensions[0] / offset, patternDimensions[1] / offset]; // Offset now only for spacing
 
     const patternId = useId();
 
@@ -109,7 +108,7 @@ export const ZoomPanBackgroundUnmemoized = forwardRef<ZoomPanBackgroundHandle, Z
                 patternTransform={`translate(-${patternOffset[0]},-${patternOffset[1]})`}
             >
                 {isDots ? (
-                    <DotPattern color={patternColor} radius={scaledSize / offset} />
+                    <DotPattern color={patternColor} radius={scaledSize / 2} /> // Dot size now solely based on scaledSize
                 ) : (
                     <LinePattern dimensions={patternDimensions} color={patternColor} lineWidth={lineWidth} />
                 )}

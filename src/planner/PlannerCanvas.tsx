@@ -6,13 +6,11 @@
 import React, { PropsWithChildren, useContext, useEffect, useMemo } from 'react';
 import { PlannerContext } from './PlannerContext';
 import { DragAndDrop } from './utils/dndUtils';
-import { useBoundingBox } from './hooks/boundingBox';
 import { BLOCK_SIZE, calculateCanvasSize } from './utils/planUtils';
 import { toClass } from '@kapeta/ui-web-utils';
 import { IBlockTypeProvider, Point } from '@kapeta/ui-web-types';
-import { ZoomButtons } from '../components/ZoomButtons';
 
-import { PlannerPayloadType, ZOOM_STEP_SIZE } from './types';
+import { PlannerPayloadType } from './types';
 import { PlannerMode } from '../utils/enums';
 import { FocusTopbar } from './components/FocusTopbar';
 import { PlannerFocusSideBar } from './components/PlannerFocusSideBar';
@@ -22,7 +20,7 @@ import { DnDPayload, DragEventInfo } from './DragAndDrop/types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { adjustBlockEdges } from './components/PlannerBlockNode';
 import { ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
-import { Box } from '@mui/material';
+import { ZoomPanContainer } from './ZoomAndPan/ZoomPanContainer';
 
 const toBlockPoint = (mousePoint: Point, zoom: number): Point => {
     return {
@@ -62,13 +60,9 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
         focused: !!planner.focusedBlock,
     });
 
-    const { value: boundingBox, onRef } = useBoundingBox();
     const canvasSize = useMemo(() => {
-        return calculateCanvasSize(planner.plan?.spec.blocks || [], planner.blockAssets, planner.nodeSize, {
-            height: boundingBox.height,
-            width: boundingBox.width,
-        });
-    }, [planner.plan?.spec.blocks, planner.blockAssets, planner.nodeSize, boundingBox.width, boundingBox.height]);
+        return calculateCanvasSize(planner.plan?.spec.blocks || [], planner.blockAssets, planner.nodeSize);
+    }, [planner.plan?.spec.blocks, planner.blockAssets, planner.nodeSize]);
 
     function calculateDimensions(dragEvent: DragEventInfo<DnDPayload>) {
         const center = (BLOCK_SIZE / 2) * planner.zoom; // To account for mouse offset
@@ -113,7 +107,7 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
     }
 
     return (
-        <div className={`planner-area-container ${classNames}`} data-kap-id={'plan-editor-canvas'}>
+        <div className={`planner-area-container ${classNames}`} data-kap-id="plan-editor-canvas">
             <div className={focusToolbar}>
                 <FocusTopbar setFocusBlock={planner.setFocusedBlock} focusedBlock={planner.focusedBlock} />
             </div>
@@ -129,91 +123,61 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                 onFocusChange={(block) => planner.setFocusedBlock(block)}
             />
 
-            <div className="planner-area-position-parent" ref={onRef}>
-                <DragAndDrop.DropZone
-                    data={{ type: PlannerPayloadType.PLAN, data: planner.plan! }}
-                    scale={planner.zoom}
-                    accept={(draggable) => {
-                        // Filter types
-                        return [
-                            PlannerPayloadType.BLOCK,
-                            PlannerPayloadType.BLOCK_DEFINITION,
-                            PlannerPayloadType.BLOCK_TYPE,
-                        ].includes(draggable.type);
-                    }}
-                    onDrop={(draggable, dragEvent) => {
-                        if (draggable.type === PlannerPayloadType.BLOCK) {
-                            planner.updateBlockInstance(
-                                draggable.data.id,
-                                blockPositionUpdater(dragEvent.zone.diff, planner.zoom)
-                            );
-                            return;
-                        }
+            <DragAndDrop.DropZone
+                data={{ type: PlannerPayloadType.PLAN, data: planner.plan! }}
+                scale={planner.zoom}
+                accept={(draggable) => {
+                    // Filter types
+                    return [
+                        PlannerPayloadType.BLOCK,
+                        PlannerPayloadType.BLOCK_DEFINITION,
+                        PlannerPayloadType.BLOCK_TYPE,
+                    ].includes(draggable.type);
+                }}
+                onDrop={(draggable, dragEvent) => {
+                    if (draggable.type === PlannerPayloadType.BLOCK) {
+                        planner.updateBlockInstance(
+                            draggable.data.id,
+                            blockPositionUpdater(dragEvent.zone.diff, planner.zoom)
+                        );
+                        return;
+                    }
 
-                        if (draggable.type === PlannerPayloadType.BLOCK_DEFINITION) {
-                            const blockInstance = createBlockInstanceForBlock(draggable.data);
-                            blockInstance.dimensions = calculateDimensions(dragEvent);
-                            planner.addBlockInstance(blockInstance);
-                        }
+                    if (draggable.type === PlannerPayloadType.BLOCK_DEFINITION) {
+                        const blockInstance = createBlockInstanceForBlock(draggable.data);
+                        blockInstance.dimensions = calculateDimensions(dragEvent);
+                        planner.addBlockInstance(blockInstance);
+                    }
 
-                        if (draggable.type === PlannerPayloadType.BLOCK_TYPE) {
-                            const ref = createLocalRef(draggable.data);
-                            const blockInfo = createBlockInstanceForBlockType(ref, draggable.data);
-                            blockInfo.instance.dimensions = calculateDimensions(dragEvent);
+                    if (draggable.type === PlannerPayloadType.BLOCK_TYPE) {
+                        const ref = createLocalRef(draggable.data);
+                        const blockInfo = createBlockInstanceForBlockType(ref, draggable.data);
+                        blockInfo.instance.dimensions = calculateDimensions(dragEvent);
 
-                            // Callback should handle the creation of the block and remove the block definition
-                            // and instance from the planner if the creation is cancelled
-                            props.onCreateBlock?.(blockInfo.block, blockInfo.instance);
-                        }
-                    }}
-                >
-                    {({ onRef: zoneRef }) => (
-                        <div className="planner-area-scroll" ref={zoneRef}>
-                            <Box
-                                className="planner-area-canvas"
-                                sx={{
-                                    transformOrigin: 'top left',
-                                    transform: `scale(${planner.zoom})`,
-                                    width: canvasSize.width,
-                                    height: canvasSize.height,
-
-                                    ...(props.showPixelGrid
-                                        ? {
-                                              '&::before': {
-                                                  content: '""',
-
-                                                  position: 'absolute',
-                                                  width: '100%',
-                                                  height: '100%',
-                                                  top: 0,
-                                                  left: 0,
-
-                                                  backgroundImage: 'radial-gradient(#bb845a 1px, transparent 0)',
-                                                  backgroundSize: '7px 7px',
-                                                  backgroundPosition: '-8.5px -8.5px',
-
-                                                  WebkitMaskImage:
-                                                      'radial-gradient(ellipse at center, rgba(0,0,0,0.15), transparent 100%)',
-                                              },
-                                          }
-                                        : {}),
-                                }}
-                            >
-                                {props.children}
-                            </Box>
-                        </div>
-                    )}
-                </DragAndDrop.DropZone>
-
-                {!planner.focusedBlock && (
-                    <ZoomButtons
-                        currentZoom={planner.zoom}
-                        onZoomIn={() => planner.setZoomLevel((currentZoom) => currentZoom + ZOOM_STEP_SIZE)}
-                        onZoomOut={() => planner.setZoomLevel((currentZoom) => currentZoom - ZOOM_STEP_SIZE)}
-                        onZoomReset={() => planner.setZoomLevel(1)}
-                    />
+                        // Callback should handle the creation of the block and remove the block definition
+                        // and instance from the planner if the creation is cancelled
+                        props.onCreateBlock?.(blockInfo.block, blockInfo.instance);
+                    }
+                }}
+            >
+                {({ onRef: dropZoneRef }) => (
+                    <ZoomPanContainer
+                        ref={dropZoneRef}
+                        className="planner-area-canvas"
+                        onZoomPanEnd={(x, y, k) => {
+                            planner.setZoomLevel(k);
+                        }}
+                        childrenBBox={canvasSize}
+                        sx={{
+                            width: '100%',
+                            height: '100%',
+                        }}
+                        showPixelGrid={props.showPixelGrid}
+                    >
+                        {props.children}
+                    </ZoomPanContainer>
                 )}
-            </div>
+            </DragAndDrop.DropZone>
         </div>
     );
 };
