@@ -1,3 +1,10 @@
+## [1.23.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.23.2...v1.23.3) (2023-12-23)
+
+
+### Bug Fixes
+
+* Make sure resolve button is disabled during resolving ([#138](https://github.com/kapetacom/ui-web-plan-editor/issues/138)) ([2663cb7](https://github.com/kapetacom/ui-web-plan-editor/commit/2663cb78ea2936f7e471b810457f81a130cce9f1))
+
 ## [1.23.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.23.1...v1.23.2) (2023-12-22)
 
 
