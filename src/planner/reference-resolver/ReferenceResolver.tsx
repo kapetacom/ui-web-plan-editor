@@ -196,6 +196,7 @@ const AllInstallableDisplay = (props: AllInstallableDisplayProps) => {
                     const title = referenceTypeToName(resolution.type);
                     return (
                         <Stack
+                            key={index}
                             direction={'row'}
                             gap={2}
                             sx={{
