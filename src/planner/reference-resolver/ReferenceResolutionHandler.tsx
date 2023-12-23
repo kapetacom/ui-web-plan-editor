@@ -57,6 +57,7 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
             variant={'contained'}
             color={'primary'}
             loading={processing || delaying}
+            disabled={processing || delaying}
             onClick={async () => {
                 if (valid) {
                     const transformer = new PlanResolutionTransformer(
