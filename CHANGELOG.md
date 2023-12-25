@@ -1,3 +1,10 @@
+# [1.24.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.23.3...v1.24.0) (2023-12-25)
+
+
+### Features
+
+* Use TerminalOutput for log panel instead of a full XTerm ([#139](https://github.com/kapetacom/ui-web-plan-editor/issues/139)) ([f764927](https://github.com/kapetacom/ui-web-plan-editor/commit/f764927d12afdfcdde2a12274c5c4e232c1a853e))
+
 ## [1.23.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.23.2...v1.23.3) (2023-12-23)
 
 
