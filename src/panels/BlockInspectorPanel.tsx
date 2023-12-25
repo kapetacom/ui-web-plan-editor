@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import './BlockInspectorPanel.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
-import { LogEmitter, LogEntry, LogPanel } from '../logs/LogPanel';
+import { LogEntry, LogPanel } from '../logs/LogPanel';
 import { PlannerContext } from '../planner/PlannerContext';
 import { useBlockValidationIssues } from '../planner/hooks/block-validation';
 import { PlannerSidebar } from './PlannerSidebar';
@@ -16,7 +16,6 @@ interface BlockInspectorPanelProps {
     instance?: BlockInstance;
     configuration?: any;
     logs?: LogEntry[];
-    emitter?: LogEmitter;
     initialTab?: string;
     open: boolean;
     onClosed: () => void;
@@ -25,6 +24,10 @@ interface BlockInspectorPanelProps {
 export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
     const planner = useContext(PlannerContext);
     const [tab, setTab] = React.useState(props.initialTab ?? 'logs');
+
+    const [scrolledToBottom, setScrolledToBottom] = React.useState(true);
+
+    const scrollContainer = useRef<HTMLDivElement>();
 
     let block: BlockDefinition | undefined = undefined;
     if (props.instance?.block.ref) {
@@ -43,6 +46,37 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
         return props.instance ? `Inspect ${props.instance?.name}` : 'Inspect';
     }, [props.instance]);
 
+    useEffect(() => {
+        if (!scrollContainer.current) {
+            return;
+        }
+
+        const elm = scrollContainer.current;
+
+        const handler = () => {
+            const atBottom = Math.abs(elm.scrollHeight - (elm.clientHeight + elm.scrollTop)) < 10;
+            setScrolledToBottom(atBottom);
+        };
+
+        elm.addEventListener('scroll', handler);
+
+        return () => {
+            elm.removeEventListener('scroll', handler);
+        };
+    }, [scrollContainer.current, scrolledToBottom, setScrolledToBottom]);
+
+    useEffect(() => {
+        if (!scrollContainer.current) {
+            return;
+        }
+
+        const elm = scrollContainer.current;
+
+        if (scrolledToBottom) {
+            elm.scrollTop = elm.scrollHeight - elm.clientHeight;
+        }
+    }, [scrollContainer.current?.scrollHeight, scrolledToBottom, props.logs]);
+
     return (
         <PlannerSidebar title={title} open={props.open} size="large" onClose={props.onClosed} minWidth={400}>
             {props.instance && (
@@ -54,7 +88,7 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
                     }}
                 >
                     <Tabs value={tab} onChange={(evt, newTabId) => setTab(newTabId)}>
-                        {props.emitter && <Tab label={'Logs'} value={'logs'} data-kap-id="block-inspector-log-tab" />}
+                        {props.logs && <Tab label={'Logs'} value={'logs'} data-kap-id="block-inspector-log-tab" />}
                         <Tab
                             label={`Issues (${issues.length})`}
                             value={'issues'}
@@ -64,11 +98,13 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
                     {tab === 'logs' && (
                         <Box
                             flex={1}
+                            ref={scrollContainer}
                             sx={{
                                 pt: 2,
+                                overflowY: 'auto',
                             }}
                         >
-                            <LogPanel logs={props.logs} emitter={props.emitter} />
+                            <LogPanel logs={props.logs} />
                         </Box>
                     )}
                     {tab === 'issues' && (
