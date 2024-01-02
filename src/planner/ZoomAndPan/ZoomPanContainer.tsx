@@ -12,6 +12,7 @@ import { ZoomPanControls } from './ZoomPanControls';
 import { Rectangle } from '../types';
 import { ZoomPanBackground, ZoomPanBackgroundHandle } from './background/ZoomPanBackground';
 import { ZoomPanGrabber } from './ZoomPanGrabber';
+import { ZoomPanVisualBounds, ZoomPanVisualBoundsHandle } from './ZoomPanVisualBounds';
 
 export interface ZoomPanContainerProps extends BoxProps {
     /**
@@ -23,6 +24,10 @@ export interface ZoomPanContainerProps extends BoxProps {
      * Whether to show the pixel grid
      */
     showPixelGrid?: boolean;
+    /**
+     * Whether a child is being dragged. Used to highlight the visual bounds. Defaults to false.
+     */
+    isDraggingChild?: boolean;
     /**
      * Called when the zoom pan starts
      */
@@ -55,6 +60,7 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
     const {
         children,
         childrenBBox,
+        isDraggingChild = false,
         showPixelGrid,
         onZoomPanStart,
         onZoomPanTick,
@@ -67,6 +73,7 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
 
     // Refs
     const backgroundRef = React.useRef<ZoomPanBackgroundHandle>(null);
+    const visualBoundsRef = React.useRef<ZoomPanVisualBoundsHandle>(null);
     const grabRef = React.useRef<HTMLDivElement>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -89,6 +96,9 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
 
                     // Update the transform of the background
                     backgroundRef.current?.updateTransform(x, y, k);
+
+                    // Update the transform of the visual bounds
+                    visualBoundsRef.current?.updateTransform(x, y, k);
 
                     // Let the parent know about the zoom tick
                     onZoomPanTick?.(x, y, k);
@@ -153,6 +163,12 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
             {...boxProps}
         >
             {showPixelGrid && <ZoomPanBackground ref={backgroundRef} className="zoom-and-pan-background" />}
+
+            <ZoomPanVisualBounds
+                ref={visualBoundsRef}
+                className="zoom-and-pan-visual-bounds"
+                highlight={isDraggingChild}
+            />
 
             <ZoomPanGrabber ref={grabRef} className="zoom-and-pan-grab-area" />
 
