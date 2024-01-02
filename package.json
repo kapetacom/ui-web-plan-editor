@@ -52,6 +52,9 @@
         "react-use": ">=17"
     },
     "dependencies": {
+        "@types/d3-selection": "^3.0.10",
+        "@types/d3-transition": "^3.0.8",
+        "@types/d3-zoom": "^3.0.8",
         "@types/lodash": "^4.14.185",
         "@types/node": "^20.8.9",
         "@types/pathfinding": "^0.0.8",
@@ -78,9 +81,6 @@
         "@storybook/manager-webpack5": "^6.5.0-rc.1",
         "@storybook/react": "^6.5.16",
         "@storybook/react-webpack5": "^7.5.0",
-        "@types/d3-selection": "^3.0.10",
-        "@types/d3-transition": "^3.0.8",
-        "@types/d3-zoom": "^3.0.8",
         "css-loader": "^6.7.1",
         "eslint": "^8.35.0",
         "eslint-plugin-unused-imports": "^2.0.0",
