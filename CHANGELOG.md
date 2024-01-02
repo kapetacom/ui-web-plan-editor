@@ -1,3 +1,29 @@
+# [1.25.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.24.0...v1.25.0) (2024-01-02)
+
+
+### Bug Fixes
+
+* Add license headers to new files ([b2c990c](https://github.com/kapetacom/ui-web-plan-editor/commit/b2c990ce3e05c2643b6c7a13dcacb5fefae0051d))
+* Disable interaction when in view mode ([5c4df66](https://github.com/kapetacom/ui-web-plan-editor/commit/5c4df660dca982b260ed88f042fd2a13cf7455c4))
+* Improve grammer ([84c5dca](https://github.com/kapetacom/ui-web-plan-editor/commit/84c5dca1f43d6195bcb938737043cd18d7cd9311))
+* Make sure canvas has a size ([615ddb7](https://github.com/kapetacom/ui-web-plan-editor/commit/615ddb7414dafb21a2d1ecf821b3e42127b3e147))
+* Reintroduce block position adjustment ([76385c0](https://github.com/kapetacom/ui-web-plan-editor/commit/76385c050aeb324286c4d43f8744280b6b94d884))
+* Update canvas size calculation to handle negative positions ([9a02ac2](https://github.com/kapetacom/ui-web-plan-editor/commit/9a02ac287f66e84c3c6b22c390dd210d616d6dee))
+
+
+### Features
+
+* Add background component for zoom and pan component ([743c298](https://github.com/kapetacom/ui-web-plan-editor/commit/743c298a1adf88b9c14e5337550bc283c3073c8f))
+* Add helpers and hooks for measuring ([f58d448](https://github.com/kapetacom/ui-web-plan-editor/commit/f58d448d894bcd1379e5baf66ec1cc2952b85ea4))
+* Add pixel grid background ([3fa5251](https://github.com/kapetacom/ui-web-plan-editor/commit/3fa52513e5fdbc93bde4741c5c4cb98d2f7cb0e7))
+* Add story to demo Zoom and Pan ([b7abdac](https://github.com/kapetacom/ui-web-plan-editor/commit/b7abdacf2a9f026da5a08bdfb81e9ac84f16fb3f))
+* Add Zoom & Pan container component ([b78c82c](https://github.com/kapetacom/ui-web-plan-editor/commit/b78c82cde1d80691bbafa1ef15fd1868e42a958d))
+* Add Zoom & Pan Controls ([589e566](https://github.com/kapetacom/ui-web-plan-editor/commit/589e56681583e25216e12c57adfd5876e78c0d4d))
+* Add zoom background (WIP) ([deb17e0](https://github.com/kapetacom/ui-web-plan-editor/commit/deb17e0c5635cab7344df60fb36b2f11986350a9))
+* Allow negative positions for blocks ([7549011](https://github.com/kapetacom/ui-web-plan-editor/commit/7549011c4ff3a2bb268f1cdb8ef5a24507f6978c))
+* Show visual bounds while dragging a block ([ad4acbb](https://github.com/kapetacom/ui-web-plan-editor/commit/ad4acbb30e5c3b415de6d921dc51c481643c5320))
+* Zoom and pan to an initial view ([57d3d4b](https://github.com/kapetacom/ui-web-plan-editor/commit/57d3d4b1942fcecc7f6c5ea9a4fd9bab9f5830f4))
+
 # [1.24.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.23.3...v1.24.0) (2023-12-25)
 
 
