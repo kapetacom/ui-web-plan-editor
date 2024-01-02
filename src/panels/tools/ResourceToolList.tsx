@@ -71,9 +71,8 @@ export const ResourceToolList = (props: Props) => {
                 >
                     {props.resources.map((resource, ix) => {
                         return (
-                            <Grid item xs={6}>
+                            <Grid item xs={6} key={`resource-${ix}`}>
                                 <DragAndDrop.Draggable
-                                    key={`resource-${ix}`}
                                     disabled={false}
                                     data={{
                                         type: PlannerPayloadType.RESOURCE_TYPE,
