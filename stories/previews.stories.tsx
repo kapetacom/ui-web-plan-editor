@@ -384,7 +384,7 @@ export const ThumbnailBlock = () => {
                 height={400}
                 onClick={() => {}}
                 installerService={{
-                    uninstall: () => Promise.resolve(),
+                    uninstall: () => new Promise((resolve) => setTimeout(resolve, 2000)),
                     install: (ref) => Promise.resolve(),
                     get: () => Promise.resolve(AssetInstallStatus.INSTALLED),
                 }}
