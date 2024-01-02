@@ -22,6 +22,7 @@ import './Planner.less';
 import { ResourceRole } from '@kapeta/ui-web-types';
 import { ResourceMode } from '../utils/enums';
 import { PlannerConnections } from './components/PlannerConnections';
+import { InitialZoomPanViewOptions } from './ZoomAndPan/ZoomPanContainer';
 
 type RenderResult = React.ReactElement<unknown, string | React.FunctionComponent | typeof React.Component> | null;
 
@@ -29,6 +30,8 @@ export interface PlannerProps {
     // eslint-disable-next-line react/no-unused-prop-types
     systemId: string;
     showPixelGrid?: boolean;
+    initialZoomPanView?: InitialZoomPanViewOptions;
+    showZoomPanControls?: boolean;
     // Should we instead augment the
     actions?: PlannerActionConfig;
     configurations?: { [key: string]: any };
@@ -264,7 +267,12 @@ export const Planner = (props: PlannerProps) => {
             }}
             resetKeys={[props.systemId, planner.plan, planner.blockAssets]}
         >
-            <PlannerCanvas onCreateBlock={props.onCreateBlock} showPixelGrid={props.showPixelGrid}>
+            <PlannerCanvas
+                onCreateBlock={props.onCreateBlock}
+                showPixelGrid={props.showPixelGrid}
+                initialZoomPanView={instances.length > 0 ? props.initialZoomPanView : undefined}
+                showZoomPanControls={props.showZoomPanControls}
+            >
                 {instances.map((instance, index) => {
                     const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
                     const isInFocus = !!(focusInfo && isBlockInFocus(focusInfo, instance.id));

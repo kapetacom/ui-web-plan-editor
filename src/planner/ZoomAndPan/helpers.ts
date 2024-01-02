@@ -10,12 +10,17 @@ import { Rectangle } from '../types';
  * Calculate transform to fit child in parent. The child is scaled to fit the parent.
  * @param parentBBox
  * @param childBBox
+ * @param maxScale Maximum scale to apply
  */
-export const calculateFitToParent = (parentBBox: Rectangle, childBBox: Rectangle): ZoomTransform => {
+export const calculateFitToParent = (
+    parentBBox: Rectangle,
+    childBBox: Rectangle,
+    maxScale = Infinity
+): ZoomTransform => {
     // Compute scale respecting aspect ratio
     const scaleX = parentBBox.width / childBBox.width;
     const scaleY = parentBBox.height / childBBox.height;
-    const scale = Math.min(scaleX, scaleY);
+    const scale = Math.min(scaleX, scaleY, maxScale);
 
     // Scale the child's bounding box dimensions
     const scaledWidth = childBBox.width * scale;

@@ -20,7 +20,7 @@ import { DnDPayload, DragEventInfo } from './DragAndDrop/types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { adjustBlockEdges } from './components/PlannerBlockNode';
 import { ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
-import { ZoomPanContainer } from './ZoomAndPan/ZoomPanContainer';
+import { ZoomPanContainer, InitialZoomPanViewOptions } from './ZoomAndPan/ZoomPanContainer';
 
 const toBlockPoint = (mousePoint: Point, zoom: number): Point => {
     return {
@@ -48,6 +48,8 @@ const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstanc
 export interface PlannerCanvasProps extends PropsWithChildren {
     onCreateBlock?: (block: BlockDefinition, instance: BlockInstance) => void;
     showPixelGrid?: boolean;
+    initialZoomPanView?: InitialZoomPanViewOptions;
+    showZoomPanControls?: boolean;
 }
 
 export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
@@ -175,6 +177,8 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                         showPixelGrid={props.showPixelGrid}
                         isDraggingChild={isDragging}
                         isViewOnly={planner.mode === PlannerMode.VIEW}
+                        initialZoomPanView={props.initialZoomPanView}
+                        showZoomPanControls={props.showZoomPanControls}
                     >
                         {props.children}
                     </ZoomPanContainer>

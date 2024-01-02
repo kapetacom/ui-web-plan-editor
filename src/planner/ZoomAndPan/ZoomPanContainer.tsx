@@ -5,7 +5,7 @@
 
 import React, { forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { Box, BoxProps } from '@mui/material';
-import { zoom, zoomIdentity, D3ZoomEvent } from 'd3-zoom';
+import { zoom, zoomIdentity, D3ZoomEvent, ZoomTransform } from 'd3-zoom';
 import { select } from 'd3-selection';
 import { useFitChildInParent, useMeasureElement } from './hooks';
 import { ZoomPanControls } from './ZoomPanControls';
@@ -13,6 +13,11 @@ import { Rectangle } from '../types';
 import { ZoomPanBackground, ZoomPanBackgroundHandle } from './background/ZoomPanBackground';
 import { ZoomPanGrabber } from './ZoomPanGrabber';
 import { ZoomPanVisualBounds, ZoomPanVisualBoundsHandle } from './ZoomPanVisualBounds';
+
+export type InitialZoomPanViewOptions = {
+    view: 'fit' | 'center';
+    transitionDuration?: number;
+};
 
 export interface ZoomPanContainerProps extends BoxProps {
     /**
@@ -32,6 +37,14 @@ export interface ZoomPanContainerProps extends BoxProps {
      * Whether the container is in view only mode. Defaults to false.
      */
     isViewOnly?: boolean;
+    /**
+     * The initial view of the container when it is mounted.
+     */
+    initialZoomPanView?: InitialZoomPanViewOptions;
+    /**
+     * Whether to show the zoom pan controls. Defaults to true.
+     */
+    showZoomPanControls?: boolean;
     /**
      * Called when the zoom pan starts
      */
@@ -64,9 +77,11 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
     const {
         children,
         childrenBBox,
+        showPixelGrid,
         isDraggingChild = false,
         isViewOnly = false,
-        showPixelGrid,
+        initialZoomPanView,
+        showZoomPanControls = true,
         onZoomPanStart,
         onZoomPanTick,
         onZoomPanEnd,
@@ -84,7 +99,11 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
 
     // Calculate the transforms to position the content nicely in the container
     const containerBBox = useMeasureElement(containerRef);
-    const { transformToFitView, transformToCenter } = useFitChildInParent(containerBBox, childrenBBox);
+    const { transformToFitView, transformToCenter, transformToCenterWithScaleDown } = useFitChildInParent(
+        containerBBox,
+        childrenBBox
+    );
+    const isReadyToAutoPosition = transformToFitView.k > 0 && transformToCenterWithScaleDown.k > 0;
 
     // Create a zoom behavior function
     const zoomBehaviour = useMemo(
@@ -138,25 +157,50 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
 
     const onZoomOut = useCallback(() => zoomBy(0.8), [zoomBy]);
 
+    const onAutoPosition = useCallback(
+        (transform: ZoomTransform, transitionDuration = 750) => {
+            if (grabRef?.current) {
+                const { x, y, k } = transform || { x: 0, y: 0, k: 1 };
+                select(grabRef.current)
+                    .transition()
+                    .duration(transitionDuration)
+                    .call(zoomBehaviour.transform, zoomIdentity.translate(x, y).scale(k));
+            }
+        },
+        [zoomBehaviour.transform]
+    );
+
     const onFitToView = useCallback(() => {
-        if (grabRef?.current) {
-            const { x, y, k } = transformToFitView || { x: 0, y: 0, k: 1 };
-            select(grabRef.current)
-                .transition()
-                .duration(750)
-                .call(zoomBehaviour.transform, zoomIdentity.translate(x, y).scale(k));
-        }
-    }, [transformToFitView, zoomBehaviour.transform]);
+        onAutoPosition(transformToFitView, 750);
+    }, [onAutoPosition, transformToFitView]);
 
     const onCenter = useCallback(() => {
-        if (grabRef?.current) {
-            const { x, y, k } = transformToCenter || { x: 0, y: 0, k: 1 };
-            select(grabRef.current)
-                .transition()
-                .duration(750)
-                .call(zoomBehaviour.transform, zoomIdentity.translate(x, y).scale(k));
+        onAutoPosition(transformToCenter, 750);
+    }, [onAutoPosition, transformToCenter]);
+
+    // When initialZoomPanView is set we auto position to that view when the component is mounted.
+    const [initialViewDone, setInitialViewDone] = React.useState(false);
+    useEffect(() => {
+        if (!initialZoomPanView || !isReadyToAutoPosition || initialViewDone) {
+            return;
         }
-    }, [transformToCenter, zoomBehaviour.transform]);
+        if (initialZoomPanView.view === 'center') {
+            onAutoPosition(transformToCenterWithScaleDown, initialZoomPanView.transitionDuration);
+            setInitialViewDone(true);
+        } else if (initialZoomPanView.view === 'fit') {
+            onAutoPosition(transformToFitView, initialZoomPanView.transitionDuration);
+            setInitialViewDone(true);
+        }
+    }, [
+        initialViewDone,
+        initialZoomPanView?.view,
+        initialZoomPanView?.transitionDuration,
+        onAutoPosition,
+        transformToCenterWithScaleDown,
+        transformToFitView,
+        initialZoomPanView,
+        isReadyToAutoPosition,
+    ]);
 
     return (
         <Box
@@ -186,6 +230,11 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                     height: '100%',
                     transform: 'translate(0px, 0px) scale(1)',
                     transformOrigin: 'left top',
+                    ...(initialZoomPanView
+                        ? {
+                              opacity: isReadyToAutoPosition ? 1 : 0,
+                          }
+                        : {}),
                     ...(isViewOnly
                         ? {}
                         : {
@@ -200,16 +249,18 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                 {children}
             </Box>
 
-            <ZoomPanControls
-                className="zoom-and-pan-controls"
-                data-kap-id="zoom-and-pan-controls"
-                onZoomIn={onZoomIn}
-                onZoomOut={onZoomOut}
-                onFitToView={onFitToView}
-                onCenter={onCenter}
-                onLock={onLock}
-                onUnlock={onUnlock}
-            />
+            {showZoomPanControls && (
+                <ZoomPanControls
+                    className="zoom-and-pan-controls"
+                    data-kap-id="zoom-and-pan-controls"
+                    onZoomIn={onZoomIn}
+                    onZoomOut={onZoomOut}
+                    onFitToView={onFitToView}
+                    onCenter={onCenter}
+                    onLock={onLock}
+                    onUnlock={onUnlock}
+                />
+            )}
         </Box>
     );
 });
