@@ -1,3 +1,10 @@
+## [1.25.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.1...v1.25.2) (2024-01-02)
+
+
+### Bug Fixes
+
+* Move types for d3 to dependencies ([3e5063c](https://github.com/kapetacom/ui-web-plan-editor/commit/3e5063ccda0302556a2222d78b63307727b3a890))
+
 ## [1.25.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.0...v1.25.1) (2024-01-02)
 
 
