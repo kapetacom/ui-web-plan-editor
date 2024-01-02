@@ -1,3 +1,10 @@
+## [1.25.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.2...v1.25.3) (2024-01-02)
+
+
+### Bug Fixes
+
+* Change delete button to a MUI Button ([79290ee](https://github.com/kapetacom/ui-web-plan-editor/commit/79290ee33b05f317449f30b6bcd88dbc102d5b48))
+
 ## [1.25.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.1...v1.25.2) (2024-01-02)
 
 
