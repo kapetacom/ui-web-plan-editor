@@ -4,7 +4,7 @@
  */
 
 import { IBlockTypeProvider } from '@kapeta/ui-web-types';
-import { Box, Grid, Stack } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import React from 'react';
 import { BlockTypeTool } from './BlockTypeTool';
 
@@ -18,8 +18,8 @@ export const BlockTypeToolList = (props: Props) => {
             <Grid container spacing={2}>
                 {props.blockTypes.map((blockType, ix) => {
                     return (
-                        <Grid item xs={6}>
-                            <BlockTypeTool key={`block-type-${ix}`} blockType={blockType} />
+                        <Grid item xs={6} key={`block-type-${ix}`}>
+                            <BlockTypeTool blockType={blockType} />
                         </Grid>
                     );
                 })}
