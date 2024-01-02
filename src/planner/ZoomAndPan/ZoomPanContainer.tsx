@@ -15,8 +15,8 @@ import { ZoomPanGrabber } from './ZoomPanGrabber';
 
 export interface ZoomPanContainerProps extends BoxProps {
     /**
-     * A bounding for of the children. It is e.g. used to calculate how to fit the children in the
-     * container.
+     * A bounding box for of the children. It is e.g. used to calculate how to fit the children in
+     * the container.
      */
     childrenBBox?: Rectangle;
     /**
@@ -103,7 +103,7 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
         [onZoomPanEnd, onZoomPanStart, onZoomPanTick]
     );
 
-    // On mount, initialize zoom behavior
+    // On mount, initialize the zoom behavior
     useEffect(() => {
         if (grabRef?.current) {
             select(grabRef.current).call(zoomBehaviour);
