@@ -174,6 +174,7 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                         }}
                         showPixelGrid={props.showPixelGrid}
                         isDraggingChild={isDragging}
+                        isViewOnly={planner.mode === PlannerMode.VIEW}
                     >
                         {props.children}
                     </ZoomPanContainer>

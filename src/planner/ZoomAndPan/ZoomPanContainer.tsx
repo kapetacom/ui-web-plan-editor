@@ -29,6 +29,10 @@ export interface ZoomPanContainerProps extends BoxProps {
      */
     isDraggingChild?: boolean;
     /**
+     * Whether the container is in view only mode. Defaults to false.
+     */
+    isViewOnly?: boolean;
+    /**
      * Called when the zoom pan starts
      */
     onZoomPanStart?: () => void;
@@ -61,6 +65,7 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
         children,
         childrenBBox,
         isDraggingChild = false,
+        isViewOnly = false,
         showPixelGrid,
         onZoomPanStart,
         onZoomPanTick,
@@ -181,10 +186,15 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                     height: '100%',
                     transform: 'translate(0px, 0px) scale(1)',
                     transformOrigin: 'left top',
-                    pointerEvents: 'none',
-                    '& > *': {
-                        pointerEvents: 'initial',
-                    },
+                    ...(isViewOnly
+                        ? {}
+                        : {
+                              // When not in view only mode, allow interaction with child elements
+                              pointerEvents: 'none',
+                              '& > *': {
+                                  pointerEvents: 'auto',
+                              },
+                          }),
                 }}
             >
                 {children}
