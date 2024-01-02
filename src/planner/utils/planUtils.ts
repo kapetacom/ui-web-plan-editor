@@ -4,7 +4,7 @@
  */
 
 import { AssetInfo, PlannerNodeSize } from '../../types';
-import { ResourceRole, Size } from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { BlockDefinition, BlockInstance, Plan } from '@kapeta/schemas';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
@@ -19,15 +19,15 @@ export const RESOURCE_HEIGHTS = {
 export const calculateCanvasSize = (
     blocks: BlockInstance[],
     blockAssets: AssetInfo<BlockDefinition>[],
-    size: PlannerNodeSize,
-    containerSize: Size
+    size: PlannerNodeSize
 ) => {
     // We want the canvas to always have enough space for the block + connections, even at the edges
-    const canvasPadding = 150;
-    let maxWidth = 50;
-    let maxHeight = 50;
-    let minX = 0;
-    let minY = 0;
+    const CANVAS_PADDING = [50, 220]; // top/bottom, left/right
+
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
 
     if (blocks && blocks.length > 0) {
         blocks.forEach((instance) => {
@@ -44,31 +44,46 @@ export const calculateCanvasSize = (
                 console.warn('Could not find block for instance when calculating canvas size', instance);
                 return;
             }
-            const bottom = dimensions.top + getReservedBlockHeight(blockDefinition.content, size);
-            const right = dimensions.left + dimensions.width + canvasPadding;
-            const y = dimensions.top;
-            const x = dimensions.left;
-            if (maxHeight < bottom) {
-                maxHeight = bottom;
+            const blockHeight = getReservedBlockHeight(blockDefinition.content, size);
+            const blockWidth = dimensions.width;
+            const blockY = dimensions.top;
+            const blockX = dimensions.left;
+
+            if (blockX < minX) {
+                minX = blockX;
             }
-            if (maxWidth < right) {
-                maxWidth = right;
+
+            if (blockY < minY) {
+                minY = blockY;
             }
-            if (y < minY) {
-                minY = y;
+
+            if (blockX + blockWidth > maxX) {
+                maxX = blockX + blockWidth;
             }
-            if (x < minX) {
-                minX = x;
+
+            if (blockY + blockHeight > maxY) {
+                maxY = blockY + blockHeight;
             }
         });
     }
 
-    return {
-        x: minX,
-        y: minY,
-        width: Math.max(maxWidth, containerSize.width),
-        height: Math.max(maxHeight, containerSize.height),
+    if (!isFinite(minX) || !isFinite(minY) || !isFinite(maxX) || !isFinite(maxY)) {
+        return {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 50,
+        };
+    }
+
+    const canvasSize = {
+        x: minX - CANVAS_PADDING[1],
+        y: minY - CANVAS_PADDING[0],
+        width: maxX - minX + CANVAS_PADDING[1] * 2,
+        height: maxY - minY + CANVAS_PADDING[0] * 2,
     };
+
+    return canvasSize;
 };
 
 /**

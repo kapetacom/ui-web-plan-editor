@@ -151,6 +151,11 @@ const PlanPreviewInner = withPlannerContext<InnerProps>(
                         renderMissingReferences={() => {
                             return <MissingRefs />;
                         }}
+                        showZoomPanControls={false}
+                        initialZoomPanView={{
+                            view: 'center',
+                            transitionDuration: 0,
+                        }}
                     />
                 </div>
             </Box>

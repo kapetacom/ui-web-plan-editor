@@ -331,11 +331,11 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     // Allow internal changes, but load from props in case props change
     useEffect(() => {
         setPlan(props.plan);
-    }, [props.plan]);
+    }, [props.plan, setPlan]);
 
     useEffect(() => {
         setBlockAssets(props.blockAssets);
-    }, [props.blockAssets]);
+    }, [props.blockAssets, setBlockAssets]);
 
     const toggleFocusBlock = (block: BlockInstance | undefined) => {
         setFocusedBlock((prevFocus) => (prevFocus && block && block.id === prevFocus.id ? undefined : block));

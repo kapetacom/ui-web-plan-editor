@@ -233,6 +233,10 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                     });
                 }}
                 showPixelGrid
+                initialZoomPanView={{
+                    view: 'center',
+                    transitionDuration: 500,
+                }}
             />
 
             <ItemEditorPanel
