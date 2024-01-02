@@ -1,3 +1,10 @@
+## [1.25.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.0...v1.25.1) (2024-01-02)
+
+
+### Bug Fixes
+
+* Add key prop ([15f8c18](https://github.com/kapetacom/ui-web-plan-editor/commit/15f8c187b165ec27c6204f2addcbbaec512ec78d))
+
 # [1.25.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.24.0...v1.25.0) (2024-01-02)
 
 
