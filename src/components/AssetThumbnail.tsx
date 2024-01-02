@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { forwardRef, useState } from 'react';
-import { Box, Chip, CircularProgress, Stack, SvgIconProps, Typography } from '@mui/material';
+import React, { forwardRef, useCallback, useState } from 'react';
+import { Box, CircularProgress, IconButton, Stack, SvgIconProps, Typography, alpha } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
 import { SchemaKind } from '@kapeta/ui-web-types';
 import {
     DateDisplay,
@@ -15,12 +16,9 @@ import {
     TooltipProps,
 } from '@kapeta/ui-web-components';
 import { AssetKindIcon, CoreTypes, SimpleLoader, useConfirm } from '@kapeta/ui-web-components';
-
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
-
 import { BlockDefinition, Plan } from '@kapeta/schemas';
 
-import { Delete } from '@mui/icons-material';
 import { PlanPreview } from './PlanPreview';
 import { BlockPreview, BlockTypePreview } from './BlockTypePreview';
 import { ResourceTypePreview } from './ResourceTypePreview';
@@ -69,6 +67,37 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnail
 
     const kindNameLC = getNameForKind(props.asset.content.kind).toLowerCase();
 
+    const onDelete: React.MouseEventHandler<HTMLButtonElement> = useCallback(
+        async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!props.installerService?.uninstall) {
+                return;
+            }
+            if (
+                await confirm({
+                    title: props.subscription ? `Remove ${kindNameLC}` : `Uninstall ${kindNameLC}`,
+                    content: props.subscription
+                        ? `Are you sure you want to remove ${title}?
+                                    This will also remove all environments for this plan.`
+                        : `Are you sure you want to uninstall ${title}?
+                                    This will not delete anything from your disk.`,
+                    confirmationText: props.subscription ? 'Remove' : 'Uninstall',
+                })
+            ) {
+                try {
+                    setDeleting(true);
+                    await props.installerService.uninstall(props.asset.ref);
+                } catch (e) {
+                    // Ignore
+                } finally {
+                    setDeleting(false);
+                }
+            }
+        },
+        [confirm, kindNameLC, props.asset.ref, props.installerService, props.subscription, title]
+    );
+
     return (
         <Stack
             ref={ref}
@@ -89,6 +118,10 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnail
                 bgcolor: '#ECEEF2',
                 '&:hover': {
                     boxShadow: 3,
+                    '.asset-thumbnail-delete-button': {
+                        color: (theme) => theme.palette.text.secondary,
+                        backgroundColor: (theme) => alpha(theme.palette.text.secondary, 0.04),
+                    },
                 },
                 '& > .preview': {
                     position: 'relative',
@@ -101,57 +134,43 @@ export const AssetThumbnailContainer = forwardRef<HTMLDivElement, AssetThumbnail
         >
             <Box className="preview" flex={1}>
                 {props.installerService?.uninstall && (
-                    <Chip
-                        data-kap-id="asset-thumbnail-delete-button"
-                        label={deleting ? <CircularProgress size={24} /> : <Delete />}
-                        variant="filled"
-                        color="default"
-                        onClick={async (evt) => {
-                            evt.preventDefault();
-                            evt.stopPropagation();
-                            if (!props.installerService?.uninstall) {
-                                return;
-                            }
-                            if (
-                                await confirm({
-                                    title: props.subscription ? `Remove ${kindNameLC}` : `Uninstall ${kindNameLC}`,
-                                    content: props.subscription
-                                        ? `Are you sure you want to remove ${title}?
-                                    This will also remove all environments for this plan.`
-                                        : `Are you sure you want to uninstall ${title}?
-                                    This will not delete anything from your disk.`,
-                                    confirmationText: props.subscription ? 'Remove' : 'Uninstall',
-                                })
-                            ) {
-                                try {
-                                    setDeleting(true);
-                                    await props.installerService.uninstall(props.asset.ref);
-                                } catch (e) {
-                                    // Ignore
-                                } finally {
-                                    setDeleting(false);
-                                }
-                            }
-                        }}
+                    <Box
                         sx={{
                             position: 'absolute',
                             top: '8px',
                             right: '8px',
+                            width: '30px',
+                            height: '30px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             zIndex: 1,
-                            border: '1px solid #263238',
-                            color: '#263238',
-                            '& > .MuiChip-label': {
-                                p: '0 4px',
-                                width: '24px',
-                                height: '24px',
-                            },
-                            '&:hover': {
-                                boxShadow: 2,
-                                color: 'error.contrastText',
-                                bgcolor: 'error.main',
-                            },
                         }}
-                    />
+                    >
+                        {deleting ? (
+                            <>
+                                <CircularProgress size={30} color="error" sx={{ position: 'absolute' }} thickness={2} />
+                                <ClearIcon fontSize="small" color="error" />
+                            </>
+                        ) : (
+                            <IconButton
+                                data-kap-id="asset-thumbnail-delete-button"
+                                className="asset-thumbnail-delete-button"
+                                size="small"
+                                onClick={onDelete}
+                                sx={{
+                                    transition: 'background-color 0.2s ease-in-out',
+                                    color: (theme) => theme.palette.text.disabled,
+                                    '&&:hover': {
+                                        color: (theme) => theme.palette.error.main,
+                                        backgroundColor: (theme) => alpha(theme.palette.error.main, 0.08),
+                                    },
+                                }}
+                            >
+                                <ClearIcon fontSize="small" />
+                            </IconButton>
+                        )}
+                    </Box>
                 )}
                 {props.children}
             </Box>
