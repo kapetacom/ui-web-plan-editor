@@ -18,6 +18,7 @@ import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { createBlockInstanceForBlock, createBlockInstanceForBlockType } from './utils/blockUtils';
 import { DnDPayload, DragEventInfo } from './DragAndDrop/types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import { adjustBlockEdges } from './components/PlannerBlockNode';
 import { ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
 import { ZoomPanContainer } from './ZoomAndPan/ZoomPanContainer';
 
@@ -32,6 +33,7 @@ const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstanc
     const point = toBlockPoint(diff, zoom);
     point.x += block.dimensions!.left;
     point.y += block.dimensions!.top;
+    adjustBlockEdges(point);
 
     return {
         ...block,
@@ -171,6 +173,7 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                             height: '100%',
                         }}
                         showPixelGrid={props.showPixelGrid}
+                        isDraggingChild={isDragging}
                     >
                         {props.children}
                     </ZoomPanContainer>
