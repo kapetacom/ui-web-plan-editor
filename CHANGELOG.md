@@ -1,3 +1,10 @@
+## [1.25.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.3...v1.25.4) (2024-01-03)
+
+
+### Bug Fixes
+
+* Adjust block position for canvas offset ([98ef6a7](https://github.com/kapetacom/ui-web-plan-editor/commit/98ef6a7c8ecb448e62a8063656b8edfc202d4d2f))
+
 ## [1.25.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.2...v1.25.3) (2024-01-02)
 
 
