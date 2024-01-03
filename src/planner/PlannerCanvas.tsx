@@ -71,7 +71,13 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
         const point = dragEvent.zone.end;
         point.x -= center;
         point.y -= center;
+
+        // Adjust for pan offset
+        point.x -= planner.panOffset.x;
+        point.y -= planner.panOffset.y;
+
         const blockPoint = toBlockPoint(point, planner.zoom);
+
         return {
             height: -1,
             width: BLOCK_SIZE,
@@ -168,6 +174,7 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                         className="planner-area-canvas"
                         onZoomPanEnd={(x, y, k) => {
                             planner.setZoomLevel(k);
+                            planner.setPanOffset({ x, y });
                         }}
                         childrenBBox={canvasSize}
                         sx={{
