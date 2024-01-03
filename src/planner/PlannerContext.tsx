@@ -88,9 +88,13 @@ export interface PlannerContextData {
     instanceStates: { [id: string]: InstanceStatus };
 
     mode?: PlannerMode;
-    zoom: number;
 
+    zoom: number;
     setZoomLevel: (zoom: number | ((currentZoom: number) => number)) => void;
+
+    panOffset: Point;
+    setPanOffset: (offset: Point | ((currentOffset: Point) => Point)) => void;
+
     nodeSize: PlannerNodeSize;
 
     getBlockByRef(ref: string): BlockDefinition | undefined;
@@ -176,8 +180,12 @@ const defaultValue: PlannerContextData = {
         setResourceIcon() {},
     },
     instanceStates: {},
+
     zoom: 1,
     setZoomLevel() {},
+
+    panOffset: { x: 0, y: 0 },
+    setPanOffset() {},
 
     setFocusedBlock(block: BlockInstance) {},
 
@@ -285,6 +293,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     const [canvasSize, setCanvasSize] = useState<Rectangle>({ x: 0, y: 0, width: 0, height: 0 });
 
     const [zoom, setZoomLevel] = useState(1);
+
+    const [panOffset, setPanOffset] = useState<Point>({ x: 0, y: 0 });
 
     // Allow internal changes, but load from props in case props change
     type ContextData = {
@@ -569,6 +579,9 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
         zoom,
         setZoomLevel,
+
+        panOffset,
+        setPanOffset,
 
         canvasSize,
         setCanvasSize,
