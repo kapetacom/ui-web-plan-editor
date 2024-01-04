@@ -1,3 +1,10 @@
+## [1.25.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.4...v1.25.5) (2024-01-04)
+
+
+### Bug Fixes
+
+* Make PlanPreview fill its container ([1ae407a](https://github.com/kapetacom/ui-web-plan-editor/commit/1ae407a134096d7841622b7d1ebdd83d8f572797))
+
 ## [1.25.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.3...v1.25.4) (2024-01-03)
 
 
