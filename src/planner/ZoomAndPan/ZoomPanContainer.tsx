@@ -219,7 +219,7 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                 highlight={isDraggingChild}
             />
 
-            <ZoomPanGrabber ref={grabRef} className="zoom-and-pan-grab-area" />
+            <ZoomPanGrabber ref={grabRef} className="zoom-and-pan-grab-area" disabled={isViewOnly} />
 
             <Box
                 ref={containerRef}
@@ -235,15 +235,11 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                               opacity: isReadyToAutoPosition ? 1 : 0,
                           }
                         : {}),
-                    ...(isViewOnly
-                        ? {}
-                        : {
-                              // When not in view only mode, allow interaction with child elements
-                              pointerEvents: 'none',
-                              '& > *': {
-                                  pointerEvents: 'auto',
-                              },
-                          }),
+                    pointerEvents: 'none',
+                    '& > *': {
+                        // When not in view only mode, allow interaction with child elements
+                        pointerEvents: isViewOnly ? undefined : 'auto',
+                    },
                 }}
             >
                 {children}

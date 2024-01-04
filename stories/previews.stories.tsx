@@ -50,8 +50,6 @@ export const PlanViewer = () => {
         <TempPreviewContainer>
             {plan.value ? (
                 <PlanPreview
-                    width={WIDTH - 20}
-                    height={HEIGHT - 20}
                     blocks={plan.value.blockAssets || []}
                     asset={{
                         ref: 'kapeta/something:local',
@@ -75,8 +73,6 @@ export const PlanMissingReferences = () => {
         <TempPreviewContainer>
             {plan.value ? (
                 <PlanPreview
-                    width={WIDTH - 20}
-                    height={HEIGHT - 20}
                     blocks={plan.value.blockAssets || []}
                     asset={{
                         ref: 'kapeta/something:local',

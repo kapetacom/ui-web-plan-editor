@@ -8,6 +8,7 @@ import React, { forwardRef } from 'react';
 
 export interface ZoomPanGrabberProps {
     className?: string;
+    disabled?: boolean;
 }
 
 export const ZoomPanGrabber = forwardRef<HTMLDivElement, ZoomPanGrabberProps>((props, ref) => {
@@ -20,6 +21,7 @@ export const ZoomPanGrabber = forwardRef<HTMLDivElement, ZoomPanGrabberProps>((p
                 width: '100%',
                 height: '100%',
                 cursor: 'grab',
+                pointerEvents: props.disabled ? 'none' : undefined,
             }}
         />
     );
