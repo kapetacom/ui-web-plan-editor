@@ -258,8 +258,6 @@ const AssetThumbnailInnerPreview = (props: AssetThumbnailInnerPreviewProps) => {
                         {!context.loading && (
                             <PlanPreview
                                 asset={props.asset}
-                                width={props.width}
-                                height={props.height}
                                 blocks={context.blocks}
                                 onMissingReferences={props.onMissingReferences}
                             />

@@ -88,48 +88,8 @@
         height: 100%;
     }
 
-    .planner-zoom-buttons {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-    }
-
     .planner-temp-resource-item {
         position: absolute;
-    }
-
-    .planner-area-scroll {
-        .transition(background 500ms);
-        height: 100%;
-        width: 100%;
-        background-color: @bw-planner-background;
-
-        &.focused-planner {
-            background-color: @gray-background;
-
-            .planner-connection {
-                path.background {
-                    stroke: @gray-background;
-                }
-            }
-        }
-
-        overflow: scroll;
-
-        .planner-zoom-panel {
-            background-color: #23423444;
-            overflow: visible;
-            position: relative;
-            width: inherit;
-            top: 0;
-            left: 0;
-            height: inherit;
-            .transition();
-        }
-
-        .connection-hidden {
-            opacity: 0;
-        }
     }
 
     &.read-only {
@@ -149,7 +109,6 @@
         .planner-area-position-parent {
             padding-right: @focus-toolbar-width;
         }
-
     }
 }
 
