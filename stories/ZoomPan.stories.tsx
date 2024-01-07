@@ -95,12 +95,14 @@ export const ZoomAndPanDemo = () => {
                 height: '100%',
                 background: '#f5f1ee',
             }}
-            onLock={() => console.log('Locked')}
-            onUnlock={() => console.log('Unlocked')}
             childrenBBox={calculateCombinedBoundingBox(blocks)}
             onZoomPanStart={() => console.log('ZoomPanStart')}
             onZoomPanEnd={() => console.log('ZoomPanEnd')}
             onZoomPanTick={(x, y, z) => console.log('ZoomPanTick', x, y, z)}
+            onAutoFitEnabled={() => console.log('Auto fit Enabled')}
+            onAutoFitDisabled={() => console.log('Auto fit Disabled')}
+            onLock={() => console.log('Locked')}
+            onUnlock={() => console.log('Unlocked')}
         >
             <Box sx={getBlockStyle(50, 50)}>Block 1</Box>
             <Box sx={getBlockStyle(200, 200)}>Block 2</Box>

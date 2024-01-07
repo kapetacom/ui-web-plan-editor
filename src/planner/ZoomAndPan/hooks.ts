@@ -48,34 +48,42 @@ export type UseFitChildInParentResult = {
 };
 
 export const useFitChildInParent = (parentBBox?: Rectangle, childBBox?: Rectangle): UseFitChildInParentResult => {
-    const transformToFitView = useMemo(() => {
-        if (!parentBBox || !childBBox) {
-            return new ZoomTransform(1, 0, 0);
-        }
-        return calculateFitToParent(parentBBox, childBBox);
-    }, [childBBox, parentBBox]);
+    // The reason we split the parent and child bounding boxes and then put them back together in
+    // the useMemo hook is because we want to make sure that the useMemo hook is only called when
+    // the the values inside the bounding boxes change.
 
-    const transformToCenter = useMemo(() => {
-        if (!parentBBox || !childBBox) {
-            return new ZoomTransform(1, 0, 0);
-        }
-        return calculateCenterInParent(parentBBox, childBBox);
-    }, [childBBox, parentBBox]);
+    const px = parentBBox?.x ?? 0;
+    const py = parentBBox?.y ?? 0;
+    const pw = parentBBox?.width ?? 0;
+    const ph = parentBBox?.height ?? 0;
 
-    const transformToCenterWithScaleDown = useMemo(() => {
-        if (!parentBBox || !childBBox) {
-            return new ZoomTransform(1, 0, 0);
-        }
-        return calculateFitToParent(
-            parentBBox,
-            childBBox,
-            1 // Setting maxScale to 1 to make sure the child is not scaled up
-        );
-    }, [childBBox, parentBBox]);
+    const cx = childBBox?.x ?? 0;
+    const cy = childBBox?.y ?? 0;
+    const cw = childBBox?.width ?? 0;
+    const ch = childBBox?.height ?? 0;
 
-    return {
-        transformToFitView,
-        transformToCenter,
-        transformToCenterWithScaleDown,
-    };
+    const transforms = useMemo(() => {
+        if (px + py + pw + ph === 0 || cx + cy + cw + ch === 0) {
+            return {
+                transformToFitView: new ZoomTransform(1, 0, 0),
+                transformToCenter: new ZoomTransform(1, 0, 0),
+                transformToCenterWithScaleDown: new ZoomTransform(1, 0, 0),
+            };
+        }
+
+        const pBBox = { x: px, y: py, width: pw, height: ph };
+        const cBBox = { x: cx, y: cy, width: cw, height: ch };
+
+        return {
+            transformToFitView: calculateFitToParent(pBBox, cBBox),
+            transformToCenter: calculateCenterInParent(pBBox, cBBox),
+            transformToCenterWithScaleDown: calculateFitToParent(
+                pBBox,
+                cBBox,
+                1 // Setting maxScale to 1 to make sure the child is not scaled up
+            ),
+        };
+    }, [px, py, pw, ph, cx, cy, cw, ch]);
+
+    return transforms;
 };

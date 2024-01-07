@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { forwardRef, useCallback, useEffect, useMemo } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { debounce } from 'lodash';
 import { Box, BoxProps } from '@mui/material';
 import { zoom, zoomIdentity, D3ZoomEvent, ZoomTransform } from 'd3-zoom';
 import { select } from 'd3-selection';
@@ -64,6 +65,14 @@ export interface ZoomPanContainerProps extends BoxProps {
      */
     onZoomPanEnd?: (x: number, y: number, k: number) => void;
     /**
+     * Called when auto fit is enabled
+     */
+    onAutoFitEnabled?: () => void;
+    /**
+     * Called when auto fit is disabled
+     */
+    onAutoFitDisabled?: () => void;
+    /**
      * Called when the lock button is clicked
      */
     onLock?: () => void;
@@ -85,6 +94,8 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
         onZoomPanStart,
         onZoomPanTick,
         onZoomPanEnd,
+        onAutoFitEnabled,
+        onAutoFitDisabled,
         onLock,
         onUnlock,
         sx,
@@ -99,11 +110,11 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
 
     // Calculate the transforms to position the content nicely in the container
     const containerBBox = useMeasureElement(containerRef);
-    const { transformToFitView, transformToCenter, transformToCenterWithScaleDown } = useFitChildInParent(
-        containerBBox,
-        childrenBBox
-    );
+    const { transformToFitView, transformToCenterWithScaleDown } = useFitChildInParent(containerBBox, childrenBBox);
     const isReadyToAutoPosition = transformToFitView.k > 0 && transformToCenterWithScaleDown.k > 0;
+
+    // Keep track of the current zoom level
+    const [currentZoom, setCurrentZoom] = useState<number>(1);
 
     // Create a zoom behavior function
     const zoomBehaviour = useMemo(
@@ -113,6 +124,9 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                 .scaleExtent([0.25, 2])
                 .on('zoom', function handleZoom(event: D3ZoomEvent<HTMLDivElement, unknown>) {
                     const { x, y, k } = event.transform;
+
+                    setCurrentZoom(k);
+
                     // Update the transform of the container
                     select(containerRef.current).style('transform', () => {
                         return `translate(${x}px, ${y}px) scale(${k})`;
@@ -170,13 +184,31 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
         [zoomBehaviour.transform]
     );
 
-    const onFitToView = useCallback(() => {
-        onAutoPosition(transformToFitView, 750);
-    }, [onAutoPosition, transformToFitView]);
+    // Auto fit
+    const [autoFit, setAutoFit] = useState(false);
 
-    const onCenter = useCallback(() => {
-        onAutoPosition(transformToCenter, 750);
-    }, [onAutoPosition, transformToCenter]);
+    const enabledAutoFit = useCallback(() => {
+        setAutoFit(true);
+        onAutoFitEnabled?.();
+    }, [onAutoFitEnabled]);
+
+    const disabledAutoFit = useCallback(() => {
+        setAutoFit(false);
+        onAutoFitDisabled?.();
+    }, [onAutoFitDisabled]);
+
+    const autoFitDebounced = useMemo(() => debounce((callback) => callback(), 100), []);
+
+    const onCenterWithScaleDown = useCallback(() => {
+        onAutoPosition(transformToCenterWithScaleDown, 750);
+    }, [onAutoPosition, transformToCenterWithScaleDown]);
+
+    useEffect(() => {
+        if (!autoFit) {
+            return;
+        }
+        autoFitDebounced(onCenterWithScaleDown);
+    }, [autoFit, autoFitDebounced, onCenterWithScaleDown]);
 
     // When initialZoomPanView is set we auto position to that view when the component is mounted.
     const [initialViewDone, setInitialViewDone] = React.useState(false);
@@ -249,10 +281,11 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                 <ZoomPanControls
                     className="zoom-and-pan-controls"
                     data-kap-id="zoom-and-pan-controls"
+                    currentZoom={currentZoom}
                     onZoomIn={onZoomIn}
                     onZoomOut={onZoomOut}
-                    onFitToView={onFitToView}
-                    onCenter={onCenter}
+                    onEnableAutoFit={enabledAutoFit}
+                    onDisableAutoFit={disabledAutoFit}
                     onLock={onLock}
                     onUnlock={onUnlock}
                 />
