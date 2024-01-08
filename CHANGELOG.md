@@ -1,3 +1,10 @@
+## [1.25.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.5...v1.25.6) (2024-01-08)
+
+
+### Bug Fixes
+
+* Do not disregard name from converter if available ([#147](https://github.com/kapetacom/ui-web-plan-editor/issues/147)) ([c66bd6b](https://github.com/kapetacom/ui-web-plan-editor/commit/c66bd6b9880ffa8c58b200ee1efa18dea1e8e1e7))
+
 ## [1.25.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.4...v1.25.5) (2024-01-04)
 
 
