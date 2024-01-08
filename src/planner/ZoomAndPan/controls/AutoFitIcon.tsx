@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
+
 import React, { forwardRef, useLayoutEffect, useRef } from 'react';
 import { select } from 'd3-selection';
 import 'd3-transition';
