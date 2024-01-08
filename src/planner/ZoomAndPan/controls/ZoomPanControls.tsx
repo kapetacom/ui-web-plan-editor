@@ -3,14 +3,14 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Box, BoxProps, Button, ButtonGroup, styled } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Tooltip } from '@kapeta/ui-web-components';
-import { AutoFitIcon } from './controls/AutoFitIcon';
+import { AutoFitIcon } from './AutoFitIcon';
 
 export interface ZoomPanControlsProps extends BoxProps {
     // Zoom in / out
@@ -19,10 +19,12 @@ export interface ZoomPanControlsProps extends BoxProps {
     onZoomOut?: () => void;
 
     // Auto fit
+    isAutoFit?: boolean;
     onEnableAutoFit?: () => void;
     onDisableAutoFit?: () => void;
 
     // Lock
+    isLocked?: boolean;
     onLock?: () => void;
     onUnlock?: () => void;
 }
@@ -30,7 +32,9 @@ export interface ZoomPanControlsProps extends BoxProps {
 const StyledButtonGroup = styled(ButtonGroup)(({ theme }) => ({
     boxShadow: '0 0 2px 1px #00000014',
     '.MuiButtonGroup-grouped': {
+        width: '30px',
         minWidth: '30px',
+        maxWidth: '30px',
         borderColor: 'rgb(245 241 238)',
         backgroundColor: '#ffffff',
         '&:hover': {
@@ -51,10 +55,12 @@ export const ZoomPanControls = (props: ZoomPanControlsProps) => {
         onZoomOut,
 
         // Auto fit
+        isAutoFit = false,
         onEnableAutoFit,
         onDisableAutoFit,
 
         // Lock
+        isLocked = false,
         onLock,
         onUnlock,
 
@@ -81,32 +87,6 @@ export const ZoomPanControls = (props: ZoomPanControlsProps) => {
             clearTimeout(timer);
         };
     }, [currentZoom]);
-
-    // Auto fit
-    const [shouldAutoFit, setShouldAutoFit] = useState(false);
-
-    const enableAutoFit = useCallback(() => {
-        setShouldAutoFit(true);
-        onEnableAutoFit?.();
-    }, [onEnableAutoFit]);
-
-    const disableAutoFit = useCallback(() => {
-        setShouldAutoFit(false);
-        onDisableAutoFit?.();
-    }, [onDisableAutoFit]);
-
-    // Lock
-    const [isLocked, setIsLocked] = useState(false);
-
-    const enableLock = useCallback(() => {
-        setIsLocked(true);
-        onLock?.();
-    }, [onLock]);
-
-    const disableLock = useCallback(() => {
-        setIsLocked(false);
-        onUnlock?.();
-    }, [onUnlock]);
 
     return (
         <Box
@@ -168,10 +148,10 @@ export const ZoomPanControls = (props: ZoomPanControlsProps) => {
 
                 <Tooltip title="Auto fit" placement="right" enterDelay={1000}>
                     <Button
-                        onClick={shouldAutoFit ? disableAutoFit : enableAutoFit}
-                        className={shouldAutoFit ? 'selected' : ''}
+                        onClick={isAutoFit ? onDisableAutoFit : onEnableAutoFit}
+                        className={isAutoFit ? 'selected' : ''}
                     >
-                        <AutoFitIcon autoFit={shouldAutoFit} size={18} />
+                        <AutoFitIcon autoFit={isAutoFit} size={18} />
                     </Button>
                 </Tooltip>
             </StyledButtonGroup>
@@ -179,7 +159,7 @@ export const ZoomPanControls = (props: ZoomPanControlsProps) => {
             {/* Lock */}
             {(onLock || onUnlock) && (
                 <StyledButtonGroup orientation="vertical" variant="text" color="inherit" aria-label="zoom buttons">
-                    <Button onClick={isLocked ? disableLock : enableLock}>
+                    <Button onClick={isLocked ? onUnlock : onLock}>
                         {isLocked ? (
                             <LockOutlinedIcon fontSize="inherit" />
                         ) : (

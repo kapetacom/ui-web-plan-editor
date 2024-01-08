@@ -6,17 +6,12 @@
 /* eslint-disable no-console */
 
 import React from 'react';
-import { ZoomPanContainer } from '../src/planner/ZoomAndPan/ZoomPanContainer';
+import { ZoomPanContainer } from '../../src/planner/ZoomAndPan/ZoomPanContainer';
 import { Box } from '@mui/material';
-import { Rectangle } from '../src/planner/types';
-import {
-    BackgroundVariant,
-    ZoomPanBackground,
-    ZoomPanBackgroundProps,
-} from '../src/planner/ZoomAndPan/background/ZoomPanBackground';
+import { Rectangle } from '../../src/planner/types';
 
 export default {
-    title: 'Zoom and Pan',
+    title: 'Zoom and Pan/Container',
     parameters: {
         layout: 'fullscreen',
     },
@@ -33,38 +28,6 @@ const getBlockStyle = (x: number, y: number) => ({
     borderRadius: 1,
     outline: '1px solid #e4e4e4',
 });
-
-export const BackgroundDemo = () => {
-    const items: ZoomPanBackgroundProps[] = [
-        { color: 'black', variant: BackgroundVariant.Dots },
-        { color: 'black', variant: BackgroundVariant.Lines },
-        { color: 'black', variant: BackgroundVariant.Cross },
-        { color: '#e4e4e4', variant: BackgroundVariant.Dots },
-        { color: '#e4e4e4', variant: BackgroundVariant.Lines },
-        { color: '#e4e4e4', variant: BackgroundVariant.Cross },
-        { color: '#5aacff', variant: BackgroundVariant.Dots, style: { backgroundColor: '#dae1ff' } },
-        { color: '#5aacff', variant: BackgroundVariant.Lines, style: { backgroundColor: '#dae1ff' } },
-        { color: '#5aacff', variant: BackgroundVariant.Cross, style: { backgroundColor: '#dae1ff' } },
-    ];
-
-    return (
-        <Box
-            sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, min-content)',
-                gap: '20px',
-            }}
-        >
-            {items.map((item, index) => {
-                return (
-                    <Box sx={{ position: 'relative', width: '200px', height: '200px' }} key={index}>
-                        <ZoomPanBackground {...item} />
-                    </Box>
-                );
-            })}
-        </Box>
-    );
-};
 
 export const ZoomAndPanDemo = () => {
     const blocks: Rectangle[] = [
@@ -101,8 +64,7 @@ export const ZoomAndPanDemo = () => {
             onZoomPanTick={(x, y, z) => console.log('ZoomPanTick', x, y, z)}
             onAutoFitEnabled={() => console.log('Auto fit Enabled')}
             onAutoFitDisabled={() => console.log('Auto fit Disabled')}
-            onLock={() => console.log('Locked')}
-            onUnlock={() => console.log('Unlocked')}
+            showPixelGrid
         >
             <Box sx={getBlockStyle(50, 50)}>Block 1</Box>
             <Box sx={getBlockStyle(200, 200)}>Block 2</Box>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AutoFitIcon } from '../src/planner/ZoomAndPan/controls/AutoFitIcon';
+import { AutoFitIcon } from '../../src/planner/ZoomAndPan/controls/AutoFitIcon';
 import { Box, Stack, Typography } from '@mui/material';
 import FitScreenIcon from '@mui/icons-material/FitScreen';
 
@@ -16,7 +16,7 @@ export const Default = () => {
     return (
         <Stack>
             <Typography variant="body2" sx={{ mb: 4 }}>
-                This story demonstrates the AutoFit icon next to the FitScreen icon (from MUI)
+                This story demonstrates the AutoFit icon (compared to the FitScreen icon from MUI)
                 <br />
                 The AutoFit icon is a custom icon that can be in two states: autoFit or not autoFit.
                 <br />

@@ -42,9 +42,9 @@ export const useMeasureElement = <E extends Element = Element>(externalRef: RefO
 };
 
 export type UseFitChildInParentResult = {
-    transformToFitView: ZoomTransform;
-    transformToCenter: ZoomTransform;
-    transformToCenterWithScaleDown: ZoomTransform;
+    transformToFitView: ZoomTransform | undefined;
+    transformToCenter: ZoomTransform | undefined;
+    transformToCenterWithScaleDown: ZoomTransform | undefined;
 };
 
 export const useFitChildInParent = (parentBBox?: Rectangle, childBBox?: Rectangle): UseFitChildInParentResult => {
@@ -65,9 +65,9 @@ export const useFitChildInParent = (parentBBox?: Rectangle, childBBox?: Rectangl
     const transforms = useMemo(() => {
         if (px + py + pw + ph === 0 || cx + cy + cw + ch === 0) {
             return {
-                transformToFitView: new ZoomTransform(1, 0, 0),
-                transformToCenter: new ZoomTransform(1, 0, 0),
-                transformToCenterWithScaleDown: new ZoomTransform(1, 0, 0),
+                transformToFitView: undefined,
+                transformToCenter: undefined,
+                transformToCenterWithScaleDown: undefined,
             };
         }
 

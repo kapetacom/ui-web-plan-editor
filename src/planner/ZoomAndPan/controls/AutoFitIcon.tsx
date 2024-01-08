@@ -1,5 +1,6 @@
 import React, { forwardRef, useLayoutEffect, useRef } from 'react';
 import { select } from 'd3-selection';
+import 'd3-transition';
 import { Box, BoxProps } from '@mui/material';
 
 export interface AutoFitIconProps extends BoxProps {
