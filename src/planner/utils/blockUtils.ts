@@ -100,14 +100,6 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
         return undefined;
     }
 
-    let counter = 1;
-    let resourceName = provider.resource.metadata.name;
-
-    while (hasResource(consumerBlock, resourceName, ResourceRole.CONSUMES)) {
-        resourceName = `${provider.resource.metadata.name}_${counter}`;
-        counter++;
-    }
-
     const fromEntities = provider.block.spec.entities?.types ?? [];
 
     // Get entities in use by resource being copied
@@ -193,6 +185,14 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
     newEntities.forEach((entity) => {
         consumerBlock.spec.entities = addEntity(entity, consumerBlock.spec.entities);
     });
+
+    let counter = 1;
+    let resourceName = newResource.metadata.name ?? provider.resource.metadata.name;
+
+    while (hasResource(consumerBlock, resourceName, ResourceRole.CONSUMES)) {
+        resourceName = `${newResource.metadata.name}_${counter}`;
+        counter++;
+    }
 
     newResource.metadata.name = resourceName;
 
