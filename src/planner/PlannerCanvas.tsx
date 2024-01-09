@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { PropsWithChildren, useContext, useEffect, useMemo } from 'react';
+import React, { PropsWithChildren, useCallback, useContext, useEffect, useMemo } from 'react';
 import { PlannerContext } from './PlannerContext';
 import { DragAndDrop } from './utils/dndUtils';
 import { BLOCK_SIZE, calculateCanvasSize } from './utils/planUtils';
@@ -114,6 +114,15 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
         throw new ReferenceValidationError('Missing references', missingReferences);
     }
 
+    const { setZoomLevel, setPanOffset } = planner;
+    const onZoomPanEnd = useCallback(
+        (x: number, y: number, k: number) => {
+            setZoomLevel(k);
+            setPanOffset({ x, y });
+        },
+        [setZoomLevel, setPanOffset]
+    );
+
     return (
         <div className={`planner-area-container ${classNames}`} data-kap-id="plan-editor-canvas">
             <div className={focusToolbar}>
@@ -172,10 +181,7 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                     <ZoomPanContainer
                         ref={dropZoneRef}
                         className="planner-area-canvas"
-                        onZoomPanEnd={(x, y, k) => {
-                            planner.setZoomLevel(k);
-                            planner.setPanOffset({ x, y });
-                        }}
+                        onZoomPanEnd={onZoomPanEnd}
                         childrenBBox={canvasSize}
                         sx={{
                             width: '100%',
