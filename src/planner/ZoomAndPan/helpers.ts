@@ -22,6 +22,12 @@ export const calculateFitToParent = (
     const scaleY = parentBBox.height / childBBox.height;
     const scale = Math.min(scaleX, scaleY, maxScale);
 
+    if (scale === 0) {
+        // If scale is 0 then the child is not visible and we return the identity transform (no
+        // scaling or translation) to avoid errors in other components
+        return new ZoomTransform(1, 0, 0);
+    }
+
     // Scale the child's bounding box dimensions
     const scaledWidth = childBBox.width * scale;
     const scaledHeight = childBBox.height * scale;
