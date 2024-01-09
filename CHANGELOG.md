@@ -1,3 +1,17 @@
+# [1.26.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.6...v1.26.0) (2024-01-09)
+
+
+### Bug Fixes
+
+* Fix reposition action buttons ([5138fc5](https://github.com/kapetacom/ui-web-plan-editor/commit/5138fc5f284b57bbd6abf8262f24f8dfd049e83d))
+* Handle 0 size case ([49a2109](https://github.com/kapetacom/ui-web-plan-editor/commit/49a2109d4b3bef639e619a0c7e16103568984468))
+
+
+### Features
+
+* Auto fit content to parent ([04ab502](https://github.com/kapetacom/ui-web-plan-editor/commit/04ab5027c2fbd5a69de03d73ce19ace960e6be73))
+* Set auto fit in consumer ([d048978](https://github.com/kapetacom/ui-web-plan-editor/commit/d04897829a19b7ab01d89a6f9c4c4cf2f47261e0))
+
 ## [1.25.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.5...v1.25.6) (2024-01-08)
 
 
