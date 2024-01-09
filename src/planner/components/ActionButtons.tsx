@@ -58,7 +58,7 @@ export const ActionButtons = (props: ActionButtonListProps) => {
             setWidth(w / planner.zoom);
             setHeight(h / planner.zoom);
         }
-    }, [ref]);
+    }, [ref, planner.zoom]);
 
     useLayoutEffect(() => {
         recalculateSize();
