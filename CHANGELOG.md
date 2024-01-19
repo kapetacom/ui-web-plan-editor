@@ -1,3 +1,10 @@
+# [1.27.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.26.0...v1.27.0) (2024-01-19)
+
+
+### Features
+
+* Bump to latest versions ([#148](https://github.com/kapetacom/ui-web-plan-editor/issues/148)) ([81e2dd7](https://github.com/kapetacom/ui-web-plan-editor/commit/81e2dd7aba2ec73631b03d8a91d3268a5fde8a54))
+
 # [1.26.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.25.6...v1.26.0) (2024-01-09)
 
 
