@@ -12,7 +12,6 @@ import {
     PlanResolutionResult,
     PlanResolutionTransformer,
     ResolutionState,
-    ResolutionStateType,
 } from '../validation/PlanResolutionTransformer';
 
 interface ReferenceResolverModalProps extends Omit<ReferenceResolverProps, 'onChange'> {

@@ -131,8 +131,6 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: EditI
         );
     }
 
-    // TODO: Implement resource editing
-    // @ts-ignore
     if (editableItem.type === ItemType.RESOURCE) {
         const data = editableItem.item.resource as Resource;
         const resourceType = ResourceTypeProvider.get(data.kind);
@@ -172,8 +170,6 @@ function renderEditableItemForm(planner: PlannerContextData, editableItem: EditI
                 >
                     <resourceType.editorComponent
                         key={editableItem.item.ref}
-                        // TODO: make resource editorComponent accept Resource/Schemakind
-                        // @ts-ignore
                         block={data}
                         creating={editableItem.creating}
                     />
