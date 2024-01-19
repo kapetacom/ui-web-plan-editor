@@ -8,6 +8,7 @@ import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context'
 import { BlockDefinition, BlockInstance, Resource, validateSchema, EntityType, Entity } from '@kapeta/schemas';
 import { ValidationIssue } from '../types';
 import { stripUndefinedProps, validateEntities } from '@kapeta/kaplang-core';
+import { getBlockEntities, transformEntities } from '../hooks/useBlockEntitiesForResource';
 
 /**
  * These configuration value types are built into the system and should not be defined in the block
@@ -73,8 +74,10 @@ export class BlockValidator {
             const resourceType = ResourceTypeProvider.get(resource.kind);
 
             if (resourceType.validate) {
+                const entities = getBlockEntities(resource.kind, this.block);
+                const transformed = transformEntities(resource.kind, entities);
                 try {
-                    const typeErrors = resourceType.validate(resource, this.block.spec.entities?.types ?? []);
+                    const typeErrors = resourceType.validate(resource, transformed);
                     errors.push(...typeErrors);
                 } catch (e: any) {
                     errors.push(`Resource was invalid: ${e.message}`);
@@ -153,7 +156,7 @@ export class BlockValidator {
                 const stripped = stripUndefinedProps(this.block.spec);
                 const schemaIssues = validateSchema(blockType?.definition?.spec?.schema, stripped);
                 schemaIssues.forEach((issue) => {
-                    errors.push(`Schema validation failed: ${issue.message}`);
+                    errors.push(`Schema validation failed: ${issue.message} in ${issue.instancePath}`);
                 });
             }
             if (blockType?.validate) {

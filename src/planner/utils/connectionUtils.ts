@@ -13,6 +13,7 @@ import { calculateBlockSize } from '../BlockContext';
 import { BlockMode } from '../../utils/enums';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
+import { getBlockEntities, transformEntities } from '../hooks/useBlockEntitiesForResource';
 
 export const POINT_PADDING_X = 40;
 export const POINT_PADDING_Y = 20;
@@ -80,11 +81,13 @@ export function createConnection(provider: BlockInstanceResource, consumer: Bloc
 
     const converter = ResourceTypeProvider.getConverterFor(provider.resource.kind, consumer.resource.kind);
     if (converter && converter.createMapping) {
+        const fromEntities = getBlockEntities(provider.resource.kind, provider.block);
+        const toEntities = getBlockEntities(consumer.resource.kind, consumer.block);
         const mapping = converter.createMapping(
             provider.resource,
             consumer.resource,
-            provider.block.spec.entities?.types ?? [],
-            consumer.block.spec.entities?.types ?? []
+            transformEntities(provider.resource.kind, fromEntities),
+            transformEntities(consumer.resource.kind, toEntities)
         );
         connection.mapping = mapping;
     }

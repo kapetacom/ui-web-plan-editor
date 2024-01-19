@@ -8,12 +8,23 @@ import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { IBlockTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
 import { randomUUID } from '../../utils/cryptoUtils';
 import { BLOCK_SIZE } from './planUtils';
-import { DSL_LANGUAGE_ID, DSLConverters, DSLEntity, DSLWriter } from '@kapeta/ui-web-components';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockInfo } from '../types';
 import { AssetInfo } from '../../types';
 import _ from 'lodash';
-import { EntityHelpers } from '@kapeta/kaplang-core';
+import {
+    DSLCompatibilityHelper,
+    DSLData,
+    DSLDataType,
+    DSLEntityType,
+    DSLReferenceResolver,
+    DSLTypeHelper,
+    KAPLANG_ID,
+    KAPLANG_VERSION,
+    KaplangWriter,
+    DSLConverters,
+} from '@kapeta/kaplang-core';
+import { getBlockEntities } from '../hooks/useBlockEntitiesForResource';
 
 export function createBlockInstanceForBlock(blockAsset: AssetInfo<BlockDefinition>): BlockInstance {
     return {
@@ -89,40 +100,37 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
         return undefined;
     }
 
-    const fromEntities = provider.block.spec.entities?.types ?? [];
+    const fromEntities = getBlockEntities(provider.resource.kind, provider.block);
+    const toEntities = getBlockEntities(provider.resource.kind, consumerBlock, false);
 
     // Get entities in use by resource being copied
-    const directUseEntities = ResourceTypeProvider.resolveEntities(provider.resource);
+    const directUseEntityNames = ResourceTypeProvider.resolveEntities(provider.resource);
 
-    // Get entities in use by entities in use by resource being copied
-    const referencedEntities: string[] = [];
-    directUseEntities.forEach((entityName) => {
-        const entity = fromEntities.find((e) => e.name === entityName);
-        if (!entity) {
-            return;
-        }
+    const directUseEntities = directUseEntityNames
+        .map((entityName) => {
+            const type = DSLTypeHelper.asType(entityName);
+            return fromEntities.find((e) => e.name === type.name);
+        })
+        .filter((e) => !!e) as DSLData[];
 
-        resolveEntitiesFromEntity(entity, fromEntities).forEach((e) => {
-            if (referencedEntities.indexOf(e.name) === -1) {
-                referencedEntities.push(e.name);
-            }
-        });
-    });
+    const referenceResolver = new DSLReferenceResolver();
+    const referencedEntities = referenceResolver.resolveReferences(directUseEntities);
 
     // Convert resource to consumable resource
     const newResource = ResourceTypeProvider.convertToConsumable(provider.resource);
 
-    const allEntities = new Set<string>([...directUseEntities, ...referencedEntities]);
-    const newEntities: Entity[] = [];
+    const allEntities = new Set<string>([...referencedEntities, ...directUseEntityNames]);
+    const newEntities: DSLData[] = [];
     const renamedEntities: { [from: string]: string } = {};
     allEntities.forEach((entityName) => {
-        const fromEntity = fromEntities.find((e) => e.name === entityName);
+        const type = DSLTypeHelper.asType(entityName);
+        const fromEntity = fromEntities.find((e) => e.name === type.name);
         if (!fromEntity) {
             return;
         }
 
         // See if target block already has an entity that is identical to this one
-        const existingEntity = getMatchingEntityForName(consumerBlock, fromEntity, fromEntities);
+        const existingEntity = getMatchingEntityForName(fromEntity, fromEntities, toEntities);
         if (existingEntity) {
             // If already there no need to do anything
             return;
@@ -132,7 +140,7 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
         let conflictCount = 1;
         const originalName = fromEntity.name;
         let addEntity = true;
-        let toEntity = getMatchingEntityForSchema(consumerBlock, fromEntity, fromEntities);
+        let toEntity = getMatchingEntityForSchema(fromEntity, fromEntities, toEntities);
         if (toEntity) {
             addEntity = false;
         } else {
@@ -140,7 +148,7 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
 
             do {
                 // Check if an entity exists of the same name - but different properties
-                conflictingEntity = getConflictingEntity(consumerBlock, toEntity, fromEntities);
+                conflictingEntity = getConflictingEntity(toEntity, fromEntities, toEntities);
 
                 if (conflictingEntity) {
                     // We need to rename the new entity and all references to it to be able to add it to the target block.
@@ -151,12 +159,12 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
         }
         if (toEntity.name !== originalName) {
             // See if target block already has an entity that is identical to this one
-            if (addEntity && getMatchingEntityForName(consumerBlock, toEntity, fromEntities)) {
+            if (addEntity && getMatchingEntityForName(toEntity, fromEntities, toEntities)) {
                 // If already there do not add
                 addEntity = false;
             }
 
-            if (directUseEntities.includes(originalName)) {
+            if (directUseEntityNames.includes(originalName)) {
                 // We need to change the ref name in the resource
                 ResourceTypeProvider.renameEntityReferences(newResource, originalName, toEntity.name);
             }
@@ -171,9 +179,9 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
 
     applyEntityNameChanges(newEntities, renamedEntities);
 
-    newEntities.forEach((entity) => {
-        consumerBlock.spec.entities = addEntity(entity, consumerBlock.spec.entities);
-    });
+    const targetEntityList = [...toEntities, ...newEntities];
+
+    consumerBlock.spec.entities = createEntityList(targetEntityList);
 
     let counter = 1;
     let resourceName = newResource.metadata.name ?? provider.resource.metadata.name;
@@ -188,10 +196,25 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
     return newResource;
 }
 
-export function applyEntityNameChanges(entities: Entity[], nameChanges: { [from: string]: string }): void {
+export function createEntityList(targetEntityList: DSLData[]): EntityList {
+    const targetDataTypes = targetEntityList.filter((e) => e.type === DSLEntityType.DATATYPE) as DSLDataType[];
+
+    return {
+        types: targetEntityList
+            .map((e) => DSLConverters.toSchemaEntity(e, targetDataTypes))
+            .filter(Boolean) as Entity[],
+        source: {
+            type: KAPLANG_ID,
+            version: KAPLANG_VERSION,
+            value: KaplangWriter.write(targetEntityList),
+        },
+    };
+}
+
+export function applyEntityNameChanges(entities: DSLData[], nameChanges: { [from: string]: string }): void {
     Object.entries(nameChanges).forEach(([from, to]) => {
         entities.forEach((entity) => {
-            if (!EntityHelpers.isDTO(entity)) {
+            if (entity.type !== DSLEntityType.DATATYPE) {
                 return;
             }
 
@@ -199,157 +222,68 @@ export function applyEntityNameChanges(entities: Entity[], nameChanges: { [from:
                 return;
             }
 
-            Object.values(entity.properties).forEach((property) => {
-                if (EntityHelpers.isBuiltInType(property)) {
+            entity.properties.forEach((property) => {
+                if (DSLTypeHelper.isBuiltInType(property.type)) {
                     return;
                 }
 
-                if (from !== EntityHelpers.typeName(property)) {
+                const type = DSLTypeHelper.asType(property.type);
+
+                if (from !== type.name) {
                     return;
                 }
 
-                // Change the reference in the entity
-                if (EntityHelpers.isList(property)) {
-                    property.ref = to + '[]';
-                } else {
-                    property.ref = to;
-                }
+                type.name = to;
+                property.type = type;
             });
         });
     });
 }
 
-function getEntityByName(block: BlockDefinition, entityName: string): Entity | undefined {
-    if (!block.spec.entities?.types) {
+function getEntityByName(entities: DSLData[], entityName: string): DSLData | undefined {
+    if (!entities) {
         return undefined;
     }
 
-    return block.spec.entities.types.find((t: Entity) => t.name === entityName);
+    return entities.find((t: DSLData) => t.name === entityName);
 }
 
 function getMatchingEntityForName(
-    block: BlockDefinition,
-    entity: Entity,
-    sourceEntities: Entity[]
-): Entity | undefined {
-    const namedEntity = getEntityByName(block, entity.name);
-    let matchedEntity;
+    entity: DSLData,
+    sourceEntities: DSLData[],
+    targetEntities: DSLData[]
+): DSLData | undefined {
+    const existingEntity = getEntityByName(targetEntities, entity.name);
 
     if (
-        namedEntity &&
-        EntityHelpers.isEntityCompatible(entity, namedEntity, sourceEntities, block.spec?.entities?.types ?? [])
+        existingEntity &&
+        DSLCompatibilityHelper.isDataCompatible(entity, existingEntity, sourceEntities, targetEntities)
     ) {
-        matchedEntity = namedEntity;
+        return existingEntity;
     }
 
-    return matchedEntity;
+    return undefined;
 }
 
 function getMatchingEntityForSchema(
-    block: BlockDefinition,
-    entity: Entity,
-    sourceEntities: Entity[]
-): Entity | undefined {
-    return block.spec.entities?.types?.find((targetEntity: Entity) => {
-        return EntityHelpers.isEntityCompatible(
-            entity,
-            targetEntity,
-            sourceEntities,
-            block.spec?.entities?.types ?? []
-        );
+    entity: DSLData,
+    sourceEntities: DSLData[],
+    targetEntities: DSLData[]
+): DSLData | undefined {
+    return targetEntities.find((targetEntity) => {
+        return DSLCompatibilityHelper.isDataCompatible(entity, targetEntity, sourceEntities, targetEntities);
     });
 }
 
-function getConflictingEntity(block: BlockDefinition, entity: Entity, sourceEntities: Entity[]): Entity | undefined {
-    const namedEntity = getEntityByName(block, entity.name);
-    let conflictingEntity;
-
-    if (
-        namedEntity &&
-        !EntityHelpers.isEntityCompatible(entity, namedEntity, sourceEntities, block.spec?.entities?.types ?? [])
-    ) {
-        conflictingEntity = namedEntity;
+function getConflictingEntity(
+    entity: DSLData,
+    sourceEntities: DSLData[],
+    targetEntities: DSLData[]
+): DSLData | undefined {
+    const namedEntity = getEntityByName(targetEntities, entity.name);
+    if (namedEntity && !DSLCompatibilityHelper.isDataCompatible(entity, namedEntity, sourceEntities, targetEntities)) {
+        return namedEntity;
     }
 
-    return conflictingEntity;
-}
-
-function addEntity(entity: Entity, target?: EntityList) {
-    let targets = target || {
-        types: [],
-        source: {
-            type: DSL_LANGUAGE_ID,
-            value: '',
-        },
-    };
-
-    if (Array.isArray(target)) {
-        targets = {
-            types: target,
-            source: {
-                type: DSL_LANGUAGE_ID,
-                value: DSLWriter.write(target.map(DSLConverters.fromSchemaEntity).filter(Boolean) as DSLEntity[]),
-            },
-        };
-    }
-
-    if (!targets.types) {
-        targets.types = [];
-    }
-
-    if (!targets.source) {
-        targets.source = {
-            type: DSL_LANGUAGE_ID,
-            value: '',
-        };
-    }
-
-    const code = DSLWriter.write([DSLConverters.fromSchemaEntity(entity)].filter(Boolean) as DSLEntity[]);
-    targets.source.value += '\n\n' + code;
-    targets.source.value = targets.source.value.trim();
-    targets.types = [...targets.types, entity];
-
-    return { ...target };
-}
-
-export function resolveEntitiesFromEntity(entity: Entity, entities: Entity[]): Entity[] {
-    if (!EntityHelpers.isDTO(entity)) {
-        return [];
-    }
-
-    const out: string[] = [];
-
-    if (!entity.properties) {
-        return [];
-    }
-
-    Object.values(entity.properties).forEach((property) => {
-        if (typeof property.type === 'string') {
-            return;
-        }
-
-        const name = EntityHelpers.typeName(property);
-        if (entity.name === name) {
-            return;
-        }
-
-        if (out.indexOf(name) > -1) {
-            return;
-        }
-
-        out.push(name);
-
-        const subEntity = entities.find((e) => e.name === name);
-
-        if (subEntity) {
-            const subEntityEntities = resolveEntitiesFromEntity(subEntity, entities);
-            subEntityEntities.forEach((e) => {
-                if (out.indexOf(e.name) === -1) {
-                    out.push(e.name);
-                }
-            });
-        }
-    });
-
-    return out.map((name) => entities.find((e) => e.name === name)).filter((e) => !!e) as Entity[];
+    return undefined;
 }

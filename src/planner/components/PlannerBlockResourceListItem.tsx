@@ -26,6 +26,7 @@ import { createConnection } from '../utils/connectionUtils';
 import { PlannerMode, ResourceMode } from '../../utils/enums';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { AssetKindIcon } from '@kapeta/ui-web-components';
+import { useBlockEntities } from '../hooks/useBlockEntitiesForResource';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const COUNTER_SIZE = 8;
@@ -138,8 +139,9 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     const errors: string[] = [];
     try {
         resourceConfig = ResourceTypeProvider.get(props.resource.kind);
+        const entities: any = useBlockEntities(props.resource.kind, blockDefinition);
         if (resourceConfig && resourceConfig.validate) {
-            errors.push(...resourceConfig.validate(props.resource, blockDefinition?.spec.entities?.types ?? []));
+            errors.push(...resourceConfig.validate(props.resource, entities));
         }
     } catch (e) {
         errors.push(`Failed to read resource kind: ${e && (e as Error).message}`);
