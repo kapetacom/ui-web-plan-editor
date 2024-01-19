@@ -3,19 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import {
-    BlockDefinition,
-    BlockInstance,
-    BlockResource,
-    Entity,
-    EntityList,
-    isBuiltInType,
-    isDTO,
-    isList,
-    isSchemaEntityCompatible,
-    Resource,
-    typeName,
-} from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, BlockResource, Entity, EntityList, Resource } from '@kapeta/schemas';
 import { ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { IBlockTypeProvider, ResourceRole } from '@kapeta/ui-web-types';
 import { randomUUID } from '../../utils/cryptoUtils';
@@ -25,6 +13,7 @@ import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockInfo } from '../types';
 import { AssetInfo } from '../../types';
 import _ from 'lodash';
+import { EntityHelpers } from '@kapeta/kaplang-core';
 
 export function createBlockInstanceForBlock(blockAsset: AssetInfo<BlockDefinition>): BlockInstance {
     return {
@@ -202,21 +191,25 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
 export function applyEntityNameChanges(entities: Entity[], nameChanges: { [from: string]: string }): void {
     Object.entries(nameChanges).forEach(([from, to]) => {
         entities.forEach((entity) => {
-            if (!isDTO(entity)) {
+            if (!EntityHelpers.isDTO(entity)) {
+                return;
+            }
+
+            if (!entity.properties) {
                 return;
             }
 
             Object.values(entity.properties).forEach((property) => {
-                if (isBuiltInType(property)) {
+                if (EntityHelpers.isBuiltInType(property)) {
                     return;
                 }
 
-                if (from !== typeName(property)) {
+                if (from !== EntityHelpers.typeName(property)) {
                     return;
                 }
 
                 // Change the reference in the entity
-                if (isList(property)) {
+                if (EntityHelpers.isList(property)) {
                     property.ref = to + '[]';
                 } else {
                     property.ref = to;
@@ -244,7 +237,7 @@ function getMatchingEntityForName(
 
     if (
         namedEntity &&
-        isSchemaEntityCompatible(entity, namedEntity, sourceEntities, block.spec?.entities?.types ?? [])
+        EntityHelpers.isEntityCompatible(entity, namedEntity, sourceEntities, block.spec?.entities?.types ?? [])
     ) {
         matchedEntity = namedEntity;
     }
@@ -258,7 +251,12 @@ function getMatchingEntityForSchema(
     sourceEntities: Entity[]
 ): Entity | undefined {
     return block.spec.entities?.types?.find((targetEntity: Entity) => {
-        return isSchemaEntityCompatible(entity, targetEntity, sourceEntities, block.spec?.entities?.types ?? []);
+        return EntityHelpers.isEntityCompatible(
+            entity,
+            targetEntity,
+            sourceEntities,
+            block.spec?.entities?.types ?? []
+        );
     });
 }
 
@@ -268,7 +266,7 @@ function getConflictingEntity(block: BlockDefinition, entity: Entity, sourceEnti
 
     if (
         namedEntity &&
-        !isSchemaEntityCompatible(entity, namedEntity, sourceEntities, block.spec?.entities?.types ?? [])
+        !EntityHelpers.isEntityCompatible(entity, namedEntity, sourceEntities, block.spec?.entities?.types ?? [])
     ) {
         conflictingEntity = namedEntity;
     }
@@ -315,18 +313,22 @@ function addEntity(entity: Entity, target?: EntityList) {
 }
 
 export function resolveEntitiesFromEntity(entity: Entity, entities: Entity[]): Entity[] {
-    if (!isDTO(entity)) {
+    if (!EntityHelpers.isDTO(entity)) {
         return [];
     }
 
     const out: string[] = [];
+
+    if (!entity.properties) {
+        return [];
+    }
 
     Object.values(entity.properties).forEach((property) => {
         if (typeof property.type === 'string') {
             return;
         }
 
-        const name = typeName(property);
+        const name = EntityHelpers.typeName(property);
         if (entity.name === name) {
             return;
         }

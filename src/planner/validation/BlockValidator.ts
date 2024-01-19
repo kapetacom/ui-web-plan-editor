@@ -5,17 +5,9 @@
 
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
-import {
-    BlockDefinition,
-    BlockInstance,
-    Resource,
-    validateEntities,
-    validateSchema,
-    stripUndefinedProps,
-    EntityType,
-    Entity,
-} from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, Resource, validateSchema, EntityType, Entity } from '@kapeta/schemas';
 import { ValidationIssue } from '../types';
+import { stripUndefinedProps, validateEntities } from '@kapeta/kaplang-core';
 
 /**
  * These configuration value types are built into the system and should not be defined in the block
