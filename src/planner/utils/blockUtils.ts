@@ -88,11 +88,36 @@ export function hasResource(toBlock: BlockDefinition, name: string, role: Resour
 }
 
 export function canAddResourceToBlock(toBlock: BlockDefinition, fromBlock: BlockDefinition) {
-    if (fromBlock === toBlock) {
-        return false;
+    return fromBlock !== toBlock;
+}
+
+function resolveAllReferences(targets: DSLData[], entities: DSLData[], previouslyLookedUp: string[] = []): string[] {
+    const referenceResolver = new DSLReferenceResolver();
+    const referencedEntities = referenceResolver.resolveReferences(targets).map((name) => {
+        const type = DSLTypeHelper.asType(name);
+        return type.name;
+    });
+    if (referencedEntities.length > 0) {
+        const referencedEntitiesData = referencedEntities
+            .map((name) => {
+                return entities.find((entity) => entity.name === name);
+            })
+            .filter((e) => {
+                return e && !previouslyLookedUp.includes(e.name);
+            }) as DSLData[];
+
+        return Array.from(
+            new Set<string>([
+                ...referencedEntities,
+                ...resolveAllReferences(referencedEntitiesData, entities, [
+                    ...previouslyLookedUp,
+                    ...referencedEntities,
+                ]),
+            ])
+        );
     }
 
-    return true;
+    return referencedEntities;
 }
 
 export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: BlockResource): Resource | undefined {
@@ -101,7 +126,7 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
     }
 
     const fromEntities = getBlockEntities(provider.resource.kind, provider.block);
-    const toEntities = getBlockEntities(provider.resource.kind, consumerBlock, false);
+    const toEntities = getBlockEntities(provider.resource.kind, consumerBlock);
 
     // Get entities in use by resource being copied
     const directUseEntityNames = ResourceTypeProvider.resolveEntities(provider.resource);
@@ -113,8 +138,7 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
         })
         .filter((e) => !!e) as DSLData[];
 
-    const referenceResolver = new DSLReferenceResolver();
-    const referencedEntities = referenceResolver.resolveReferences(directUseEntities);
+    const referencedEntities = resolveAllReferences(directUseEntities, fromEntities);
 
     // Convert resource to consumable resource
     const newResource = ResourceTypeProvider.convertToConsumable(provider.resource);
@@ -145,6 +169,13 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
             addEntity = false;
         } else {
             toEntity = _.cloneDeep(fromEntity);
+
+            if (toEntity.annotations) {
+                // We don't want to copy the native annotation
+                toEntity.annotations = toEntity.annotations.filter((a) => {
+                    return a.type !== '@Native';
+                });
+            }
 
             do {
                 // Check if an entity exists of the same name - but different properties
@@ -179,7 +210,15 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
 
     applyEntityNameChanges(newEntities, renamedEntities);
 
-    const targetEntityList = [...toEntities, ...newEntities];
+    const targetEntityList = [
+        ...newEntities,
+        ...toEntities.filter((e) => {
+            // Skip native entities
+            return !e.annotations?.some((a) => {
+                return a.type === '@Native';
+            });
+        }),
+    ];
 
     consumerBlock.spec.entities = createEntityList(targetEntityList);
 

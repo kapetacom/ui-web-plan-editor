@@ -2,7 +2,14 @@ import { useMemo } from 'react';
 import { BlockTargetProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { BlockDefinition, Entity } from '@kapeta/schemas';
 import { IncludeContextType } from '@kapeta/ui-web-types';
-import { DSLConverters, DSLData, DSLDataType, DSLDataTypeParser, DSLEntityType } from '@kapeta/kaplang-core';
+import {
+    DSLConverters,
+    DSLData,
+    DSLDataType,
+    DSLDataTypeParser,
+    DSLEntityType,
+    DSLTypeHelper,
+} from '@kapeta/kaplang-core';
 
 export const getBlockEntities = (
     resourceKind: string,
@@ -15,18 +22,33 @@ export const getBlockEntities = (
     const targetProvider = block?.spec.target?.kind
         ? BlockTargetProvider.get(block.spec.target.kind, block.kind)
         : null;
-
-    if (resourceProvider.capabilities?.directDSL && block?.spec.entities?.source?.value) {
-        const code = [block.spec.entities.source.value];
+    let includes: DSLData[] = [];
+    let result: DSLData[] = [];
+    if (resourceProvider.capabilities?.directDSL) {
         if (useIncludes && targetProvider?.getDSLIncludes) {
             const include = targetProvider.getDSLIncludes(contextType);
             if (include?.source) {
-                code.push(include.source);
+                try {
+                    includes = DSLDataTypeParser.parse(include?.source, {
+                        ignoreSemantics: true,
+                    });
+                } catch (e: any) {
+                    console.error('Failed to parse included source', e);
+                }
             }
         }
-        return DSLDataTypeParser.parse(code.join('\n\n'), {
-            ignoreSemantics: true,
-        });
+        try {
+            if (block?.spec.entities?.source?.value) {
+                result = DSLDataTypeParser.parse(block.spec.entities.source.value, {
+                    validTypes: includes.map((i) => DSLTypeHelper.asFullName(i.name, true)),
+                    ignoreSemantics: true,
+                });
+            }
+        } catch (e: any) {
+            console.error('Failed to parse source', e);
+        }
+
+        return [...result, ...includes];
     }
 
     const entities = block?.spec.entities?.types ?? ([] as Entity[]);
@@ -70,4 +92,31 @@ export const useTransformEntities = (resourceKind: string, entities: DSLData[]) 
     return useMemo(() => {
         return transformEntities(resourceKind, entities);
     }, [resourceKind, entities]);
+};
+
+export const useDSLEntityIncludes = (
+    blockKind: string,
+    targetKind: string | undefined,
+    contextType: IncludeContextType = IncludeContextType.REST
+) => {
+    return useMemo<string[]>(() => {
+        if (!targetKind) {
+            return [];
+        }
+        const targetProvider = BlockTargetProvider.get(targetKind, blockKind);
+
+        if (targetProvider?.getDSLIncludes) {
+            const include = targetProvider.getDSLIncludes(contextType);
+            if (include?.source) {
+                try {
+                    return DSLDataTypeParser.parse(include?.source, {
+                        ignoreSemantics: true,
+                    }).map((i) => DSLTypeHelper.asFullName(i, true));
+                } catch (e: any) {
+                    console.error('Failed to parse included source', e);
+                }
+            }
+        }
+        return [];
+    }, [targetKind, blockKind, contextType]);
 };
