@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.27.0...v2.0.0) (2024-01-20)
+
+
+### Features
+
+* Refactor to handle Entity and DSL types correctly ([#149](https://github.com/kapetacom/ui-web-plan-editor/issues/149)) ([81d8355](https://github.com/kapetacom/ui-web-plan-editor/commit/81d8355fbfbc7f29e9bd784c39d240d8396de129))
+
+
+### BREAKING CHANGES
+
+* Changes how we deal with entities using the DSL types as the primary format
+
 # [1.27.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.26.0...v1.27.0) (2024-01-19)
 
 
