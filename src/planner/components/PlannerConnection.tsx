@@ -6,7 +6,7 @@
 import React, { useContext, useMemo, useState } from 'react';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
-import { Point, ResourceRole } from '@kapeta/ui-web-types';
+import { ResourceRole } from '@kapeta/ui-web-types';
 import { toClass } from '@kapeta/ui-web-utils';
 import { getResourceId } from '../utils/planUtils';
 import { ActionContext, PlannerAction } from '../types';
@@ -31,6 +31,7 @@ import {
 } from '../utils/connectionUtils';
 import { applyObstacles } from '../utils/connectionUtils/src/matrix';
 import _ from 'lodash';
+import { useBlockEntities, useTransformEntities } from '../hooks/useBlockEntitiesForResource';
 
 const CLUSTER_INDEX_OFFSET = 10;
 const ENABLE_CLUSTERING = true;
@@ -56,14 +57,20 @@ function useConnectionValidation(connection: Connection, planner: PlannerContext
     );
 
     if (fromResource && toResource) {
-        const fromEntities = planner.getBlockById(connection.provider.blockId)?.spec.entities?.types || [];
-        const toEntities = planner.getBlockById(connection.consumer.blockId)?.spec.entities?.types || [];
+        const fromBlock = planner.getBlockById(connection.provider.blockId);
+        const toBlock = planner.getBlockById(connection.consumer.blockId);
 
         try {
             const converter = ResourceTypeProvider.getConverterFor(fromResource.kind, toResource.kind);
             if (converter) {
+                // We force to any here because we don't know the type of the entities
+                const fromEntities = useBlockEntities(fromResource.kind, fromBlock);
+                const toEntities = useBlockEntities(toResource.kind, toBlock);
+                const fromTransformed = useTransformEntities(fromResource.kind, fromEntities);
+                const toTransformed = useTransformEntities(toResource.kind, toEntities);
+
                 const errors = converter.validateMapping
-                    ? converter.validateMapping(connection, fromResource, toResource, fromEntities, toEntities)
+                    ? converter.validateMapping(connection, fromResource, toResource, fromTransformed, toTransformed)
                     : [];
                 return errors.length === 0;
             }

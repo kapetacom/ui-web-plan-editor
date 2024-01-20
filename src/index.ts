@@ -44,6 +44,8 @@ export * from './planner/validation/PlanReferenceValidation';
 export * from './planner/renderers/plannerRenderer';
 export * from './planner/reference-resolver/index';
 
+export * from './planner/hooks/useBlockEntitiesForResource';
+
 export * from './panels/PlannerDrawer';
 export * from './panels/PlannerSidebar';
 export * from './panels/BlockInspectorPanel';
