@@ -24,9 +24,8 @@ import { PlannerAction, Rectangle } from './types';
 import { PlannerMode, BlockMode, ResourceMode } from '../utils/enums';
 import { getResourceId } from './utils/planUtils';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
-import { connectionEquals } from './utils/connectionUtils';
+import { cleanupConnections, connectionEquals } from './utils/connectionUtils';
 import { BlockResouceIconProps } from './components/BlockResourceIcon';
-import { cleanupConnections } from './helpers';
 
 export type BlockDefinitionReference = {
     ref: string;
