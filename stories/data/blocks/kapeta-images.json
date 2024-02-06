@@ -46,6 +46,9 @@
                     "name": "images"
                 },
                 "spec": {
+                    "port": {
+                        "type": "rest"
+                    },
                     "methods": {
                         "createimage": {
                             "description": "Create image",

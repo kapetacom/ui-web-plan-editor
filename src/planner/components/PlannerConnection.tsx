@@ -56,18 +56,19 @@ function useConnectionValidation(connection: Connection, planner: PlannerContext
         [connection.consumer, planner]
     );
 
-    if (fromResource && toResource) {
-        const fromBlock = planner.getBlockById(connection.provider.blockId);
-        const toBlock = planner.getBlockById(connection.consumer.blockId);
+    const fromBlock = planner.getBlockById(connection.provider.blockId);
+    const toBlock = planner.getBlockById(connection.consumer.blockId);
 
+    const fromEntities = useBlockEntities(fromResource?.kind, fromBlock);
+    const toEntities = useBlockEntities(toResource?.kind, toBlock);
+    const fromTransformed = useTransformEntities(fromResource?.kind, fromEntities);
+    const toTransformed = useTransformEntities(toResource?.kind, toEntities);
+
+    if (fromResource && toResource) {
         try {
             const converter = ResourceTypeProvider.getConverterFor(fromResource.kind, toResource.kind);
             if (converter) {
                 // We force to any here because we don't know the type of the entities
-                const fromEntities = useBlockEntities(fromResource.kind, fromBlock);
-                const toEntities = useBlockEntities(toResource.kind, toBlock);
-                const fromTransformed = useTransformEntities(fromResource.kind, fromEntities);
-                const toTransformed = useTransformEntities(toResource.kind, toEntities);
 
                 const errors = converter.validateMapping
                     ? converter.validateMapping(connection, fromResource, toResource, fromTransformed, toTransformed)

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import { BlockInstanceResource, Connection, Plan } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, BlockInstanceResource, Connection, Plan } from '@kapeta/schemas';
 import { BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 import { Point, ResourceRole } from '@kapeta/ui-web-types';
 import { getResourceId } from './planUtils';
@@ -14,6 +14,8 @@ import { BlockMode } from '../../utils/enums';
 import { DnDContext } from '../DragAndDrop/DnDContext';
 import { PlannerContext } from '../PlannerContext';
 import { getBlockEntities, transformEntities } from '../hooks/useBlockEntitiesForResource';
+import { AssetInfo } from '../../types';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 export const POINT_PADDING_X = 40;
 export const POINT_PADDING_Y = 20;
@@ -358,4 +360,79 @@ export function createSimplePathVia(from: Point, fromX: number, to: Point, toX: 
               [toX, to.y],
               [to.x, to.y],
           ];
+}
+
+/**
+ * Removes connections that point to non-existing resources and duplicate connections.
+ *
+ * Will not remove connections that point to non-existing block definitions as those are assumed
+ * to exist but not yet loaded.
+ */
+export function cleanupConnections(plan: Plan, blockAssets: AssetInfo<BlockDefinition>[]) {
+    let anyChanges = false;
+    const instanceBlocks: Record<string, AssetInfo<BlockDefinition>> = {};
+    const instances: Record<string, BlockInstance> = {};
+    plan.spec.blocks?.forEach((instance) => {
+        const blockRef = parseKapetaUri(instance.block.ref);
+        instances[instance.id] = instance;
+        const asset = blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(blockRef));
+        if (!asset) {
+            return;
+        }
+        instanceBlocks[instance.id] = asset;
+    });
+
+    const connectionSet = new Set<string>();
+
+    const newConnections =
+        plan.spec.connections?.filter((connection) => {
+            const connectionId = `${connection.consumer.blockId}:${connection.consumer.resourceName}:${connection.provider.blockId}:${connection.provider.resourceName}:${connection.port?.type}`;
+            if (connectionSet.has(connectionId)) {
+                anyChanges = true;
+                return false;
+            }
+            connectionSet.add(connectionId);
+
+            const consumerInstance = instances[connection.consumer.blockId];
+            const providerInstance = instances[connection.provider.blockId];
+            if (!consumerInstance || !providerInstance) {
+                anyChanges = true;
+                return false;
+            }
+
+            const consumerBlock = instanceBlocks[connection.consumer.blockId];
+            const providerBlock = instanceBlocks[connection.provider.blockId];
+
+            if (!consumerBlock || !providerBlock) {
+                // We don't deal with missing block definitions here
+                return true;
+            }
+
+            const consumerResource = consumerBlock.content?.spec?.consumers?.find((consumer) => {
+                return consumer.metadata.name === connection.consumer.resourceName;
+            });
+
+            const providerResource = providerBlock.content?.spec?.providers?.find((provider) => {
+                return provider.metadata.name === connection.provider.resourceName;
+            });
+
+            if (!consumerResource || !providerResource) {
+                anyChanges = true;
+                return false;
+            }
+
+            return true;
+        }) ?? [];
+
+    if (!anyChanges) {
+        return plan;
+    }
+
+    return {
+        ...plan,
+        spec: {
+            ...plan.spec,
+            connections: newConnections,
+        },
+    };
 }

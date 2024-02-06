@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import { EntityList } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, EntityList, Plan } from '@kapeta/schemas';
 import _ from 'lodash';
+import { AssetInfo } from '../types';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 type ConfigMap = { [key: string]: any };
 

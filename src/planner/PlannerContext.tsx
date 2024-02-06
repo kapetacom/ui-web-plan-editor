@@ -24,7 +24,7 @@ import { PlannerAction, Rectangle } from './types';
 import { PlannerMode, BlockMode, ResourceMode } from '../utils/enums';
 import { getResourceId } from './utils/planUtils';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
-import { connectionEquals } from './utils/connectionUtils';
+import { cleanupConnections, connectionEquals } from './utils/connectionUtils';
 import { BlockResouceIconProps } from './components/BlockResourceIcon';
 
 export type BlockDefinitionReference = {
@@ -314,7 +314,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                     return prev;
                 }
                 return {
-                    plan: newPlan,
+                    plan: cleanupConnections(newPlan, prev.blockAssets),
                     blockAssets: prev.blockAssets,
                 };
             });
@@ -399,6 +399,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             setAssets((prev) => {
                 const newContext = typeof updater === 'function' ? updater(prev) : updater;
 
+                newContext.plan = cleanupConnections(newContext.plan, newContext.blockAssets);
+
                 if (newContext.plan !== prev.plan) {
                     if (!(preventChangeEvent && preventChangeEvent(newContext))) {
                         props.onChange?.(newContext.plan);
@@ -450,10 +452,13 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
     const isTempInstance = (assetState: ContextData, blockInstance: BlockInstance) => {
         const instanceBlockUri = parseKapetaUri(blockInstance.block.ref);
         const block = assetState.blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(instanceBlockUri));
+        return isTempBlock(block);
+    };
+
+    const isTempBlock = (block: AssetInfo<BlockDefinition> | undefined) => {
         if (!block) {
             return true;
         }
-
         if (!block.exists) {
             return true;
         }
@@ -720,73 +725,91 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
 
             const blockUri = parseKapetaUri(blockRef);
 
-            updateBlockAssets((prevState) => {
-                const newAssets = [...prevState];
-                const blockIx = newAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ?? -1;
+            const blockFinder = (prevState: ContextData) => {
+                const blockIx =
+                    prevState.blockAssets.findIndex((block) => parseKapetaUri(block.ref).equals(blockUri)) ?? -1;
 
                 if (blockIx === -1) {
-                    throw new Error(`Block #${blockRef} not found`);
+                    return null;
                 }
 
-                const block = (newAssets[blockIx] = cloneDeep(newAssets[blockIx]));
+                return {
+                    index: blockIx,
+                    block: prevState.blockAssets[blockIx],
+                };
+            };
 
-                const resources: Resource[] =
-                    role === ResourceRole.PROVIDES
-                        ? block.content.spec.providers ?? []
-                        : block.content.spec.consumers ?? [];
+            updateAssets(
+                (prevState) => {
+                    const newState = {
+                        plan: prevState.plan,
+                        blockAssets: [...prevState.blockAssets],
+                    };
+                    const blockAssets = newState.blockAssets;
 
-                const existingResourceIx = resources.findIndex((r: Resource) => r.metadata.name === resourceName);
-                if (existingResourceIx === -1) {
-                    throw new Error(`Resource ${resourceName} on block #${blockRef} not found`);
-                }
+                    const existingBlockInfo = blockFinder(newState);
 
-                const existingResource = resources[existingResourceIx];
+                    if (!existingBlockInfo) {
+                        throw new Error(`Block #${blockRef} not found`);
+                    }
 
-                if (existingResource.metadata.name !== resource.metadata.name) {
-                    // We changed the name of the resource.
-                    // We need to update all connections that reference this resource
-                    updatePlan(
-                        (prevPlanState) => {
-                            const newPlan = cloneDeep(prevPlanState);
-                            const affectedInstances = newPlan.spec.blocks.filter((instance) =>
-                                parseKapetaUri(instance.block.ref).equals(blockUri)
-                            );
+                    const block = (blockAssets[existingBlockInfo.index] = cloneDeep(existingBlockInfo.block));
 
-                            affectedInstances.forEach((instance) => {
-                                newPlan.spec.connections?.filter((conn) => {
-                                    if (
-                                        role === ResourceRole.CONSUMES &&
-                                        conn.consumer.blockId === instance.id &&
-                                        conn.consumer.resourceName === resourceName
-                                    ) {
-                                        conn.consumer.resourceName = resource.metadata.name;
-                                    }
+                    const resources: Resource[] =
+                        role === ResourceRole.PROVIDES
+                            ? block.content.spec.providers ?? []
+                            : block.content.spec.consumers ?? [];
 
-                                    if (
-                                        role === ResourceRole.PROVIDES &&
-                                        conn.provider.blockId === instance.id &&
-                                        conn.provider.resourceName === resourceName
-                                    ) {
-                                        conn.provider.resourceName = resource.metadata.name;
-                                    }
-                                });
+                    const existingResourceIx = resources.findIndex((r: Resource) => r.metadata.name === resourceName);
+                    if (existingResourceIx === -1) {
+                        throw new Error(`Resource ${resourceName} on block #${blockRef} not found`);
+                    }
+
+                    const existingResource = resources[existingResourceIx];
+
+                    if (existingResource.metadata.name !== resource.metadata.name) {
+                        // We changed the name of the resource.
+                        // We need to update all connections that reference this resource
+                        newState.plan = cloneDeep(prevState.plan);
+                        const newPlan = newState.plan;
+                        const affectedInstances = newPlan.spec.blocks.filter((instance) =>
+                            parseKapetaUri(instance.block.ref).equals(blockUri)
+                        );
+                        affectedInstances.forEach((instance) => {
+                            newPlan.spec.connections?.forEach((conn) => {
+                                if (
+                                    role === ResourceRole.CONSUMES &&
+                                    conn.consumer.blockId === instance.id &&
+                                    conn.consumer.resourceName === resourceName
+                                ) {
+                                    conn.consumer.resourceName = resource.metadata.name;
+                                }
+
+                                if (
+                                    role === ResourceRole.PROVIDES &&
+                                    conn.provider.blockId === instance.id &&
+                                    conn.provider.resourceName === resourceName
+                                ) {
+                                    conn.provider.resourceName = resource.metadata.name;
+                                }
                             });
+                        });
+                    }
 
-                            return newPlan;
-                        },
-                        () => !block.exists
-                    );
+                    resources[existingResourceIx] = resource;
+                    if (role === ResourceRole.PROVIDES) {
+                        block.content.spec.providers = resources;
+                    } else {
+                        block.content.spec.consumers = resources;
+                    }
+
+                    return newState;
+                },
+                (state) => {
+                    const blockInfo = blockFinder(state);
+                    return isTempBlock(blockInfo?.block);
                 }
-
-                resources[existingResourceIx] = resource;
-                if (role === ResourceRole.PROVIDES) {
-                    block.content.spec.providers = resources;
-                } else {
-                    block.content.spec.consumers = resources;
-                }
-
-                return newAssets;
-            });
+            );
         },
         onResourceAdded(callback: ResourceAddedCallback) {
             callbackHandlers.onResourceAdded.push(callback);
