@@ -205,25 +205,53 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
     // in config mode, if the resource is not connected to anything
 
     const dragIsCompatible = useMemo(() => {
+        if (!isConsumer) {
+            // Only allow dropping onto consumers
+            return false;
+        }
+
         try {
             switch (planner.mode) {
                 case PlannerMode.EDIT:
-                    return (
-                        isConsumer &&
-                        draggable?.type === 'resource' &&
-                        draggable.data.block.id !== blockInstance.id &&
-                        ResourceTypeProvider.canApplyResourceToKind(
-                            draggable.data.resource.kind,
-                            props.resource.kind
-                        ) &&
-                        !planner.hasConnections({
+                    if (draggable?.type !== 'resource') {
+                        // Only allow dropping resources
+                        return false;
+                    }
+
+                    if (draggable.data.block.id === blockInstance.id) {
+                        // Only allow dropping if the resource does not belong to this block
+                        return false;
+                    }
+
+                    const resourceProvider = ResourceTypeProvider.get(props.resource.kind);
+                    if (!resourceProvider) {
+                        // Only allow dropping if the resource is a known type
+                        return false;
+                    }
+
+                    const allowMultipleConnections = Boolean(resourceProvider.capabilities?.allowMultipleConnections);
+
+                    if (
+                        !allowMultipleConnections &&
+                        planner.hasConnections({
                             blockId: blockInstance.id,
                             resourceName: props.resource.metadata.name,
                         })
+                    ) {
+                        // Only allow dropping if the resource is not connected to anything
+                        return false;
+                    }
+
+                    const canApply = ResourceTypeProvider.canApplyResourceToKind(
+                        draggable.data.resource.kind,
+                        props.resource.kind
                     );
+
+                    console.log('canApply', draggable.data.resource.kind, props.resource.kind, canApply);
+
+                    return canApply;
                 case PlannerMode.CONFIGURATION:
                     return (
-                        isConsumer &&
                         draggable?.type === 'operator' &&
                         // compare without versions
                         parseKapetaUri(props.resource.kind).fullName ===

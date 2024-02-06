@@ -156,6 +156,9 @@ blocks.push(
         },
         definition: resource,
         editorComponent: EditorComponent,
+        capabilities: {
+            directDSL: true,
+        },
     });
 });
 
@@ -180,6 +183,10 @@ blocks.push(
         type: ResourceProviderType.INTERNAL,
         role: ResourceRole.CONSUMES,
         definition: resource,
+        converters: [{ fromKind: 'kapeta/resource-type-web-page' }],
+        capabilities: {
+            allowMultipleConnections: true,
+        },
     });
 });
 
