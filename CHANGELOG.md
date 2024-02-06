@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.0.0...v2.0.1) (2024-02-06)
+
+
+### Bug Fixes
+
+* Cleanup dangling and duplicate connections ([#150](https://github.com/kapetacom/ui-web-plan-editor/issues/150)) ([ee9af74](https://github.com/kapetacom/ui-web-plan-editor/commit/ee9af748733e1f0ea15802d09bb4a5eb5820b95c))
+
 # [2.0.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v1.27.0...v2.0.0) (2024-01-20)
 
 
