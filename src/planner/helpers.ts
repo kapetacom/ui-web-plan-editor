@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import { BlockDefinition, EntityList, Plan } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, EntityList, Plan } from '@kapeta/schemas';
 import _ from 'lodash';
 import { AssetInfo } from '../types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
@@ -72,8 +72,10 @@ export function createGlobalConfigurationFromEntities(entities?: EntityList, con
 export function cleanupConnections(plan: Plan, blockAssets: AssetInfo<BlockDefinition>[]) {
     let anyDangling = false;
     const instanceBlocks: Record<string, AssetInfo<BlockDefinition>> = {};
+    const instances: Record<string, BlockInstance> = {};
     plan.spec.blocks?.forEach((instance) => {
         const blockRef = parseKapetaUri(instance.block.ref);
+        instances[instance.id] = instance;
         const asset = blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(blockRef));
         if (!asset) {
             return;
@@ -90,8 +92,17 @@ export function cleanupConnections(plan: Plan, blockAssets: AssetInfo<BlockDefin
                 return false;
             }
             connectionSet.add(connectionId);
+
+            const consumerInstance = instances[connection.consumer.blockId];
+            const providerInstance = instances[connection.provider.blockId];
+            if (!consumerInstance || !providerInstance) {
+                anyDangling = true;
+                return false;
+            }
+
             const consumerBlock = instanceBlocks[connection.consumer.blockId];
             const providerBlock = instanceBlocks[connection.provider.blockId];
+
             if (!consumerBlock || !providerBlock) {
                 // We don't deal with missing block definitions here
                 return true;

@@ -777,7 +777,7 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
                             parseKapetaUri(instance.block.ref).equals(blockUri)
                         );
                         affectedInstances.forEach((instance) => {
-                            newPlan.spec.connections?.filter((conn) => {
+                            newPlan.spec.connections?.forEach((conn) => {
                                 if (
                                     role === ResourceRole.CONSUMES &&
                                     conn.consumer.blockId === instance.id &&
