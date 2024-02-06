@@ -76,13 +76,13 @@ export const transformEntities = (resourceKind: string, entities: DSLData[]): an
 };
 
 export const useBlockEntities = (
-    resourceKind: string,
+    resourceKind?: string,
     block?: BlockDefinition,
     useIncludes: boolean = true,
     contextType: IncludeContextType = IncludeContextType.REST
 ) => {
     return useMemo(() => {
-        return getBlockEntities(resourceKind, block, useIncludes, contextType);
+        return resourceKind ? getBlockEntities(resourceKind, block, useIncludes, contextType) : [];
     }, [resourceKind, block, contextType]);
 };
 
@@ -92,9 +92,9 @@ export const useDirectDSL = (resourceKind: string) => {
     }, [resourceKind]);
 };
 
-export const useTransformEntities = (resourceKind: string, entities: DSLData[]) => {
+export const useTransformEntities = (resourceKind?: string, entities?: DSLData[]) => {
     return useMemo(() => {
-        return transformEntities(resourceKind, entities);
+        return resourceKind && entities ? transformEntities(resourceKind, entities) : [];
     }, [resourceKind, entities]);
 };
 

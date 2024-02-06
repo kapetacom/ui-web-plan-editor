@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import { EntityList } from '@kapeta/schemas';
+import { BlockDefinition, EntityList, Plan } from '@kapeta/schemas';
 import _ from 'lodash';
+import { AssetInfo } from '../types';
+import { parseKapetaUri } from '@kapeta/nodejs-utils';
 
 type ConfigMap = { [key: string]: any };
 
@@ -59,4 +61,67 @@ export function createGlobalConfigurationFromEntities(entities?: EntityList, con
     });
 
     return _.isEmpty(defaultConfig) ? undefined : defaultConfig;
+}
+
+/**
+ * Removes connections that point to non-existing resources and duplicate connections.
+ *
+ * Will not remove connections that point to non-existing block definitions as those are assumed
+ * to exist but not yet loaded.
+ */
+export function cleanupConnections(plan: Plan, blockAssets: AssetInfo<BlockDefinition>[]) {
+    let anyDangling = false;
+    const instanceBlocks: Record<string, AssetInfo<BlockDefinition>> = {};
+    plan.spec.blocks?.forEach((instance) => {
+        const blockRef = parseKapetaUri(instance.block.ref);
+        const asset = blockAssets.find((asset) => parseKapetaUri(asset.ref).equals(blockRef));
+        if (!asset) {
+            return;
+        }
+        instanceBlocks[instance.id] = asset;
+    });
+
+    const connectionSet = new Set<string>();
+
+    const newConnections =
+        plan.spec.connections?.filter((connection) => {
+            const connectionId = `${connection.consumer.blockId}:${connection.consumer.resourceName}:${connection.provider.blockId}:${connection.provider.resourceName}:${connection.port?.type}`;
+            if (connectionSet.has(connectionId)) {
+                return false;
+            }
+            connectionSet.add(connectionId);
+            const consumerBlock = instanceBlocks[connection.consumer.blockId];
+            const providerBlock = instanceBlocks[connection.provider.blockId];
+            if (!consumerBlock || !providerBlock) {
+                // We don't deal with missing block definitions here
+                return true;
+            }
+
+            const consumerResource = consumerBlock.content?.spec?.consumers?.find((consumer) => {
+                return consumer.metadata.name === connection.consumer.resourceName;
+            });
+
+            const providerResource = providerBlock.content?.spec?.providers?.find((provider) => {
+                return provider.metadata.name === connection.provider.resourceName;
+            });
+
+            if (!consumerResource || !providerResource) {
+                anyDangling = true;
+                return false;
+            }
+
+            return true;
+        }) ?? [];
+
+    if (!anyDangling) {
+        return plan;
+    }
+
+    return {
+        ...plan,
+        spec: {
+            ...plan.spec,
+            connections: newConnections,
+        },
+    };
 }
