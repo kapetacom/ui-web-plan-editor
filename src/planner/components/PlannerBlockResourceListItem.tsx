@@ -247,8 +247,6 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                         props.resource.kind
                     );
 
-                    console.log('canApply', draggable.data.resource.kind, props.resource.kind, canApply);
-
                     return canApply;
                 case PlannerMode.CONFIGURATION:
                     return (
