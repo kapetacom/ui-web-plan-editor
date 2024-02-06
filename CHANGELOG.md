@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.0.1...v2.1.0) (2024-02-06)
+
+
+### Features
+
+* Add support for multiple connections to consumer capability ([#151](https://github.com/kapetacom/ui-web-plan-editor/issues/151)) ([1149563](https://github.com/kapetacom/ui-web-plan-editor/commit/11495638d576f78ac933722cd23805c4e5453684))
+
 ## [2.0.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.0.0...v2.0.1) (2024-02-06)
 
 
