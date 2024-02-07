@@ -25,6 +25,7 @@ interface ReferenceResolverModalProps extends Omit<ReferenceResolverProps, 'onCh
      * @returns The new asset ref as a string or null if the import failed
      */
     importAsset?: (ref: string) => Promise<string | null>;
+    openExternal?: () => void; //Should open the project in an editor or file explorer
     inline?: boolean;
 }
 
@@ -139,6 +140,11 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
                 {props.onClose && (
                     <Button variant={unresolvable ? 'contained' : 'text'} onClick={props.onClose}>
                         {unresolvable ? 'Close' : 'Cancel'}
+                    </Button>
+                )}
+                {props.openExternal && (
+                    <Button variant={'text'} onClick={props.openExternal}>
+                        Open Plan
                     </Button>
                 )}
                 {applyButton}
