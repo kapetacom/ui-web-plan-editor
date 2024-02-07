@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.1.0...v2.2.0) (2024-02-07)
+
+
+### Features
+
+* Add support for opening folder from resolution ui ([#152](https://github.com/kapetacom/ui-web-plan-editor/issues/152)) ([b32b87c](https://github.com/kapetacom/ui-web-plan-editor/commit/b32b87c81086604c1fb478c8c3f7c01a636ee74b))
+
 # [2.1.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.0.1...v2.1.0) (2024-02-06)
 
 
