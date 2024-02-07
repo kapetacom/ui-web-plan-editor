@@ -15,9 +15,21 @@ import {
 } from '../validation/PlanResolutionTransformer';
 
 interface ReferenceResolverModalProps extends Omit<ReferenceResolverProps, 'onChange'> {
+    /**
+     * Whether the modal is open. Ignored if `inline` is true
+     */
     open: boolean;
+    /**
+     * Callback to close the modal. Ignored if `inline` is true
+     */
     onClose?: () => void;
+    /**
+     * Callback to handle the result of the resolution
+     */
     onResolved?: (result: PlanResolutionResult) => void | Promise<void>;
+    /**
+     * Callback to install an asset
+     */
     installAsset?: (ref: string) => Promise<void>;
     /**
      *
@@ -25,6 +37,13 @@ interface ReferenceResolverModalProps extends Omit<ReferenceResolverProps, 'onCh
      * @returns The new asset ref as a string or null if the import failed
      */
     importAsset?: (ref: string) => Promise<string | null>;
+    /**
+     * Should open the project in an editor or file explorer
+     */
+    openExternal?: () => void;
+    /**
+     * If true, will not render in a modal. Defaults to false
+     */
     inline?: boolean;
 }
 
@@ -139,6 +158,11 @@ export const ReferenceResolutionHandler = (props: Omit<ReferenceResolverModalPro
                 {props.onClose && (
                     <Button variant={unresolvable ? 'contained' : 'text'} onClick={props.onClose}>
                         {unresolvable ? 'Close' : 'Cancel'}
+                    </Button>
+                )}
+                {props.openExternal && (
+                    <Button variant={'text'} onClick={props.openExternal}>
+                        Open Plan
                     </Button>
                 )}
                 {applyButton}
