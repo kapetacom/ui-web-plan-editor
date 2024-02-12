@@ -324,11 +324,11 @@ export const PlannerConnection: React.FC<{
         });
     } else {
         const svgPath = pointsToSVG(points);
-        const path = replaceJoinsWithArcs(svgPath, 10);
+        // const path = replaceJoinsWithArcs(svgPath, 10);
         const actionsPoint = getPathMidpoint(points);
 
         paths.push({
-            path,
+            path: svgPath,
             actionsPoint,
             pointType: 'center',
         });

@@ -3,10 +3,15 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import { useState, useMemo, RefObject, useLayoutEffect } from 'react';
+import { useState, useMemo, RefObject, useLayoutEffect, ReactNode, useContext } from 'react';
 import { ZoomTransform } from 'd3-zoom';
 import { calculateFitToParent, calculateCenterInParent } from './helpers';
 import { Rectangle } from '../types';
+import { PlannerContext } from '../PlannerContext';
+import { BlockTypeProvider } from '@kapeta/ui-web-context';
+import { calculateBlockSize } from '../BlockContext';
+import { BlockMode } from '../../utils/enums';
+import { has } from 'lodash';
 
 export const useMeasureElement = <E extends Element = Element>(externalRef: RefObject<E>): Rectangle => {
     const [rect, setRect] = useState<Rectangle>({
@@ -40,6 +45,130 @@ export const useMeasureElement = <E extends Element = Element>(externalRef: RefO
 
     return rect;
 };
+
+export function useMeasureChildren(
+    containerRef: RefObject<HTMLElement>,
+    children: ReactNode,
+    transform: [number, number, number]
+): Rectangle[] {
+    const [rectangles, setRectangles] = useState<Rectangle[]>([]);
+
+    const [x, y, k] = transform;
+
+    useLayoutEffect(() => {
+        if (containerRef.current) {
+            const newRectangles: Rectangle[] = [];
+            const childrenElements = containerRef.current.children;
+            for (let i = 0; i < childrenElements.length; i++) {
+                const child = childrenElements[i];
+                const rect = child.getBoundingClientRect();
+                newRectangles.push({
+                    x: rect.left - x,
+                    y: rect.top - y,
+                    width: rect.width / k,
+                    height: rect.height / k,
+                });
+            }
+            setRectangles(newRectangles);
+        }
+    }, [containerRef, children, x, y, k]); // Re-run if children change
+
+    return rectangles;
+}
+
+export const useGetPlanObstacles = (): Rectangle[] => {
+    const planner = useContext(PlannerContext);
+
+    if (!planner.plan?.spec.blocks) {
+        return [];
+    }
+
+    const PADDING = 10;
+    const RESOURCE_WIDTH = 35;
+
+    const obstacles = planner.plan.spec.blocks.map((block) => {
+        const {
+            dimensions: { left, top, width, height },
+        } = block;
+
+        const rect: Rectangle = {
+            x: left,
+            y: top,
+            width,
+            height,
+        };
+
+        const blockDefinition = planner.getBlockById(block.id);
+        if (!blockDefinition) {
+            return rect;
+        }
+
+        const blockType = BlockTypeProvider.get(blockDefinition.kind);
+        const { instanceBlockWidth, instanceBlockHeight } = calculateBlockSize({
+            nodeSize: planner.nodeSize,
+            blockType,
+            blockMode: BlockMode.SHOW,
+            blockDefinition,
+        });
+
+        rect.width = Math.max(rect.width, instanceBlockWidth);
+        rect.height = Math.max(rect.height, instanceBlockHeight);
+
+        // Add padding for resources
+        const hasConsumers = (blockDefinition.spec.consumers || []).length > 0;
+        const hasProviders = (blockDefinition.spec.providers || []).length > 0;
+        if (hasConsumers) {
+            rect.x -= RESOURCE_WIDTH;
+            rect.width += RESOURCE_WIDTH;
+        }
+        if (hasProviders) {
+            rect.width += RESOURCE_WIDTH;
+        }
+
+        // Add general padding
+        rect.x -= PADDING;
+        rect.y -= PADDING;
+        rect.width += PADDING * 2;
+        rect.height += PADDING * 2;
+
+        return rect;
+    });
+
+    return obstacles;
+};
+
+// export const useMeasureElements = <E extends Element = Element>(externalRefs: RefObject<E>[]): Rectangle[] => {
+//     const [rects, setRects] = useState<Rectangle[]>([]);
+
+//     const observer = useMemo(
+//         () =>
+//             new ResizeObserver((entries) => {
+//                 const newRects = entries.map((entry) => {
+//                     const { x, y, width, height } = entry.contentRect;
+//                     return { x, y, width, height };
+//                 });
+//                 setRects(newRects);
+//             }),
+//         []
+//     );
+
+//     useLayoutEffect(() => {
+//         const elements = externalRefs.map((ref) => ref.current);
+//         if (elements.length === 0) {
+//             return undefined;
+//         }
+//         elements.forEach((element) => {
+//             if (element) {
+//                 observer.observe(element);
+//             }
+//         });
+//         return () => {
+//             observer.disconnect();
+//         };
+//     }, [externalRefs, observer]);
+
+//     return rects;
+// };
 
 export type UseFitChildInParentResult = {
     transformToFitView: ZoomTransform | undefined;

@@ -77,15 +77,15 @@ export const ZoomAndPanDemo = () => {
  * Calculate the bounding box of a set of rectangles. The bounding box is the smallest rectangle
  * that contains all the rectangles.
  */
-function calculateCombinedBoundingBox(rectangles: Rectangle[]): Rectangle {
+export function calculateCombinedBoundingBox(rectangles: Rectangle[]): Rectangle {
     if (rectangles.length === 0) {
         return { x: 0, y: 0, width: 0, height: 0 };
     }
 
     let minX = Infinity;
     let minY = Infinity;
-    let maxX = 0;
-    let maxY = 0;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
 
     rectangles.forEach((element) => {
         const { x, y, width, height } = element;

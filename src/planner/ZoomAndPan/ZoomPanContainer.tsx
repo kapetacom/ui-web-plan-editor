@@ -15,6 +15,7 @@ import { Rectangle } from '../types';
 import { ZoomPanBackground, ZoomPanBackgroundHandle } from './background/ZoomPanBackground';
 import { ZoomPanGrabber } from './ZoomPanGrabber';
 import { ZoomPanVisualBounds, ZoomPanVisualBoundsHandle } from './ZoomPanVisualBounds';
+import { ZoomPanPathGrid, ZoomPanPathGridHandle } from './pathGrid/ZoomPanPathGrid';
 
 export type InitialZoomPanViewOptions = {
     /**
@@ -107,6 +108,7 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
     // Refs
     const backgroundRef = React.useRef<ZoomPanBackgroundHandle>(null);
     const visualBoundsRef = React.useRef<ZoomPanVisualBoundsHandle>(null);
+    const pathGridRef = React.useRef<ZoomPanPathGridHandle>(null);
     const grabRef = React.useRef<HTMLDivElement>(null);
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -137,6 +139,9 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                     // Update the transform of the background
                     backgroundRef.current?.updateTransform(x, y, k);
 
+                    // Update the transform of the path grid
+                    pathGridRef.current?.updateTransform(x, y, k);
+
                     // Update the transform of the visual bounds
                     visualBoundsRef.current?.updateTransform(x, y, k);
 
@@ -155,9 +160,13 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
 
     // On mount, initialize the zoom behavior
     useEffect(() => {
-        if (grabRef?.current) {
-            select(grabRef.current).call(zoomBehaviour);
+        const grabber = grabRef?.current;
+        if (grabber) {
+            select(grabber).call(zoomBehaviour);
         }
+        return () => {
+            select(grabber).on('.zoom', null);
+        };
     }, [zoomBehaviour]);
 
     const zoomBy = useCallback(
@@ -267,6 +276,8 @@ export const ZoomPanContainer = forwardRef<HTMLDivElement, ZoomPanContainerProps
                 className="zoom-and-pan-visual-bounds"
                 highlight={isDraggingChild}
             />
+
+            {/* <ZoomPanPathGrid ref={pathGridRef} className="zoom-and-pan-path-grid" contentBBox={childrenBBox} /> */}
 
             <ZoomPanGrabber ref={grabRef} className="zoom-and-pan-grab-area" disabled={isViewOnly} />
 
