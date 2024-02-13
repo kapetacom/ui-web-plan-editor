@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.2.0...v2.2.1) (2024-02-13)
+
+
+### Bug Fixes
+
+* Make trailing "/" a valid path ([#153](https://github.com/kapetacom/ui-web-plan-editor/issues/153)) ([d4f8785](https://github.com/kapetacom/ui-web-plan-editor/commit/d4f8785a6a01344d15a681104f861ec47303ba51))
+
 # [2.2.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.1.0...v2.2.0) (2024-02-07)
 
 
