@@ -5,7 +5,7 @@
 
 import React, { useContext, useMemo, useState, useEffect } from 'react';
 
-import { IResourceTypeProvider, ResourceProviderType, ResourceRole } from '@kapeta/ui-web-types';
+import { IResourceTypeProvider, ResourceProviderType, ResourceRole, ResourceWithSpec } from '@kapeta/ui-web-types';
 
 import './PlannerBlockResourceListItem.less';
 import { PlannerNodeSize } from '../../types';
@@ -68,7 +68,7 @@ const getResourceConnectionPoint = ({ isConsumer = false, isExpanded = false, bu
 };
 
 interface TempResourceProps {
-    resource: Resource;
+    resource: ResourceWithSpec<any>;
     nodeSize: PlannerNodeSize;
     x: number;
     y: number;

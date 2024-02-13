@@ -232,7 +232,7 @@ export function copyResourceToBlock(consumerBlock: BlockDefinition, provider: Bl
 
     newResource.metadata.name = resourceName;
 
-    return newResource;
+    return newResource as Resource;
 }
 
 export function createEntityList(targetEntityList: DSLData[]): EntityList {
