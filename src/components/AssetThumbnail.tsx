@@ -267,6 +267,7 @@ const AssetThumbnailInnerPreview = (props: AssetThumbnailInnerPreviewProps) => {
             }
             case CoreTypes.BLOCK_TYPE:
             case CoreTypes.BLOCK_TYPE_OPERATOR:
+            case CoreTypes.BLOCK_TYPE_EXECUTABLE:
                 return (
                     <BlockTypePreview
                         width={props.width}
