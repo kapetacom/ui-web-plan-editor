@@ -1,3 +1,15 @@
+# [2.3.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.2.1...v2.3.0) (2024-02-20)
+
+
+### Bug Fixes
+
+* Bump ui-web-components to latest version ([9314883](https://github.com/kapetacom/ui-web-plan-editor/commit/931488304ffb61bd9eec60f0949c50cad1ba8dc6))
+
+
+### Features
+
+* Add block-type-executabla ([96dc3d0](https://github.com/kapetacom/ui-web-plan-editor/commit/96dc3d078948fd8a15aa56a771617f342416e82c))
+
 ## [2.2.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.2.0...v2.2.1) (2024-02-13)
 
 
