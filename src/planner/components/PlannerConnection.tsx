@@ -213,8 +213,8 @@ export const PlannerConnection: React.FC<{
             return fallbackPath;
         }
 
-        const matrixStart = [fromX, from.y];
-        const matrixEnd = [toX, to.y];
+        const matrixStart = [fromX, from.y - planner.canvasSize.y];
+        const matrixEnd = [toX, to.y - planner.canvasSize.y];
 
         const start: [number, number] = matrixStart.map((v) => Math.floor(v / CELL_SIZE)) as [number, number];
         const end: [number, number] = matrixEnd.map((v) => Math.floor(v / CELL_SIZE)) as [number, number];
@@ -250,7 +250,7 @@ export const PlannerConnection: React.FC<{
 
         const rawPath = convertMatrixPathToPoints(matrixPath, {
             offsetX: 0,
-            offsetY: from.y % CELL_SIZE,
+            offsetY: planner.canvasSize.y + (from.y % CELL_SIZE),
             stepX: CELL_SIZE,
             stepY: CELL_SIZE,
         });
@@ -264,6 +264,15 @@ export const PlannerConnection: React.FC<{
         } else if (lastPoint[1] === prevPoint[1]) {
             // horizontal line, add a new point
             rawPath.push([lastPoint[0], to.y]);
+        }
+
+        // we want to start on a horizontal line
+        const firstPoint = rawPath[0];
+        const secondPoint = rawPath[1];
+        if (firstPoint[0] === secondPoint[0]) {
+            firstPoint[1] = from.y;
+        } else if (firstPoint[1] === secondPoint[1]) {
+            rawPath.unshift([firstPoint[0], from.y]);
         }
 
         return [...startingPoints, ...rawPath, ...endingPoints];
