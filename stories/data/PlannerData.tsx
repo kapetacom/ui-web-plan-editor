@@ -319,6 +319,32 @@ export const WonkyConnectionPlannerData: Plan = {
                 },
             },
             {
+                id: 'avoid',
+                name: 'Avoid me',
+                block: {
+                    ref: 'kapeta://kapeta/todo:1.2.3',
+                },
+                dimensions: {
+                    top: 400,
+                    width: 150,
+                    left: 690,
+                    height: -1,
+                },
+            },
+            {
+                id: 'move',
+                name: 'Move me',
+                block: {
+                    ref: 'kapeta://kapeta/todo:1.2.3',
+                },
+                dimensions: {
+                    top: 300,
+                    width: 150,
+                    left: 690,
+                    height: -1,
+                },
+            },
+            {
                 id: 'todo',
                 name: 'Todo service',
                 block: {
@@ -327,7 +353,7 @@ export const WonkyConnectionPlannerData: Plan = {
                 dimensions: {
                     top: 400,
                     width: 150,
-                    left: 890,
+                    left: 1090,
                     height: -1,
                 },
             },
