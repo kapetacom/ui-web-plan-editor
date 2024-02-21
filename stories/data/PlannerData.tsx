@@ -297,3 +297,56 @@ export const InvalidPlannerData: Plan = {
         connections: [],
     },
 };
+
+export const WonkyConnectionPlannerData: Plan = {
+    kind: 'core/plan',
+    metadata: {
+        name: 'kapeta/my-wonky-connection',
+    },
+    spec: {
+        blocks: [
+            {
+                id: 'user',
+                name: 'Users',
+                block: {
+                    ref: 'kapeta/user:local',
+                },
+                dimensions: {
+                    top: 400,
+                    width: 150,
+                    left: 250,
+                    height: -1,
+                },
+            },
+            {
+                id: 'todo',
+                name: 'Todo service',
+                block: {
+                    ref: 'kapeta://kapeta/todo:1.2.3',
+                },
+                dimensions: {
+                    top: 400,
+                    width: 150,
+                    left: 890,
+                    height: -1,
+                },
+            },
+        ],
+        connections: [
+            {
+                provider: {
+                    blockId: 'user',
+                    resourceName: 'users',
+                },
+                consumer: {
+                    blockId: 'todo',
+                    resourceName: 'users',
+                },
+                port: {
+                    type: 'rest',
+                },
+                mapping: {},
+            },
+        ],
+    },
+};
