@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.3.0...v2.3.1) (2024-02-22)
+
+
+### Bug Fixes
+
+* better connection pathing by forcing grid to start in 0,0  ([#155](https://github.com/kapetacom/ui-web-plan-editor/issues/155)) ([66a6f2c](https://github.com/kapetacom/ui-web-plan-editor/commit/66a6f2ce1604c76f1311e63aae08854983420aad))
+
 # [2.3.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.2.1...v2.3.0) (2024-02-20)
 
 
