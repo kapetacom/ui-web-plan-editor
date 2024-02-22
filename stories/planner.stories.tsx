@@ -10,7 +10,7 @@ import { ButtonStyle, DefaultContext } from '@kapeta/ui-web-components';
 
 import { Planner } from '../src/planner/Planner';
 
-import { readInvalidPlan, readPlanV2 } from './data/planReader';
+import { readInvalidPlan, readPlanV2, readWonkyPlan } from './data/planReader';
 import { PlannerActionConfig, PlannerContext, withPlannerContext } from '../src/planner/PlannerContext';
 import { useAsync } from 'react-use';
 import { ItemType, ResourceRole, SchemaKind } from '@kapeta/ui-web-types';
@@ -291,7 +291,11 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
 const PlanEditor = withPlannerContext(InnerPlanEditor);
 
 const PlannerLoader = (props: { planId?: string; instanceStatus: InstanceStatus; plannerMode: PlannerMode }) => {
-    const plan = useAsync(() => (props.planId === 'invalid' ? readInvalidPlan() : readPlanV2()), [props.planId]);
+    const plan = useAsync(
+        () =>
+            props.planId === 'invalid' ? readInvalidPlan() : props.planId === 'wonky' ? readWonkyPlan() : readPlanV2(),
+        [props.planId]
+    );
 
     const instanceStatuses = plan.value?.plan?.spec.blocks?.reduce((agg, blockInstance) => {
         agg[blockInstance.id] = props.instanceStatus;
@@ -463,4 +467,12 @@ export const PlannerSidebarWithCustomTitle = () => {
             Sidebar content
         </PlannerSidebar>
     );
+};
+
+export const WonkyMode: Story = {
+    args: {
+        plannerMode: PlannerMode.EDIT,
+        instanceStatus: InstanceStatus.READY,
+        planId: 'wonky',
+    },
 };

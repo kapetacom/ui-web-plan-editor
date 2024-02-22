@@ -186,8 +186,8 @@ export const PlannerConnection: React.FC<{
         let from = adjustedProviderCluster ?? providerPoint;
         let to = adjustedConsumerCluster ?? consumerPoint;
 
-        const fromX = Math.floor((from.x + POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
-        const toX = Math.floor((to.x - POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
+        const fromX = Math.round((from.x + POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
+        const toX = Math.round((to.x - POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
 
         const startingPoints = adjustedProviderCluster
             ? createSimplePath(providerPoint, adjustedProviderCluster)
@@ -264,6 +264,15 @@ export const PlannerConnection: React.FC<{
         } else if (lastPoint[1] === prevPoint[1]) {
             // horizontal line, add a new point
             rawPath.push([lastPoint[0], to.y]);
+        }
+
+        // we want to start on a horizontal line
+        const firstPoint = rawPath[0];
+        const secondPoint = rawPath[1];
+        if (firstPoint[0] === secondPoint[0]) {
+            firstPoint[1] = from.y;
+        } else if (firstPoint[1] === secondPoint[1]) {
+            rawPath.unshift([firstPoint[0], from.y]);
         }
 
         return [...startingPoints, ...rawPath, ...endingPoints];
