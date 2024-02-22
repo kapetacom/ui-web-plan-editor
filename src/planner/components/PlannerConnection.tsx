@@ -186,8 +186,8 @@ export const PlannerConnection: React.FC<{
         let from = adjustedProviderCluster ?? providerPoint;
         let to = adjustedConsumerCluster ?? consumerPoint;
 
-        const fromX = Math.floor((from.x + POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
-        const toX = Math.floor((to.x - POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
+        const fromX = Math.round((from.x + POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
+        const toX = Math.round((to.x - POINT_PADDING_X) / CELL_SIZE) * CELL_SIZE;
 
         const startingPoints = adjustedProviderCluster
             ? createSimplePath(providerPoint, adjustedProviderCluster)
@@ -213,8 +213,8 @@ export const PlannerConnection: React.FC<{
             return fallbackPath;
         }
 
-        const matrixStart = [fromX, from.y - planner.canvasSize.y];
-        const matrixEnd = [toX, to.y - planner.canvasSize.y];
+        const matrixStart = [fromX, from.y];
+        const matrixEnd = [toX, to.y];
 
         const start: [number, number] = matrixStart.map((v) => Math.floor(v / CELL_SIZE)) as [number, number];
         const end: [number, number] = matrixEnd.map((v) => Math.floor(v / CELL_SIZE)) as [number, number];
@@ -250,7 +250,7 @@ export const PlannerConnection: React.FC<{
 
         const rawPath = convertMatrixPathToPoints(matrixPath, {
             offsetX: 0,
-            offsetY: planner.canvasSize.y + (from.y % CELL_SIZE),
+            offsetY: from.y % CELL_SIZE,
             stepX: CELL_SIZE,
             stepY: CELL_SIZE,
         });

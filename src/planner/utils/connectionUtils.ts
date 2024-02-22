@@ -114,8 +114,8 @@ export const useBlockMatrix = () => {
                 const out = {
                     x: block.dimensions.left,
                     y: block.dimensions.top,
-                    width: Math.max(block.dimensions.width + 40, 150),
-                    height: Math.max(block.dimensions.height + 40, 150),
+                    width: Math.max(block.dimensions.width + 40, 200),
+                    height: Math.max(block.dimensions.height + 40, 200),
                     id: block.id,
                 };
 
@@ -151,13 +151,24 @@ export const useBlockMatrix = () => {
         if (!planner.canvasSize.width || !planner.canvasSize.height) {
             return [];
         }
-        const matrixSize: [number, number] = [planner.canvasSize.width, planner.canvasSize.height];
+        // TODO: This can be optimized, and should be rewritten when we refactor the canvas
+        const matrixSize: [number, number] = [
+            planner.canvasSize.width + planner.canvasSize.x + 100,
+            planner.canvasSize.height + planner.canvasSize.y + 100,
+        ];
         return fillMatrix(
             obstacles.filter((o) => o.id !== draggedBlockId),
             matrixSize,
             [CELL_SIZE, CELL_SIZE]
         );
-    }, [planner.canvasSize.width, planner.canvasSize.height, obstacles, draggedBlockId]);
+    }, [
+        planner.canvasSize.width,
+        planner.canvasSize.height,
+        planner.canvasSize.x,
+        planner.canvasSize.y,
+        obstacles,
+        draggedBlockId,
+    ]);
 };
 
 type ConnectionExtensionResult = {
