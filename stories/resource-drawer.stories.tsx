@@ -41,6 +41,9 @@ export const DrawerTabs = () => {
                 </Tabs>
                 {currentTab === 0 ? (
                     <PlannerResourcesList
+                        onBlockImport={() => {
+                            console.log('import block');
+                        }}
                         onShowMoreAssets={() => {
                             console.log('show more assets');
                         }}
