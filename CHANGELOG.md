@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.3.1...v2.4.0) (2024-02-29)
+
+
+### Features
+
+* Add option for importing block from resource list ([#156](https://github.com/kapetacom/ui-web-plan-editor/issues/156)) ([2b66ce9](https://github.com/kapetacom/ui-web-plan-editor/commit/2b66ce9010bea3bf1498faeb964c38fda8b36bca))
+
 ## [2.3.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.3.0...v2.3.1) (2024-02-22)
 
 
