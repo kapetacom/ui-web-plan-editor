@@ -11,6 +11,7 @@ import { ResourceToolList } from './ResourceToolList';
 import { BlockTypeToolList } from './BlockTypeToolList';
 import { TipIcon } from '../../components/TipIcon';
 import { Add } from '@mui/icons-material';
+import { Tooltip } from '@kapeta/ui-web-components';
 
 const HEADER_SIZE = '14px';
 
@@ -85,21 +86,23 @@ export const PlannerResourcesList = (props: Props) => {
                     </Typography>
                     {props.onBlockImport && (
                         <Box sx={{ ml: 1 }}>
-                            <IconButton
-                                size="small"
-                                sx={{
-                                    width: '22px',
-                                    height: '22px',
-                                    '& .MuiSvgIcon-root': {
-                                        fontSize: '16px',
-                                    },
-                                }}
-                                color={'primary'}
-                                onClick={props.onBlockImport}
-                                data-kap-id="resources-import-block"
-                            >
-                                <Add />
-                            </IconButton>
+                            <Tooltip title={'Import block from your hard drive'} placement="right">
+                                <IconButton
+                                    size="small"
+                                    sx={{
+                                        width: '22px',
+                                        height: '22px',
+                                        '& .MuiSvgIcon-root': {
+                                            fontSize: '16px',
+                                        },
+                                    }}
+                                    color={'primary'}
+                                    onClick={props.onBlockImport}
+                                    data-kap-id="resources-import-block"
+                                >
+                                    <Add />
+                                </IconButton>
+                            </Tooltip>
                         </Box>
                     )}
                 </Stack>
