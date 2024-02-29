@@ -38,7 +38,7 @@
         "@kapeta/kaplang-core": "^1.9",
         "@kapeta/nodejs-utils": "<2",
         "@kapeta/schemas": "^3",
-        "@kapeta/ui-web-components": "^3",
+        "@kapeta/ui-web-components": "^3.2.0",
         "@kapeta/ui-web-context": "^1",
         "@kapeta/ui-web-types": "^1",
         "@kapeta/ui-web-utils": ">=0.0.29 <2",
