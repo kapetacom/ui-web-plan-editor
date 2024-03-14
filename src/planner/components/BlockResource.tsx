@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { toClass, createHexagonPath, Orientation } from '@kapeta/ui-web-utils';
 
 import { ResourceRole } from '@kapeta/ui-web-types';
@@ -13,6 +13,7 @@ import { PlannerNodeSize } from '../../types';
 import './BlockResource.less';
 import { ActionContext } from '../types';
 import { BlockResourceIcon } from './BlockResourceIcon';
+import { Tooltip } from '@kapeta/ui-web-components';
 
 interface PlannerResourceProps {
     size?: PlannerNodeSize;
@@ -48,6 +49,12 @@ export const BlockResource = (props: PlannerResourceProps) => {
     });
 
     const maxTextWidth = width - 70;
+    const [hasOverflow, setHasOverflow] = React.useState(false);
+    const onRef = (el: HTMLSpanElement | null) => {
+        if (el) {
+            setHasOverflow(el.scrollWidth > el.offsetWidth);
+        }
+    };
 
     const padding = 8;
 
@@ -60,7 +67,17 @@ export const BlockResource = (props: PlannerResourceProps) => {
             )}
             <foreignObject width={maxTextWidth} className="block-resource-text resource-name" y={padding} x={textX}>
                 <plannerRenderer.Outlet id={PlannerOutlet.ResourceTitle} context={props.actionContext}>
-                    <span>{props.name}</span>
+                    {hasOverflow ? (
+                        <Tooltip
+                            title={props.name}
+                            // Estimate for overflow by string length
+                            placement={consumer ? 'bottom-end' : 'bottom-start'}
+                        >
+                            <span ref={onRef}>{props.name}</span>
+                        </Tooltip>
+                    ) : (
+                        <span ref={onRef}>{props.name}</span>
+                    )}
                 </plannerRenderer.Outlet>
             </foreignObject>
 

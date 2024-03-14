@@ -99,6 +99,40 @@ export default {
     },
 };
 
+export const ResourceLongName = () => {
+    const resource: Resource = {
+        kind: 'kapeta/resource-type-rest-api:1.2.3',
+        metadata: {
+            name: 'This is a very long name that should be truncated',
+        },
+        spec: {
+            port: {
+                type: 'rest',
+            },
+        },
+    };
+    return (
+        <BlockContext.Provider
+            value={
+                {
+                    blockInstance: ValidInstance,
+                    blockReference: parseKapetaUri(ValidInstance.block.ref),
+                } as Partial<PlannerBlockContextData> as any
+            }
+        >
+            <div style={{ padding: '20px' }}>
+                <PlannerBlockResourceListItem
+                    size={PlannerNodeSize.FULL}
+                    index={0}
+                    mode={ResourceMode.SHOW}
+                    resource={resource}
+                    role={ResourceRole.PROVIDES}
+                />
+            </div>
+        </BlockContext.Provider>
+    );
+};
+
 export const ResourceMissingKind = () => {
     const resource = MissingResourceKind;
     const errors = new BlockValidator(ValidDefinition, ValidInstance).validateResource(resource);
