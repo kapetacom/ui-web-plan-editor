@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.4.0...v2.4.1) (2024-03-15)
+
+
+### Bug Fixes
+
+* add tooltip for overflowing resource names ([#157](https://github.com/kapetacom/ui-web-plan-editor/issues/157)) ([a9acab1](https://github.com/kapetacom/ui-web-plan-editor/commit/a9acab11181fbc109b70acfcc8d957b67b81da94))
+
 # [2.4.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.3.1...v2.4.0) (2024-02-29)
 
 
