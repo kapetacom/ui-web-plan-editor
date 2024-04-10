@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useContext, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
 import { ResourceRole } from '@kapeta/ui-web-types';
@@ -18,6 +18,7 @@ import {
     convertMatrixPathToPoints,
     findMatrixPath,
     getPathMidpoint,
+    nearestPointOnPath,
     replaceJoinsWithArcs,
 } from '../utils/connectionUtils/src/path';
 
@@ -114,11 +115,28 @@ export const PlannerConnection: React.FC<{
     style?: React.CSSProperties;
     clusterIndex?: number;
     clusterSize?: number;
-    zoomInfo?: { x: number; y: number; zoom: number };
 }> = (props) => {
     const planner = useContext(PlannerContext);
     const [cursorState, setCursorState] = useState({ focus: true, position: { x: 0, y: 0 } });
     const rootRef = useRef<SVGSVGElement>(null);
+
+    // Add some delay to make the actionButtons less intrusive
+    const [showActions, setShowActions] = useState(false);
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+
+        if (cursorState.focus) {
+            timeout = setTimeout(() => {
+                setShowActions(cursorState.focus);
+            }, 300);
+        } else {
+            setShowActions(false);
+        }
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [setShowActions, cursorState.focus]);
 
     const isTemp =
         props.connection.consumer.blockId === 'temp-block' &&
@@ -351,15 +369,18 @@ export const PlannerConnection: React.FC<{
     };
 
     // Transform to relative to root svg ref
-    const getPosition = (evt: { x: number; y: number }) => {
+    const getPosition = (evtX: number, evtY: number) => {
         if (!rootRef.current) {
             return { x: 0, y: 0 };
         }
         const rootX = rootRef.current.getBoundingClientRect().x;
         const rootY = rootRef.current.getBoundingClientRect().y;
-        const x = (evt.x - rootX) / (props.zoomInfo?.zoom || 1);
-        const y = (evt.y - rootY) / (props.zoomInfo?.zoom || 1);
-        return { x, y };
+        const x = (evtX - rootX) / (planner.zoom || 1);
+        const y = (evtY - rootY) / (planner.zoom || 1);
+
+        const pathP = nearestPointOnPath([x, y], points);
+
+        return { x: pathP[0], y: pathP[1] };
     };
 
     return (
@@ -371,7 +392,7 @@ export const PlannerConnection: React.FC<{
                         props.onMouseEnter(actionContext);
                     }
                     setCursorState((state) => ({
-                        position: getPosition({ x: evt.clientX, y: evt.clientY }),
+                        position: getPosition(evt.clientX, evt.clientY),
                         focus: true,
                     }));
                 }}
@@ -415,7 +436,7 @@ export const PlannerConnection: React.FC<{
 
                             {props.actions && (
                                 <ActionButtons
-                                    show={cursorState.focus}
+                                    show={showActions}
                                     pointType={pathInfo.pointType}
                                     x={cursorState.position.x}
                                     y={cursorState.position.y}

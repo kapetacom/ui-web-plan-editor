@@ -236,7 +236,6 @@ export const Planner = (props: PlannerProps) => {
 
     const focusInfo = useFocusInfo();
     const focusModeEnabled = !!focusInfo;
-    const [panZoom, setPanZoom] = useState({ x: 0, y: 0, zoom: 1 });
 
     return (
         <ErrorBoundary
@@ -273,7 +272,6 @@ export const Planner = (props: PlannerProps) => {
                 showPixelGrid={props.showPixelGrid}
                 initialZoomPanView={instances.length > 0 ? props.initialZoomPanView : undefined}
                 showZoomPanControls={props.showZoomPanControls}
-                onPanZoomChange={(x, y, zoom) => setPanZoom({ x, y, zoom })}
             >
                 {instances.map((instance, index) => {
                     const focusedBlock = focusInfo?.focus?.instance.id === instance.id;
@@ -315,7 +313,6 @@ export const Planner = (props: PlannerProps) => {
                     highlightedConnections={highlightedConnections}
                     onConnectionMouseEnter={callbacks.onConnectionMouseEnter}
                     onConnectionMouseLeave={callbacks.onConnectionMouseLeave}
-                    zoomInfo={panZoom}
                 />
             </PlannerCanvas>
         </ErrorBoundary>

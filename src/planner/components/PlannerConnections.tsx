@@ -42,7 +42,6 @@ interface Props {
     connections: ConnectionExtension[];
     onConnectionMouseEnter?: (context: ActionContext) => void;
     onConnectionMouseLeave?: (context: ActionContext) => void;
-    zoomInfo: { x: number; y: number; zoom: number };
 }
 
 export const PlannerConnections = (props: Props) => {
@@ -186,7 +185,6 @@ export const PlannerConnections = (props: Props) => {
                         actions={props.actions?.connection || []}
                         onMouseOver={props.onConnectionMouseEnter}
                         onMouseLeave={props.onConnectionMouseLeave}
-                        zoomInfo={props.zoomInfo}
                     />
                 );
             })}

@@ -194,3 +194,28 @@ export function replaceJoinsWithArcs(svgPath: string, radius: number): string {
 
     return `${replacedSegments.join(' ')}`;
 }
+
+export function nearestPointOnPath(point: [number, number], path: number[][]) {
+    const [px, py] = point;
+    let minDist = Infinity;
+    let nearestPoint = path[0];
+
+    for (let i = 1; i < path.length; i++) {
+        const [x1, y1] = path[i - 1];
+        const [x2, y2] = path[i];
+        if (x1 === x2) {
+            const dist = Math.abs(px - x1);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestPoint = [x1, py];
+            }
+        } else if (y1 === y2) {
+            const dist = Math.abs(py - y1);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestPoint = [px, y1];
+            }
+        }
+    }
+    return nearestPoint;
+}
