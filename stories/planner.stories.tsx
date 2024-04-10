@@ -200,6 +200,18 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 label: 'Delete',
                 kapId: 'delete-connection',
             },
+            {
+                enabled(context): boolean {
+                    return planner.mode === PlannerMode.EDIT;
+                },
+                onClick(context, { connection }) {
+                    console.log('edit connection', connection);
+                },
+                buttonStyle: ButtonStyle.SECONDARY,
+                icon: 'fa fa-pencil',
+                label: 'Edit',
+                kapId: 'edit-connection',
+            },
         ],
     };
 

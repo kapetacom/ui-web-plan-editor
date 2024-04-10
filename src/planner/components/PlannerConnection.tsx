@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useRef, useState } from 'react';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
 import { ResourceRole } from '@kapeta/ui-web-types';
@@ -114,9 +114,11 @@ export const PlannerConnection: React.FC<{
     style?: React.CSSProperties;
     clusterIndex?: number;
     clusterSize?: number;
+    zoomInfo: { x: number; y: number; zoom: number };
 }> = (props) => {
     const planner = useContext(PlannerContext);
-    const [hasFocus, setHasFocus] = useState(false);
+    const [cursorState, setCursorState] = useState({ focus: true, position: { x: 0, y: 0 } });
+    const rootRef = useRef<SVGElement>(null);
 
     const isTemp =
         props.connection.consumer.blockId === 'temp-block' &&
@@ -348,23 +350,43 @@ export const PlannerConnection: React.FC<{
         connection: props.connection,
     };
 
+    // Transform to relative to root svg ref
+    const getPosition = (evt: { x: number; y: number }) => {
+        if (!rootRef.current) {
+            return { x: 0, y: 0 };
+        }
+        const rootX = rootRef.current.getBoundingClientRect().x;
+        const rootY = rootRef.current.getBoundingClientRect().y;
+        console.log({ zoomInfo: props.zoomInfo, rootX, rootY, evt });
+        const x = (evt.x - rootX) / props.zoomInfo.zoom; // - props.zoomInfo.x;
+        const y = (evt.y - rootY) / props.zoomInfo.zoom; // - props.zoomInfo.y;
+        return { x, y };
+    };
+
     return (
-        <svg style={{ position: 'absolute', zIndex: -1, top: 0, left: 0, ...props.style }}>
+        <svg style={{ position: 'absolute', zIndex: -1, top: 0, left: 0, ...props.style }} ref={rootRef}>
             <g
                 className={className.trim()}
-                onMouseEnter={() => {
+                onMouseEnter={(evt) => {
                     if (props.onMouseEnter) {
                         props.onMouseEnter(actionContext);
                     }
+                    setCursorState((state) => ({
+                        position: getPosition({ x: evt.clientX, y: evt.clientY }),
+                        focus: true,
+                    }));
                 }}
-                onMouseOver={() => {
+                onMouseOver={(evt) => {
                     if (props.onMouseOver) {
                         props.onMouseOver(actionContext);
                     }
-                    setHasFocus(true);
+                    setCursorState((state) => ({
+                        ...state,
+                        focus: true,
+                    }));
                 }}
                 onMouseOut={() => {
-                    setHasFocus(false);
+                    setCursorState((state) => ({ ...state, focus: false }));
                     if (props.onMouseLeave) {
                         props.onMouseLeave(actionContext);
                     }
@@ -392,13 +414,12 @@ export const PlannerConnection: React.FC<{
 
                             <path className="line" d={pathInfo.path} />
 
-                            {pathInfo.actionsPoint && props.actions && (
+                            {props.actions && (
                                 <ActionButtons
-                                    show={hasFocus}
+                                    show={cursorState.focus}
                                     pointType={pathInfo.pointType}
-                                    x={pathInfo.actionsPoint.x}
-                                    // TODO: how can we avoid the magic number?
-                                    y={pathInfo.actionsPoint.y - 5}
+                                    x={cursorState.position.x}
+                                    y={cursorState.position.y}
                                     actions={props.actions}
                                     actionContext={actionContext}
                                 />
