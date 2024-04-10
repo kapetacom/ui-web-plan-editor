@@ -114,11 +114,11 @@ export const PlannerConnection: React.FC<{
     style?: React.CSSProperties;
     clusterIndex?: number;
     clusterSize?: number;
-    zoomInfo: { x: number; y: number; zoom: number };
+    zoomInfo?: { x: number; y: number; zoom: number };
 }> = (props) => {
     const planner = useContext(PlannerContext);
     const [cursorState, setCursorState] = useState({ focus: true, position: { x: 0, y: 0 } });
-    const rootRef = useRef<SVGElement>(null);
+    const rootRef = useRef<SVGSVGElement>(null);
 
     const isTemp =
         props.connection.consumer.blockId === 'temp-block' &&
@@ -357,9 +357,8 @@ export const PlannerConnection: React.FC<{
         }
         const rootX = rootRef.current.getBoundingClientRect().x;
         const rootY = rootRef.current.getBoundingClientRect().y;
-        console.log({ zoomInfo: props.zoomInfo, rootX, rootY, evt });
-        const x = (evt.x - rootX) / props.zoomInfo.zoom; // - props.zoomInfo.x;
-        const y = (evt.y - rootY) / props.zoomInfo.zoom; // - props.zoomInfo.y;
+        const x = (evt.x - rootX) / (props.zoomInfo?.zoom || 1);
+        const y = (evt.y - rootY) / (props.zoomInfo?.zoom || 1);
         return { x, y };
     };
 
