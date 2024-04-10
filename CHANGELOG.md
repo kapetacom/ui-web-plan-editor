@@ -1,3 +1,15 @@
+# [2.5.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.4.1...v2.5.0) (2024-04-10)
+
+
+### Bug Fixes
+
+* add highlight of invalid connection on hover ([b4a8b22](https://github.com/kapetacom/ui-web-plan-editor/commit/b4a8b22e1e8788fc082d616d4b0d7b3c55041eb7))
+
+
+### Features
+
+* connection action buttons now appear at cursor position ([98a68a6](https://github.com/kapetacom/ui-web-plan-editor/commit/98a68a6aac7d4540d72d16fbca442c5640d3935a))
+
 ## [2.4.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.4.0...v2.4.1) (2024-03-15)
 
 
