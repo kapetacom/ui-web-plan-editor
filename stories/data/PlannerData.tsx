@@ -77,7 +77,7 @@ export const ValidPlannerData: Plan = {
                 },
 
                 dimensions: {
-                    top: 300,
+                    top: 325,
                     width: 150,
                     left: 350,
                     height: -1,
@@ -154,6 +154,20 @@ export const ValidPlannerData: Plan = {
                         type: ConnectionMethodMappingType.EXACT,
                     },
                 },
+            },
+            {
+                provider: {
+                    resourceName: 'images',
+                    blockId: 'images',
+                },
+                consumer: {
+                    resourceName: 'images',
+                    blockId: 'todo-frontend',
+                },
+                port: {
+                    type: 'rest',
+                },
+                throw: true,
             },
         ],
     },
