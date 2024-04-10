@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { PlannerContext, PlannerContextData } from '../PlannerContext';
 import { PlannerNodeSize } from '../../types';
 import { ResourceRole } from '@kapeta/ui-web-types';
@@ -18,6 +18,7 @@ import {
     convertMatrixPathToPoints,
     findMatrixPath,
     getPathMidpoint,
+    nearestPointOnPath,
     replaceJoinsWithArcs,
 } from '../utils/connectionUtils/src/path';
 
@@ -116,7 +117,26 @@ export const PlannerConnection: React.FC<{
     clusterSize?: number;
 }> = (props) => {
     const planner = useContext(PlannerContext);
-    const [hasFocus, setHasFocus] = useState(false);
+    const [cursorState, setCursorState] = useState({ focus: true, position: { x: 0, y: 0 } });
+    const rootRef = useRef<SVGSVGElement>(null);
+
+    // Add some delay to make the actionButtons less intrusive
+    const [showActions, setShowActions] = useState(false);
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+
+        if (cursorState.focus) {
+            timeout = setTimeout(() => {
+                setShowActions(cursorState.focus);
+            }, 300);
+        } else {
+            setShowActions(false);
+        }
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [setShowActions, cursorState.focus]);
 
     const isTemp =
         props.connection.consumer.blockId === 'temp-block' &&
@@ -348,23 +368,45 @@ export const PlannerConnection: React.FC<{
         connection: props.connection,
     };
 
+    // Transform to relative to root svg ref
+    const getPosition = (evtX: number, evtY: number) => {
+        if (!rootRef.current) {
+            return { x: 0, y: 0 };
+        }
+        const rootX = rootRef.current.getBoundingClientRect().x;
+        const rootY = rootRef.current.getBoundingClientRect().y;
+        const x = (evtX - rootX) / (planner.zoom || 1);
+        const y = (evtY - rootY) / (planner.zoom || 1);
+
+        const pathP = nearestPointOnPath([x, y], points);
+
+        return { x: pathP[0], y: pathP[1] };
+    };
+
     return (
-        <svg style={{ position: 'absolute', zIndex: -1, top: 0, left: 0, ...props.style }}>
+        <svg style={{ position: 'absolute', zIndex: -1, top: 0, left: 0, ...props.style }} ref={rootRef}>
             <g
                 className={className.trim()}
-                onMouseEnter={() => {
+                onMouseEnter={(evt) => {
                     if (props.onMouseEnter) {
                         props.onMouseEnter(actionContext);
                     }
+                    setCursorState((state) => ({
+                        position: getPosition(evt.clientX, evt.clientY),
+                        focus: true,
+                    }));
                 }}
-                onMouseOver={() => {
+                onMouseOver={(evt) => {
                     if (props.onMouseOver) {
                         props.onMouseOver(actionContext);
                     }
-                    setHasFocus(true);
+                    setCursorState((state) => ({
+                        ...state,
+                        focus: true,
+                    }));
                 }}
                 onMouseOut={() => {
-                    setHasFocus(false);
+                    setCursorState((state) => ({ ...state, focus: false }));
                     if (props.onMouseLeave) {
                         props.onMouseLeave(actionContext);
                     }
@@ -392,13 +434,12 @@ export const PlannerConnection: React.FC<{
 
                             <path className="line" d={pathInfo.path} />
 
-                            {pathInfo.actionsPoint && props.actions && (
+                            {props.actions && (
                                 <ActionButtons
-                                    show={hasFocus}
+                                    show={showActions}
                                     pointType={pathInfo.pointType}
-                                    x={pathInfo.actionsPoint.x}
-                                    // TODO: how can we avoid the magic number?
-                                    y={pathInfo.actionsPoint.y - 5}
+                                    x={cursorState.position.x}
+                                    y={cursorState.position.y}
                                     actions={props.actions}
                                     actionContext={actionContext}
                                 />

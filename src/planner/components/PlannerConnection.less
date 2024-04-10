@@ -68,6 +68,16 @@
             stroke-dasharray: 5;
             stroke: @status-danger-bg;
         }
+
+        &.highlight {
+            .line {
+                stroke: darken(@status-danger-bg, 15%);
+            }
+
+            g.portal {
+                fill: darken(@status-danger-bg, 15%);
+            }
+        }
     }
 }
 

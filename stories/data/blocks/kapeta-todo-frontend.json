@@ -6,7 +6,14 @@
     },
     "spec": {
         "entities": [],
-        "consumers": [],
+        "consumers": [
+            {
+                "kind": "kapeta/resource-type-rest-client:1.2.3",
+                "metadata": {
+                    "name": "images"
+                }
+            }
+        ],
         "providers": [
             {
                 "kind": "kapeta/resource-type-web-page:1.2.3",

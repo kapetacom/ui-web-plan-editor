@@ -120,7 +120,14 @@ blocks.push(
         title: resource.metadata.title,
         type: ResourceProviderType.INTERNAL,
         role: ResourceRole.CONSUMES,
-        converters: [{ fromKind: 'kapeta/resource-type-rest-api' }],
+        converters: [
+            {
+                fromKind: 'kapeta/resource-type-rest-api',
+                validateMapping(connection, from, to) {
+                    return connection?.throw ? ['Invalid mapping!'] : [];
+                },
+            },
+        ],
         getCounterValue() {
             return 2;
         },
