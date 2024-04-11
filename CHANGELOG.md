@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.0...v2.5.1) (2024-04-11)
+
+
+### Bug Fixes
+
+* dont show actionButtons by default ([#159](https://github.com/kapetacom/ui-web-plan-editor/issues/159)) ([a39ad2c](https://github.com/kapetacom/ui-web-plan-editor/commit/a39ad2c1d77e8a03dd4f9c39471fbcb1c18eeb3c))
+
 # [2.5.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.4.1...v2.5.0) (2024-04-10)
 
 
