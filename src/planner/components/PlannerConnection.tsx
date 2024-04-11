@@ -117,7 +117,7 @@ export const PlannerConnection: React.FC<{
     clusterSize?: number;
 }> = (props) => {
     const planner = useContext(PlannerContext);
-    const [cursorState, setCursorState] = useState({ focus: true, position: { x: 0, y: 0 } });
+    const [cursorState, setCursorState] = useState({ focus: false, position: { x: 0, y: 0 } });
     const rootRef = useRef<SVGSVGElement>(null);
 
     // Add some delay to make the actionButtons less intrusive
