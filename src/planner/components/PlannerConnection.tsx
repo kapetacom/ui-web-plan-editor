@@ -370,7 +370,7 @@ export const PlannerConnection: React.FC<{
 
     // Transform to relative to root svg ref
     const getPosition = (evtX: number, evtY: number) => {
-        if (!rootRef.current) {
+        if (!rootRef.current || behaveAsPortal) {
             return { x: 0, y: 0 };
         }
         const rootX = rootRef.current.getBoundingClientRect().x;
@@ -391,6 +391,7 @@ export const PlannerConnection: React.FC<{
                     if (props.onMouseEnter) {
                         props.onMouseEnter(actionContext);
                     }
+
                     setCursorState((state) => ({
                         position: getPosition(evt.clientX, evt.clientY),
                         focus: true,
@@ -413,6 +414,10 @@ export const PlannerConnection: React.FC<{
                 }}
             >
                 {paths.map((pathInfo, ix) => {
+                    // If we are behaving as a portal, we want to show the actions at the portal points - since the line
+                    // is only drawn at the start and end points
+                    const xPosition = behaveAsPortal ? pathInfo.actionsPoint!.x : cursorState.position.x;
+                    const yPosition = behaveAsPortal ? pathInfo.actionsPoint!.y - 5 : cursorState.position.y;
                     return (
                         <g key={ix}>
                             <path className="mouse-catcher" d={pathInfo.path} />
@@ -438,8 +443,8 @@ export const PlannerConnection: React.FC<{
                                 <ActionButtons
                                     show={showActions}
                                     pointType={pathInfo.pointType}
-                                    x={cursorState.position.x}
-                                    y={cursorState.position.y}
+                                    x={xPosition}
+                                    y={yPosition}
                                     actions={props.actions}
                                     actionContext={actionContext}
                                 />
