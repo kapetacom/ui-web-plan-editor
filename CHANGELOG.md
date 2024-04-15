@@ -1,3 +1,10 @@
+## [2.5.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.1...v2.5.2) (2024-04-15)
+
+
+### Bug Fixes
+
+* Issue when dealing with portal connections ([#160](https://github.com/kapetacom/ui-web-plan-editor/issues/160)) ([6e02204](https://github.com/kapetacom/ui-web-plan-editor/commit/6e02204c12c3bb09bbc528fd63037a655ba1f948))
+
 ## [2.5.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.0...v2.5.1) (2024-04-11)
 
 
