@@ -45,7 +45,7 @@ export const calculateCanvasSize = (
                 return;
             }
             const blockHeight = getReservedBlockHeight(blockDefinition.content, size);
-            const blockWidth = dimensions.width;
+            const blockWidth = Math.max(dimensions.width, BLOCK_SIZE);
             const blockY = dimensions.top;
             const blockX = dimensions.left;
 
