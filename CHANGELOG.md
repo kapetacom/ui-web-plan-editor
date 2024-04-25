@@ -1,3 +1,10 @@
+## [2.5.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.2...v2.5.3) (2024-04-25)
+
+
+### Bug Fixes
+
+* use 150 block minWidth for canvas size calculations [CORE-2571] ([#161](https://github.com/kapetacom/ui-web-plan-editor/issues/161)) ([789f00c](https://github.com/kapetacom/ui-web-plan-editor/commit/789f00c2a54b17b28f1f7031a49d73c4dd046869))
+
 ## [2.5.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.1...v2.5.2) (2024-04-15)
 
 
