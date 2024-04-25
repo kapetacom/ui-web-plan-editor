@@ -36,8 +36,8 @@ export const ValidPlannerData: Plan = {
 
                 dimensions: {
                     top: 700,
-                    width: 150,
-                    left: 750,
+                    width: 0,
+                    left: 1250,
                     height: -1,
                 },
             },
