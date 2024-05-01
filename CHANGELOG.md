@@ -1,3 +1,10 @@
+## [2.5.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.3...v2.5.4) (2024-05-01)
+
+
+### Bug Fixes
+
+* Bump kaplang and ui libs ([f46b79a](https://github.com/kapetacom/ui-web-plan-editor/commit/f46b79a164f79e8257d0c607dbf383e948411f39))
+
 ## [2.5.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.2...v2.5.3) (2024-04-25)
 
 
