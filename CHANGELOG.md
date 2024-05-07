@@ -1,3 +1,10 @@
+## [2.5.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.4...v2.5.5) (2024-05-07)
+
+
+### Bug Fixes
+
+* Bump kapeta deps ([e4f8b3c](https://github.com/kapetacom/ui-web-plan-editor/commit/e4f8b3c127c22f9e82ab60b7e1ddbdf6133b68f8))
+
 ## [2.5.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.3...v2.5.4) (2024-05-01)
 
 
