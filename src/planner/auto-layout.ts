@@ -1,3 +1,7 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: BUSL-1.1
+ */
 import { BlockDefinition, Plan } from '@kapeta/schemas';
 import { AssetInfo, PlannerNodeSize } from '../types';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
@@ -24,6 +28,13 @@ function toEdgeId(providerId: string, consumerId: string) {
     return [providerId, consumerId].sort().join('-');
 }
 
+/**
+ * Will lay out blocks in a grid based on their connections:
+ * - Blocks with no connections will be placed in the first column
+ * - Subsequent columns will be decided by the connections from the previous column.
+ * - The chosen column will be the provider block in the right-most column that has a connection to the block + 1.
+ * - Each column is sorted by the total number of connections to and from the block.
+ */
 export function applyAutoLayout(
     plan: Plan,
     blocks: AssetInfo<BlockDefinition>[],
