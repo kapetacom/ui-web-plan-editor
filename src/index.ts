@@ -17,6 +17,7 @@ export * from './logs/LogPanel';
 export * from './utils/SVGDropShadow';
 export * from './utils/cryptoUtils';
 export * from './types';
+
 export { ResourceMode, BlockMode, PlannerMode } from './utils/enums';
 
 export { createDragAndDrop } from './planner/DragAndDrop/index';
@@ -54,3 +55,5 @@ export * from './panels/tools/BlockTypeToolList';
 export * from './panels/tools/BlockTypeTool';
 
 export * from './panels/tools/ResourceToolList';
+
+export * from './planner/auto-layout';
