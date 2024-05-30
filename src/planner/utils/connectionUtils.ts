@@ -20,7 +20,7 @@ import { parseKapetaUri } from '@kapeta/nodejs-utils';
 export const POINT_PADDING_X = 40;
 export const POINT_PADDING_Y = 20;
 export const CELL_SIZE = 30;
-export const MANY_CONNECTIONS_THRESHOLD = 3;
+export const MANY_CONNECTIONS_THRESHOLD = 8;
 
 export interface ResourceCluster {
     id: string;

@@ -31,6 +31,7 @@ import { PublicUrlList } from '../src/panels/tools/PublicUrlList';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 import './styles.less';
+import { applyAutoLayout } from '../src/planner/auto-layout';
 
 const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const planner = useContext(PlannerContext);
@@ -303,11 +304,17 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
 const PlanEditor = withPlannerContext(InnerPlanEditor);
 
 const PlannerLoader = (props: { planId?: string; instanceStatus: InstanceStatus; plannerMode: PlannerMode }) => {
-    const plan = useAsync(
-        () =>
-            props.planId === 'invalid' ? readInvalidPlan() : props.planId === 'wonky' ? readWonkyPlan() : readPlanV2(),
-        [props.planId]
-    );
+    const plan = useAsync(async () => {
+        const out = await (props.planId === 'invalid'
+            ? readInvalidPlan()
+            : props.planId === 'wonky'
+            ? readWonkyPlan()
+            : readPlanV2());
+
+        out.plan = applyAutoLayout(out.plan, out.blockAssets);
+
+        return out;
+    }, [props.planId]);
 
     const instanceStatuses = plan.value?.plan?.spec.blocks?.reduce((agg, blockInstance) => {
         agg[blockInstance.id] = props.instanceStatus;
@@ -329,7 +336,10 @@ const PlannerLoader = (props: { planId?: string; instanceStatus: InstanceStatus;
                     blockAssets={plan.value.blockAssets || []}
                     mode={props.plannerMode}
                     // eslint-disable-next-line no-console
-                    onChange={console.log}
+                    onChange={(changedPlan) => {
+                        console.log('plan changed', changedPlan);
+                        applyAutoLayout(changedPlan, plan.value?.blockAssets || []);
+                    }}
                     // eslint-disable-next-line no-console
                     onAssetChange={console.log}
                     instanceStates={instanceStatuses}
