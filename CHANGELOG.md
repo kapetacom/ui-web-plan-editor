@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.5...v2.6.0) (2024-05-30)
+
+
+### Features
+
+* Adds auto-layout method for laying out blocks in a plan ([#164](https://github.com/kapetacom/ui-web-plan-editor/issues/164)) ([8f881c4](https://github.com/kapetacom/ui-web-plan-editor/commit/8f881c4b8425287517e2238fba96dd7f62005345))
+
 ## [2.5.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.4...v2.5.5) (2024-05-07)
 
 
