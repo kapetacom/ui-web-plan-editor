@@ -14,6 +14,7 @@ import { PlannerActionConfig, PlannerContext } from '../PlannerContext';
 import { useFocusInfo } from '../utils/focusUtils';
 import { getResourceId } from '../utils/planUtils';
 import { ResourceRole } from '@kapeta/ui-web-types';
+import { useAtomValue } from 'jotai';
 
 const renderTempResources: (value: DnDContextType<PlannerPayload>) => ReactNode = ({ draggable }) => {
     return draggable && draggable.type === 'resource' ? (
@@ -121,6 +122,8 @@ export const PlannerConnections = (props: Props) => {
         return out;
     }, [connections, props.highlightedConnections]);
 
+    const hoveredChatUIValue = useAtomValue(planner.hoveredChatUIAtom);
+
     return (
         <>
             {connections.map((connection) => {
@@ -148,7 +151,9 @@ export const PlannerConnections = (props: Props) => {
                     firstForProvider = true;
                 }
 
-                let highlighted = props.highlightedConnections.includes(connectionId);
+                const highlighted =
+                    props.highlightedConnections.includes(connectionId) ||
+                    (hoveredChatUIValue?.type === 'connection' && hoveredChatUIValue.id === connection.id);
                 let showPortal = false;
                 if (firstForProvider && !providerHasHighlightedPortal[providerId]) {
                     showPortal = true;

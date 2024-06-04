@@ -26,6 +26,7 @@ import { getResourceId } from './utils/planUtils';
 import { DnDContainer } from './DragAndDrop/DnDContainer';
 import { cleanupConnections, connectionEquals } from './utils/connectionUtils';
 import { BlockResouceIconProps } from './components/BlockResourceIcon';
+import { PrimitiveAtom, atom } from 'jotai';
 
 export type BlockDefinitionReference = {
     ref: string;
@@ -43,7 +44,7 @@ export interface PlannerActionConfig {
     resource?: PlannerAction<any>[];
 }
 
-export interface PlannerContextData {
+export interface PlannerContextData<HoveredChatUIAtomValue = any> {
     plan?: Plan;
     asset?: AssetInfo<Plan>;
     uri?: KapetaURI;
@@ -160,9 +161,12 @@ export interface PlannerContextData {
     canvasSize: Rectangle;
 
     setCanvasSize(canvasSize: Rectangle): void;
+
+    setHoveredChatUIAtom: React.Dispatch<React.SetStateAction<PrimitiveAtom<HoveredChatUIAtomValue | null>>>;
+    hoveredChatUIAtom: PrimitiveAtom<HoveredChatUIAtomValue | null>;
 }
 
-const defaultValue: PlannerContextData = {
+const defaultValue: PlannerContextData<any> = {
     focusedBlock: undefined,
     mode: PlannerMode.VIEW,
     assetState: {
@@ -245,6 +249,9 @@ const defaultValue: PlannerContextData = {
 
     canvasSize: { x: 0, y: 0, width: 0, height: 0 },
     setCanvasSize() {},
+
+    setHoveredChatUIAtom() {},
+    hoveredChatUIAtom: atom(null),
 };
 
 export const PlannerContext = React.createContext(defaultValue);
@@ -259,7 +266,9 @@ export type PlannerContextProps = {
 };
 
 // Helper to make sure we memoize anything we can for the context
-export const usePlannerContext = (props: PlannerContextProps): PlannerContextData => {
+export const usePlannerContext = <HoveredChatUIAtomValue = any,>(
+    props: PlannerContextProps
+): PlannerContextData<HoveredChatUIAtomValue> => {
     //
     const [points, setPoints] = useState<{ [id: string]: Point }>(() => ({}));
     const addPoint = useCallback(
@@ -572,6 +581,8 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             };
         });
     }
+
+    const [hoveredChatUIAtom, setHoveredChatUIAtom] = useState<PrimitiveAtom<HoveredChatUIAtomValue | any>>(atom(null));
 
     return {
         // view state
@@ -953,12 +964,14 @@ export const usePlannerContext = (props: PlannerContextProps): PlannerContextDat
             );
         },
         connectionPoints,
+        setHoveredChatUIAtom,
+        hoveredChatUIAtom,
     };
 };
 
-export function withPlannerContext<T>(Inner: ExoticComponent<T & RefAttributes<HTMLElement>>) {
+export function withPlannerContext<T, HoveredChatUIAtom = any>(Inner: ExoticComponent<T & RefAttributes<HTMLElement>>) {
     return (props: T & JSX.IntrinsicAttributes & PlannerContextProps) => {
-        const context = usePlannerContext(props);
+        const context = usePlannerContext<HoveredChatUIAtom>(props);
         const rootRef = useRef(null);
         return (
             <PlannerContext.Provider value={context}>
