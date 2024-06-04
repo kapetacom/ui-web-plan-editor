@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.6.0...v2.7.0) (2024-06-04)
+
+
+### Features
+
+* Highlight connection on hover in chat UI ([605e098](https://github.com/kapetacom/ui-web-plan-editor/commit/605e098bd002df37661b4c8c64d44ce6b6d5a71c))
+
 # [2.6.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.5.5...v2.6.0) (2024-05-30)
 
 
