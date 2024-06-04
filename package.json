@@ -64,6 +64,7 @@
         "d3-selection": "^3.0.0",
         "d3-transition": "^3.0.1",
         "d3-zoom": "^3.0.0",
+        "jotai": "^2.8.3",
         "pathfinding": "^0.4.18"
     },
     "devDependencies": {
