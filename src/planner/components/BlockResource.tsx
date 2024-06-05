@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useCallback } from 'react';
+import React, { useContext } from 'react';
 import { toClass, createHexagonPath, Orientation } from '@kapeta/ui-web-utils';
 
 import { ResourceRole } from '@kapeta/ui-web-types';
@@ -14,6 +14,9 @@ import './BlockResource.less';
 import { ActionContext } from '../types';
 import { BlockResourceIcon } from './BlockResourceIcon';
 import { Tooltip } from '@kapeta/ui-web-components';
+import { Box } from '@mui/material';
+import { useAtomValue } from 'jotai';
+import { PlannerContext } from '../PlannerContext';
 
 interface PlannerResourceProps {
     size?: PlannerNodeSize;
@@ -58,12 +61,47 @@ export const BlockResource = (props: PlannerResourceProps) => {
 
     const padding = 8;
 
+    // Highlight the resource if it is hovered in the chat UI
+    const { hoveredChatUIAtom } = useContext(PlannerContext);
+    const hovered = useAtomValue(hoveredChatUIAtom);
+    let highlight = false;
+    if (
+        hovered?.blockRef === props.actionContext.blockInstance?.block.ref &&
+        hovered?.instanceId === props.actionContext.blockInstance?.id
+    ) {
+        if (hovered?.resourceName === props.name) {
+            if (hovered.type === 'api' && (props.typeName === 'rest api' || props.typeName === 'rest client')) {
+                highlight = true;
+            }
+            if (hovered.type === 'model' && (props.typeName === 'postgres' || props.typeName === 'mongodb')) {
+                highlight = true;
+            }
+        }
+    }
+
     return (
         <g className={resourceClass}>
             {props.type === 'operator' ? (
-                <rect className="block-resource-body" width={width} height={height} rx="3" ry="3" x="3" />
+                <Box
+                    component="rect"
+                    className="block-resource-body"
+                    width={width}
+                    height={height}
+                    rx="3"
+                    ry="3"
+                    x="3"
+                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3 } } : {}}
+                />
             ) : (
-                <path className="block-resource-body" d={hexagonPath} strokeLinejoin="round" rx="3" ry="3" />
+                <Box
+                    component="path"
+                    className="block-resource-body"
+                    d={hexagonPath}
+                    strokeLinejoin="round"
+                    rx="3"
+                    ry="3"
+                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3 } } : {}}
+                />
             )}
             <foreignObject width={maxTextWidth} className="block-resource-text resource-name" y={padding} x={textX}>
                 <plannerRenderer.Outlet id={PlannerOutlet.ResourceTitle} context={props.actionContext}>
