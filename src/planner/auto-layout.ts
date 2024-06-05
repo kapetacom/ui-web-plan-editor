@@ -100,11 +100,9 @@ export function applyAutoLayout(
 
             if (currentIndex === undefined) {
                 columns[blockId] = columnIndex;
-                console.log('setting', blockId, columnIndex);
                 changedAny = true;
             } else if (currentIndex < columnIndex) {
                 columns[blockId] = columnIndex;
-                console.log('updating', blockId, columnIndex);
                 changedAny = true;
             }
         });
