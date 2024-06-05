@@ -298,9 +298,9 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 <Typography variant="body1" fontWeight={500} sx={{ mt: 4, mb: 1 }}>
                     Blocks
                 </Typography>
-                {planner.plan?.spec.blocks.map((block) => (
+                {planner.plan?.spec.blocks.map((block, index) => (
                     <Typography
-                        key={block.ref}
+                        key={`block_${index}`}
                         variant="body2"
                         sx={{ mb: 1 }}
                         onMouseEnter={() =>
@@ -320,9 +320,9 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 <Typography variant="body1" fontWeight={500} sx={{ mt: 4, mb: 1 }}>
                     Connections
                 </Typography>
-                {planner.plan?.spec.connections.map((connection) => (
+                {planner.plan?.spec.connections.map((connection, index) => (
                     <Typography
-                        key={connection.id}
+                        key={`connection_${index}`}
                         variant="body2"
                         sx={{ mb: 1 }}
                         onMouseEnter={() =>
@@ -340,17 +340,17 @@ const InnerPlanEditor = forwardRef<HTMLDivElement, {}>((props: any, forwardedRef
                 <Typography variant="body1" fontWeight={500} sx={{ mt: 4, mb: 1 }}>
                     Resources
                 </Typography>
-                {planner.plan?.spec.blocks.map((block) => {
+                {planner.plan?.spec.blocks.map((block, blockIdx) => {
                     const blockDef = planner.getBlockById(block.id);
                     const providers = blockDef?.spec?.providers || [];
                     const consumers = blockDef?.spec?.consumers || [];
                     const resources = providers.concat(consumers);
-                    return resources.map((resource) => {
+                    return resources.map((resource, resourceIdx) => {
                         const resourceType = getResourceTypeFromKind(resource.kind);
 
                         return resourceType ? (
                             <Typography
-                                key={resource.metadata.name}
+                                key={`block_${blockIdx}_resource_${resourceIdx}`}
                                 variant="body2"
                                 sx={{ mb: 1 }}
                                 onMouseEnter={() => {
