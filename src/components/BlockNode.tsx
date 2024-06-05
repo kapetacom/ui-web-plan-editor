@@ -60,7 +60,7 @@ export const BlockNode = (props: BlockNodeProps) => {
                     component="path"
                     className="block-body block-border"
                     d={path}
-                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3 } } : {}}
+                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3, strokeOpacity: 1 } } : {}}
                 />
 
                 <PlannerBlockWarningTag

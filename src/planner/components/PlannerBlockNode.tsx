@@ -23,12 +23,14 @@ import { copyResourceToBlock } from '../utils/blockUtils';
 import { createConnection, ResourceCluster } from '../utils/connectionUtils';
 import { useBlockValidation } from '../hooks/block-validation';
 import { BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
-import { BlockLayout } from '@kapeta/ui-web-components';
+import { BlockLayout, useBlock } from '@kapeta/ui-web-components';
 
 import './PlannerBlockNode.less';
 import { withErrorBoundary } from 'react-error-boundary';
 import { Resource } from '@kapeta/schemas';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
+import { Box } from '@mui/material';
+import { useAtomValue } from 'jotai';
 
 export function adjustBlockEdges(point: Point) {
     if (point.x < 220) {
@@ -185,6 +187,19 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
         }
 
         return true;
+    }
+
+    // Highlight the block if it is hovered in the chat UI
+    const { hoveredChatUIAtom } = useContext(PlannerContext);
+    const hovered = useAtomValue(hoveredChatUIAtom);
+    const block = useBlock();
+    let highlight = false;
+    if (
+        (hovered?.type === 'block' || hovered?.type === 'type') &&
+        hovered?.blockRef === block.instance?.block.ref &&
+        hovered?.instanceId === block.instance?.id
+    ) {
+        highlight = true;
     }
 
     return (
@@ -416,7 +431,22 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                     }}
                                 >
                                     {({ onRef }) => (
-                                        <g {...evt.componentProps} ref={onRef}>
+                                        <Box
+                                            component="g"
+                                            {...evt.componentProps}
+                                            ref={onRef}
+                                            sx={
+                                                highlight
+                                                    ? {
+                                                          '&& .block-node > .block-border': {
+                                                              stroke: '#651FFF',
+                                                              strokeWidth: 3,
+                                                              strokeOpacity: 1,
+                                                          },
+                                                      }
+                                                    : {}
+                                            }
+                                        >
                                             {blockContext.blockDefinition ? (
                                                 <BlockLayout
                                                     definition={blockContext.blockDefinition}
@@ -463,7 +493,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                     <code>{blockContext.blockInstance.block.ref}</code>
                                                 </foreignObject>
                                             )}
-                                        </g>
+                                        </Box>
                                     )}
                                 </DragAndDrop.DropZone>
                             </g>
