@@ -192,12 +192,11 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     // Highlight the block if it is hovered in the chat UI
     const { hoveredChatUIAtom } = useContext(PlannerContext);
     const hovered = useAtomValue(hoveredChatUIAtom);
-    const block = useBlock();
     let highlight = false;
     if (
         (hovered?.type === 'block' || hovered?.type === 'type') &&
-        hovered?.blockRef === block.instance?.block.ref &&
-        hovered?.instanceId === block.instance?.id
+        hovered?.blockRef === blockContext.blockInstance.block.ref &&
+        hovered?.instanceId === blockContext.blockInstance.id
     ) {
         highlight = true;
     }
