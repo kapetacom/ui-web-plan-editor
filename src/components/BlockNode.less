@@ -3,7 +3,7 @@
 
 @kapeta-text-primary: #000000de;
 @kapeta-block-bg: #ffffff;
-@kapeta-block-outline: rgba(0, 0, 0, 0.12);
+@kapeta-block-outline: #000000;
 
 .block-node {
     overflow: visible;
@@ -49,15 +49,16 @@
 
     .block-body {
         .transition(fill 150ms);
-        fill: @kapeta-block-bg;
-        
+        fill: @kapeta-block-bg;        
     }
 
     .block-border {
         .transition(stroke 150ms);
         .transition(stroke-width 150ms);
+        .transition(stroke-opacity 150ms);
         stroke: @kapeta-block-outline;
         stroke-width: 1.5;
+        stroke-opacity: 0.12;
     }
 
     .block-body-text {
