@@ -192,12 +192,11 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     // Highlight the block if it is hovered in the chat UI
     const { hoveredChatUIAtom } = useContext(PlannerContext);
     const hovered = useAtomValue(hoveredChatUIAtom);
-    const block = useBlock();
     let highlight = false;
     if (
         (hovered?.type === 'block' || hovered?.type === 'type') &&
-        hovered?.blockRef === block.instance?.block.ref &&
-        hovered?.instanceId === block.instance?.id
+        hovered?.blockRef === blockContext.blockInstance.block.ref &&
+        hovered?.instanceId === blockContext.blockInstance.id
     ) {
         highlight = true;
     }
@@ -430,71 +429,73 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                         blockContext.setBlockMode(BlockMode.HIDDEN);
                                     }}
                                 >
-                                    {({ onRef }) => (
-                                        <Box
-                                            component="g"
-                                            {...evt.componentProps}
-                                            ref={onRef}
-                                            sx={
-                                                highlight
-                                                    ? {
-                                                          '&& .block-node > .block-border': {
-                                                              stroke: '#651FFF',
-                                                              strokeWidth: 3,
-                                                              strokeOpacity: 1,
-                                                          },
-                                                      }
-                                                    : {}
-                                            }
-                                        >
-                                            {blockContext.blockDefinition ? (
-                                                <BlockLayout
-                                                    definition={blockContext.blockDefinition}
-                                                    instance={blockContext.blockInstance}
-                                                    readOnly={!canEditInstance}
-                                                    status={blockContext.instanceStatus}
-                                                    onInstanceNameChange={(name) => {
-                                                        planner.updateBlockInstance(
-                                                            blockContext.blockInstance.id,
-                                                            (block) => ({
-                                                                ...block,
-                                                                name,
-                                                            })
-                                                        );
-                                                    }}
-                                                >
-                                                    <NodeComponent
-                                                        block={blockContext.blockDefinition}
+                                    {({ onRef }) => {
+                                        return (
+                                            <Box
+                                                component="g"
+                                                {...evt.componentProps}
+                                                ref={onRef}
+                                                sx={
+                                                    highlight
+                                                        ? {
+                                                              '&& .block-node > .block-border': {
+                                                                  stroke: '#651FFF',
+                                                                  strokeWidth: 3,
+                                                                  strokeOpacity: 1,
+                                                              },
+                                                          }
+                                                        : {}
+                                                }
+                                            >
+                                                {blockContext.blockDefinition ? (
+                                                    <BlockLayout
+                                                        definition={blockContext.blockDefinition}
                                                         instance={blockContext.blockInstance}
                                                         readOnly={!canEditInstance}
+                                                        status={blockContext.instanceStatus}
+                                                        onInstanceNameChange={(name) => {
+                                                            planner.updateBlockInstance(
+                                                                blockContext.blockInstance.id,
+                                                                (block) => ({
+                                                                    ...block,
+                                                                    name,
+                                                                })
+                                                            );
+                                                        }}
+                                                    >
+                                                        <NodeComponent
+                                                            block={blockContext.blockDefinition}
+                                                            instance={blockContext.blockInstance}
+                                                            readOnly={!canEditInstance}
+                                                            width={blockContext.instanceBlockWidth}
+                                                            height={blockContext.instanceBlockHeight}
+                                                            valid={isValid}
+                                                            errors={errors}
+                                                            onWarningClick={onWarningClick}
+                                                        />
+                                                    </BlockLayout>
+                                                ) : (
+                                                    <foreignObject
                                                         width={blockContext.instanceBlockWidth}
                                                         height={blockContext.instanceBlockHeight}
-                                                        valid={isValid}
-                                                        errors={errors}
-                                                        onWarningClick={onWarningClick}
-                                                    />
-                                                </BlockLayout>
-                                            ) : (
-                                                <foreignObject
-                                                    width={blockContext.instanceBlockWidth}
-                                                    height={blockContext.instanceBlockHeight}
-                                                    style={{ textAlign: 'center' }}
-                                                >
-                                                    <BlockNode
-                                                        height={blockContext.instanceBlockHeight}
-                                                        width={blockContext.instanceBlockWidth}
-                                                        readOnly={!canEditInstance}
-                                                        errors={errors}
-                                                        valid={isValid}
-                                                        onWarningClick={onWarningClick}
-                                                    />
-                                                    <p>Failed to load</p>
-                                                    <pre>{blockContext.blockInstance.name}</pre>
-                                                    <code>{blockContext.blockInstance.block.ref}</code>
-                                                </foreignObject>
-                                            )}
-                                        </Box>
-                                    )}
+                                                        style={{ textAlign: 'center' }}
+                                                    >
+                                                        <BlockNode
+                                                            height={blockContext.instanceBlockHeight}
+                                                            width={blockContext.instanceBlockWidth}
+                                                            readOnly={!canEditInstance}
+                                                            errors={errors}
+                                                            valid={isValid}
+                                                            onWarningClick={onWarningClick}
+                                                        />
+                                                        <p>Failed to load</p>
+                                                        <pre>{blockContext.blockInstance.name}</pre>
+                                                        <code>{blockContext.blockInstance.block.ref}</code>
+                                                    </foreignObject>
+                                                )}
+                                            </Box>
+                                        );
+                                    }}
                                 </DragAndDrop.DropZone>
                             </g>
                             <g>
