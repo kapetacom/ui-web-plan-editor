@@ -1,3 +1,10 @@
+## [2.8.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.0...v2.8.1) (2024-06-06)
+
+
+### Bug Fixes
+
+* Use stroke opacity ([102aa9d](https://github.com/kapetacom/ui-web-plan-editor/commit/102aa9d082c58ed4e26c93e4433430b0ed9070f9))
+
 # [2.8.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.7.0...v2.8.0) (2024-06-06)
 
 
