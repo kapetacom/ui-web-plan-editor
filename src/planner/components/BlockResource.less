@@ -2,7 +2,7 @@
 @import '~@kapeta/ui-web-components/styles/functions';
 
 @kapeta-block-resource-background: #ffffff;
-@kapeta-block-outline: rgba(0, 0, 0, 0.12);
+@kapeta-block-outline: #000000;
 
 .block-resource {
     position: relative;
@@ -18,7 +18,8 @@
     .block-resource-body {
         fill: @kapeta-block-resource-background;
         stroke: @kapeta-block-outline;
-        transition: stroke 0.2s ease, stroke-width 0.2s ease;
+        stroke-opacity: 0.12;
+        transition: stroke 0.2s ease, stroke-width 0.2s ease, stroke-opacity 0.2s ease;
     }
 
     .block-resource-text {

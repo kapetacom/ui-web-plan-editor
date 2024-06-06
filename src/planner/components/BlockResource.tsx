@@ -90,7 +90,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
                     rx="3"
                     ry="3"
                     x="3"
-                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3 } } : {}}
+                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3, strokeOpacity: 1 } } : {}}
                 />
             ) : (
                 <Box
@@ -100,7 +100,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
                     strokeLinejoin="round"
                     rx="3"
                     ry="3"
-                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3 } } : {}}
+                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3, strokeOpacity: 1 } } : {}}
                 />
             )}
             <foreignObject width={maxTextWidth} className="block-resource-text resource-name" y={padding} x={textX}>
