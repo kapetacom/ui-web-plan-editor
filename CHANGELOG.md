@@ -1,3 +1,16 @@
+# [2.8.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.7.0...v2.8.0) (2024-06-06)
+
+
+### Bug Fixes
+
+* Also highlight "special" blocks ([ebc4345](https://github.com/kapetacom/ui-web-plan-editor/commit/ebc43454cdb099a08703ded4c7cddd4431930b20))
+
+
+### Features
+
+* Highlight blocks ([67a8527](https://github.com/kapetacom/ui-web-plan-editor/commit/67a852759bb7bb02f95d4b8b8de26278b2a4d0e4))
+* Highlight resources ([ffe026c](https://github.com/kapetacom/ui-web-plan-editor/commit/ffe026c5e831da9df74f3505a99eabafe698f4ad))
+
 # [2.7.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.6.0...v2.7.0) (2024-06-04)
 
 
