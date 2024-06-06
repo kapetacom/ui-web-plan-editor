@@ -3,16 +3,19 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { createHexagonPath, Orientation, toClass } from '@kapeta/ui-web-utils';
 
 import './BlockNode.less';
 import { PlannerBlockWarningTag } from './PlannerBlockWarningTag';
-import { BlockStatus, Tooltip, useBlock } from '@kapeta/ui-web-components';
+import { BlockStatus, useBlock } from '@kapeta/ui-web-components';
 import { BlockInstanceName } from '@kapeta/ui-web-components';
 import { BlockName } from '@kapeta/ui-web-components';
 import { BlockHandle } from '@kapeta/ui-web-components';
 import { BlockVersion } from '@kapeta/ui-web-components';
+import { Box } from '@mui/material';
+import { PlannerContext } from '../planner/PlannerContext';
+import { useAtomValue } from 'jotai';
 
 interface BlockNodeProps {
     height: number;
@@ -38,10 +41,27 @@ export const BlockNode = (props: BlockNodeProps) => {
     const path = createHexagonPath(props.width, props.height, 5, Orientation.VERTICAL, pointSize);
     const centeredX = props.width / 2;
 
+    // Highlight the block if it is hovered in the chat UI
+    const { hoveredChatUIAtom } = useContext(PlannerContext);
+    const hovered = useAtomValue(hoveredChatUIAtom);
+    let highlight = false;
+    if (
+        (hovered?.type === 'block' || hovered?.type === 'type') &&
+        hovered?.blockRef === block.instance?.block.ref &&
+        hovered?.instanceId === block.instance?.id
+    ) {
+        highlight = true;
+    }
+
     return (
         <>
             <g className={className} x={50}>
-                <path className="block-body" d={path} />
+                <Box
+                    component="path"
+                    className="block-body block-border"
+                    d={path}
+                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3, strokeOpacity: 1 } } : {}}
+                />
 
                 <PlannerBlockWarningTag
                     show={props.valid === false}
