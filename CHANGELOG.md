@@ -1,3 +1,10 @@
+## [2.8.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.1...v2.8.2) (2024-06-06)
+
+
+### Bug Fixes
+
+* Fix block reference ([3e40722](https://github.com/kapetacom/ui-web-plan-editor/commit/3e4072215af0ba8f439f79ec434aa974cb276f90))
+
 ## [2.8.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.0...v2.8.1) (2024-06-06)
 
 
