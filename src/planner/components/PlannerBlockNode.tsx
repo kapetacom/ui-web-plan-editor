@@ -212,9 +212,13 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
             }}
         >
             {(evt) => {
+                const startPoint = adjustBlockEdges({
+                    x: blockContext.blockInstance.dimensions!.left,
+                    y: blockContext.blockInstance.dimensions!.top,
+                });
                 let point: Point = adjustBlockEdges({
-                    x: blockContext.blockInstance.dimensions!.left + evt.zone.diff.x / planner.zoom,
-                    y: blockContext.blockInstance.dimensions!.top + evt.zone.diff.y / planner.zoom,
+                    x: startPoint.x + evt.zone.diff.x / planner.zoom,
+                    y: startPoint.y + evt.zone.diff.y / planner.zoom,
                 });
 
                 if (focusInfo) {

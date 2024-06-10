@@ -31,8 +31,9 @@ const toBlockPoint = (mousePoint: Point, zoom: number): Point => {
 
 const blockPositionUpdater = (diff: Point, zoom: number) => (block: BlockInstance) => {
     const point = toBlockPoint(diff, zoom);
-    point.x += block.dimensions!.left;
-    point.y += block.dimensions!.top;
+    const originalPosition = adjustBlockEdges({ x: block.dimensions.left, y: block.dimensions.top });
+    point.x += originalPosition.x;
+    point.y += originalPosition.y;
     adjustBlockEdges(point);
 
     return {
