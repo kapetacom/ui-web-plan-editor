@@ -1,3 +1,10 @@
+## [2.8.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.2...v2.8.3) (2024-06-10)
+
+
+### Bug Fixes
+
+* include block offsets in initial drag position calculations [CORE-3020] ([#169](https://github.com/kapetacom/ui-web-plan-editor/issues/169)) ([f039166](https://github.com/kapetacom/ui-web-plan-editor/commit/f0391661325a00280ad5fe7a29628ffe5c6008b8))
+
 ## [2.8.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.1...v2.8.2) (2024-06-06)
 
 
