@@ -1,3 +1,10 @@
+## [2.8.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.3...v2.8.4) (2024-06-13)
+
+
+### Bug Fixes
+
+* guard against infinite loop in layout algorithm ([#170](https://github.com/kapetacom/ui-web-plan-editor/issues/170)) ([6f8a4fc](https://github.com/kapetacom/ui-web-plan-editor/commit/6f8a4fcd5920cbc115eefd2d942c14f2591f5ec1))
+
 ## [2.8.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.2...v2.8.3) (2024-06-10)
 
 
