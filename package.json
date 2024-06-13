@@ -68,6 +68,7 @@
         "pathfinding": "^0.4.18"
     },
     "devDependencies": {
+        "@jest/globals": "^29.7.0",
         "@kapeta/kaplang-core": "^1.13.0",
         "@kapeta/nodejs-utils": "^0.1.3",
         "@kapeta/prettier-config": "^0.6.2",

@@ -22,6 +22,7 @@ interface LayoutOptions {
     nodeWidth: number;
     marginX: number;
     marginY: number;
+    maxIterations?: number;
 }
 
 function toEdgeId(providerId: string, consumerId: string) {
@@ -74,8 +75,9 @@ export function applyAutoLayout(
         }
     });
 
+    const maxIterations = options?.maxIterations ?? 500;
     const columns: { [key: string]: number } = {};
-    while (true) {
+    for (let iteration = 0; iteration < maxIterations; iteration++) {
         let changedAny = false;
         const visitedEdges: { [key: string]: boolean } = {};
         graph.blockIds().forEach((blockId) => {
@@ -230,7 +232,7 @@ class GraphHandler {
 
         this.plan.spec.connections.forEach((connection) => {
             const key = `${connection.provider.blockId}-${connection.consumer.blockId}`;
-            if (!uniqueEdges[key]) {
+            if (!uniqueEdges[key] && connection.consumer.blockId !== connection.provider.blockId) {
                 uniqueEdges[key] = true;
                 edges.push({
                     consumerId: connection.consumer.blockId,
