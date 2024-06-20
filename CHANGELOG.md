@@ -1,3 +1,10 @@
+## [2.8.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.4...v2.8.5) (2024-06-20)
+
+
+### Bug Fixes
+
+* Tweak BlockInspectorPanel (dark mode) ([94f4eea](https://github.com/kapetacom/ui-web-plan-editor/commit/94f4eea59c716b11840323b5f7554847bf531ed4))
+
 ## [2.8.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.3...v2.8.4) (2024-06-13)
 
 
