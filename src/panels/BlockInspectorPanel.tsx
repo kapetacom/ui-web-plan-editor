@@ -4,13 +4,12 @@
  */
 
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
-import './BlockInspectorPanel.less';
 import { BlockDefinition, BlockInstance } from '@kapeta/schemas';
 import { LogEntry, LogPanel } from '../logs/LogPanel';
 import { PlannerContext } from '../planner/PlannerContext';
 import { useBlockValidationIssues } from '../planner/hooks/block-validation';
 import { PlannerSidebar } from './PlannerSidebar';
-import { Box, Stack, Tab, Tabs } from '@mui/material';
+import { Box, List, ListItem, Stack, Tab, Tabs, Typography } from '@mui/material';
 
 interface BlockInspectorPanelProps {
     instance?: BlockInstance;
@@ -63,7 +62,7 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
         return () => {
             elm.removeEventListener('scroll', handler);
         };
-    }, [scrollContainer.current, scrolledToBottom, setScrolledToBottom]);
+    }, [scrolledToBottom, setScrolledToBottom]);
 
     useEffect(() => {
         if (!scrollContainer.current) {
@@ -81,17 +80,16 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
         <PlannerSidebar title={title} open={props.open} size="large" onClose={props.onClosed} minWidth={400}>
             {props.instance && (
                 <Stack
-                    direction={'column'}
-                    className="item-inspector-panel"
+                    direction="column"
                     sx={{
                         height: '100%',
                     }}
                 >
                     <Tabs value={tab} onChange={(evt, newTabId) => setTab(newTabId)}>
-                        {props.logs && <Tab label={'Logs'} value={'logs'} data-kap-id="block-inspector-log-tab" />}
+                        {props.logs && <Tab label="Logs" value="logs" data-kap-id="block-inspector-log-tab" />}
                         <Tab
                             label={`Issues (${issues.length})`}
-                            value={'issues'}
+                            value="issues"
                             data-kap-id="block-inspector-issues-tab"
                         />
                     </Tabs>
@@ -108,25 +106,32 @@ export const BlockInspectorPanel = (props: BlockInspectorPanelProps) => {
                         </Box>
                     )}
                     {tab === 'issues' && (
-                        <Box flex={1} className="issues-container">
+                        <Box sx={{ flex: 1, p: 2 }}>
                             {(!valid && (
                                 <>
-                                    <span>Found the following issues in block</span>
-                                    <ul className="issues-list">
+                                    <Typography variant="body2" component="span">
+                                        Found the following issues in block
+                                    </Typography>
+                                    <List>
                                         {issues.map((issue, ix) => {
                                             return (
-                                                <li key={`issue_${ix}`}>
-                                                    <div className="issue-context">
-                                                        <span className="level">{issue.level}</span>:
-                                                        <span className="name">{issue.name}</span>
-                                                    </div>
-                                                    <div className="issue-message">{issue.issue}</div>
-                                                </li>
+                                                <ListItem key={`issue_${ix}`} divider sx={{ px: 0 }}>
+                                                    <Box sx={{ fontSize: '12px' }}>
+                                                        <Typography variant="body2">
+                                                            {issue.level}: <strong>{issue.name}</strong>
+                                                        </Typography>
+                                                        <Typography variant="body2">{issue.issue}</Typography>
+                                                    </Box>
+                                                </ListItem>
                                             );
                                         })}
-                                    </ul>
+                                    </List>
                                 </>
-                            )) || <span>No issues found</span>}
+                            )) || (
+                                <Typography variant="body2" component="span">
+                                    No issues found
+                                </Typography>
+                            )}
                         </Box>
                     )}
                 </Stack>
