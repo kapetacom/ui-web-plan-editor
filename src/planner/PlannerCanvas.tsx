@@ -21,6 +21,7 @@ import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { adjustBlockEdges } from './components/PlannerBlockNode';
 import { ReferenceValidationError, usePlanValidation } from './validation/PlanReferenceValidation';
 import { ZoomPanContainer, InitialZoomPanViewOptions } from './ZoomAndPan/ZoomPanContainer';
+import { useTheme } from '@mui/material';
 
 const toBlockPoint = (mousePoint: Point, zoom: number): Point => {
     return {
@@ -124,6 +125,8 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
         [setZoomLevel, setPanOffset]
     );
 
+    const isDarkMode = useTheme().palette.mode === 'dark';
+
     return (
         <div className={`planner-area-container ${classNames}`} data-kap-id="plan-editor-canvas">
             <div className={focusToolbar}>
@@ -187,6 +190,8 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                         sx={{
                             width: '100%',
                             height: '100%',
+                            // If dark mode set background color, otherwise let it use the LESS variable
+                            backgroundColor: isDarkMode ? '#1E2020' : undefined,
                         }}
                         showPixelGrid={props.showPixelGrid}
                         isDraggingChild={isDragging}
