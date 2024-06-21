@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { ZoomPanContainer } from '../../src/planner/ZoomAndPan/ZoomPanContainer';
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { Rectangle } from '../../src/planner/types';
 
 export default {
@@ -30,6 +30,7 @@ const getBlockStyle = (x: number, y: number) => ({
 });
 
 export const ZoomAndPanDemo = () => {
+    const isDarkMode = useTheme().palette.mode === 'dark';
     const blocks: Rectangle[] = [
         {
             x: 50,
@@ -56,7 +57,7 @@ export const ZoomAndPanDemo = () => {
             sx={{
                 width: '100%',
                 height: '100%',
-                background: '#f5f1ee',
+                background: isDarkMode ? '#1E2020' : '#f5f1ee',
             }}
             childrenBBox={calculateCombinedBoundingBox(blocks)}
             onZoomPanStart={() => console.log('ZoomPanStart')}
