@@ -190,8 +190,11 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                         sx={{
                             width: '100%',
                             height: '100%',
-                            // If dark mode set background color, otherwise let it use the LESS variable
-                            backgroundColor: isDarkMode ? '#1E2020' : undefined,
+                            // When in dark mode set background color, otherwise let it use the LESS variable
+                            ...(isDarkMode && {
+                                // Beating specificity with &&&
+                                '&&&': { backgroundColor: '#1E2020' },
+                            }),
                         }}
                         showPixelGrid={props.showPixelGrid}
                         isDraggingChild={isDragging}
