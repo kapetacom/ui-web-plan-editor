@@ -1,3 +1,16 @@
+# [2.9.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.5...v2.9.0) (2024-06-24)
+
+
+### Bug Fixes
+
+* Make sure planner canvas background specificity wins ([884af96](https://github.com/kapetacom/ui-web-plan-editor/commit/884af96af9437e3083a363239044f5110c01ce6f))
+
+
+### Features
+
+* Dark mode planner background ([579d312](https://github.com/kapetacom/ui-web-plan-editor/commit/579d3129559197d04d66923434c9b68ea975877a))
+* Dark mode ZoomPanControls ([ddc6e6c](https://github.com/kapetacom/ui-web-plan-editor/commit/ddc6e6cd5d2bff8d9a7740cd0ecd23f281e9d709))
+
 ## [2.8.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.4...v2.8.5) (2024-06-20)
 
 
