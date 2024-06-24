@@ -20,9 +20,9 @@ export default {
 
 export const BackgroundDemo = () => {
     const items: ZoomPanBackgroundProps[] = [
-        { color: 'black', variant: BackgroundVariant.Dots },
-        { color: 'black', variant: BackgroundVariant.Lines },
-        { color: 'black', variant: BackgroundVariant.Cross },
+        { variant: BackgroundVariant.Dots },
+        { variant: BackgroundVariant.Lines },
+        { variant: BackgroundVariant.Cross },
         { color: '#e4e4e4', variant: BackgroundVariant.Dots },
         { color: '#e4e4e4', variant: BackgroundVariant.Lines },
         { color: '#e4e4e4', variant: BackgroundVariant.Cross },

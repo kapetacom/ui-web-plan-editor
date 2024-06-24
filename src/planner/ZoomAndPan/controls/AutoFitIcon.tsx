@@ -15,7 +15,7 @@ export interface AutoFitIconProps extends BoxProps {
 }
 
 export const AutoFitIcon = forwardRef<HTMLDivElement, AutoFitIconProps>((props, ref) => {
-    const { autoFit, color = 'inherit', size = 24, sx, ...boxProps } = props;
+    const { autoFit, color = 'currentColor', size = 24, sx, ...boxProps } = props;
 
     const scaledSize = 24 * (size / 24);
 

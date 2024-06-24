@@ -12,6 +12,7 @@
 import React, { forwardRef, memo, useId, useImperativeHandle } from 'react';
 import { DotPattern, LinePattern } from './ZoomPanBackgroundPatterns';
 import { CSSProperties } from 'react';
+import { useTheme } from '@mui/material';
 
 export enum BackgroundVariant {
     Lines = 'lines',
@@ -23,6 +24,12 @@ const variantColor = {
     [BackgroundVariant.Dots]: 'rgba(187, 132, 90, 0.2)',
     [BackgroundVariant.Lines]: 'rgba(187, 132, 90, 0.1)',
     [BackgroundVariant.Cross]: 'rgba(187, 132, 90, 0.15)',
+};
+
+const variantColorDark = {
+    [BackgroundVariant.Dots]: '#323639',
+    [BackgroundVariant.Lines]: '#323639',
+    [BackgroundVariant.Cross]: '#323639',
 };
 
 const variantSize = {
@@ -64,8 +71,11 @@ export const ZoomPanBackgroundUnmemoized = forwardRef<ZoomPanBackgroundHandle, Z
         className,
     } = props;
 
+    const theme = useTheme();
+    const isDarkMode = theme.palette.mode === 'dark';
+
     const [transform, setTransform] = React.useState([0, 0, 1]);
-    const patternColor = color || variantColor[variant];
+    const patternColor = color || (isDarkMode ? variantColorDark[variant] : variantColor[variant]);
     const baseSize = size || variantSize[variant];
     const scaledSize = baseSize * transform[2]; // Apply zoom scaling
     const isDots = variant === BackgroundVariant.Dots;

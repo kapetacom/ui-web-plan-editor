@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: BUSL-1.1
  */
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, BoxProps, Button, ButtonGroup, styled } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -29,23 +29,27 @@ export interface ZoomPanControlsProps extends BoxProps {
     onUnlock?: () => void;
 }
 
-const StyledButtonGroup = styled(ButtonGroup)(({ theme }) => ({
-    boxShadow: '0 0 2px 1px #00000014',
-    '.MuiButtonGroup-grouped': {
-        width: '30px',
-        minWidth: '30px',
-        maxWidth: '30px',
-        borderColor: 'rgb(245 241 238)',
-        backgroundColor: '#ffffff',
-        '&:hover': {
-            backgroundColor: '#f5f5f5',
+const StyledButtonGroup = styled(ButtonGroup)(({ theme }) => {
+    const isDarkMode = theme.palette.mode === 'dark';
+
+    return {
+        boxShadow: '0 0 2px 1px #00000014',
+        '.MuiButtonGroup-grouped': {
+            width: '30px',
+            minWidth: '30px',
+            maxWidth: '30px',
+            borderColor: isDarkMode ? '#666666' : '#f5f1ee',
+            backgroundColor: isDarkMode ? '#474747' : '#ffffff',
+            '&:hover': {
+                backgroundColor: isDarkMode ? '#5a5a5a' : '#f5f5f5',
+            },
+            '&.selected': {
+                backgroundColor: isDarkMode ? '#6e6e6e' : '#eadad1',
+                boxShadow: isDarkMode ? 'inset 0 0px 3px 0 rgba(0,0,0,0.2)' : 'inset 0 0 2px 0 rgba(0,0,0,0.1)',
+            },
         },
-        '&.selected': {
-            backgroundColor: 'rgb(234,218,209)',
-            boxShadow: 'inset 0 0 2px 0 rgba(0,0,0,0.1)',
-        },
-    },
-}));
+    };
+});
 
 export const ZoomPanControls = (props: ZoomPanControlsProps) => {
     const {
@@ -130,17 +134,17 @@ export const ZoomPanControls = (props: ZoomPanControlsProps) => {
                     <Box
                         ref={currentZoomRef}
                         component="span"
-                        sx={{
+                        sx={(theme) => ({
                             position: 'absolute',
                             top: '-25px',
                             left: '50%',
-                            color: 'rgba(0,0,0,0.5)',
+                            color: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.5)',
                             fontSize: '0.8rem',
                             // As default the zoom value is hidden
                             opacity: 0,
                             transform: 'translateX(-50%) translateY(10px)',
                             transition: 'opacity 300ms ease-in-out, transform 300ms ease-in-out',
-                        }}
+                        })}
                     >
                         {Math.round(currentZoom * 100)}%
                     </Box>
