@@ -186,6 +186,7 @@ export const PlannerConnections = (props: Props) => {
                         style={{ zIndex: highlighted ? -1 : showPortal ? -40 : -50 }}
                         size={props.nodeSize}
                         className={className}
+                        highlight={highlighted}
                         connection={connection}
                         actions={props.actions?.connection || []}
                         onMouseOver={props.onConnectionMouseEnter}

@@ -33,6 +33,7 @@ import {
 import { applyObstacles } from '../utils/connectionUtils/src/matrix';
 import _ from 'lodash';
 import { useBlockEntities, useTransformEntities } from '../hooks/useBlockEntitiesForResource';
+import { Box } from '@mui/material';
 
 const CLUSTER_INDEX_OFFSET = 10;
 const ENABLE_CLUSTERING = true;
@@ -103,6 +104,7 @@ export const PlannerConnection: React.FC<{
     // eslint-disable-next-line react/no-unused-prop-types
     size: PlannerNodeSize;
     className?: string;
+    highlight?: boolean;
     // eslint-disable-next-line react/no-unused-prop-types
     viewOnly?: boolean;
     focused?: boolean;
@@ -421,7 +423,17 @@ export const PlannerConnection: React.FC<{
                     return (
                         <g key={ix}>
                             <path className="mouse-catcher" d={pathInfo.path} />
-                            <path className="background" d={pathInfo.path} />
+                            <Box
+                                component="path"
+                                className="background"
+                                d={pathInfo.path}
+                                sx={(theme) => {
+                                    const isDarkMode = theme.palette.mode === 'dark';
+                                    return {
+                                        ...(isDarkMode ? { '&&&': { stroke: '#212425' } } : {}),
+                                    };
+                                }}
+                            />
 
                             {behaveAsPortal && pathInfo.portalPoint && (
                                 <svg
@@ -437,7 +449,22 @@ export const PlannerConnection: React.FC<{
                                 </svg>
                             )}
 
-                            <path className="line" d={pathInfo.path} />
+                            <Box
+                                component="path"
+                                className="line"
+                                d={pathInfo.path}
+                                sx={(theme) => {
+                                    const validColor = props.highlight
+                                        ? theme.palette.primary.main
+                                        : theme.palette.success.main;
+                                    return {
+                                        '&&&': {
+                                            stroke: connectionValid ? validColor : theme.palette.error.light,
+                                            strokeDasharray: connectionValid ? 'none' : '5 5',
+                                        },
+                                    };
+                                }}
+                            />
 
                             {props.actions && (
                                 <ActionButtons

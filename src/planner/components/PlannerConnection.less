@@ -50,10 +50,6 @@
     }
 
     &.highlight {
-        .line {
-            stroke: #651fff;
-        }
-
         g.portal {
             fill: #651fff;
         }
@@ -64,11 +60,6 @@
     }
 
     &.invalid {
-        .line {
-            stroke-dasharray: 5;
-            stroke: @status-danger-bg;
-        }
-
         &.highlight {
             .line {
                 stroke: darken(@status-danger-bg, 15%);
