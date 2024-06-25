@@ -1,3 +1,10 @@
+## [2.10.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.0...v2.10.1) (2024-06-25)
+
+
+### Bug Fixes
+
+* Change "color" in planner container when in dark mode ([7c20914](https://github.com/kapetacom/ui-web-plan-editor/commit/7c2091419200e6f16dea5c05997737b7a60718ca))
+
 # [2.10.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.9.0...v2.10.0) (2024-06-25)
 
 
