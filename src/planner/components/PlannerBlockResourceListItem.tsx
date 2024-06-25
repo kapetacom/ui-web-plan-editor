@@ -27,6 +27,7 @@ import { PlannerMode, ResourceMode } from '../../utils/enums';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
 import { AssetKindIcon } from '@kapeta/ui-web-components';
 import { useBlockEntities } from '../hooks/useBlockEntitiesForResource';
+import { Box } from '@mui/material';
 
 export const RESOURCE_SPACE = 4; // Vertical distance between resources
 const COUNTER_SIZE = 8;
@@ -479,7 +480,32 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                     x={counterPoint.x}
                                     y={counterPoint.y}
                                 >
-                                    <g className="resource-counter">
+                                    <Box
+                                        component="g"
+                                        className="resource-counter"
+                                        sx={(theme) => {
+                                            const isDarkMode = theme.palette.mode === 'dark';
+                                            return {
+                                                '&&&': {
+                                                    '.background': {
+                                                        ...(isDarkMode
+                                                            ? {
+                                                                  fill: theme.palette.success.light,
+                                                                  stroke: '#212425',
+                                                              }
+                                                            : {}),
+                                                    },
+                                                    '.foreground': {
+                                                        ...(isDarkMode
+                                                            ? {
+                                                                  fill: theme.palette.text.primary,
+                                                              }
+                                                            : {}),
+                                                    },
+                                                },
+                                            };
+                                        }}
+                                    >
                                         <circle
                                             cx={COUNTER_SIZE}
                                             cy={COUNTER_SIZE}
@@ -489,7 +515,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                         <text textAnchor="middle" className="foreground" y={12} x={COUNTER_SIZE}>
                                             {counterValue}
                                         </text>
-                                    </g>
+                                    </Box>
                                 </svg>
                             </g>
                         </svg>

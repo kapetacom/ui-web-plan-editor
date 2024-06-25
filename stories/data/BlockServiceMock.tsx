@@ -306,9 +306,11 @@ BlockTypeProvider.register({
         return (
             <g className="block-node" style={{ cursor: block.readOnly ? 'default' : 'move' }}>
                 {/* Background */}
-                <rect width={props.width} height={props.height} rx="6" fill="white" />
+                <rect className="block-body" width={props.width} height={props.height} rx="6" fill="white" />
+
                 {/* Border */}
                 <rect
+                    className="block-border"
                     x="0.5"
                     y="0.5"
                     width={props.width - 1}
@@ -397,9 +399,19 @@ BlockTypeProvider.register({
         return (
             <g className="block-node" style={{ cursor: block.readOnly ? 'default' : 'move' }}>
                 {/* Background */}
-                <rect x={0} y={0} width={props.width} fill="white" height={props.height} rx="5px" ry="5px" />
+                <rect
+                    className="block-body"
+                    x={0}
+                    y={0}
+                    width={props.width}
+                    fill="white"
+                    height={props.height}
+                    rx="5px"
+                    ry="5px"
+                />
                 {/* Border */}
                 <rect
+                    className="block-border"
                     x="0.5"
                     y="0.5"
                     width={props.width - 1}
