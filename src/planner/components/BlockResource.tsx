@@ -80,7 +80,16 @@ export const BlockResource = (props: PlannerResourceProps) => {
     }
 
     return (
-        <g className={resourceClass}>
+        <Box
+            component="g"
+            className={resourceClass}
+            sx={(theme) => {
+                const isDarkMode = theme.palette.mode === 'dark';
+                return {
+                    ...(isDarkMode ? { '&&& .block-resource-text': { color: 'white' } } : {}),
+                };
+            }}
+        >
             {props.type === 'operator' ? (
                 <Box
                     component="rect"
@@ -90,7 +99,27 @@ export const BlockResource = (props: PlannerResourceProps) => {
                     rx="3"
                     ry="3"
                     x="3"
-                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3, strokeOpacity: 1 } } : {}}
+                    sx={(theme) => ({
+                        ...(highlight
+                            ? {
+                                  '&&': {
+                                      stroke: '#651FFF',
+                                      strokeWidth: 3,
+                                      strokeOpacity: 1,
+                                  },
+                              }
+                            : {}),
+                        ...(theme.palette.mode === 'dark'
+                            ? {
+                                  '&&&': {
+                                      fill: '#212425',
+                                      stroke: '#727272',
+                                      strokeOpacity: 1,
+                                      strokeWidth: 1,
+                                  },
+                              }
+                            : {}),
+                    })}
                 />
             ) : (
                 <Box
@@ -100,7 +129,27 @@ export const BlockResource = (props: PlannerResourceProps) => {
                     strokeLinejoin="round"
                     rx="3"
                     ry="3"
-                    sx={highlight ? { '&&': { stroke: '#651FFF', strokeWidth: 3, strokeOpacity: 1 } } : {}}
+                    sx={(theme) => ({
+                        ...(highlight
+                            ? {
+                                  '&&': {
+                                      stroke: '#651FFF',
+                                      strokeWidth: 3,
+                                      strokeOpacity: 1,
+                                  },
+                              }
+                            : {}),
+                        ...(theme.palette.mode === 'dark'
+                            ? {
+                                  '&&&': {
+                                      fill: '#212425',
+                                      stroke: '#727272',
+                                      strokeOpacity: 1,
+                                      strokeWidth: 1,
+                                  },
+                              }
+                            : {}),
+                    })}
                 />
             )}
             <foreignObject width={maxTextWidth} className="block-resource-text resource-name" y={padding} x={textX}>
@@ -126,9 +175,21 @@ export const BlockResource = (props: PlannerResourceProps) => {
             </foreignObject>
 
             {props.icon ? (
-                <foreignObject x={iconX} y={height / 2 - 10} width={20} height={20}>
+                <Box
+                    component="foreignObject"
+                    x={iconX}
+                    y={height / 2 - 10}
+                    width={20}
+                    height={20}
+                    sx={(theme) => {
+                        const isDarkMode = theme.palette.mode === 'dark';
+                        return {
+                            ...(isDarkMode ? { '&&&': { filter: 'invert(1) brightness(2) contrast(1.5)' } } : {}),
+                        };
+                    }}
+                >
                     {props.icon}
-                </foreignObject>
+                </Box>
             ) : (
                 <BlockResourceIcon
                     x={iconX}
@@ -138,6 +199,6 @@ export const BlockResource = (props: PlannerResourceProps) => {
                     color={props.typeStatusColor}
                 />
             )}
-        </g>
+        </Box>
     );
 };
