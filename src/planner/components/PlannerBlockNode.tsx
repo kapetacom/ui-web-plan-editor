@@ -29,7 +29,7 @@ import './PlannerBlockNode.less';
 import { withErrorBoundary } from 'react-error-boundary';
 import { Resource } from '@kapeta/schemas';
 import { KapetaURI, parseKapetaUri } from '@kapeta/nodejs-utils';
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import { useAtomValue } from 'jotai';
 
 export function adjustBlockEdges(point: Point) {
@@ -200,6 +200,8 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
     ) {
         highlight = true;
     }
+
+    const isDarkMode = useTheme().palette.mode === 'dark';
 
     return (
         // TODO: Readonly/ viewonly
@@ -438,17 +440,60 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                             component="g"
                                             {...evt.componentProps}
                                             ref={onRef}
-                                            sx={
-                                                highlight
+                                            sx={(theme) => ({
+                                                ...(highlight
                                                     ? {
                                                           '&& .block-node > .block-border': {
-                                                              stroke: '#651FFF',
-                                                              strokeWidth: 3,
-                                                              strokeOpacity: 1,
+                                                              stroke: `${theme.palette.primary.main} !important`,
+                                                              strokeWidth: `${3} !important`,
+                                                              strokeOpacity: `${1} !important`,
                                                           },
                                                       }
-                                                    : {}
-                                            }
+                                                    : {}),
+                                                ...(isDarkMode
+                                                    ? {
+                                                          '&& .block-node': {
+                                                              '> .block-body': {
+                                                                  fill: '#212425',
+                                                              },
+                                                              '> .block-border': {
+                                                                  stroke: '#727272',
+                                                                  strokeWidth: 1.5,
+                                                                  strokeOpacity: 1,
+                                                              },
+                                                              '.block-body-text': {
+                                                                  '&.instance-name': {
+                                                                      fill: '#ffffff',
+                                                                  },
+                                                                  '&.block-name, &.block-version, &.block-handle': {
+                                                                      fill: '#CBCBCB',
+                                                                  },
+                                                              },
+                                                              'circle.instance_failed': {
+                                                                  fill: theme.palette.error.main,
+                                                              },
+                                                              'circle.instance_busy': {
+                                                                  fill: theme.palette.warning.main,
+                                                              },
+                                                              'circle.instance_stopped': {
+                                                                  fill: '#727272',
+                                                              },
+                                                              'circle.instance_stopping': {
+                                                                  fill: '#727272',
+                                                              },
+                                                              'circle.instance_ready': {
+                                                                  fill: theme.palette.success.main,
+                                                              },
+                                                              'circle.instance_unhealthy': {
+                                                                  fill: theme.palette.warning.main,
+                                                              },
+                                                              'circle.instance_starting': {
+                                                                  fill: theme.palette.success.main,
+                                                              },
+                                                          },
+                                                      }
+                                                    : {}),
+                                            })}
                                         >
                                             {blockContext.blockDefinition ? (
                                                 <BlockLayout
