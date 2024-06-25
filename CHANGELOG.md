@@ -1,3 +1,20 @@
+# [2.10.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.9.0...v2.10.0) (2024-06-25)
+
+
+### Bug Fixes
+
+* Remove color transition from connection line ([14fdfa3](https://github.com/kapetacom/ui-web-plan-editor/commit/14fdfa3c4e623bd9a2e9dc8235b572064ecf3d83))
+* Remove transition of background color ([44cc2e3](https://github.com/kapetacom/ui-web-plan-editor/commit/44cc2e345fdd2c74043ba4ed81762757b98f0165))
+* Update mock blocks to have the right classnames ([6cd47dd](https://github.com/kapetacom/ui-web-plan-editor/commit/6cd47dd25520b87216739f285682c6cfb29d4e8d))
+
+
+### Features
+
+* Dark mode support for action buttons ([d36a97c](https://github.com/kapetacom/ui-web-plan-editor/commit/d36a97c8cdcb270735ffe4f1e88ff360a63d1727))
+* Dark mode support for blocks ([abddc33](https://github.com/kapetacom/ui-web-plan-editor/commit/abddc33aa8971440c421ebba18f077c0b89f239c))
+* Dark mode support for connections ([271de40](https://github.com/kapetacom/ui-web-plan-editor/commit/271de40f67b06af58995d3f39593022fd01b2b28))
+* Dark mode support for resources ([6b37ea3](https://github.com/kapetacom/ui-web-plan-editor/commit/6b37ea3958b22d44d3ecbcd9af9bbc2f18bc4c6a))
+
 # [2.9.0](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.8.5...v2.9.0) (2024-06-24)
 
 
