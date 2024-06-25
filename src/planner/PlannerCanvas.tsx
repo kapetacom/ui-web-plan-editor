@@ -125,7 +125,8 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
         [setZoomLevel, setPanOffset]
     );
 
-    const isDarkMode = useTheme().palette.mode === 'dark';
+    const { palette } = useTheme();
+    const isDarkMode = palette.mode === 'dark';
 
     return (
         <div className={`planner-area-container ${classNames}`} data-kap-id="plan-editor-canvas">
@@ -190,10 +191,12 @@ export const PlannerCanvas: React.FC<PlannerCanvasProps> = (props) => {
                         sx={{
                             width: '100%',
                             height: '100%',
-                            // When in dark mode set background color, otherwise let it use the LESS variable
                             ...(isDarkMode && {
                                 // Beating specificity with &&&
-                                '&&&': { backgroundColor: '#1E2020' },
+                                '&&&': {
+                                    backgroundColor: '#1E2020',
+                                    color: palette.text.primary,
+                                },
                             }),
                         }}
                         showPixelGrid={props.showPixelGrid}
