@@ -10,17 +10,60 @@ import { staggeredFade } from '../utils/transitionUtils';
 import './ActionButtons.less';
 import { usePrevious } from 'react-use';
 import { toClass } from '@kapeta/ui-web-utils';
+import { Box } from '@mui/material';
 
 const CircleButton = (props: any) => {
     // NOTE: A bit strange - but this has to be a div to not experience a UI glitch where the button
     // receives some sort of focus and is moved into view when closing the sidepanel it opens
     return (
-        <div
+        <Box
             data-kap-id={props['data-kap-id']}
             onClick={props.onClick}
             className={`svg-circle-button ${props.className}`}
             style={{ padding: 0, border: 0, background: 'none', ...(props.style || {}) }}
             title={props.label}
+            sx={(theme) => {
+                const isDarkMode = theme.palette.mode === 'dark';
+                return {
+                    ...(isDarkMode
+                        ? {
+                              '&&&': {
+                                  '.bg-container': {
+                                      backgroundColor: '#474747',
+                                  },
+                                  '.container': {
+                                      backgroundColor: '#474747',
+                                      color: 'white',
+                                      borderColor: '#717171',
+                                      '&:hover, &:active': {
+                                          background: '#060303',
+                                      },
+                                  },
+                                  '&.primary .container': {
+                                      '&:hover, &:active': {
+                                          background: theme.palette.primary.main,
+                                          borderColor: 'transparent',
+                                      },
+                                  },
+
+                                  '&.secondary .container': {
+                                      '&:hover, &:active': {
+                                          background: theme.palette.secondary.main,
+                                          borderColor: 'transparent',
+                                      },
+                                  },
+
+                                  '&.danger .container': {
+                                      '&:hover, &:active': {
+                                          background: theme.palette.error.light,
+                                          borderColor: 'transparent',
+                                      },
+                                  },
+                              },
+                          }
+                        : {}),
+                };
+            }}
         >
             {/* White opaque background to avoid opacity in colors looking weird on top of connections */}
             <div className="bg-container">
@@ -28,7 +71,7 @@ const CircleButton = (props: any) => {
                     <i className={props.icon} />
                 </div>
             </div>
-        </div>
+        </Box>
     );
 };
 
