@@ -4,9 +4,13 @@
  */
 
 import React from 'react';
-import { Paper, Stack } from '@mui/material';
+import { Paper, PaperProps, Stack } from '@mui/material';
 
-export const PlannerDrawer = (props: React.PropsWithChildren) => {
+export interface PlannerDrawerProps extends PaperProps {}
+
+export const PlannerDrawer = (props: PlannerDrawerProps) => {
+    const { sx, children, ...paperProps } = props;
+
     return (
         <Paper
             data-kap-id="plan-editor-resource-drawer"
@@ -14,16 +18,18 @@ export const PlannerDrawer = (props: React.PropsWithChildren) => {
             square
             variant="elevation"
             sx={{
-                p: 2,
                 width: '284px',
                 height: '100%',
                 boxSizing: 'border-box',
                 flexShrink: 0,
-                overflowY: 'auto',
+                ...sx,
             }}
             elevation={2}
+            {...paperProps}
         >
-            <Stack direction="column">{props.children}</Stack>
+            <Stack direction="column" sx={{ height: '100%' }}>
+                {children}
+            </Stack>
         </Paper>
     );
 };
