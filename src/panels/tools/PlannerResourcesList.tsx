@@ -43,7 +43,7 @@ export const PlannerResourcesList = (props: Props) => {
     }, []);
 
     return (
-        <Stack gap={4} sx={{ py: 3 }}>
+        <Stack gap={4}>
             <Stack className="resources" data-kap-id="plan-editor-resource-container" gap={2}>
                 <Typography
                     fontSize={HEADER_SIZE}
