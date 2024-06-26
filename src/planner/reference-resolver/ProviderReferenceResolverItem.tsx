@@ -81,11 +81,11 @@ export const ProviderReferenceResolverItem = (props: InnerItemProps) => {
         availableTypes.length
     );
 
-    let icon: IconValue | undefined = undefined;
+    let icons: IconValue[] | undefined = undefined;
 
     if (alternativeVersions.length > 0) {
         kind = alternativeVersions[0].definition.kind;
-        icon = alternativeVersions[0].icon;
+        icons = alternativeVersions[0].icons ?? [alternativeVersions[0].definition.icon].filter(Boolean);
         if (alternativeVersions[0].title) {
             typeName = alternativeVersions[0].title;
         }
@@ -102,7 +102,7 @@ export const ProviderReferenceResolverItem = (props: InnerItemProps) => {
     return (
         <TableRow>
             <TableCell>
-                <ReferenceTile blockTitle={blockTitle} title={message} subtitle={subtitle} kind={kind} icon={icon} />
+                <ReferenceTile blockTitle={blockTitle} title={message} subtitle={subtitle} kind={kind} icons={icons} />
             </TableCell>
             <TableCell align={'center'}>
                 <ArrowForward />

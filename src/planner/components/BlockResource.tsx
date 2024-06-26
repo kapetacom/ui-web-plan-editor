@@ -175,19 +175,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
             </foreignObject>
 
             {props.icon ? (
-                <Box
-                    component="foreignObject"
-                    x={iconX}
-                    y={height / 2 - 10}
-                    width={20}
-                    height={20}
-                    sx={(theme) => {
-                        const isDarkMode = theme.palette.mode === 'dark';
-                        return {
-                            ...(isDarkMode ? { '&&&': { filter: 'invert(1) brightness(2) contrast(1.5)' } } : {}),
-                        };
-                    }}
-                >
+                <Box component="foreignObject" x={iconX} y={height / 2 - 10} width={20} height={20}>
                     {props.icon}
                 </Box>
             ) : (

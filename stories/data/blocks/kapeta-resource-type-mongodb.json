@@ -6,9 +6,17 @@
     },
     "spec": {
         "ports": [{ "type": "mongodb" }],
-        "icon": {
-            "type": "url",
-            "value": "https://smyl.es/wurdp/assets/mongodb-150x150.png"
-        }
+        "icons": [
+            {
+                "type": "url",
+                "value": "https://smyl.es/wurdp/assets/mongodb-150x150.png",
+                "theme": "light"
+            },
+            {
+                "type": "url",
+                "value": "https://smyl.es/wurdp/assets/mongodb-150x150.png",
+                "theme": "dark"
+            }
+        ]
     }
 }

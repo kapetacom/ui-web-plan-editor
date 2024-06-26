@@ -20,7 +20,7 @@ export const BlockReferenceResolverItem = (props: InnerItemProps) => {
         .map((asset) => {
             return {
                 title: asset.content.metadata.name ?? asset.content.metadata.title,
-                icon: asset.content.spec.icon,
+                icons: asset.content.spec.icons,
                 kind: asset.content.kind,
                 ref: asset.ref,
             };
