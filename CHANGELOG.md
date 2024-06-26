@@ -1,3 +1,10 @@
+## [2.10.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.1...v2.10.2) (2024-06-26)
+
+
+### Bug Fixes
+
+* Improve styling of PlannerDrawer so desktop app can use nice scrollbar ([5dc29e7](https://github.com/kapetacom/ui-web-plan-editor/commit/5dc29e75192db7ba0c248ecf8abe717ccbf80c52))
+
 ## [2.10.1](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.0...v2.10.1) (2024-06-25)
 
 
