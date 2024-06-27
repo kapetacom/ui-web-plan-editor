@@ -454,7 +454,7 @@ const PlannerBlockNodeBase: React.FC<Props> = (props: Props) => {
                                                     ? {
                                                           '&& .block-node': {
                                                               '> .block-body': {
-                                                                  fill: '#212425',
+                                                                  fill: '#2D3032',
                                                               },
                                                               '> .block-border': {
                                                                   stroke: '#727272',

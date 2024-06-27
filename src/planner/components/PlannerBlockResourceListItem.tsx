@@ -491,7 +491,7 @@ export const PlannerBlockResourceListItem: React.FC<PlannerBlockResourceListItem
                                                         ...(isDarkMode
                                                             ? {
                                                                   fill: theme.palette.success.light,
-                                                                  stroke: '#212425',
+                                                                  stroke: '#2D3032',
                                                               }
                                                             : {}),
                                                     },
