@@ -1,3 +1,10 @@
+## [2.10.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.3...v2.10.4) (2024-06-27)
+
+
+### Bug Fixes
+
+* Change block background to a lighter gray ([ef978ac](https://github.com/kapetacom/ui-web-plan-editor/commit/ef978acc09613f5c2f3cd364940abbf5e8397b62))
+
 ## [2.10.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.2...v2.10.3) (2024-06-27)
 
 
