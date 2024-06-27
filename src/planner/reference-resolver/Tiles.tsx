@@ -49,7 +49,7 @@ export const ReferenceTile = (props: {
     subtitle: string | ReactNode;
     blockTitle?: string;
     kind: string;
-    icon?: IconValue;
+    icons?: IconValue[];
 }) => {
     const referenceTitle = props.title;
     const referenceSubTitle = props.subtitle;
@@ -62,7 +62,7 @@ export const ReferenceTile = (props: {
                 },
             }}
         >
-            <KindIcon size={24} kind={props.kind} icon={props.icon} title={props.title} />
+            <KindIcon size={24} kind={props.kind} icons={props.icons} title={props.title} />
             <Box
                 sx={{
                     fontSize: '12px',

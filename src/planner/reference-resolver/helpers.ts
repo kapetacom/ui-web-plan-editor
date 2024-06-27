@@ -5,11 +5,10 @@
 
 import { useEffect, useMemo } from 'react';
 import { ReferenceType } from '../validation/PlanReferenceValidation';
-import { ProviderBase, ResourceRole } from '@kapeta/ui-web-types';
+import { ProviderBase } from '@kapeta/ui-web-types';
 import { AssetVersionSelectorEntry, CoreTypes } from '@kapeta/ui-web-components';
 import { normalizeKapetaUri } from '@kapeta/nodejs-utils';
 import { ActionType, InnerItemProps } from './types';
-import { BlockTargetProvider, BlockTypeProvider, ResourceTypeProvider } from '@kapeta/ui-web-context';
 
 export function shortenPathName(path: string) {
     const parts = path.split(/[\\/]/g);

@@ -7,10 +7,11 @@ import React from 'react';
 import { ResourceRole } from '@kapeta/ui-web-types';
 
 import { BlockValidator, PlannerNodeSize, ResourceMode } from '../src';
-import { BlockDefinition, BlockInstance, Resource } from '@kapeta/schemas';
+import { BlockDefinition, BlockInstance, IconType, Resource, Theme } from '@kapeta/schemas';
 import { PlannerBlockResourceListItem } from '../src/planner/components/PlannerBlockResourceListItem';
 import { BlockContext, PlannerBlockContextData } from '../src/planner/BlockContext';
 import { parseKapetaUri } from '@kapeta/nodejs-utils';
+import './data/BlockServiceMock';
 
 import './styles.less';
 
@@ -29,7 +30,7 @@ const ValidInstance: BlockInstance = {
 };
 
 const ValidDefinition: BlockDefinition = {
-    kind: 'kapeta/block-type-service',
+    kind: 'kapeta/block-type-service:1.2.3',
     metadata: {
         name: 'test/demo',
     },
@@ -213,6 +214,38 @@ export const ResourceInvalidResourceSpec = () => {
 
 export const ResourceInvalidResourceSpecThrown = () => {
     const resource = InvalidResourceSpecThrown;
+    const errors = new BlockValidator(ValidDefinition, ValidInstance).validateResource(resource);
+    return (
+        <BlockContext.Provider
+            value={
+                {
+                    blockInstance: ValidInstance,
+                    blockReference: parseKapetaUri(ValidInstance.block.ref),
+                } as Partial<PlannerBlockContextData> as any
+            }
+        >
+            <div style={{ padding: '20px' }}>
+                <PlannerBlockResourceListItem
+                    size={PlannerNodeSize.FULL}
+                    index={0}
+                    mode={ResourceMode.SHOW}
+                    resource={resource}
+                    role={ResourceRole.PROVIDES}
+                />
+                <pre style={{ left: 200, position: 'absolute' }}>{['Errors:', ...(errors || [])].join('\n')}</pre>
+            </div>
+        </BlockContext.Provider>
+    );
+};
+
+export const CustomIcons = () => {
+    const resource = {
+        ...ValidDefinition,
+    };
+    resource.spec.icons = [
+        { type: IconType.URL, value: 'https://kapeta.com/favicon.ico', theme: Theme.Light },
+        { type: IconType.URL, value: 'https://kapeta.com/favicon.ico', theme: Theme.Dark },
+    ];
     const errors = new BlockValidator(ValidDefinition, ValidInstance).validateResource(resource);
     return (
         <BlockContext.Provider
