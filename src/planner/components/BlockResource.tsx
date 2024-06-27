@@ -112,7 +112,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
                         ...(theme.palette.mode === 'dark'
                             ? {
                                   '&&&': {
-                                      fill: '#212425',
+                                      fill: '#2D3032',
                                       stroke: '#727272',
                                       strokeOpacity: 1,
                                       strokeWidth: 1,
@@ -142,7 +142,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
                         ...(theme.palette.mode === 'dark'
                             ? {
                                   '&&&': {
-                                      fill: '#212425',
+                                      fill: '#2D3032',
                                       stroke: '#727272',
                                       strokeOpacity: 1,
                                       strokeWidth: 1,
