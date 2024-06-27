@@ -1,3 +1,10 @@
+## [2.10.3](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.2...v2.10.3) (2024-06-27)
+
+
+### Bug Fixes
+
+* use new themed icons [CORE-3097] ([#174](https://github.com/kapetacom/ui-web-plan-editor/issues/174)) ([7b72963](https://github.com/kapetacom/ui-web-plan-editor/commit/7b7296326888b278fbebbfa0f103259977195684))
+
 ## [2.10.2](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.1...v2.10.2) (2024-06-26)
 
 
