@@ -1,3 +1,10 @@
+## [2.10.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.4...v2.10.5) (2024-06-28)
+
+
+### Bug Fixes
+
+* Ensure stroke with is right and highlight beats darkmode ([fb36c4c](https://github.com/kapetacom/ui-web-plan-editor/commit/fb36c4c0f87b0a6d60dd306b23b50c833c8ee34e))
+
 ## [2.10.4](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.3...v2.10.4) (2024-06-27)
 
 
