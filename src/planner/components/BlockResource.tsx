@@ -102,7 +102,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
                     sx={(theme) => ({
                         ...(highlight
                             ? {
-                                  '&&': {
+                                  '&&&&': {
                                       stroke: '#651FFF',
                                       strokeWidth: 3,
                                       strokeOpacity: 1,
@@ -115,7 +115,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
                                       fill: '#2D3032',
                                       stroke: '#727272',
                                       strokeOpacity: 1,
-                                      strokeWidth: 1,
+                                      strokeWidth: 1.5,
                                   },
                               }
                             : {}),
@@ -145,7 +145,7 @@ export const BlockResource = (props: PlannerResourceProps) => {
                                       fill: '#2D3032',
                                       stroke: '#727272',
                                       strokeOpacity: 1,
-                                      strokeWidth: 1,
+                                      strokeWidth: 1.5,
                                   },
                               }
                             : {}),
