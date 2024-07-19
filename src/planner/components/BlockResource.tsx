@@ -52,12 +52,8 @@ export const BlockResource = (props: PlannerResourceProps) => {
     });
 
     const maxTextWidth = width - 70;
-    const [hasOverflow, setHasOverflow] = React.useState(false);
-    const onRef = (el: HTMLSpanElement | null) => {
-        if (el) {
-            setHasOverflow(el.scrollWidth > el.offsetWidth);
-        }
-    };
+    const titleRef = React.useRef<HTMLSpanElement>(null);
+    const [showTooltip, setShowTooltip] = React.useState(false);
 
     const padding = 8;
 
@@ -154,17 +150,20 @@ export const BlockResource = (props: PlannerResourceProps) => {
             )}
             <foreignObject width={maxTextWidth} className="block-resource-text resource-name" y={padding} x={textX}>
                 <plannerRenderer.Outlet id={PlannerOutlet.ResourceTitle} context={props.actionContext}>
-                    {hasOverflow ? (
-                        <Tooltip
-                            title={props.name}
-                            // Estimate for overflow by string length
-                            placement={consumer ? 'bottom-end' : 'bottom-start'}
-                        >
-                            <span ref={onRef}>{props.name}</span>
-                        </Tooltip>
-                    ) : (
-                        <span ref={onRef}>{props.name}</span>
-                    )}
+                    <Tooltip
+                        title={props.name}
+                        // Estimate for overflow by string length
+                        placement={consumer ? 'bottom-end' : 'bottom-start'}
+                        open={showTooltip}
+                        onOpen={() =>
+                            setShowTooltip(
+                                titleRef.current ? titleRef.current.scrollWidth > titleRef.current.offsetWidth : false
+                            )
+                        }
+                        onClose={() => setShowTooltip(false)}
+                    >
+                        <span ref={titleRef}>{props.name}</span>
+                    </Tooltip>
                 </plannerRenderer.Outlet>
             </foreignObject>
 
