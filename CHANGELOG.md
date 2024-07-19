@@ -1,3 +1,10 @@
+## [2.10.6](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.5...v2.10.6) (2024-07-19)
+
+
+### Bug Fixes
+
+* make resource tooltips lazier ([#178](https://github.com/kapetacom/ui-web-plan-editor/issues/178)) ([3f41748](https://github.com/kapetacom/ui-web-plan-editor/commit/3f417489a3ca692748a70d542c6d7c9477050a25))
+
 ## [2.10.5](https://github.com/kapetacom/ui-web-plan-editor/compare/v2.10.4...v2.10.5) (2024-06-28)
 
 
